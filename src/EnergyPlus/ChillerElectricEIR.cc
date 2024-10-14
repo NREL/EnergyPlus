@@ -2034,27 +2034,26 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
     this->ChillerCapFT = Curve::CurveValue(state, this->ChillerCapFTIndex, EvapOutletTempSetPoint, AvgCondSinkTemp);
 
     if (this->ChillerCapFT < 0) {
-        if (this->ChillerCapFTError < 1 &&
-            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
-            !state.dataGlobal->WarmupFlag) {
+        if (PlantUtilities::okToIssueWarning(state, this->CWPlantLoc)) {
             ++this->ChillerCapFTError;
-            ShowWarningError(state, format("CHILLER:ELECTRIC:EIR \"{}\":", this->Name));
-            ShowContinueError(state, format(" Chiller Capacity as a Function of Temperature curve output is negative ({:.3R}).", this->ChillerCapFT));
-            ShowContinueError(state,
-                              format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.",
-                                     EvapOutletTempSetPoint,
-                                     condInletTemp));
-            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-        } else if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock !=
-                       DataPlant::FlowLock::Unlocked &&
-                   !state.dataGlobal->WarmupFlag) {
-            ++this->ChillerCapFTError;
-            ShowRecurringWarningErrorAtEnd(state,
-                                           "CHILLER:ELECTRIC:EIR \"" + this->Name +
-                                               "\": Chiller Capacity as a Function of Temperature curve output is negative warning continues...",
-                                           this->ChillerCapFTErrorIndex,
-                                           this->ChillerCapFT,
-                                           this->ChillerCapFT);
+            if (this->ChillerCapFTError < 1) {
+                ShowWarningError(state, format("CHILLER:ELECTRIC:EIR \"{}\":", this->Name));
+                ShowContinueError(state,
+                                  format(" Chiller Capacity as a Function of Temperature curve output is negative ({:.3R}).", this->ChillerCapFT));
+                ShowContinueError(state,
+                                  format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.",
+                                         EvapOutletTempSetPoint,
+                                         condInletTemp));
+                ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+            } else {
+                ++this->ChillerCapFTError;
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "CHILLER:ELECTRIC:EIR \"" + this->Name +
+                                                   "\": Chiller Capacity as a Function of Temperature curve output is negative warning continues...",
+                                               this->ChillerCapFTErrorIndex,
+                                               this->ChillerCapFT,
+                                               this->ChillerCapFT);
+            }
         }
         this->ChillerCapFT = 0.0;
     }
@@ -2314,51 +2313,45 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
 
     this->ChillerEIRFT = Curve::CurveValue(state, this->ChillerEIRFTIndex, this->EvapOutletTemp, AvgCondSinkTemp);
     if (this->ChillerEIRFT < 0.0) {
-        if (this->ChillerEIRFTError < 1 &&
-            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
-            !state.dataGlobal->WarmupFlag) {
+        if (PlantUtilities::okToIssueWarning(state, this->CWPlantLoc)) {
             ++this->ChillerEIRFTError;
-            ShowWarningError(state, format("CHILLER:ELECTRIC:EIR \"{}\":", this->Name));
-            ShowContinueError(state, format(" Chiller EIR as a Function of Temperature curve output is negative ({:.3R}).", this->ChillerEIRFT));
-            ShowContinueError(state,
-                              format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.",
-                                     this->EvapOutletTemp,
-                                     condInletTemp));
-            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-        } else if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock !=
-                       DataPlant::FlowLock::Unlocked &&
-                   !state.dataGlobal->WarmupFlag) {
-            ++this->ChillerEIRFTError;
-            ShowRecurringWarningErrorAtEnd(state,
-                                           "CHILLER:ELECTRIC:EIR \"" + this->Name +
-                                               "\": Chiller EIR as a Function of Temperature curve output is negative warning continues...",
-                                           this->ChillerEIRFTErrorIndex,
-                                           this->ChillerEIRFT,
-                                           this->ChillerEIRFT);
+            if (this->ChillerEIRFTError < 1) {
+                ShowWarningError(state, format("CHILLER:ELECTRIC:EIR \"{}\":", this->Name));
+                ShowContinueError(state, format(" Chiller EIR as a Function of Temperature curve output is negative ({:.3R}).", this->ChillerEIRFT));
+                ShowContinueError(state,
+                                  format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.",
+                                         this->EvapOutletTemp,
+                                         condInletTemp));
+                ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+            } else {
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "CHILLER:ELECTRIC:EIR \"" + this->Name +
+                                                   "\": Chiller EIR as a Function of Temperature curve output is negative warning continues...",
+                                               this->ChillerEIRFTErrorIndex,
+                                               this->ChillerEIRFT,
+                                               this->ChillerEIRFT);
+            }
         }
         this->ChillerEIRFT = 0.0;
     }
 
     this->ChillerEIRFPLR = Curve::CurveValue(state, this->ChillerEIRFPLRIndex, PartLoadRat);
     if (this->ChillerEIRFPLR < 0.0) {
-        if (this->ChillerEIRFPLRError < 1 &&
-            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
-            !state.dataGlobal->WarmupFlag) {
+        if (PlantUtilities::okToIssueWarning(state, this->CWPlantLoc)) {
             ++this->ChillerEIRFPLRError;
-            ShowWarningError(state, format("CHILLER:ELECTRIC:EIR \"{}\":", this->Name));
-            ShowContinueError(state, format(" Chiller EIR as a function of PLR curve output is negative ({:.3R}).", this->ChillerEIRFPLR));
-            ShowContinueError(state, format(" Negative value occurs using a part-load ratio of {:.3R}.", PartLoadRat));
-            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-        } else if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock !=
-                       DataPlant::FlowLock::Unlocked &&
-                   !state.dataGlobal->WarmupFlag) {
-            ++this->ChillerEIRFPLRError;
-            ShowRecurringWarningErrorAtEnd(state,
-                                           "CHILLER:ELECTRIC:EIR \"" + this->Name +
-                                               "\": Chiller EIR as a function of PLR curve output is negative warning continues...",
-                                           this->ChillerEIRFPLRErrorIndex,
-                                           this->ChillerEIRFPLR,
-                                           this->ChillerEIRFPLR);
+            if (this->ChillerEIRFPLRError < 1) {
+                ShowWarningError(state, format("CHILLER:ELECTRIC:EIR \"{}\":", this->Name));
+                ShowContinueError(state, format(" Chiller EIR as a function of PLR curve output is negative ({:.3R}).", this->ChillerEIRFPLR));
+                ShowContinueError(state, format(" Negative value occurs using a part-load ratio of {:.3R}.", PartLoadRat));
+                ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+            } else {
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "CHILLER:ELECTRIC:EIR \"" + this->Name +
+                                                   "\": Chiller EIR as a function of PLR curve output is negative warning continues...",
+                                               this->ChillerEIRFPLRErrorIndex,
+                                               this->ChillerEIRFPLR,
+                                               this->ChillerEIRFPLR);
+            }
         }
         this->ChillerEIRFPLR = 0.0;
     }
