@@ -2059,4 +2059,9 @@ MinFlowIfBranchHasVSPump(EnergyPlusData &state, PlantLocation const &plantLoc, b
     return branchPumpMinFlowLimit;
 }
 
+bool okToIssueWarning(EnergyPlusData &state, PlantLocation const &plantLoc)
+{
+    return (state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
+            !state.dataGlobal->WarmupFlag);
+}
 } // namespace EnergyPlus::PlantUtilities
