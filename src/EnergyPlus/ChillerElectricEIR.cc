@@ -1866,18 +1866,24 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
     // if the component control is SERIESACTIVE we set the component flow to inlet flow so that
     // flow resolver will not shut down the branch
     if (MyLoad >= 0 || !RunFlag) {
-        if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive ||
-            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
-            this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
-        }
-        if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-            if (DataPlant::CompData::getPlantComponent(state, this->CDPlantLoc).FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) {
-                this->CondMassFlowRate = state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate;
-            }
-        }
-        if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
+        this->EvapMassFlowRate = 0.0;
+        PlantUtilities::SetComponentFlowRate(state, this->EvapMassFlowRate, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc);
+
+        switch (this->CondenserType) {
+        case DataPlant::CondenserType::AirCooled: {
+            // nothing to do for air cooled
+        } break;
+        case DataPlant::CondenserType::WaterCooled: {
+            this->CondMassFlowRate = 0.0;
+            PlantUtilities::SetComponentFlowRate(state, this->CondMassFlowRate, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDPlantLoc);
+        } break;
+        case DataPlant::CondenserType::EvapCooled: {
             CalcBasinHeaterPower(
                 state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
+        } break;
+        default: {
+        } break;
+            assert(false);
         }
         this->PrintMessage = false;
         return;
