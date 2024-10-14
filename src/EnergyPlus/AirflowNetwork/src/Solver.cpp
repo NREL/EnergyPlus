@@ -10610,6 +10610,16 @@ namespace AirflowNetwork {
                         SetDXCoilAirLoopNumber(m_state, DisSysCompCoilData(i).name, DisSysCompCoilData(i).AirLoopNum);
                     }
 
+                } else if (SELECT_CASE_var == "COIL:HEATING:DX:MULTISPEED") {
+                    ValidateComponent(
+                        m_state, "Coil:Heating:DX:MultiSpeed", DisSysCompCoilData(i).name, IsNotOK, format(RoutineName) + CurrentModuleObject);
+                    ++MultiSpeedHPIndicator;
+                    if (IsNotOK) {
+                        ErrorsFound = true;
+                    } else {
+                        SetDXCoilAirLoopNumber(m_state, DisSysCompCoilData(i).name, DisSysCompCoilData(i).AirLoopNum);
+                    }
+
                 } else if (SELECT_CASE_var == "COIL:COOLING:DX:VARIABLESPEED") {
                     ValidateComponent(
                         m_state, "Coil:Cooling:DX:VariableSpeed", DisSysCompCoilData(i).name, IsNotOK, format(RoutineName) + CurrentModuleObject);
@@ -10620,9 +10630,9 @@ namespace AirflowNetwork {
                         SetDXCoilAirLoopNumber(m_state, DisSysCompCoilData(i).name, DisSysCompCoilData(i).AirLoopNum);
                     }
 
-                } else if (SELECT_CASE_var == "COIL:HEATING:DX:MULTISPEED") {
+                } else if (SELECT_CASE_var == "COIL:HEATING:DX:VARIABLESPEED") {
                     ValidateComponent(
-                        m_state, "Coil:Heating:DX:MultiSpeed", DisSysCompCoilData(i).name, IsNotOK, format(RoutineName) + CurrentModuleObject);
+                        m_state, "Coil:Heating:DX:VariableSpeed", DisSysCompCoilData(i).name, IsNotOK, format(RoutineName) + CurrentModuleObject);
                     ++MultiSpeedHPIndicator;
                     if (IsNotOK) {
                         ErrorsFound = true;

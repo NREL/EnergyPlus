@@ -6100,14 +6100,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
-TEST_F(EnergyPlusFixture, AirflowNetwork_ValidateVarSpeedCoolingCoil)
+TEST_F(EnergyPlusFixture, AirflowNetwork_ValidateDistCoils)
 {
     std::string const idf_objects = delimited_string({
 
         "  Coil:Cooling:DX:VariableSpeed,",
-        "    Super Coil,   !- Name",
-        "    Cooling Coil Air Inlet Node_unit1,  !- Indoor Air Inlet Node Name",
-        "    Heating Coil Air Inlet Node_unit1,  !- Indoor Air Outlet Node Name",
+        "    Super Coil,              !- Name",
+        "    Node_1,                  !- Indoor Air Inlet Node Name",
+        "    Node_2,                  !- Indoor Air Outlet Node Name",
         "    1,                       !- Number of Speeds {dimensionless}",
         "    1,                       !- Nominal Speed Level {dimensionless}",
         "    autosize,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}",
@@ -6130,9 +6130,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_ValidateVarSpeedCoolingCoil)
         "    ,                        !- Basin Heater Capacity {W/K}",
         "    2,                       !- Basin Heater Setpoint Temperature {C}",
         "    ,                        !- Basin Heater Operating Schedule Name",
-        "    15000,                    !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}",
-        "    0.55,                     !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
-        "    4.3,                    !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}",
+        "    15000,                   !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}",
+        "    0.55,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
+        "    4.3,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}",
         "    0.05,                    !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
         "    ,                        !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    ,                        !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
@@ -6142,6 +6142,36 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_ValidateVarSpeedCoolingCoil)
         "    HPCoolingCAPFFF,         !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
         "    HPCoolingEIRFTemp,       !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
         "    HPCoolingEIRFFF;         !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "",
+        "  Coil:Heating:DX:VariableSpeed,",
+        "    Super Heating Coil,      !- Name",
+        "    Node_1,                  !- Indoor Air Inlet Node Name",
+        "    Node_2,                  !- Indoor Air Outlet Node Name",
+        "    1,                       !- Number of Speeds {dimensionless}",
+        "    1,                       !- Nominal Speed Level {dimensionless}",
+        "    autosize,                !- Rated Heating Capacity At Selected Nominal Speed Level {W}",
+        "    autosize,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+        "    HPHEATPLFFPLR,           !- Energy Part Load Fraction Curve Name",
+        "    ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name",
+        "    -8,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
+        "    5,                       !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
+        "    ,                        !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "    ReverseCycle,            !- Defrost Strategy",
+        "    Timed,                   !- Defrost Control",
+        "    0.058333,                !- Defrost Time Period Fraction",
+        "    ,                        !- Resistive Defrost Heater Capacity {W}",
+        "    17500,                   !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}",
+        "    4.5,                     !- Speed 1 Reference Unit Gross Rated Heating COP {W/W}",
+        "    0.05,                    !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- 2017 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    934.4,                   !- 2023 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    HPHeatingCAPFTemp,       !- Speed 1 Heating Capacity Function of Temperature Curve Name",
+        "    HPHeatingCAPFFF,         !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPHeatingEIRFTemp,       !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPHeatingEIRFFF;         !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name        ",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -6149,17 +6179,19 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_ValidateVarSpeedCoolingCoil)
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 2;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(2);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Coil:Cooling:DX:VariableSpeed";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "VariableSpeedCoolingCoil";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf = "Coil:Heating:DX:VariableSpeed";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).Name = "VariableSpeedHeatingCoil";
 
-    state->afn->DisSysNumOfCoils = 1;
-    state->afn->DisSysCompCoilData.allocate(1);
+    state->afn->DisSysNumOfCoils = 2;
+    state->afn->DisSysCompCoilData.allocate(2);
     state->afn->DisSysCompCoilData(1).EPlusType = "COIL:COOLING:DX:VARIABLESPEED";
     state->afn->DisSysCompCoilData(1).name = "Super Coil";
-
-    int num_coils = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Coil:Cooling:DX:VariableSpeed");
+    state->afn->DisSysCompCoilData(2).EPlusType = "COIL:HEATING:DX:VARIABLESPEED";
+    state->afn->DisSysCompCoilData(2).name = "Super Heating Coil";
 
     state->afn->validate_distribution();
 }
