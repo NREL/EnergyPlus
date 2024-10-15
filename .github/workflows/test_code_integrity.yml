@@ -36,11 +36,11 @@ jobs:
         run: |
           mkdir cppcheck
           cd cppcheck
-          wget https://github.com/danmar/cppcheck/archive/2.10.tar.gz
-          tar xfz 2.10.tar.gz
+          wget https://github.com/danmar/cppcheck/archive/2.15.0.tar.gz
+          tar xfz 2.15.0.tar.gz
           mkdir build
           cd build
-          cmake -DCMAKE_BUILD_TYPE=Release ../cppcheck-2.10/
+          cmake -DCMAKE_BUILD_TYPE=Release ../cppcheck-2.15.0/
           make -j $(nproc)
           sudo make install
           cd ..
