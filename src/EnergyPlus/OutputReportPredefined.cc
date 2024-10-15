@@ -352,7 +352,7 @@ namespace OutputReportPredefined {
         s->pdchCoolCoilArea = newPreDefColumn(state, s->pdstCoolCoil, "Nominal Coil Surface Area [m2]");
 
         s->pdstDXCoolCoil = newPreDefSubTable(state, s->pdrEquip, "DX Cooling Coil Standard Ratings 2017");
-        s->pdchDXCoolCoilType = newPreDefColumn(state, s->pdstDXCoolCoil, "Cooling Coil Type [1]");
+        s->pdchDXCoolCoilType = newPreDefColumn(state, s->pdstDXCoolCoil, "Cooling Coil Type (1)");
         s->pdchDXCoolCoilNetCapSI = newPreDefColumn(state, s->pdstDXCoolCoil, "Standard Rating Net Cooling Capacity [W][2]");
 
         s->pdchDXCoolCoilCOP = newPreDefColumn(state, s->pdstDXCoolCoil, "Standard Rating Net COP [W/W][2]");
@@ -363,7 +363,7 @@ namespace OutputReportPredefined {
 
         // for DX Cooling Coil AHRI Standard 2023 Ratings | SEER2
         s->pdstDXCoolCoil_2023 = newPreDefSubTable(state, s->pdrEquip, "DX Cooling Coil Standard Ratings 2023");
-        s->pdchDXCoolCoilType_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Cooling Coil Type [1]");
+        s->pdchDXCoolCoilType_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Cooling Coil Type (1)");
         s->pdchDXCoolCoilNetCapSI_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Standard Rating Net Cooling Capacity [W][2]");
 
         s->pdchDXCoolCoilCOP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Standard Rating Net COP2 [W/W][2,4]");
