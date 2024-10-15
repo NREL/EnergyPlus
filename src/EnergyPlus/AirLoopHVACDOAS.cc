@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -980,32 +981,35 @@ namespace AirLoopHVACDOAS {
 
     void AirLoopDOAS::SizingAirLoopDOAS(EnergyPlusData &state)
     {
-        Real64 sizingMassFlow = 0;
+        Real64 sizingVolumeFlow = 0;
 
         for (int AirLoop = 1; AirLoop <= this->NumOfAirLoops; AirLoop++) {
             int AirLoopNum = this->m_AirLoopNum[AirLoop - 1];
             this->m_OACtrlNum.push_back(state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OACtrlNum);
 
             if (this->m_OACtrlNum[AirLoop - 1] > 0) {
-                sizingMassFlow += state.dataMixedAir->OAController(this->m_OACtrlNum[AirLoop - 1]).MaxOA;
+                sizingVolumeFlow +=
+                    state.dataMixedAir->OAController(this->m_OACtrlNum[AirLoop - 1]).MaxOA; // this is a volume flow rate not a mass flow rate
             }
         }
-        this->SizingMassFlow = sizingMassFlow;
+        this->SizingMassFlow = sizingVolumeFlow * state.dataEnvrn->StdRhoAir;
+
+        BaseSizer::reportSizerOutput(state, "AirLoopHVAC:DedicatedOutdoorAirSystem", this->Name, "Design Volume Flow Rate [m3/s]", sizingVolumeFlow);
         this->GetDesignDayConditions(state);
 
-        if (this->m_FanIndex > 0 && this->m_FanTypeNum == SimAirServingZones::CompType::Fan_System_Object) {
-            state.dataFans->fans(this->m_FanIndex)->maxAirFlowRate = sizingMassFlow / state.dataEnvrn->StdRhoAir;
-            state.dataLoopNodes->Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
-            state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
-            state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMax = sizingMassFlow;
+        if (this->m_FanIndex > -1 && this->m_FanTypeNum == SimAirServingZones::CompType::Fan_System_Object) {
+            state.dataFans->fans(this->m_FanIndex)->maxAirFlowRate = sizingVolumeFlow;
+            state.dataLoopNodes->Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = this->SizingMassFlow;
+            state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = this->SizingMassFlow;
+            state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMax = this->SizingMassFlow;
         }
         if (this->m_FanIndex > 0 && this->m_FanTypeNum == SimAirServingZones::CompType::Fan_ComponentModel) {
-            state.dataFans->fans(this->m_FanIndex)->maxAirFlowRate = sizingMassFlow / state.dataEnvrn->StdRhoAir;
+            state.dataFans->fans(this->m_FanIndex)->maxAirFlowRate = sizingVolumeFlow;
             state.dataFans->fans(this->m_FanIndex)->minAirFlowRate = 0.0;
-            state.dataFans->fans(this->m_FanIndex)->maxAirMassFlowRate = sizingMassFlow;
-            state.dataLoopNodes->Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
-            state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
-            state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMax = sizingMassFlow;
+            state.dataFans->fans(this->m_FanIndex)->maxAirMassFlowRate = this->SizingMassFlow;
+            state.dataLoopNodes->Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = this->SizingMassFlow;
+            state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = this->SizingMassFlow;
+            state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMax = this->SizingMassFlow;
         }
 
         state.dataSize->CurSysNum = state.dataHVACGlobal->NumPrimaryAirSys + this->m_AirLoopDOASNum + 1;
@@ -1044,6 +1048,21 @@ namespace AirLoopHVACDOAS {
                 }
             }
         }
+
+        BaseSizer::reportSizerOutput(
+            state, "AirLoopHVAC:DedicatedOutdoorAirSystem", this->Name, "Design Cooling Outdoor Air Temperature [C]", this->SizingCoolOATemp);
+        BaseSizer::reportSizerOutput(state,
+                                     "AirLoopHVAC:DedicatedOutdoorAirSystem",
+                                     this->Name,
+                                     "Design Cooling Outdoor Air Humidity Ratio [kgWater/kgDryAir]",
+                                     this->SizingCoolOAHumRat);
+        BaseSizer::reportSizerOutput(
+            state, "AirLoopHVAC:DedicatedOutdoorAirSystem", this->Name, "Design Heating Outdoor Air Temperature [C]", this->HeatOutTemp);
+        BaseSizer::reportSizerOutput(state,
+                                     "AirLoopHVAC:DedicatedOutdoorAirSystem",
+                                     this->Name,
+                                     "Design Heating Outdoor Air Humidity Ratio [kgWater/kgDryAir]",
+                                     this->HeatOutHumRat);
     }
 
     void CheckConvergence(EnergyPlusData &state)
