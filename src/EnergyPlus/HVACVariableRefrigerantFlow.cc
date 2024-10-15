@@ -276,6 +276,9 @@ void SimulateVRF(EnergyPlusData &state,
 
         if (state.dataHVACVarRefFlow->VRF(VRFCondenser).CondenserType == DataHeatBalance::RefrigCondenserType::Water)
             UpdateVRFCondenser(state, VRFCondenser);
+        // add back piping correction to coil side
+        state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex).TotalHeatingEnergyRate *=
+            state.dataHVACVarRefFlow->VRF(VRFCondenser).PipingCorrectionHeating;
     }
 }
 
@@ -11705,15 +11708,19 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
         this->VRFCondCyclingRatio = CyclingRatio;
 
         Tsuction = this->EvaporatingTemp; // Outdoor unit evaporating temperature
-        this->HeatingCapacity =
-            this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(NumOfCompSpdInput), Tdischarge, Tsuction) +
-            this->RatedCompPower * CurveValue(state,
-                                              this->OUCoolingPWRFT(NumOfCompSpdInput),
-                                              Tdischarge,
-                                              Tsuction); // Include the piping loss, at the highest compressor speed
+        if (FirstHVACIteration) {
+            this->HeatingCapacity =
+                this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(NumOfCompSpdInput), Tdischarge, Tsuction) +
+                this->RatedCompPower * CurveValue(state,
+                                                  this->OUCoolingPWRFT(NumOfCompSpdInput),
+                                                  Tdischarge,
+                                                  Tsuction); // Include the piping loss, at the highest compressor speed
+        }
         this->PipingCorrectionHeating = TU_HeatingLoad / (TU_HeatingLoad + Pipe_Q_h);
-        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) =
-            this->HeatingCapacity; // for report, maximum condensing capacity the system can provide
+        if (state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) == Constant::MaxCap) {
+            state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) =
+                this->HeatingCapacity; // for report, maximum condensing capacity the system can provide
+        }
 
         this->CoolingCapacity = 0.0; // Include the piping loss
         this->PipingCorrectionCooling = 1.0;
@@ -12064,10 +12071,10 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
 
         // From the VRF_FluidTCtrl model
         TotalCondHeatingCapacity = this->HeatingCapacity;
-        TotalTUHeatingCapacity = TotalCondHeatingCapacity * this->PipingCorrectionHeating;
+        TotalTUHeatingCapacity = TotalCondHeatingCapacity;
 
         if (TotalCondHeatingCapacity > 0.0) {
-            HeatingPLR = min(1.0, (this->TUHeatingLoad / this->PipingCorrectionHeating) / TotalCondHeatingCapacity);
+            HeatingPLR = min(1.0, (this->TUHeatingLoad) / TotalCondHeatingCapacity);
             HeatingPLR += (LoadDueToDefrost * HeatingPLR) / TotalCondHeatingCapacity;
         } else {
             HeatingPLR = 0.0;
