@@ -577,13 +577,13 @@ namespace HVACVariableRefrigerantFlow {
         );
 
         void VRFOU_CompCap(EnergyPlusData &state,
-                           int CompSpdActual,   // Given compressor speed
-                           Real64 T_suction,    // Compressor suction temperature Te' [C]
-                           Real64 T_discharge,  // Compressor discharge temperature Tc' [C]
-                           Real64 h_IU_evap_in, // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-                           Real64 h_comp_in,    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-                           Real64 &Q_c_tot,     // Compressor evaporative capacity [W]
-                           Real64 &Ncomp        // Compressor power [W]
+                           Real64 CompSpdActual, // Given compressor speed
+                           Real64 T_suction,     // Compressor suction temperature Te' [C]
+                           Real64 T_discharge,   // Compressor discharge temperature Tc' [C]
+                           Real64 h_IU_evap_in,  // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+                           Real64 h_comp_in,     // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+                           Real64 &Q_c_tot,      // Compressor evaporative capacity [W]
+                           Real64 &Ncomp         // Compressor power [W]
         );
 
         void VRFOU_PipeLossC(EnergyPlusData &state,

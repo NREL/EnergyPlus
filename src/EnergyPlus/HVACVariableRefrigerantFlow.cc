@@ -13725,7 +13725,11 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
                                                                            (Q_evap_req * C_cap_operation - CompEvaporatingCAPSpd(CompSpdLB));
 
                 } else {
-                    CompSpdActual = this->CompressorSpeed(1) * (Q_evap_req * C_cap_operation) / CompEvaporatingCAPSpd(1);
+                    if (Q_evap_req < 0.0) { // use compressor power to meet condenser required load
+                        CompSpdActual = this->CompressorSpeed(1) * (Q_cond_req * C_cap_operation) / CompEvaporatingPWRSpd(1);
+                    } else {
+                        CompSpdActual = this->CompressorSpeed(1) * (Q_evap_req * C_cap_operation) / CompEvaporatingCAPSpd(1);
+                    }
                 }
 
                 break; // EXIT DoName1
@@ -13740,13 +13744,13 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
 
 void VRFCondenserEquipment::VRFOU_CompCap(
     EnergyPlusData &state,
-    int const CompSpdActual,   // Given compressor speed
-    Real64 const T_suction,    // Compressor suction temperature Te' [C]
-    Real64 const T_discharge,  // Compressor discharge temperature Tc' [C]
-    Real64 const h_IU_evap_in, // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-    Real64 const h_comp_in,    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-    Real64 &Q_c_tot,           // Compressor evaporative capacity [W]
-    Real64 &Ncomp              // Compressor power [W]
+    Real64 const CompSpdActual, // Given compressor speed
+    Real64 const T_suction,     // Compressor suction temperature Te' [C]
+    Real64 const T_discharge,   // Compressor discharge temperature Tc' [C]
+    Real64 const h_IU_evap_in,  // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 const h_comp_in,     // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 &Q_c_tot,            // Compressor evaporative capacity [W]
+    Real64 &Ncomp               // Compressor power [W]
 )
 {
 
