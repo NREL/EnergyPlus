@@ -2102,14 +2102,11 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     //  if the component control is SERIESACTIVE we set the component flow to inlet flow so that
     //  flow resolver will not shut down the branch
     if (MyLoad >= 0 || !RunFlag) {
-        if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive ||
-            state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
-            this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
-        }
+        this->EvapMassFlowRate = 0.0;
+        PlantUtilities::SetComponentFlowRate(state, this->EvapMassFlowRate, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc);
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-            if (DataPlant::CompData::getPlantComponent(state, this->CDPlantLoc).FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) {
-                this->CondMassFlowRate = state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate;
-            }
+            this->CondMassFlowRate = 0.0;
+            PlantUtilities::SetComponentFlowRate(state, this->CondMassFlowRate, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDPlantLoc);
         }
 
         return;
@@ -2251,9 +2248,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     // Set evaporator heat transfer rate
     this->QEvaporator = AvailChillerCap * PartLoadRat;
     this->ChillerPartLoadRatio = PartLoadRat;
-    // If FlowLock is False (0), the chiller sets the plant loop mdot
-    // If FlowLock is True (1),  the new resolved plant loop mdot is used
-    if (state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
+    { // Old flowlock false section
         this->PossibleSubcooling = !(state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType ==
                                      DataPlant::OpScheme::CompSetPtBased);
 
@@ -2356,16 +2351,13 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
             this->ChillerPartLoadRatio = PartLoadRat;
         }
 
-    } else { // If FlowLock is True
-        this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
-        PlantUtilities::SetComponentFlowRate(state, this->EvapMassFlowRate, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc);
+        // Old flowlock true section
         //       Some other component set the flow to 0. No reason to continue with calculations.
         if (this->EvapMassFlowRate == 0.0) {
             MyLoad = 0.0;
             return;
         }
 
-        Real64 EvapDeltaTemp;
         if (this->PossibleSubcooling) {
             this->QEvaporator = std::abs(MyLoad);
             EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
@@ -2464,8 +2456,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
         if (this->ChillerFalseLoadRate < HVAC::SmallLoad) {
             this->ChillerFalseLoadRate = 0.0;
         }
-
-    } // This is the end of the FlowLock Block
+    } // end of old flowlock sections
 
     // set the module level variable used for reporting FRAC
     this->ChillerCyclingRatio = FRAC;
@@ -2595,14 +2586,7 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
     //  To compare the evaporator/condenser outlet temperatures to curve object min/max values
 
     // Do not print out warnings if chiller not operating or FirstIteration/WarmupFlag/FlowLock
-    int PlantLoopNum = this->CWPlantLoc.loopNum;
-    DataPlant::LoopSideLocation LoopSideNum = this->CWPlantLoc.loopSideNum;
-    int BranchNum = this->CWPlantLoc.branchNum;
-    int CompNum = this->CWPlantLoc.compNum;
-
-    if (FirstIteration || state.dataGlobal->WarmupFlag ||
-        state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked)
-        return;
+    if (FirstIteration || !PlantUtilities::okToIssueWarning(state, this->CWPlantLoc)) return;
 
     // Minimum evaporator leaving temperature allowed by CAPFT curve [C]
     Real64 CAPFTXTmin = this->ChillerCAPFTXTempMin;
@@ -2822,6 +2806,10 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
 
     Real64 EvapOutletTempSetPoint(0.0); // Evaporator outlet temperature setpoint [C]
 
+    int PlantLoopNum = this->CWPlantLoc.loopNum;
+    DataPlant::LoopSideLocation LoopSideNum = this->CWPlantLoc.loopSideNum;
+    int BranchNum = this->CWPlantLoc.branchNum;
+    int CompNum = this->CWPlantLoc.compNum;
     switch (state.dataPlnt->PlantLoop(PlantLoopNum).LoopDemandCalcScheme) {
     case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
@@ -2853,8 +2841,7 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
     this->ChillerCapFT = Curve::CurveValue(state, this->ChillerCapFTIndex, EvapOutletTempSetPoint, this->CondOutletTemp);
 
     if (this->ChillerCapFT < 0) {
-        if (this->ChillerCapFTError < 1 && state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
-            !state.dataGlobal->WarmupFlag) {
+        if (this->ChillerCapFTError < 1) {
             ++this->ChillerCapFTError;
             ShowWarningError(state, format("CHILLER:ELECTRIC:REFORMULATEDEIR \"{}\":", this->Name));
             ShowContinueError(state, format(" Chiller Capacity as a Function of Temperature curve output is negative ({:.3R}).", this->ChillerCapFT));
@@ -2863,8 +2850,7 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
                                      EvapOutletTempSetPoint,
                                      this->CondOutletTemp));
             ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-        } else if (state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
-                   !state.dataGlobal->WarmupFlag) {
+        } else {
             ++this->ChillerCapFTError;
             ShowRecurringWarningErrorAtEnd(state,
                                            "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
@@ -2878,8 +2864,7 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
     this->ChillerEIRFT = Curve::CurveValue(state, this->ChillerEIRFTIndex, this->EvapOutletTemp, this->CondOutletTemp);
 
     if (this->ChillerEIRFT < 0.0) {
-        if (this->ChillerEIRFTError < 1 && state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
-            !state.dataGlobal->WarmupFlag) {
+        if (this->ChillerEIRFTError < 1) {
             ++this->ChillerEIRFTError;
             ShowWarningError(state, format("CHILLER:ELECTRIC:REFORMULATEDEIR \"{}\":", this->Name));
             ShowContinueError(
@@ -2889,8 +2874,7 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
                                      this->EvapOutletTemp,
                                      this->CondOutletTemp));
             ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-        } else if (state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
-                   !state.dataGlobal->WarmupFlag) {
+        } else {
             ++this->ChillerEIRFTError;
             ShowRecurringWarningErrorAtEnd(state,
                                            "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
@@ -2926,9 +2910,7 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
     }
 
     if (this->ChillerEIRFPLR < 0.0) {
-        if (this->ChillerEIRFPLRError < 1 &&
-            state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
-            !state.dataGlobal->WarmupFlag) {
+        if (this->ChillerEIRFPLRError < 1) {
             ++this->ChillerEIRFPLRError;
             ShowWarningError(state, format("CHILLER:ELECTRIC:REFORMULATEDEIR \"{}\":", this->Name));
             ShowContinueError(
@@ -2939,8 +2921,7 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
                                      this->ChillerPartLoadRatio,
                                      this->CondOutletTemp));
             ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-        } else if (state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
-                   !state.dataGlobal->WarmupFlag) {
+        } else {
             ++this->ChillerEIRFPLRError;
             ShowRecurringWarningErrorAtEnd(state,
                                            "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
