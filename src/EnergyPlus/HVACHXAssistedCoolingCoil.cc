@@ -943,28 +943,22 @@ namespace HVACHXAssistedCoolingCoil {
                     coilMode = HVAC::CoilMode::Enhanced;
                 }
 
-                Real64 mCoolingSpeedRatio = 0.0; // used same setting as the original variable speed coil
-                Real64 mCoolCompPartLoadRatio = (compressorOp == HVAC::CompressorOp::On) ? 1.0 : 0.0;
-
-                Real64 CoilPLR;
-                if (mCoolingSpeedNum > 1) {
-                    if (mSingleMode == 0) {
-                        mCoolCompPartLoadRatio = (compressorOp == HVAC::CompressorOp::On) ? 1.0 : 0.0;
-                    } else {
-                        mCoolCompPartLoadRatio = PartLoadRatio * ((compressorOp == HVAC::CompressorOp::On) ? 1.0 : 0.0);
-                        mCoolingSpeedRatio = 1.0;
-                    }
-                    CoilPLR = 1.0;
+                Real64 CoilPLR = 1.0;
+                if (compressorOp == HVAC::CompressorOp::Off) {
+                    mCoolingSpeedNum = 1; // Bypass mixed-speed calculations in called functions
                 } else {
-                    mCoolingSpeedRatio = 1.0;
-                    CoilPLR = PartLoadRatio * ((compressorOp == HVAC::CompressorOp::On) ? 1.0 : 0.0);
+                    if (singleMode) {
+                        CoilPLR =
+                            (mCoolingSpeedNum == 1) ? PartLoadRatio : 0.0; // singleMode allows cycling, but not part load operation at higher speeds
+                    } else {
+                        CoilPLR = PartLoadRatio;
+                    }
                 }
 
                 state.dataCoilCooingDX->coilCoolingDXs[thisHXCoil.CoolingCoilIndex].simulate(state,
                                                                                              coilMode, // partially implemented for HXAssistedCoil
-                                                                                             CoilPLR,  // PartLoadRatio,
                                                                                              mCoolingSpeedNum,
-                                                                                             mCoolingSpeedRatio,
+                                                                                             CoilPLR,
                                                                                              fanOp,
                                                                                              singleMode); //
 

@@ -84,36 +84,42 @@ struct CoilCoolingDXCurveFitPerformance
 {
     std::string object_name = "Coil:Cooling:DX:CurveFit:Performance";
     std::string parentName;
+
     void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data);
+
     void simulate(EnergyPlusData &state,
                   const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
                   HVAC::CoilMode currentCoilMode,
-                  Real64 &PLR,
-                  int &speedNum,
-                  Real64 &speedRatio,
+                  int speedNum,
+                  Real64 speedRatio,
                   HVAC::FanOp const fanOp,
                   DataLoopNode::NodeData &condInletNode,
                   DataLoopNode::NodeData &condOutletNode,
-                  bool const singleMode,
+                  bool singleMode,
                   Real64 LoadSHR = 0.0);
 
     void calculate(EnergyPlusData &state,
                    CoilCoolingDXCurveFitOperatingMode &currentMode,
                    const DataLoopNode::NodeData &inletNode,
                    DataLoopNode::NodeData &outletNode,
-                   Real64 &PLR,
-                   int &speedNum,
-                   Real64 &speedRatio,
+                   int speedNum,
+                   Real64 speedRatio,
                    HVAC::FanOp const fanOp,
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode,
-                   bool const singleMode);
+                   bool singleMode);
+
     void calcStandardRatings210240(EnergyPlusData &state);
+
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
+
     CoilCoolingDXCurveFitPerformance() = default;
+
     explicit CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name);
+
     void size(EnergyPlusData &state);
+
     void setOperMode(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
 
     std::string name;

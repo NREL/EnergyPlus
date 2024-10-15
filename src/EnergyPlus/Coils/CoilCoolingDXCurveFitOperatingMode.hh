@@ -92,13 +92,12 @@ struct CoilCoolingDXCurveFitOperatingMode
     void CalcOperatingMode(EnergyPlusData &state,
                            const DataLoopNode::NodeData &inletNode,
                            DataLoopNode::NodeData &outletNode,
-                           Real64 &PLR,
-                           int &speedNum,
-                           Real64 &speedRatio,
+                           int speedNum,
+                           Real64 speedRatio,
                            HVAC::FanOp const fanOp,
                            DataLoopNode::NodeData &condInletNode,
                            DataLoopNode::NodeData &condOutletNode,
-                           bool const singleMode);
+                           bool singleMode);
 
     std::string name;
     Real64 ratedGrossTotalCap = 0.0;       // [W]

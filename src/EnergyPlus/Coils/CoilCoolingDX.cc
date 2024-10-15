@@ -658,12 +658,11 @@ void CoilCoolingDX::size(EnergyPlusData &state)
 
 void CoilCoolingDX::simulate(EnergyPlusData &state,
                              HVAC::CoilMode coilMode,
-                             Real64 PLR,
-                             int speedNum,
-                             Real64 speedRatio,
+                             int const speedNum,
+                             Real64 const speedRatio,
                              HVAC::FanOp const fanOp,
                              bool const singleMode,
-                             Real64 LoadSHR)
+                             Real64 const LoadSHR)
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit(state);
@@ -693,7 +692,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     this->performance.OperatingMode = 0;
     this->performance.ModeRatio = 0.0;
     this->performance.simulate(
-        state, evapInletNode, evapOutletNode, coilMode, PLR, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode, LoadSHR);
+        state, evapInletNode, evapOutletNode, coilMode, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode, LoadSHR);
     CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
@@ -770,7 +769,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     this->wasteHeatEnergyRate = this->performance.wasteHeatRate;
     this->wasteHeatEnergy = this->performance.wasteHeatRate * reportingConstant;
 
-    this->partLoadRatioReport = PLR;
+    this->partLoadRatioReport = speedNum > 1 ? 1.0 : speedRatio;
     this->speedNumReport = speedNum;
     this->speedRatioReport = speedRatio;
 
@@ -827,7 +826,6 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
             DataLoopNode::NodeData dummyEvapOutlet;
             DataLoopNode::NodeData dummyCondInlet;
             DataLoopNode::NodeData dummyCondOutlet;
-            Real64 dummyPLR = 1.0;
             int dummySpeedNum = 1;
             Real64 dummySpeedRatio = 1.0;
             HVAC::FanOp dummyFanOp = HVAC::FanOp::Cycling;
@@ -869,7 +867,6 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                                        dummyEvapInlet,
                                        dummyEvapOutlet,
                                        HVAC::CoilMode::Normal,
-                                       dummyPLR,
                                        dummySpeedNum,
                                        dummySpeedRatio,
                                        dummyFanOp,
