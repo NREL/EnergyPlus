@@ -1,4 +1,4 @@
-name: Releases
+name: Linux Releases
 
 on:
   push:
@@ -70,7 +70,8 @@ jobs:
       shell: bash
       run: |
         cmake -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
-              -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
+              -DLINK_WITH_PYTHON:BOOL=ON -DPYTHON_CLI:BOOL=ON \
+              -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
               -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/x64/ \
               -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD:STRING="BuildWithAll" -DTEX_INTERACTION:STRING="batchmode" -DENABLE_PCH:BOOL=OFF \
@@ -127,16 +128,10 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        name: [20, 22, 24]
         include:
-          - name: 20
-            os: ubuntu-20.04
-            test_key: ubuntu2004
-          - name: 22
-            os: ubuntu-22.04
+          - os: ubuntu-22.04
             test_key: ubuntu2204
-          - name: 24
-            os: ubuntu-24.04
+          - os: ubuntu-24.04
             test_key: ubuntu2404
 
     steps:

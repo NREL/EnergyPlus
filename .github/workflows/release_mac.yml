@@ -1,4 +1,4 @@
-name: Releases
+name: Mac Releases
 
 on:
   push:
@@ -137,7 +137,7 @@ jobs:
         echo "Installing gcc@13 for gfortran support of -static-libquadmath"
         brew list gcc@13 || brew install gcc@13
         which gfortran-13 || echo "FC=$(brew --prefix gcc@13)/bin/gfortran-13" >> $GITHUB_ENV
-        brew install ninja
+        brew install ninja tcl-tk
 
     - name: Create Build Directory
       run: cmake -E make_directory ./build/
@@ -150,7 +150,8 @@ jobs:
       run: |
         cmake -G Ninja -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE \
               -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }} \
-              -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
+              -DLINK_WITH_PYTHON:BOOL=ON -DPYTHON_CLI:BOOL=ON \
+              -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
               -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/ \
               -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD:STRING=$DOCUMENTATION_BUILD -DTEX_INTERACTION:STRING="batchmode" \

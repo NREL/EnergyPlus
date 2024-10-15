@@ -61,6 +61,10 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#if LINK_WITH_PYTHON
+#include <EnergyPlus/PythonEngine.hh>
+#endif
+
 namespace EnergyPlus {
 
 namespace CommandLineInterface {
@@ -229,6 +233,58 @@ Built on Platform: {}
         }
         // bool debugCLI = false;
         app.add_flag("--debug-cli", debugCLI, "Print the result of the CLI assignments to the console and exit")->group(""); // Empty group to hide it
+
+#if LINK_WITH_PYTHON
+#ifdef PYTHON_CLI
+        auto *auxiliaryToolsSubcommand = app.add_subcommand("auxiliary", "Run Auxiliary Python Tools");
+        auxiliaryToolsSubcommand->require_subcommand(); // should default to requiring 1 or more additional args?
+
+        std::vector<std::string> python_fwd_args;
+        auto *epLaunchSubCommand = auxiliaryToolsSubcommand->add_subcommand("eplaunch", "EnergyPlus Launch");
+        epLaunchSubCommand->add_option("args", python_fwd_args, "Extra Arguments forwarded to EnergyPlus Launch")->option_text("ARG ...");
+        epLaunchSubCommand->positionals_at_end(true);
+        epLaunchSubCommand->footer("You can pass extra arguments after the eplaunch keyword, they will be forwarded to EnergyPlus Launch.");
+
+        epLaunchSubCommand->callback([&state, &python_fwd_args] {
+            EnergyPlus::Python::PythonEngine engine(state);
+            // There's probably better to be done, like instantiating the pythonEngine with the argc/argv then calling PyRun_SimpleFile but whatever
+            std::string cmd = R"python(import sys
+sys.argv.clear()
+sys.argv.append("energyplus")
+)python";
+            for (const auto &arg : python_fwd_args) {
+                cmd += fmt::format("sys.argv.append(\"{}\")\n", arg);
+            }
+
+            fs::path programDir = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+            fs::path const pathToPythonPackages = programDir / "python_lib";
+            std::string sPathToPythonPackages = std::string(pathToPythonPackages.string());
+            std::replace(sPathToPythonPackages.begin(), sPathToPythonPackages.end(), '\\', '/');
+            cmd += fmt::format("sys.path.insert(0, \"{}\")\n", sPathToPythonPackages);
+
+            std::string tclConfigDir = "";
+            for (auto &p : std::filesystem::directory_iterator(pathToPythonPackages)) {
+                if (p.is_directory()) {
+                    std::string dirName = p.path().filename().string();
+                    if (dirName.find("tcl", 0) == 0 && dirName.find(".", 0) > 0) {
+                        tclConfigDir = dirName;
+                        break;
+                    }
+                }
+            }
+            cmd += "from os import environ\n";
+            cmd += fmt::format("environ[\'TCL_LIBRARY\'] = \"{}/{}\"\n", sPathToPythonPackages, tclConfigDir);
+
+            cmd += R"python(
+from eplaunch.tk_runner import main_gui
+main_gui()
+)python";
+            // std::cout << "Trying to execute this python snippet: " << std::endl << cmd << std::endl;
+            engine.exec(cmd);
+            exit(0);
+        });
+#endif
+#endif
 
         app.footer("Example: energyplus -w weather.epw -r input.idf");
 
@@ -695,25 +751,9 @@ state.dataStrGlobals->inputFilePath='{:g}',
         // Duplicate the kind of reading the Windows "GetINISetting" would
         // do.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace EnergyPlus;
         using namespace DataStringGlobals;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         std::string Param;
         std::string::size_type ILB;
@@ -721,7 +761,6 @@ state.dataStrGlobals->inputFilePath='{:g}',
         std::string::size_type IEQ;
         std::string::size_type IPAR;
         std::string::size_type IPOS;
-        std::string::size_type ILEN;
 
         // Formats
 
@@ -731,7 +770,6 @@ state.dataStrGlobals->inputFilePath='{:g}',
 
         Param = KindofParameter;
         strip(Param);
-        ILEN = len(Param);
         inputFile.rewind();
         bool Found = false;
         bool NewHeading = false;

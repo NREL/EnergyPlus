@@ -45,7 +45,7 @@ set(VERSIONS
     2_0_0  2_1_0  2_2_0  3_0_0  3_1_0  4_0_0  5_0_0  6_0_0  7_0_0  7_1_0  7_2_0
     8_0_0  8_1_0  8_2_0  8_3_0  8_4_0  8_5_0  8_6_0  8_7_0  8_8_0  8_9_0
     9_0_0  9_1_0  9_2_0  9_3_0  9_4_0  9_5_0  9_6_0
-    22_1_0 22_2_0 23_1_0 23_2_0 24_1_0 24_2_0
+    22_1_0 22_2_0 23_1_0 23_2_0 24_1_0 24_2_0 25_1_0
 )
 list(LENGTH VERSIONS VERSIONS_SIZE)
 math(EXPR end "${VERSIONS_SIZE} - 1")
@@ -104,6 +104,7 @@ install(FILES "InputRulesFiles/Rules22-2-0-to-23-1-0.md" DESTINATION "PreProcess
 install(FILES "InputRulesFiles/Rules23-1-0-to-23-2-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "InputRulesFiles/Rules23-2-0-to-24-1-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "InputRulesFiles/Rules24-1-0-to-24-2-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "InputRulesFiles/Rules24-2-0-to-25-1-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 
 install(FILES "OutputRulesFiles/OutputChanges9-0-0-to-9-1-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "OutputRulesFiles/OutputChanges9-1-0-to-9-2-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
@@ -117,6 +118,7 @@ install(FILES "OutputRulesFiles/OutputChanges22-2-0-to-23-1-0.md" DESTINATION "P
 install(FILES "OutputRulesFiles/OutputChanges23-1-0-to-23-2-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "OutputRulesFiles/OutputChanges23-2-0-to-24-1-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "OutputRulesFiles/OutputChanges24-1-0-to-24-2-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "OutputRulesFiles/OutputChanges24-2-0-to-25-1-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 
 install(FILES "SupportFiles/Report Variables 9-0-0 to 9-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 9-1-0 to 9-2-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
@@ -130,3 +132,4 @@ install(FILES "SupportFiles/Report Variables 22-2-0 to 23-1-0.csv" DESTINATION "
 install(FILES "SupportFiles/Report Variables 23-1-0 to 23-2-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 23-2-0 to 24-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 24-1-0 to 24-2-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "SupportFiles/Report Variables 24-2-0 to 25-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
