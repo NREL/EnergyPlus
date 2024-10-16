@@ -1346,14 +1346,14 @@ void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFl
             state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum).TempSetPointHi;
     }
 
-    Real64 mdot = 0.0;
+    this->EvapMassFlowRate = 0.0;
     Real64 mdotCond = 0.0;
-    if ((std::abs(MyLoad) > 0.0) && RunFlag) {
-        mdot = this->EvapMassFlowRateMax;
+    if ((MyLoad < 0.0) && RunFlag) {
+        this->EvapMassFlowRate = this->EvapMassFlowRateMax;
         mdotCond = this->CondMassFlowRateMax;
     }
 
-    PlantUtilities::SetComponentFlowRate(state, mdot, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc);
+    PlantUtilities::SetComponentFlowRate(state, this->EvapMassFlowRate, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc);
 
     if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         PlantUtilities::SetComponentFlowRate(state, mdotCond, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDPlantLoc);
@@ -1362,6 +1362,7 @@ void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFl
             PlantUtilities::MinFlowIfBranchHasVSPump(state, this->CDPlantLoc, this->VSBranchPumpFoundCond, this->VSLoopPumpFoundCond, false);
     }
     // Initialize heat recovery flow rates at node
+    Real64 mdot = 0.0;
     if (this->HeatRecActive) {
         mdot = RunFlag ? this->DesignHeatRecMassFlowRate : 0.0; // if RunFlag is true, mdot = this->DesignHeatRecMassFlowRate, else mdot = 0.0
         PlantUtilities::SetComponentFlowRate(state, mdot, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
