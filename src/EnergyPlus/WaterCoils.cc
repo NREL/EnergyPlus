@@ -1186,7 +1186,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
         // the cooling coil.
         // Basic Idea for UA:  Heat Transfer= UAenthalpybased*(Delta enthalpy), this is a necessity since the
         // coil may be Wet or Dry or Partially Wet-Dry, so latent effects are accounted for in this model while
-        // calculating the UA. A fictitious specific heat is also defined to caculate the conventional UA.
+        // calculating the UA. A fictitious specific heat is also defined to calculate the conventional UA.
         // On the air side, enthalpy capacity rate is the air mass flow rate,while on water side it is
         // enthalpy of saturated air at water temperature.
         //@@@ DESIGN CONDITION BEGIN HERE @@@
@@ -1295,7 +1295,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
                 // Total Coil Load from Inlet and Outlet Air States (which include fan heat as appropriate).
                 waterCoil.DesTotWaterCoilLoad = waterCoil.DesAirMassFlowRate * (DesInletAirEnth - DesOutletAirEnth);
 
-                // Enthalpy of Water at Intlet design conditions
+                // Enthalpy of Water at Inlet design conditions
                 Cp = GetSpecificHeatGlycol(state,
                                            state.dataPlnt->PlantLoop(waterCoil.WaterPlantLoc.loopNum).FluidName,
                                            waterCoil.DesInletWaterTemp,
@@ -1453,7 +1453,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
 
             // Now use SolveRoot to "invert" the cooling coil model to obtain the UA given the specified design inlet and outlet conditions
             // Note that the UAs we have obtained so far are rough estimates that are the starting points for the the following iterative
-            //   calulation of the actual UAs.
+            //   calculation of the actual UAs.
             waterCoil.InletAirTemp = waterCoil.DesInletAirTemp;
             waterCoil.InletAirHumRat = waterCoil.DesInletAirHumRat;
             waterCoil.InletWaterTemp = waterCoil.DesInletWaterTemp;
@@ -1729,7 +1729,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
             if (waterCoil.DesWaterCoolingCoilRate <= 0.0) waterCoil.DesWaterCoolingCoilRate = waterCoil.TotWaterCoolingCoilRate;
             if (waterCoil.DesWaterHeatingCoilRate <= 0.0) waterCoil.DesWaterHeatingCoilRate = waterCoil.TotWaterHeatingCoilRate;
 
-            // call coil model with everthing set at rating point
+            // call coil model with everything set at rating point
             waterCoil.InletAirMassFlowRate = waterCoil.DesAirMassFlowRate;
             waterCoil.InletAirTemp = waterCoil.DesInletAirTemp;
             waterCoil.InletAirHumRat = waterCoil.DesInletAirHumRat; // fixed in sizing routine

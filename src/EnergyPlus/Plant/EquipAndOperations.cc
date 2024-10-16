@@ -248,7 +248,7 @@ namespace DataPlant {
         int numHXsOnSupervisedLoops = 0;
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             if (this->PlantLoopIndicesBeingSupervised(LoopNum) > 0) {
-                // search for any Heat axchangers on loop supply side
+                // search for any Heat exchangers on loop supply side
                 auto &this_plant_loopside(state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply));
                 for (int BranchNum = 1; BranchNum <= this_plant_loopside.TotalBranches; ++BranchNum) {
                     for (int CompNum = 1; CompNum <= this_plant_loopside.Branch(BranchNum).TotalComponents; ++CompNum) {
@@ -1423,12 +1423,12 @@ namespace DataPlant {
         }
 
         //  step 4. check that there is sufficient flow in source side for chosen leader to avoid runaway plant conditions on source side
-        //  if not, see if other side could run benefically as leader and switch to it if so
+        //  if not, see if other side could run beneficially as leader and switch to it if so
         // Real64 FlowImbalanceRatioThreshold = 10.0; // TODO, check with TRANE engineering about WWHP operating limits wrt to relative flows (real
         //                                          // systems have a pumped sided arm flow situation and do not have low flow problems)
 
         // if (CoolLedNeed) {
-        //    if (CW_RetMdot / HW_RetMdot > FlowImbalanceRatioThreshold) { // insuficient flow in source side relative to load side
+        //    if (CW_RetMdot / HW_RetMdot > FlowImbalanceRatioThreshold) { // insufficient flow in source side relative to load side
         //        CoolLedNeed = false;
         //        // if (HW_Qdot > 1.0) {
         //        //    HeatLedNeed = true;
@@ -1436,7 +1436,7 @@ namespace DataPlant {
         //    }
         //}
         // if (HeatLedNeed) {
-        //    if (HW_RetMdot / CW_RetMdot > FlowImbalanceRatioThreshold) { // insuficient flow in source side relative to load side
+        //    if (HW_RetMdot / CW_RetMdot > FlowImbalanceRatioThreshold) { // insufficient flow in source side relative to load side
         //        HeatLedNeed = false;
         //        // if (CW_Qdot < -1.0) {
         //        //    CoolLedNeed = true;
@@ -1549,11 +1549,11 @@ namespace DataPlant {
     void ChillerHeaterSupervisoryOperationData::ProcessAndSetAuxilBoiler(EnergyPlusData &state)
     {
         // Check for boiler used as auxiliary or supplemental
-        // Assume boilers are in-line on supply side outlet branch, typically on secodary loop but may be on primary loop
+        // Assume boilers are in-line on supply side outlet branch, typically on secondary loop but may be on primary loop
         this->Report.BoilerAux_OpMode = 0;
         if (this->PlantOps.numBoilers <= 0) return;
 
-        // first intialize them to be off
+        // first initialize them to be off
         if (this->PlantOps.numBoilers > 0) {
             for (int BoilerNum = 1; BoilerNum <= this->PlantOps.numBoilers; ++BoilerNum) {
                 state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)

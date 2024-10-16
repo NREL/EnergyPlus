@@ -86,7 +86,7 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
 //                   for Gas Research Institute (Original module GasAbsoptionChiller)
 //    DATE WRITTEN   March 2001
 //    MODIFIED       Brent Griffith, Nov 2010 plant upgrades, generalize fluid properties
-//                   Mahabir Bhandari, ORNL, Aug 2011, modified to accomodate Exhaust Fired Absorption Chiller
+//                   Mahabir Bhandari, ORNL, Aug 2011, modified to accommodate Exhaust Fired Absorption Chiller
 
 // PURPOSE OF THIS MODULE:
 //    This module simulates the performance of the Exhaust fired double effect
@@ -238,7 +238,7 @@ void ExhaustAbsorberSpecs::getDesignCapacities(
 
     if (!matchfound) {
         // Error, nodes do not match
-        ShowSevereError(state, format("SimExhaustAbsorber: Invalid call to Exhaust Absorbtion Chiller-Heater {}", this->Name));
+        ShowSevereError(state, format("SimExhaustAbsorber: Invalid call to Exhaust Absorption Chiller-Heater {}", this->Name));
         ShowContinueError(state, "Node connections in branch are not consistent with object nodes.");
         ShowFatalError(state, "Preceding conditions cause termination.");
     } // Operate as Chiller or Heater
@@ -442,7 +442,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
             ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "resetting to ENTERING-CONDENSER, simulation continues");
         }
-        // Assign Other Paramters
+        // Assign Other Parameters
         if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "AirCooled")) {
             thisChiller.isWaterCooled = false;
         } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "WaterCooled")) {
@@ -937,7 +937,7 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 rho;  // local fluid density
-    Real64 mdot; // lcoal fluid mass flow rate
+    Real64 mdot; // local fluid mass flow rate
 
     int CondInletNode = this->CondReturnNodeNum;
     int CondOutletNode = this->CondSupplyNodeNum;
@@ -1448,7 +1448,7 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Jason Glazer
     //       DATE WRITTEN   March 2001
-    //       MODIFIED       Mahabir Bhandari, ORNL, Aug 2011, modified to accomodate exhaust fired chiller
+    //       MODIFIED       Mahabir Bhandari, ORNL, Aug 2011, modified to accommodate exhaust fired chiller
 
     // PURPOSE OF THIS SUBROUTINE:
     // Simulate a Exhaust fired (Exhaust consuming) absorption chiller using
@@ -1515,7 +1515,7 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
     int lThermalEnergyCoolFPLRCurve = this->ThermalEnergyCoolFPLRCurve;
     int lElecCoolFTCurve = this->ElecCoolFTCurve;
     int lElecCoolFPLRCurve = this->ElecCoolFPLRCurve;
-    bool lIsEnterCondensTemp = this->isEnterCondensTemp; // if using entering conderser water temperature is TRUE, exiting is FALSE
+    bool lIsEnterCondensTemp = this->isEnterCondensTemp; // if using entering condenser water temperature is TRUE, exiting is FALSE
     bool lIsWaterCooled = this->isWaterCooled;           // if water cooled it is TRUE
     Real64 lCHWLowLimitTemp = this->CHWLowLimitTemp;
     Real64 lHeatElectricPower = this->HeatElectricPower;               // parasitic electric power used  for heating
@@ -1722,7 +1722,7 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
                              Curve::CurveValue(state, lElecCoolFTCurve, lChillSupplyTemp, calcCondTemp) *
                              Curve::CurveValue(state, lElecCoolFPLRCurve, lCoolPartLoadRatio);
 
-        // determine conderser load which is cooling load plus the
+        // determine condenser load which is cooling load plus the
         // ThermalEnergy used for cooling plus
         // the electricity used
         lTowerLoad = lCoolingLoad + lCoolThermalEnergyUseRate / lThermalEnergyHeatRatio + lCoolElectricPower;
@@ -1754,7 +1754,7 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
                 this->ExhTempLTAbsLeavingTempIndex,
                 lExhaustInTemp,
                 AbsLeavingTemp);
-            // If exhaust is not available, it means the avilable thermal energy is 0.0 and Chiller is not available
+            // If exhaust is not available, it means the available thermal energy is 0.0 and Chiller is not available
             lCoolThermalEnergyUseRate = 0.0;
             lTowerLoad = 0.0;
             lCoolElectricPower = 0.0;
@@ -1835,7 +1835,7 @@ void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, boo
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Jason Glazer and Michael J. Witte
     //       DATE WRITTEN   March 2001
-    //       MODIFIED       Mahabir Bhandari, ORNL, Aug 2011, modified to accomodate exhaust fired double effect absorption chiller
+    //       MODIFIED       Mahabir Bhandari, ORNL, Aug 2011, modified to accommodate exhaust fired double effect absorption chiller
 
     // PURPOSE OF THIS SUBROUTINE:
     // Simulate a Exhaust fired (Exhaust consuming) absorption chiller using
@@ -1967,7 +1967,7 @@ void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, boo
         // Calculate electric parasitics used
         // for heating based on nominal capacity not available capacity
         lHeatElectricPower = this->NomCoolingCap * this->NomHeatCoolRatio * this->ElecHeatRatio * lFractionOfPeriodRunning;
-        // Coodinate electric parasitics for heating and cooling to avoid double counting
+        // Coordinate electric parasitics for heating and cooling to avoid double counting
         // Total electric is the max of heating electric or cooling electric
         // If heating electric is greater, leave cooling electric and subtract if off of heating elec
         // If cooling electric is greater, set heating electric to zero
@@ -1997,7 +1997,7 @@ void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, boo
                                            this->ExhTempLTAbsLeavingHeatingTempIndex,
                                            lExhaustInTemp,
                                            AbsLeavingTemp);
-            // If exhaust is not available, it means the avilable thermal energy is 0.0 and Chiller is not available
+            // If exhaust is not available, it means the available thermal energy is 0.0 and Chiller is not available
             lHeatThermalEnergyUseRate = 0.0;
             lHeatElectricPower = 0.0;
             lHotWaterSupplyTemp = heatReturnNode.Temp;

@@ -143,7 +143,7 @@ void FiniteDiffGroundTempsModel::initAndSim(EnergyPlusData &state)
     //       DATE WRITTEN   Summer 2015
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Initalizes and simulated finite difference ground temps model
+    // Initializes and simulated finite difference ground temps model
 
     FiniteDiffGroundTempsModel::getWeatherData(state);
 
@@ -322,10 +322,10 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     } // ... End day loop.
 
-    annualAveAirTemp = annualAveAirTemp_num / state.dataWeather->NumDaysInYear; // Used for initalizing domain
+    annualAveAirTemp = annualAveAirTemp_num / state.dataWeather->NumDaysInYear; // Used for initializing domain
 
-    // Reset Envrionment when done reading data
-    --state.dataWeather->NumOfEnvrn; // May need better way of eliminating the extra envrionment that was added to read the data
+    // Reset Environment when done reading data
+    --state.dataWeather->NumOfEnvrn; // May need better way of eliminating the extra environment that was added to read the data
     --state.dataWeather->TotRunPers;
     state.dataGlobal->KindOfSim = KindOfSim_reset;
     state.dataWeather->RPReadAllWeatherData = false;
@@ -564,7 +564,7 @@ void FiniteDiffGroundTempsModel::updateSurfaceCellTemperature(EnergyPlusData &st
     currAirTempK = cwd.dryBulbTemp + 273.15;
 
     // Convert input solar radiation [w/m2] into units for ET model, [MJ/hr-min]
-    // Diffuse + Direct Beam Radation
+    // Diffuse + Direct Beam Radiation
     incidentSolar_MJhrmin = cwd.horizontalRadiation * convert_Wm2_To_MJhrmin;
 
     // Absorbed solar radiation, [MJ/hr-min]
@@ -664,7 +664,7 @@ void FiniteDiffGroundTempsModel::updateGeneralDomainCellTemperature(int const ce
     numerator += (thisCell.beta / resistance) * cellAbove_thisCell.temperature;
     denominator += thisCell.beta / resistance;
 
-    // Conduction resitance between this cell and below cell
+    // Conduction resistance between this cell and below cell
     resistance = ((thisCell.thickness / 2.0) / (thisCell.conductionArea * thisCell.props.conductivity)) +
                  ((cellBelow_thisCell.thickness / 2.0) / (cellBelow_thisCell.conductionArea * cellBelow_thisCell.props.conductivity));
 
@@ -787,7 +787,7 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     //       DATE WRITTEN   Summer 2015
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Initalizes model using Kusuda-Achenbach model.
+    // Initializes model using Kusuda-Achenbach model.
     // Average ground temp initialized to average annual air temperature
 
     // Temporary KA model for initialization
@@ -1019,7 +1019,7 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &
     //       DATE WRITTEN   Summer 2015
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Retrieves ground tempeature when input time is in seconds
+    // Retrieves ground temperature when input time is in seconds
 
     depth = _depth;
 

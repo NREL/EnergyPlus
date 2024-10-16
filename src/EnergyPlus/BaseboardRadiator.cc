@@ -611,9 +611,9 @@ namespace BaseboardRadiator {
         bool ErrorsFound(false);             // If errors detected in input
         Real64 rho;                          // local fluid density
         Real64 Cp;                           // local fluid specific heat
-        Real64 WaterVolFlowRateMaxDes(0.0);  // Design water volume flow for reproting
+        Real64 WaterVolFlowRateMaxDes(0.0);  // Design water volume flow for reporting
         Real64 WaterVolFlowRateMaxUser(0.0); // User hard-sized volume flow for reporting
-        Real64 UADes(0.0);                   // Design UA value for reproting
+        Real64 UADes(0.0);                   // Design UA value for reporting
         Real64 UAUser(0.0);                  // User hard-sized value for reporting
         Real64 TempSize;                     // autosized value of coil input field
 
@@ -736,7 +736,7 @@ namespace BaseboardRadiator {
 
                 // UA sizing
                 bool UAAutoSize = false; // Indicator to autosizing UA
-                // Set hard-sized values to the local variable to correct a false indication aftet SolFla function calculation
+                // Set hard-sized values to the local variable to correct a false indication after SolFla function calculation
                 if (this->UA == DataSizing::AutoSize) {
                     UAAutoSize = true;
                 } else {
@@ -924,7 +924,7 @@ namespace BaseboardRadiator {
                 }
             }
         } else {
-            // if there is no heating Sizing:Plant object and autosizng was requested, issue an error message
+            // if there is no heating Sizing:Plant object and autosizing was requested, issue an error message
             if (this->WaterVolFlowRateMax == DataSizing::AutoSize || this->UA == DataSizing::AutoSize) {
                 ShowSevereError(state, format("SizeBaseboard: {}=\"{}\"", cCMO_BBRadiator_Water, this->EquipID));
                 ShowContinueError(state, "...Autosizing of hot water baseboard requires a heating loop Sizing:Plant object");

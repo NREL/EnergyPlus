@@ -43,7 +43,7 @@ https://energyplushelp.freshdesk.com/
 
 The site is monitored by EnergyPlus developers and questions are
 attempted to be answered in a timely manner. Standard EnergyPlus support
-is provided free of charge by the U.S. Deparment of Energy, as part of a
+is provided free of charge by the U.S. Department of Energy, as part of a
 continuing effort to improve the EnergyPlus building simulation tool.
 Expedited, priority support may be available from other sources. The
 helpdesk has a files area where important (after release) files may be
@@ -133,7 +133,7 @@ Datasets aka Libraries
 ----------------------
 
 EnergyPlus uses the term DataSets for what many would call libraries.
-These files are included, for the most part, in the instalation package
+These files are included, for the most part, in the installation package
 but may be available from other sites (such as the helpdesk or Yahoo
 Groups).
 
@@ -141,7 +141,7 @@ There are two flavors of DataSets: **simple** and **Macro**. Some sets
 have files in both camps (for example, Solar Collectors). Both flavors
 contain IDF objects ready to be put into EnergyPlus input files. With
 the simple datasets, you may need to use a text editor or the IDF Editor
-to search the file for the one you want to use. With the macro datsets
+to search the file for the one you want to use. With the macro datasets
 and a simply structured imf (input macro file), you can name the item
 you want to include. (The macro program is described in the `Auxiliary
 Programs document <AuxiliaryPrograms.pdf>`__).
@@ -291,7 +291,7 @@ You can’t measure extraterrestrial unless you’re in outer space, but
 then it’s assumed to be constant anyway. For the various radiation and
 illuminance values, they can measured by various instrumentation ranging
 from the very cheap to the very expensive. Properly, radiation needs to
-be measured with a pyranometer (Eppley), which is pricy, but I’m also
+be measured with a pyranometer (Eppley), which is pricey, but I’m also
 seen people use simpler apparatus (Lycors) that are really photometers.
 Direct beam is generally not measured, but derived by subtracting the
 diffuse from the global. Diffuse is measured by adding a shadow band
@@ -1024,7 +1024,7 @@ each other:
   and diffuse solar (and daylighting) to pass between the adjacent
   zones.
 
-* Radiant (long-wave thermal) transfer can be signifcant between exterior surfaces of a perimeter zone and
+* Radiant (long-wave thermal) transfer can be significant between exterior surfaces of a perimeter zone and
   interior surfaces of a core zone with an open boundary between them.
   Normally, there is no direct radiant exchange between surfaces in
   different thermal zones. Construction:AirBoundary groups adjacent
@@ -1133,7 +1133,7 @@ The Trombe wall convection algorithm is applicable to just about any
 vertical cavity with a high aspect ratio and relatively narrow width.
 I’m not sure if a double facade cavity would meet the aspect ratio
 requirement. But I do know the Trombe wall algorithm is not picky about
-whether the inner wall is highly absorbant, or about any particular
+whether the inner wall is highly absorbent, or about any particular
 properties of the walls. Actually the same basic algorithm is used by
 the window model to calculate the convection between the two panes of a
 window. The full reference is ISO 15099.
@@ -1254,7 +1254,7 @@ that are used during EnergyPlus development testing (i.e.small
 differences are within .001 or .5%; big differences are greater than
 those limits).
 
-For the purposes of dicussion, the buildings will be called:
+For the purposes of discussion, the buildings will be called:
 
 * Multistory 1 – the original 9 zone building (with multipliers and groups) ref: Figure `fig:original-multistory-idf`_;
 * Multistory 2 – the building shown in Figure `fig:multistory-with-cloned-middle-zones`_.
@@ -1317,7 +1317,7 @@ With these included, the files were rerun with the following results:
 .. table:: Multiplier Results with negated height variation.
 
    +---------------+---------------------+---------------------+---------------------+---------------------+
-   |   Location    | Multi-story 2 Loahs | Multi-story 2 Meter | Multi-story 3 Loahs | Multi-story 3 Meter |
+   |   Location    | Multi-story 2 Loads | Multi-story 2 Meter | Multi-story 3 Loads | Multi-story 3 Meter |
    +===============+=====================+=====================+=====================+=====================+
    |    Chicago    |     Small diffs     |     Small diffs     |     Small diffs     |     Small diffs     |
    +---------------+---------------------+---------------------+---------------------+---------------------+
@@ -1796,7 +1796,7 @@ A coil will check its inlet air temperature compared to the set point
 temperature. For cooling, if the inlet air temperature is above the set
 point temp, the coil turns on. It’s opposite that for heating. In the
 5ZoneAutoDXVAV example file, a schedule temperature set point is placed
-at the system outlet node. This is the temperture the designer wants at
+at the system outlet node. This is the temperature the designer wants at
 the outlet. The mixed air SP manager is used to account for fan heat and
 places the required SP at the outlet of the cooling coil so the coil
 slightly overcools the air to overcome fan heat and meet the system
@@ -1828,7 +1828,7 @@ SetpointManager objects place a setpoint on a node, for example, one
 might place a setpoint of 12C on the node named “Main Cooling Coil Air
 Outlet Node”.
 
-In the case of Controler:WaterCoil which controls a hot water or chilled
+In the case of Controller:WaterCoil which controls a hot water or chilled
 water coil, the controller reads the setpoint and tries to adjust the
 water flow so that the air temperature at the controlled node matches
 the current setpoint. Continuing the example above:
@@ -2500,7 +2500,7 @@ Low Temperature Radiant Undersizing Issues
 ------------------------------------------
 
 Some users have noted difficulties when trying to size certain aspects
-of low temperature radiant systems, particulary in cooling mode for the
+of low temperature radiant systems, particularly in cooling mode for the
 hydronic (variable flow) and constant flow low temperature radiant
 systems when using autosize. The problem appears to be that the system
 is not sizing properly or is undersizing, leaving zone conditions that
@@ -3799,7 +3799,7 @@ buildings with large numbers of surfaces and shading surfaces):
 .. table:: Recommended Reduce Time Settings for Early Diagnostic runs
 
    ======================= ================================================================================
-   Object                  Recommenheh Early Diagnostic Setting
+   Object                  Recommended Early Diagnostic Setting
    Building                MinimalShadowing (Solar Distribution field)
    ShadowCalculation       200 (Maximum Figures in Shadow Overlap Calculations field)
    SizingPeriod:DesignDays Only perform design day or limited run period runs until you have the model set.

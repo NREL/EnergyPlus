@@ -5869,7 +5869,7 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPCap)
     OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
 
     EXPECT_NEAR(
-        ExpectedOAMassFlow, OAMassFlow, 0.001); // Expect to cap the system OA to the desing OA air flow, OAMassFlow without the cap is ~0.86 m3/s
+        ExpectedOAMassFlow, OAMassFlow, 0.001); // Expect to cap the system OA to the design OA air flow, OAMassFlow without the cap is ~0.86 m3/s
 }
 
 TEST_F(EnergyPlusFixture, MechVentController_VRPNoCap)

@@ -256,7 +256,7 @@ namespace InternalHeatGains {
         const std::string bbModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
         const std::string contamSSModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
 
-        // Because there are occassions where getObjectItem will be called a second time within the routine (#9680)
+        // Because there are occasions where getObjectItem will be called a second time within the routine (#9680)
         // We should use local arrays instead of state.dataIPShortCut
         int IHGNumAlphas = 0;
         int IHGNumNumbers = 0;
@@ -3334,7 +3334,7 @@ namespace InternalHeatGains {
 
                         if (thisZoneITEq.FlowControlWithApproachTemps) {
                             Real64 TAirInSizing = 0.0;
-                            // Set the TAirInSizing to the maximun setpoint value to do sizing based on the maximum fan and cpu power of the ite
+                            // Set the TAirInSizing to the maximum setpoint value to do sizing based on the maximum fan and cpu power of the ite
                             // object
                             SetPointManager::GetSetPointManagerInputs(state);
                             for (auto *spm : state.dataSetPointManager->spms) {
@@ -7028,7 +7028,7 @@ namespace InternalHeatGains {
                                         state.dataHeatBal->space(spaceNum).Name);
                 }
 
-                // Not applicable for space until space has it's own air temeratures
+                // Not applicable for space until space has it's own air temperatures
                 // Setup Output Variable(state,
                 //                    "Space ITE Adjusted Return Air Temperature",
                 //                    Constant::Units::W,
@@ -9459,7 +9459,7 @@ namespace InternalHeatGains {
         //       DATE WRITTEN   Feb. 2012
 
         // PURPOSE OF THIS SUBROUTINE:
-        // worker routine for summing all the internal gain types based on the existing subrotine SumAllInternalCO2Gains
+        // worker routine for summing all the internal gain types based on the existing subroutine SumAllInternalCO2Gains
 
         // Return value
         Real64 SumGCGainRate(0.0);

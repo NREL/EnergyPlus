@@ -418,7 +418,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                 Real64 RefFuelUseMdot = (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecPowerOutput /
                                          state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecEfficiencyLHV) /
                                         (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelLowerHeatingValue * 1000.0);
-                // Output of Ancillary Power Modifer Curve (function of temps and fuel flow)
+                // Output of Ancillary Power Modifier Curve (function of temps and fuel flow)
                 Real64 AncillaryPowerOutput =
                     Curve::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum, RefFuelUseMdot);
                 if (std::abs(AncillaryPowerOutput - 1.0) > 0.1) {

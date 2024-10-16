@@ -84,7 +84,7 @@ namespace ElectricBaseboardRadiator {
 
     // PURPOSE OF THIS MODULE:
     // This module is to calculate the actual convective heat addition that an electrical baseboard heater
-    // deliveres to a space.
+    // delivers to a space.
 
     // METHODOLOGY EMPLOYED:
     // Based on the convective-only electric baseboard module (Object: ZoneHVAC:Baseboard:Convective:Electric)
@@ -888,7 +888,7 @@ namespace ElectricBaseboardRadiator {
         //                      April 2010 Brent Griffith, max limit to protect surface temperature calcs
 
         // PURPOSE OF THIS SUBROUTINE:
-        // To distribute the gains from the electric basebaord heater
+        // To distribute the gains from the electric baseboard heater
         // as specified in the user input file.  This includes distribution
         // of long wavelength radiant gains to surfaces and "people."
 

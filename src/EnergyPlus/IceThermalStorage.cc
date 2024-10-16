@@ -1525,7 +1525,7 @@ namespace IceThermalStorage {
         // There are three possible to calculate QiceMax
         //   with ChillerCapacity(Chiller+ITS), ITS capacity(ITS), and QchillerMax(Chiller).
         //--------------------------------------------------------
-        // Calcualte QiceMax with QiceMaxByChiller, QiceMaxByITS, QchillerMax
+        // Calculate QiceMax with QiceMaxByChiller, QiceMaxByITS, QchillerMax
         //--------------------------------------------------------
         // Calculate Qice charge max by Chiller with Twb and UAIceCh
         Real64 QiceMaxByChiller;
@@ -1562,7 +1562,7 @@ namespace IceThermalStorage {
         } // Check Uact for Discharging Process
 
         //--------------------------------------------------------
-        // Calcualte possible ITSChargingRate with Uact, Then error check
+        // Calculate possible ITSChargingRate with Uact, Then error check
         //--------------------------------------------------------
         // Calculate possible ITSChargingRate with Uact
         Real64 Qice = Uact * this->ITSNomCap / TimeInterval; //[W]
@@ -1617,7 +1617,7 @@ namespace IceThermalStorage {
         // Qice is maximized when ChillerInletTemp and ChillerOutletTemp(input data) is almost same due to LMTD method.
         // Qice is minimized(=0) when ChillerInletTemp is almost same as FreezTemp(=0).
 
-        // Initilize
+        // Initialize
         Real64 Tfr = FreezTempIP;
         Real64 ChOutletTemp = TempSItoIP(chillerOutletTemp); //[degF] = ConvertSItoIP[degC]
         // Chiller outlet temp must be below freeze temp, or else no charge
@@ -1710,7 +1710,7 @@ namespace IceThermalStorage {
 
         // Qice is calculate input U which is within boundary between Umin and Umax.
         Real64 Qice = Uact * this->ITSNomCap / TimeInterval;
-        // Qice cannot exceed MaxCap calulated by CalcIceStorageCapacity
+        // Qice cannot exceed MaxCap calculated by CalcIceStorageCapacity
         // Note Qice is negative here, MaxCap is positive
         Qice = max(Qice, -MaxCap);
 

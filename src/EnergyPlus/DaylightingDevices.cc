@@ -159,7 +159,7 @@ namespace Dayltg {
     // sky is conveniently given by SurfAnisoSkyMult.  NOTE:  The solar shading code was modified to allow sunlit
     // fraction, sunlit area, SurfAnisoSkyMult, etc. to be calculated for attached shading surfaces.
     // Future shelf model improvements:
-    // 1. Allow beam and downgoing flux to pass the end of the inside shelf depending on actual shelf goemetry.
+    // 1. Allow beam and downgoing flux to pass the end of the inside shelf depending on actual shelf geometry.
     // 2. Reduce outside shelf view factor to sky (for daylighting) by taking into account anisotropic sky
     //    distribution and shading, i.e. the daylighting equivalent of SurfAnisoSkyMult.
     // 3. Expand view factor to shelf calculation to handle more complicated geometry.
@@ -1789,7 +1789,7 @@ namespace Dayltg {
         //       DATE WRITTEN   Dec 2011
 
         // PURPOSE OF THIS SUBROUTINE:
-        // intialize zone gains at begin new environment
+        // initialize zone gains at begin new environment
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

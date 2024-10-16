@@ -606,7 +606,7 @@ namespace Window {
             assert(matScreen != nullptr);
 
             // Simon: Existing code already takes into account geometry of Woven and scales down
-            // emissivity for openning area.
+            // emissivity for opening area.
             emissFront = matScreen->AbsorpThermal;
             emissBack = matScreen->AbsorpThermal;
             transThermalFront = matScreen->TransThermal;

@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, Simulationmanager_bool_to_string)
     EXPECT_EQ(SimulationManager::bool_to_string(false), "False");
 }
 
-TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
+TEST_F(EnergyPlusFixture, Simulationmanager_writeInitialPerfLogValues)
 {
     state->dataStrGlobals->outputPerfLogFilePath = "eplusout_perflog.csv";
 
@@ -136,7 +136,7 @@ TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
     Util::appendPerfLog(*state, "RESET", "RESET");
 
     // call the function to test
-    SimulationManager::writeIntialPerfLogValues(*state, "MODE193");
+    SimulationManager::writeInitialPerfLogValues(*state, "MODE193");
 
     // force the file to be written
     Util::appendPerfLog(*state, "lastHeader", "lastValue", true);

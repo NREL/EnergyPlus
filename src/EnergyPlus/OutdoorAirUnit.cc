@@ -844,7 +844,7 @@ namespace OutdoorAirUnit {
                             break;
                         }
                         case CompType::Desiccant: {
-                            // Futher Enhancement
+                            // Future Enhancement
                             //        CASE('DEHUMIDIFIER:DESICCANT:SYSTEM')
                             //          thisOutAirUnit%OAEquip(CompNum)%Type= CompType::Desiccant
                             break;
@@ -1404,7 +1404,7 @@ namespace OutdoorAirUnit {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is for sizing zoen outdoor air control unit components for which flow rates have not been
+        // This subroutine is for sizing zone outdoor air control unit components for which flow rates have not been
         // specified in the input.
 
         // METHODOLOGY EMPLOYED:
@@ -1625,14 +1625,14 @@ namespace OutdoorAirUnit {
         Real64 SetPointTemp;   // temperature that will be used to control the radiant system [Celsius]
         Real64 HiCtrlTemp;     // Current high point in setpoint temperature range
         Real64 LoCtrlTemp;     // Current low point in setpoint temperature range
-        Real64 AirInEnt;       // RE-calcualte the Enthalpy of supply air
+        Real64 AirInEnt;       // RE-calculate the Enthalpy of supply air
         Real64 AirOutletTemp = 0.0;
         Real64 ZoneSupAirEnt; // Specific humidity ratio of inlet air (kg moisture / kg moist air)
         // Latent output
         Real64 LatentOutput; // Latent (moisture) add/removal rate, negative is dehumidification [kg/s]
         Real64 SpecHumOut;   // Specific humidity ratio of outlet air (kg moisture / kg moist air)
         Real64 SpecHumIn;    // Specific humidity ratio of inlet air (kg moisture / kg moist air)
-        Real64 ZoneAirEnt;   // zone air enthalphy J/kg
+        Real64 ZoneAirEnt;   // zone air enthalpy J/kg
 
         // initialize local variables
         int const InletNode = thisOutAirUnit.AirInletNode;        // Unit air inlet node, only used if ExtFan

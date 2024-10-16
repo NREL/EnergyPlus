@@ -2707,7 +2707,7 @@ void CHKBKS(EnergyPlusData &state,
     //                                    correspond to how CHKBKS is called
     //                      Jan 2002, FW: change error message
     //       RE-ENGINEERED  Lawrie, Oct 2000
-    //       Sep 2020: Revised the vector computation method to reliabily produce CVec,
+    //       Sep 2020: Revised the vector computation method to reliably produce CVec,
     //                 and simplified the warning messages.
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -3071,7 +3071,7 @@ void CHKSBS(EnergyPlusData &state,
         //    CALL ShowContinueError(state, 'Surface "'//TRIM(Surface(GRSNR)%Name)//'" '//TRIM(MSG(OverlapStatus))//  &
         //                     ' SubSurface "'//TRIM(Surface(SBSNR)%Name)//'"')
         //    IF (FirstSurroundError) THEN
-        //      CALL ShowWarningError(state, 'Base Surface does not surround subsurface errors occuring...'//  &
+        //      CALL ShowWarningError(state, 'Base Surface does not surround subsurface errors occurring...'//  &
         //                     'Check that the SurfaceGeometry object is expressing the proper starting corner and '//  &
         //                     'direction [CounterClockwise/Clockwise]')
         //      FirstSurroundError=.FALSE.
@@ -4155,7 +4155,7 @@ void CLIPRECT(EnergyPlusData &state, int const NS2, int const NV1, int &NV3)
         }
     }
 
-    // update homogenous edges A,B,C
+    // update homogeneous edges A,B,C
     if (NV3 > 0) {
         Real64 const X_0(state.dataSolarShading->XTEMP[0]);
         Real64 const Y_0(state.dataSolarShading->YTEMP[0]);
@@ -5894,7 +5894,7 @@ void SHDGSS(EnergyPlusData &state,
     int NS1;         // Number of the figure being overlapped
     int NS2;         // Number of the figure doing overlapping
     int NS3;         // Location to place results of overlap
-    Real64 SchValue; // Value for Schedule of shading transmittence
+    Real64 SchValue; // Value for Schedule of shading transmittance
 
     auto &s_surf = state.dataSurface;
 
@@ -5943,7 +5943,7 @@ void SHDGSS(EnergyPlusData &state,
                     }
                 }
             }
-            // Elimate shawdowing surfaces that is supposed to be disabled.
+            // Eliminate shadowing surfaces that is supposed to be disabled.
             if (state.dataSysVars->DisableAllSelfShading) {
                 if (surface.Zone != 0) {
                     continue; // Disable all shadowing surfaces in all zones. Attached shading surfaces are not part of a zone, zone value is 0.
@@ -6844,11 +6844,11 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                 } else if (s_surf->SurfWinWindowModelType(SurfNum) == WindowModel::EQL) {
                     // call the ASHWAT fenestration model for optical properties
-                    // determine the beam radiation absorptance and tranmittance of the
+                    // determine the beam radiation absorptance and transmittance of the
                     // the equivalent layer window model
                     WindowEquivalentLayer::CalcEQLOpticalProperty(state, SurfNum, SolarArrays::BEAM, state.dataSolarShading->SurfWinAbsSolBeamEQL);
                     auto &CFS = state.dataWindowEquivLayer->CFS;
-                    // recalcuate the diffuse absorptance and transmittance of the
+                    // recalculate the diffuse absorptance and transmittance of the
                     // the equivalent layer window model if there is shade control
                     int EQLNum = state.dataConstruction->Construct(surf.Construction).EQLConsPtr; // equivalent layer fenestration index
                     if (CFS(EQLNum).ISControlled) {
@@ -7128,7 +7128,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 if (ShadeFlag == WinShadingType::IntBlind) {
                                     Real64 RhoBlBmDifFr = FrontBeamDiffRefl;            // Beam-diffuse front reflectance of blind
                                     Real64 RGlDifBk = thisConstruct.ReflectSolDiffBack; // Diffuse front reflectance of glass
-                                    Real64 RhoBlDifDifFr = FrontDiffDiffRefl;           // Diffuse-diffuse front refectance of blind
+                                    Real64 RhoBlDifDifFr = FrontDiffDiffRefl;           // Diffuse-diffuse front reflectance of blind
                                     // beam-beam and diffuse transmittance of exterior beam
                                     TBmBmBl = TBmBm * TBlBmBm;
                                     TBlDifDif = FrontDiffDiffTrans;
@@ -7139,7 +7139,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     if (TBmDifShBlSc < 0.0) TBmDifShBlSc = 0.0;
                                 } else if (ShadeFlag == WinShadingType::ExtBlind) {
                                     Real64 RhoBlBmDifBk = BackBeamDiffRefl;  // Beam-diffuse back reflectance of blind
-                                    Real64 RhoBlDifDifBk = BackDiffDiffRefl; // Diffuse-diffuse back refectance of blind
+                                    Real64 RhoBlDifDifBk = BackDiffDiffRefl; // Diffuse-diffuse back reflectance of blind
                                     Real64 RGlBmFr = POLYF(CosInc, thisConstruct.ReflSolBeamFrontCoef);
                                     Real64 RGlDifFr = thisConstruct.ReflectSolDiffFront;
                                     // beam-beam and diffuse transmittance of exterior beam
@@ -7879,7 +7879,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                             CFBoverlap = 0.0;
                             // Calculate effects on all back surfaces for each of basis directions.  Each of basis directions from the back of the
-                            // window has to be considered as beam and therefore calcualte CFBoverlap for each of them
+                            // window has to be considered as beam and therefore calculate CFBoverlap for each of them
                             for (int CurTrnDir = 1; CurTrnDir <= state.dataBSDFWindow->ComplexWind(SurfNum).Geom(CurCplxFenState).Trn.NBasis;
                                  ++CurTrnDir) {
                                 Real64 CurLambda = state.dataBSDFWindow->ComplexWind(SurfNum)
@@ -7916,7 +7916,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                  CurTrnDir <= state.dataBSDFWindow->ComplexWind(SurfNum).Geom(CurCplxFenState).Trn.NBasis;
                                                  ++CurTrnDir) {
                                                 Real64 bestDot; // complex fenestration hits other complex fenestration, it is important to find
-                                                // matching beam directions.  Beam leving one window will have certaing number for it's basis
+                                                // matching beam directions.  Beam leaving one window will have certain number for it's basis
                                                 // while same beam reaching back surface will have different beam number.  This value is used
                                                 // to keep best matching dot product for those directions
                                                 Real64 curDot;   // temporary variable for current dot product
@@ -8040,7 +8040,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 Real64 backSurfBeamSolInTrans = 0.0; // Fraction of BeamSolarRad transmitted out through window inside face [W]
 
                                 // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
-                                // or interior window (treates windows with/without shades as defined) for this timestep
+                                // or interior window (treats windows with/without shades as defined) for this timestep
 
                                 // call the ASHWAT fenestration model for beam radiation here
                                 WindowEquivalentLayer::CalcEQLOpticalProperty(
@@ -8493,8 +8493,8 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
                     int CurrentState = s_surf->SurfaceWindow(SurfNum).ComplexFen.CurrentState;
                     auto &cplxState = s_surf->SurfaceWindow(SurfNum).ComplexFen.State(CurrentState);
                     for (size_t Lay = 1; Lay <= numOfLayers; ++Lay) {
-                        // Simon: Imporant note about this equation is to use BeamSolarRad and not SurfQRadSWOutIncident
-                        // is becuase BeamSolarRad is direct normal radiation (looking at the Sun) while SurfRadSWOutIncident
+                        // Simon: Important note about this equation is to use BeamSolarRad and not SurfQRadSWOutIncident
+                        // is because BeamSolarRad is direct normal radiation (looking at the Sun) while SurfRadSWOutIncident
                         // is normal to window incidence. Since BSDF coefficients are taking into account angle of incidence,
                         // BeamSolarRad should be used in this case
                         state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) =
@@ -8837,7 +8837,7 @@ void SHDRVL(EnergyPlusData &state,
     // REFERENCES:
     // BLAST/IBLAST code, original author George Walton
 
-    int NVS; // Number of verticies
+    int NVS; // Number of vertices
 
     int constexpr None(0);                       // for use with RevealStatus
     int constexpr EntireWindowShadedByReveal(1); // for use with RevealStatus
@@ -8950,7 +8950,7 @@ void SHDRVL(EnergyPlusData &state,
                 state.dataSolarShading->YVS(N) = s_surf->ShadeV(SBSNR).YV(NVS + 1 - N);
             }
 
-            // Transform to homogenous coordinates
+            // Transform to homogeneous coordinates
 
             NS2 = state.dataSolarShading->LOCHCA + 1;
             state.dataSolarShading->LOCHCA = NS2;
@@ -9410,7 +9410,7 @@ void WindowShadingManager(EnergyPlusData &state)
                         POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * surfWin.glazedFrac;
 
                 // Window has shading control
-                // select the active window shading control and corresponding contructions
+                // select the active window shading control and corresponding constructions
                 size_t indexWindowShadingControl = selectActiveWindowShadingControlIndex(state, ISurf);
                 if (!s_surf->Surface(ISurf).windowShadingControlList.empty() &&
                     indexWindowShadingControl <= s_surf->Surface(ISurf).windowShadingControlList.size() - 1) {
@@ -9910,7 +9910,7 @@ void WindowShadingManager(EnergyPlusData &state)
                             slatAng = Constant::DegToRad * surfShade.blind.slatAngDegEMSValue;
                         }
 
-                        // Slat angle is changing, need to recalcualte stored values
+                        // Slat angle is changing, need to recalculate stored values
                         if (slatAng != surfShade.blind.slatAng) {
                             surfShade.blind.slatAng = slatAng;
                             surfShade.blind.slatAngDeg = surfShade.blind.slatAng * Constant::RadToDeg;
@@ -9944,7 +9944,7 @@ void WindowShadingManager(EnergyPlusData &state)
                 } // End of check if interior or exterior or between glass blind in place
 
                 // AR: don't need to do this anymore I don't think
-                // CALL CalcScreenTransmittance to intialized all screens prior to HB calc's
+                // CALL CalcScreenTransmittance to initialized all screens prior to HB calc's
                 // if (s_surf->SurfWinShadingFlag(ISurf) == WinShadingType::ExtScreen && state.dataEnvrn->SunIsUp) {
                 //    CalcScreenTransmittance(state, ISurf);
                 // }
@@ -11117,7 +11117,7 @@ void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state)
                                 DiffReflGlass = Window::InterpSw(s_surf->SurfWinSwitchingFactor(SurfNum), DiffReflGlass, DiffReflGlassSh);
                             }
 
-                            // Calc beam solar sbsorbed (m2)
+                            // Calc beam solar absorbed (m2)
                             s_surf->SurfWinBmSolAbsdInsReveal(SurfNum) +=
                                 A2ill * SolTransGlass * InsideRevealSolAbs * CosBeta * tmp_SunlitFracWithoutReveal;
 
@@ -12556,7 +12556,7 @@ void CalcComplexWindowOverlap(EnergyPlusData &state,
 
     // HTRANS routine is using coordinates stored in XVS and YVS in order to calculate
     // surface area.  Since both projections are equal to zero, then simply
-    // compy these values into XVS and YVS arrays
+    // copy these values into XVS and YVS arrays
     for (N = 1; N <= NVT; ++N) {
         state.dataSolarShading->XVS(N) = state.dataSolarShading->XVertex(N);
         state.dataSolarShading->YVS(N) = state.dataSolarShading->YVertex(N);
@@ -12569,7 +12569,7 @@ void CalcComplexWindowOverlap(EnergyPlusData &state,
     for (IRay = 1; IRay <= Geom.Trn.NBasis; ++IRay) { // basis directions loop (on back surface)
         // For current basis direction calculate dot product between window surface
         // and basis direction.  This will be used to calculate projection of each
-        // of the back surfaces to window surface for given basis direciton
+        // of the back surfaces to window surface for given basis direction
         SdotX = dot(s_surf->Surface(ISurf).lcsx, Geom.sTrn(IRay));
         SdotY = dot(s_surf->Surface(ISurf).lcsy, Geom.sTrn(IRay));
         SdotZ = dot(s_surf->Surface(ISurf).lcsz, Geom.sTrn(IRay));
@@ -12577,7 +12577,7 @@ void CalcComplexWindowOverlap(EnergyPlusData &state,
         YSp = -SdotY;
         ZSp = -SdotZ;
 
-        // Projection of shadows for current basis direciton
+        // Projection of shadows for current basis direction
         if (std::abs(ZSp) > Constant::SmallDistance) {
             XShadowProjection = XSp / ZSp;
             YShadowProjection = YSp / ZSp;
@@ -12634,12 +12634,12 @@ void CalcComplexWindowOverlap(EnergyPlusData &state,
             Geom.AOverlap(KBkSurf, IRay) = state.dataSolarShading->HCAREA(state.dataSolarShading->LOCHCA);
         } // DO KBkSurf  = 1 , NBkSurf
 
-        // If some of back surfaces is contained in base surface, then need to substract shadow of subsurface
-        // from shadow on base surface.  Reson is that above shadowing algorithm is calculating shadow wihtout
+        // If some of back surfaces is contained in base surface, then need to subtract shadow of subsurface
+        // from shadow on base surface.  Reason is that above shadowing algorithm is calculating shadow without
         // influence of subsurfaces
         for (KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf) { // back surf loop
             BackSurfaceNumber = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf);
-            // CurBaseSurf is Current base surface number for shadow overlap calcualtions
+            // CurBaseSurf is Current base surface number for shadow overlap calculations
             int CurBaseSurf = s_surf->Surface(BackSurfaceNumber).BaseSurf;
             if (CurBaseSurf != BackSurfaceNumber) {
                 // Search if that base surface in list of back surfaces for current window

@@ -40,7 +40,7 @@ This alpha field contains the schedule name (ref. Schedule objects) that contain
 
 \paragraph{Field: Transformer Usage}\label{field-transformer-usage}
 
-This field indicates one of the three supported transformer application types: PowerInFromGrid, PowerOutToGrid, and LoadCenterPowerConditioning. A PowerInFromGrid type of transformer is used to step down voltage from the electricity grid to the building. The transformer with this type of use is somewhat free standing and does not need to be referenced in any \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} object. There should be only one PowerInFromGrid transformer in the model. A PowerOutToGrid type of transformer is used to match voltage from the building to the electricity grid. This conditions power exported out of the facility and feed back into the grid. This type of transformer will only be needed if the building ever exports power and the building and grid connection have different voltages. There should be only one PowerOutToGrid transformer in the model and it will serve all the surplus electricity produced by electric load center(s). A LoadCenterPowerConditioning type of transformer is used to match voltage between an electic load center (subpanel) and the facility's main panel. Each electric load center can have its own transformer to condition power fed into the main panel. For electric load centers that also draw power from the main panel, to charge storage, the transformer is assumed to operate in both directions (at the same performance). This type of transformer should be named in an \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} object.
+This field indicates one of the three supported transformer application types: PowerInFromGrid, PowerOutToGrid, and LoadCenterPowerConditioning. A PowerInFromGrid type of transformer is used to step down voltage from the electricity grid to the building. The transformer with this type of use is somewhat free standing and does not need to be referenced in any \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} object. There should be only one PowerInFromGrid transformer in the model. A PowerOutToGrid type of transformer is used to match voltage from the building to the electricity grid. This conditions power exported out of the facility and feed back into the grid. This type of transformer will only be needed if the building ever exports power and the building and grid connection have different voltages. There should be only one PowerOutToGrid transformer in the model and it will serve all the surplus electricity produced by electric load center(s). A LoadCenterPowerConditioning type of transformer is used to match voltage between an electric load center (subpanel) and the facility's main panel. Each electric load center can have its own transformer to condition power fed into the main panel. For electric load centers that also draw power from the main panel, to charge storage, the transformer is assumed to operate in both directions (at the same performance). This type of transformer should be named in an \hyperref[electricloadcenterdistribution]{ElectricLoadCenter:Distribution} object.
 
 \paragraph{Field: Zone Name}\label{field-zone-name-005}
 
@@ -149,7 +149,7 @@ ElectricLoadCenter:Transformer,
 \item
   HVAC,Average,Transformer Output Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Transformer Output Elecric Energy {[}J{]}
+  HVAC,Sum,Transformer Output Electric Energy {[}J{]}
 \item
   HVAC,Average,Transformer Input Electricity Rate {[}W{]}
 \item
@@ -178,7 +178,7 @@ This output field is the efficiency at which the distribution transformer change
 
 \paragraph{Transformer Output Electricity Rate {[}W{]}}\label{transformer-output-electric-power-w}
 
-\paragraph{Transformer Output Elecric Energy {[}J{]}}\label{transformer-output-elecric-energy-j}
+\paragraph{Transformer Output Electric Energy {[}J{]}}\label{transformer-output-electric-energy-j}
 
 These outputs are the total electricity power or energy provided by the transformer. They are equal to the metered loads which are wired to the transformer. These values are calculated for each HVAC system timestep being simulated, and the results are averaged (for power) or summed (for energy) for the timestep being reported.
 

@@ -133,7 +133,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
 // PURPOSE OF THIS MODULE:
 // To encapsulate the data and algorithms required to
-// manage the simluation of the surface heat balance for the building.
+// manage the simulation of the surface heat balance for the building.
 
 // REFERENCES:
 // The heat balance method is outlined in the "TARP Reference Manual", NIST, NBSIR 83-2655, Feb 1983.
@@ -996,7 +996,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         surfName,
                         WindowShadingControlTypeNames[int(state.dataSurface->WindowShadingControl(curWSC).shadingControlType)]);
 
-                    // output list of all possible shading contructions for shaded windows including those with storms
+                    // output list of all possible shading constructions for shaded windows including those with storms
                     std::string names;
                     for (int construction : surface.shadedConstructionList) {
                         if (!names.empty()) names.append("; ");
@@ -2127,7 +2127,7 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
     for (auto &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
         thisEnclosure.MRT = DataHeatBalance::ZoneInitialTemp;
     }
-    // Reset spaceHeatBalance even if doSpaceHeatBalance is false, beause spaceHB is used to gether zoneHB in some cases
+    // Reset spaceHeatBalance even if doSpaceHeatBalance is false, because spaceHB is used to gether zoneHB in some cases
     for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
         new (&thisSpaceHB) ZoneTempPredictorCorrector::SpaceHeatBalanceData();
         // Initialize the Zone Humidity Ratio here so that it is available for EMPD implementations
@@ -2836,7 +2836,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 state.dataHeatBal->EnclSolQSDifSol(enclNum) *= state.dataViewFactor->EnclSolInfo(enclNum).solVMULT;
         }
 
-        //    RJH - 09-12-07 commented out report varariable calcs here since they refer to old distribution method
+        //    RJH - 09-12-07 commented out report variable calcs here since they refer to old distribution method
         //    DO SurfNum = 1, TotSurfaces
         //      IF (.NOT. Surface(SurfNum)%HeatTransSurf) CYCLE
         //!!! Following may need to be removed or changed when shelves are considered in adjacent reflection calculations
@@ -3087,7 +3087,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     Real64 interpFac = surfShade.blind.slatAngInterpFac;
                                     Real64 AbsDiffBlind;
 
-                                    // For constructions, have to do interpolation wheather we have movable slats or not
+                                    // For constructions, have to do interpolation whether we have movable slats or not
                                     for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                         auto const &dfAbsSlatLo = constructionSh.layerSlatBlindDfAbs(Lay)[slatIdxLo];
                                         auto const &dfAbsSlatHi = constructionSh.layerSlatBlindDfAbs(Lay)[slatIdxHi];
@@ -3172,7 +3172,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             }
                             state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfNum) =
                                 state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-                            // Need to do it this way for now beaucse of scheduled surface gains. They do work only with
+                            // Need to do it this way for now because of scheduled surface gains. They do work only with
                             // BSDF windows and overwriting absorbtances will work only for ordinary windows
                             // } else if ( SurfaceWindow( SurfNum ).WindowModelType != WindowModel:: BSDF &&
                             //   SurfaceWindow( SurfNum ).WindowModelType != WindowModel:: EQL &&
@@ -3200,7 +3200,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     // ABWin(Lay) = SurfWinA(SurfNum,Lay)
                                     state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) = state.dataSurface->SurfWinA(SurfNum, Lay);
                                 } else {
-                                    // Several notes about this equation.  First part is accounting for duffuse solar radiation for the ground
+                                    // Several notes about this equation.  First part is accounting for diffuse solar radiation for the ground
                                     // and from the sky.  Second item (SurfWinA(SurfNum,Lay) * BeamSolar) is accounting for absorbed solar
                                     // radiation originating from beam on exterior side.  Third item (SurfWinACFOverlap(SurfNum,Lay)) is
                                     // accounting for absorptances from beam hitting back of the window which passes through rest of exterior
@@ -3229,7 +3229,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             for (int Lay = 1; Lay <= TotSolidLay; ++Lay) {
                                 // Absorbed window components include:
                                 // (1) beam solar radiation absorbed by all layers in the fenestration
-                                // (2) sky and ground reflected duffuse solar radiation absorbed by all layers
+                                // (2) sky and ground reflected diffuse solar radiation absorbed by all layers
                                 // (3) diffuse short wave incident on the inside face of the fenestration.  The short wave internal sources
                                 //     include light, ...
                                 state.dataHeatBalSurfMgr->AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL(Lay);
@@ -3326,8 +3326,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             // (A window shade or blind, if present, is assumed to not shade the frame, so no special
                             // treatment of frame solar needed if window has an exterior shade or blind.)
                             if (FrArea > 0.0) {
-                                Real64 FrIncSolarOut = BeamFaceInc; // Total solar incident on outside offrame including solar
-                                Real64 FrIncSolarIn = 0.0; // Total solar incident on inside offrame including solar on frame projection (W/m2)
+                                Real64 FrIncSolarOut = BeamFaceInc; // Total solar incident on outside of frame including solar
+                                Real64 FrIncSolarIn = 0.0; // Total solar incident on inside of frame including solar on frame projection (W/m2)
                                 Real64 TransDiffGl = 0.0;  // Diffuse solar transmittance
                                 if (FrProjOut > 0.0 || FrProjIn > 0.0) {
                                     Real64 BeamFrHorFaceInc =
@@ -4459,7 +4459,7 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
     //       DATE WRITTEN   April 2011
 
     // PURPOSE OF THIS SUBROUTINE:
-    // initialize material and construction surface properties if being overriden by EMS
+    // initialize material and construction surface properties if being overridden by EMS
 
     // METHODOLOGY EMPLOYED:
     // update solar, thermal and visible absorptance values when actuated by EMS
@@ -4525,7 +4525,7 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
     //       DATE WRITTEN   Jan 2012
 
     // PURPOSE OF THIS SUBROUTINE:
-    // change construction on surface if overriden by EMS
+    // change construction on surface if overridden by EMS
 
     state.dataGlobal->AnyConstrOverridesInModel = false;
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
@@ -4542,7 +4542,7 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
         if (state.dataSurface->SurfEMSConstructionOverrideON(SurfNum) && (state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum) > 0)) {
 
             if (state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum))
-                    .TypeIsWindow) { // okay, allways allow windows
+                    .TypeIsWindow) { // okay, always allow windows
                 state.dataRuntimeLang->EMSConstructActuatorChecked(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum) = true;
                 state.dataRuntimeLang->EMSConstructActuatorIsOkay(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum) = true;
             }
@@ -4568,7 +4568,7 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                             true;
                         if (state.dataConstruction->Construct(surface.Construction).NumHistories !=
                             state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).NumHistories) {
-                            // thow warning, but allow
+                            // throw warning, but allow
                             ShowWarningError(state,
                                              "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, incompatible "
                                              "CTF timescales are being used.");
@@ -4609,7 +4609,7 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
 
                         if (state.dataConstruction->Construct(surface.Construction).SourceSinkPresent) {
                             if (!state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).SourceSinkPresent) {
-                                // thow warning, and do not allow
+                                // throw warning, and do not allow
                                 ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
                                 ShowContinueError(state,
                                                   format("Construction named = {} has internal source/sink",
@@ -4640,7 +4640,7 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                             true;
                         if (state.dataHeatBalFiniteDiffMgr->ConstructFD(surface.Construction).TotNodes !=
                             state.dataHeatBalFiniteDiffMgr->ConstructFD(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).TotNodes) {
-                            // thow warning, and do not allow
+                            // throw warning, and do not allow
                             ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
                             ShowContinueError(state,
                                               format("Construction named = {} has number of finite difference nodes ={}",
@@ -4663,7 +4663,7 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
 
                         if (state.dataConstruction->Construct(surface.Construction).SourceSinkPresent) {
                             if (!state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).SourceSinkPresent) {
-                                // thow warning, and do not allow
+                                // throw warning, and do not allow
                                 ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
                                 ShowContinueError(state,
                                                   format("Construction named = {} has internal source/sink",
@@ -5074,7 +5074,7 @@ void UpdateThermalHistories(EnergyPlusData &state)
                                                 state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum); // Heat source/sink term for radiant systems
                 // Only HT opaq surfaces are evaluated, previous if (surface.Class == SurfaceClass::Floor || surface.Class == SurfaceClass::Wall ||
                 // surface.Class == SurfaceClass::IntMass || surface.Class == SurfaceClass::Roof || surface.Class == SurfaceClass::Door) checks are
-                // reduncant.
+                // redundant.
                 if (construct.SourceSinkPresent) {
                     SurfInsideFluxHistCurr += state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) * construct.CTFSourceIn[0];
                 }
@@ -5484,7 +5484,7 @@ void CalcThermalResilience(EnergyPlusData &state)
     // The current formula for determining the humidex was developed by J. M. Masterton and F. A. Richardson of
     // Canada's Atmospheric Environment Service in 1979.
     // Reference: Masterson, J., and F. Richardson, 1979: Humidex, a method of quantifying human
-    // discomfort due to excessive heat and humidity CLI 1-79, Environment Canada, Atmosheric Environment Servic
+    // discomfort due to excessive heat and humidity CLI 1-79, Environment Canada, Atmospheric Environment Service
     //        using OutputProcessor::ReqRepVars;
     if (state.dataHeatBalSurfMgr->ManageSurfaceHeatBalancefirstTime) {
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -7093,7 +7093,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     }
                     // This ends the calculations for this surface and goes on to the next SurfNum
                 } break;
-                case DataSurfaces::OtherSideCondModeledExt: { // A surface with other side conditions determined from seperate, dynamic component
+                case DataSurfaces::OtherSideCondModeledExt: { // A surface with other side conditions determined from separate, dynamic component
                     // modeling that defines the "outside environment"
                     // First, set up the outside convection coefficient and the exterior temperature
                     // boundary condition for the surface
@@ -7168,7 +7168,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     }
                     // Roughness index of the exterior surface
                     Material::SurfaceRoughness RoughSurf = state.dataHeatBalSurf->SurfRoughnessExt(SurfNum);
-                    // Thermal absoptance of the exterior surface
+                    // Thermal absorptance of the exterior surface
                     Real64 AbsThermSurf = state.dataHeatBalSurf->SurfAbsThermalExt(SurfNum);
                     HMovInsul = 0;
                     // Check for outside movable insulation
@@ -9561,7 +9561,7 @@ Real64 GetSurfIncidentSolarMultiplier(EnergyPlusData &state, int SurfNum)
 void InitSurfacePropertyViewFactors(EnergyPlusData &state)
 {
 
-    // purpuse:
+    // purpose:
     //   Initializes sky and ground surfaces view factors of exterior surfaces
     //   used by SurfaceProperty:LocalEnvironment
     //   view factors are constant hence should be set only once
@@ -9698,7 +9698,7 @@ void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state)
 
 void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state)
 {
-    //  returns ground surfaces average reflectance (dimenssionless)
+    //  returns ground surfaces average reflectance (dimensionless)
     //  ground reflectance viewed by a building exterior surface
     //  ground surfaces reflectance weighed using view factors
 
@@ -9731,7 +9731,7 @@ void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state)
 
 void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum)
 {
-    //  resets ground veiew factors based on view factors identity
+    //  resets ground view factors based on view factors identity
     //  the ground view factor value is set to the first element
     //  when the ground view factor input field is blank
 

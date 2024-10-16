@@ -648,7 +648,7 @@ std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const
 Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
 {
     // Return the value of fieldName in ep_object as a Real64.
-    // If the field value is a string, then assum autosize and return Constant::AutoCalculate(-99999).
+    // If the field value is a string, then assume autosize and return Constant::AutoCalculate(-99999).
     // If the field is not present in ep_object then return its default if there is one, or return 0.0
     auto it = ep_object.find(fieldName);
     if (it != ep_object.end()) {
@@ -681,7 +681,7 @@ Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &sche
 int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
 {
     // Return the value of fieldName in ep_object as an integer.
-    // If the field value is a string, then assume autosize or autocalulate and return Constant::AutoCalculate(-99999).
+    // If the field value is a string, then assume autosize or autocalculate and return Constant::AutoCalculate(-99999).
     // If the field is not present in ep_object then return its default if there is one, or return 0
 
     auto const &schema_field_obj = schema_obj_props[fieldName];
@@ -1473,7 +1473,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
     state.dataOutput->iNumberOfDefaultedFields = 0;     // Number of defaulted fields in IDF
     state.dataOutput->iTotalFieldsWithDefaults = 0;     // Total number of fields that could be defaulted
     state.dataOutput->iNumberOfAutoSizedFields = 0;     // Number of autosized fields in IDF
-    state.dataOutput->iTotalAutoSizableFields = 0;      // Total number of autosizeable fields
+    state.dataOutput->iTotalAutoSizableFields = 0;      // Total number of autosizable fields
     state.dataOutput->iNumberOfAutoCalcedFields = 0;    // Number of autocalculated fields
     state.dataOutput->iTotalAutoCalculatableFields = 0; // Total number of autocalculatable fields
 
@@ -1710,7 +1710,7 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This routine checks for existance of "Preprocessor Message" object and
+    // This routine checks for existence of "Preprocessor Message" object and
     // performs appropriate action.
 
     // METHODOLOGY EMPLOYED:

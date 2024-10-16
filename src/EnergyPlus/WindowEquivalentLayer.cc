@@ -171,7 +171,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
 
     // PURPOSE OF THIS SUBROUTINE:
     // Populates the the equivalent layer window model optical and thermal
-    // properties, fills default values and shades geomterical calculations
+    // properties, fills default values and shades geometrical calculations
 
     // METHODOLOGY EMPLOYED:
     // uses some routine developed for ASHRAE RP-1311 (ASHWAT Model)
@@ -420,7 +420,7 @@ void CalcEQLWindowUvalue(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("CalcEQLWindowUvalue: ");
 
     Real64 U;    // U-factor, W/m2-K
-    Real64 UOld; // U-factor during pevious iteration step, W/m2-K
+    Real64 UOld; // U-factor during previous iteration step, W/m2-K
     Real64 HXO;  // outdoor combined conv+rad surf coeff, W/m2-K
     Real64 HXI;  // indoor combined conf+rad surf coeff, W/m2-K
     Real64 HRO;  // outdoor side radiation surf coeff, W/m2-K
@@ -438,7 +438,7 @@ void CalcEQLWindowUvalue(EnergyPlusData &state,
 
     bool CFSURated = false; // false if U-Value calculation failed
 
-    // Intial guess value for combined conductance
+    // Initial guess value for combined conductance
     HXO = 29.0; // 1/FenROut
     HXI = 7.0;  // 1/FenRIn
     HCO = 26.0;
@@ -457,7 +457,7 @@ void CalcEQLWindowUvalue(EnergyPlusData &state,
               ((TGO + Constant::Kelvin) + (TOUT + Constant::Kelvin));
         HRI = Constant::StefanBoltzmann * EI * (pow_2(TGI + Constant::Kelvin) + pow_2(TIN + Constant::Kelvin)) *
               ((TGI + Constant::Kelvin) + (TIN + Constant::Kelvin));
-        // HCI = HIC_ASHRAE( Height, TGI, TI)  ! BAN June 2103 Raplaced with ISO Std 15099
+        // HCI = HIC_ASHRAE( Height, TGI, TI)  ! BAN June 2103 Replaced with ISO Std 15099
         TGIK = TGI + Constant::Kelvin;
         TIK = TIN + Constant::Kelvin;
         HCI = HCInWindowStandardRatings(state, Height, TGIK, TIK);
@@ -495,7 +495,7 @@ void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
 
     // METHODOLOGY EMPLOYED:
     // Uses routine developed for ASHRAE RP-1311 (ASHWAT Model)
-    // Summer Window Rating Conditoions
+    // Summer Window Rating Conditions
     // tin = 297.15d0         ! indoor air condition (75.2F,  24.0C)
     // tout = 305.15d0        ! Outside air temperature (89.6F, 32C)
     // hcout = 15.d0          ! Outside convective film conductance at 2.8 m/s (6.2 mph) wind speed
@@ -655,11 +655,11 @@ void CalcEQLWindowOpticalProperty(EnergyPlusData &state,
 
 void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
                                  int const SurfNum,       // Surface number
-                                 Real64 const HcOut,      // outside convection coeficient at this timestep, W/m2K
+                                 Real64 const HcOut,      // outside convection coefficient at this timestep, W/m2K
                                  Real64 &SurfInsideTemp,  // Inside window surface temperature (innermost face) [C]
                                  Real64 &SurfOutsideTemp, // Outside surface temperature (C)
                                  Real64 &SurfOutsideEmiss,
-                                 DataBSDFWindow::Condition const CalcCondition // Calucation condition (summer, winter or no condition)
+                                 DataBSDFWindow::Condition const CalcCondition // Calculation condition (summer, winter or no condition)
 )
 {
     // SUBROUTINE INFORMATION:
@@ -704,7 +704,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     Real64 QXConv;              // extra convective gain from this surface
     Real64 TaIn(0);             // zone air temperature
     Real64 tsky;                // sky temperature
-    Real64 HcIn;                // inside convection coeficient at this timestep, W/m2K
+    Real64 HcIn;                // inside convection coefficient at this timestep, W/m2K
     Real64 ConvHeatFlowNatural; // Convective heat flow from gap between glass and interior shade or blind (W)
     Real64 NetIRHeatGainWindow; // net radiation gain from the window surface to the zone (W)
     Real64 ConvHeatGainWindow;  // net convection heat gain from inside surface of window to zone air (W)
@@ -836,7 +836,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainWindow;
     state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainWindow;
     if (InSideLayerType == LayerType::GLAZE) {
-        // no interior sade
+        // no interior shade
         state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = 0.0;
     } else {
         // Interior shade exists
@@ -862,12 +862,12 @@ void OPENNESS_LW(Real64 const OPENNESS, // shade openness (=tausbb at normal inc
     //   (= wire or thread emittance)
     //   typical (default) values
     //      dark insect screen = .93
-    //      metalic insect screen = .32
+    //      metallic insect screen = .32
     //      roller blinds = .91
     //      drape fabric = .87
     //   typical (default) values
     //      dark insect screen = .02
-    //      metalic insect screen = .19
+    //      metallic insect screen = .19
     //      roller blinds = .05
     //      drape fabric = .05
 
@@ -911,7 +911,7 @@ HEMINT(EnergyPlusData &state,
     //       AUTHOR         ASHRAE 1311-RP
 
     // PURPOSE OF THIS FUNCTION:
-    // Romberg Integration of Property function over hemispeherical dome
+    // Romberg Integration of Property function over hemispherical dome
     // METHODOLOGY EMPLOYED:
     //  Romberg Integration.
 
@@ -1003,8 +1003,8 @@ void RB_DIFF(EnergyPlusData &state,
         SumRefAndTran = RHO_DD + TAU_DD;
         ShowWarningMessage(state, format("{}Roller blind diffuse-diffuse properties are inconsistent", RoutineName));
         ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
-        ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
-        ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
+        ShowContinueError(state, format("...The diffuse-diffuse transmittance = {:.4T}", TAU_DD));
+        ShowContinueError(state, format("...Sum of diffuse reflectance and transmittance = {:.4T}", SumRefAndTran));
         ShowContinueError(state, "...This sum cannot be > 1.0. Transmittance will be reset to 1 minus reflectance");
         TAU_DD = 1.0 - RHO_DD;
     }
@@ -1137,8 +1137,8 @@ void IS_DIFF(EnergyPlusData &state,
         SumRefAndTran = RHO_DD + TAU_DD;
         ShowWarningMessage(state, format("{}Calculated insect screen diffuse-diffuse properties are inconsistent", RoutineName));
         ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
-        ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
-        ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
+        ShowContinueError(state, format("...The diffuse-diffuse transmittance = {:.4T}", TAU_DD));
+        ShowContinueError(state, format("...Sum of diffuse reflectance and transmittance = {:.4T}", SumRefAndTran));
         ShowContinueError(state, "...This sum cannot be > 1.0. Transmittance will be reset to 1 minus reflectance");
         TAU_DD = 1.0 - RHO_DD;
     }
@@ -1310,8 +1310,8 @@ void FM_DIFF(EnergyPlusData &state,
         SumRefAndTran = RHO_DD + TAU_DD;
         ShowWarningMessage(state, format("{}Calculated drape fabric diffuse-diffuse properties are inconsistent", RoutineName));
         ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
-        ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
-        ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
+        ShowContinueError(state, format("...The diffuse-diffuse transmittance = {:.4T}", TAU_DD));
+        ShowContinueError(state, format("...Sum of diffuse reflectance and transmittance = {:.4T}", SumRefAndTran));
         ShowContinueError(state, "...This sum cannot be > 1.0. Transmittance will be reset to 1 minus reflectance");
         TAU_DD = 1.0 - RHO_DD;
     }
@@ -1370,7 +1370,7 @@ void FM_BEAM(EnergyPlusData &state,
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates the solar optical properties of a fabric for beam radiation incident
-    // on the forward facingsurface using optical properties at normal incidence and
+    // on the forward facing surface using optical properties at normal incidence and
     // semi-empirical relations.
 
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3386,7 +3386,7 @@ void PD_BEAM_CASE_VI(Real64 const S,                        // pleat spacing (> 
 
     Real64 AK; // length of diagonal strings
     Real64 CG;
-    Real64 Z1_BD; // diffuse source termps
+    Real64 Z1_BD; // diffuse source terms
     Real64 Z7_BD;
     // shape factors
     Real64 F12;
@@ -3518,7 +3518,7 @@ void VB_DIFF(EnergyPlusData &state,
              Real64 const PHI,         // slat angle, radians (-PI/2 <= PHI <= PI/2)
              Real64 const RHODFS_SLAT, // reflectance of downward-facing slat surfaces (concave?)
              Real64 const RHOUFS_SLAT, // reflectance of upward-facing slat surfaces (convex?)
-             Real64 const TAU_SLAT,    // diffuse transmitance of slats
+             Real64 const TAU_SLAT,    // diffuse transmittance of slats
              Real64 &RHOFVB,           // returned: front side effective diffuse reflectance of venetian blind
              Real64 &TAUVB             // returned: effective diffuse transmittance of venetian blind
 )
@@ -4283,8 +4283,8 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
     Array1D<Real64> HJC(FS.NL);
     Array1D<Real64> RHOF({0, FS.NL + 1}); // longwave reflectance, front    !  these variables help simplify
     Array1D<Real64> RHOB({0, FS.NL + 1}); // longwave reflectance, back     !  the code because it is useful to
-    Array1D<Real64> EPSF({0, FS.NL + 1}); // longwave emisivity,   front    !  increase the scope of the arrays
-    Array1D<Real64> EPSB({0, FS.NL + 1}); // longwave emisivity,   back     !  to include indoor and outdoor
+    Array1D<Real64> EPSF({0, FS.NL + 1}); // longwave emissivity,  front    !  increase the scope of the arrays
+    Array1D<Real64> EPSB({0, FS.NL + 1}); // longwave emissivity,  back     !  to include indoor and outdoor
     Array1D<Real64> TAU({0, FS.NL + 1});  // longwave transmittance         !  nodes - more general
     Array2D<Real64> HC2D(6, 6);           // convective heat transfer coefficients between layers i and j
     Array2D<Real64> HR2D(6, 6);           // radiant heat transfer coefficients between layers i and j
@@ -4745,8 +4745,8 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
     Real64 Q_IN;                          // net gain to the room [W/m2], including transmitted solar
     Array1D<Real64> RHOF({0, FS.NL + 1}); // longwave reflectance, front    !  these variables help simplify
     Array1D<Real64> RHOB({0, FS.NL + 1}); // longwave reflectance, back     !  the code because it is useful to
-    Array1D<Real64> EPSF({0, FS.NL + 1}); // longwave emisivity,   front    !  increase the scope of the arrays
-    Array1D<Real64> EPSB({0, FS.NL + 1}); // longwave emisivity,   back     !  to include indoor and outdoor
+    Array1D<Real64> EPSF({0, FS.NL + 1}); // longwave emissivity,  front    !  increase the scope of the arrays
+    Array1D<Real64> EPSB({0, FS.NL + 1}); // longwave emissivity,  back     !  to include indoor and outdoor
     Array1D<Real64> TAU({0, FS.NL + 1});  // longwave transmittance         !  nodes - more general
     Real64 RTOT;                          // total resistance from TAE_OUT to TAE_IN [m2K/W]
     Array2D<Real64> HC2D(6, 6);           // convective heat transfer coefficients between layers i and j
@@ -5162,7 +5162,7 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
                                       // CHANGE TO (NDLIAR .GT. 2) ONCE
                                       // SUBROUTINE DL2_RES IS AVAILABLE
 
-    //   calculate radiant heat transfer coefficents between adjacent opaque
+    //   calculate radiant heat transfer coefficients between adjacent opaque
     //   layers
     for (I = 0; I <= NL; ++I) { // scan through all gaps - including indoor/outdoor
         if ((ISDL(I) == 0) && (ISDL(I + 1) == 0)) {
@@ -5176,7 +5176,7 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
         }
     } // end loop through gaps
 
-    //   calculate radiant heat transfer coefficents at single diathermanous
+    //   calculate radiant heat transfer coefficients at single diathermanous
     //   layers,three coefficients in each case
 
     for (I = 0; I <= NL - 1; ++I) { // scan through all layers - look for single DL
@@ -5198,7 +5198,7 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
         }         //  end of IF(ISDL(I) .EQ. 0) .AND. .....
     }             //   end of scan through all layers
 
-    //   calculate radiant heat transfer coefficents at double diathermanous
+    //   calculate radiant heat transfer coefficients at double diathermanous
     //   layers,six coefficients in each case
     //   THIS SECTION NOT ACTIVE YET
 
@@ -5545,7 +5545,7 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
     Q_IN = UCG * (TAE_OUT - TAE_IN) + SHGC * ISOL;
 
     // End of new code - for calculating Ucg and SHGC
-    //  restore convective heat transfer coefficients if alterred earlier
+    //  restore convective heat transfer coefficients if altered earlier
     //  for more general resistor network - otherwise mainline will
     //  receive faulty data
     if (NL >= 2) { // no OCF unless at least two layers exist
@@ -5579,9 +5579,9 @@ void DL_RES_r2(Real64 const Tg,    // mean glass layer temperature, {K}
     //  Returns the radiant heat transfer coefficients between parallel surfaces:
     // METHODOLOGY EMPLOYED:
     //  Solves radiant heat transfer coefficients between three parallel surfaces.
-    //  The left and right surfcaes are opaque with reflectance rhog and rhom, respectively.
+    //  The left and right surfaces are opaque with reflectance rhog and rhom, respectively.
     //  And the middle layer is diathermanous with transmittance taud AND reflectance rhodf
-    //  and rhodb on the left and rightsides, respectively.
+    //  and rhodb on the left and right sides, respectively.
     //  The subscripts g, d and m apply to Glass, Diathermanous layer, and mean-radiant room
     //  temperature in a configuration of a window with an indoor-side shading attachment
     //  but the analysis can be applied to any three layers in the configuration described
@@ -5885,7 +5885,7 @@ void SLtoGL(EnergyPlusData const &state,
 
         // properties of AIR
         rho = state.dataWindowEquivalentLayer->PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
-        beta = 1.0 / Tavg;                                                      // thermal expansion coef(/K)
+        beta = 1.0 / Tavg;                                                      // thermal expansion coeff (/K)
         dvisc = (18.05 + ((Tavg - 290.0) / 10.0) * (18.53 - 18.05)) * 1.0e-6;
         //  dynamic viscosity (kg/m.sec) or (N.sec/m2)
         Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * pow_2(Tavg) - 0.00000027034 * pow_3(Tavg);
@@ -5943,7 +5943,7 @@ Real64 SLtoAMB(EnergyPlusData const &state,
         // properties of AIR
         Tavg = (Ts + Tamb) / 2.0;
         rho = state.dataWindowEquivalentLayer->PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
-        beta = 1.0 / Tavg;                                                      // thermal expansion coef(/K)
+        beta = 1.0 / Tavg;                                                      // thermal expansion coeff (/K)
         dvisc = (18.05 + ((Tavg - 290.0) / 10.0) * (18.53 - 18.05)) * 1.0e-6;
         //  dynamic viscosity (kg/m.sec) or (N.sec/m2)
         Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * pow_2(Tavg) - 0.00000027034 * pow_3(Tavg);
@@ -5972,7 +5972,7 @@ Real64 SLtoAMB(EnergyPlusData const &state,
         // properties of AIR
         Tavg = (Ts + Tamb) / 2.0;
         rho = state.dataWindowEquivalentLayer->PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
-        beta = 1.0 / Tavg;                                                      // thermal expansion coef(/K)
+        beta = 1.0 / Tavg;                                                      // thermal expansion coeff (/K)
         dvisc = (18.05 + ((Tavg - 290.0) / 10.0) * (18.53 - 18.05)) * 1.0e-6;
         //  dynamic viscosity (kg/m.sec) or (N.sec/m2)
         Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * pow_2(Tavg) - 0.00000027034 * pow_3(Tavg);
@@ -6047,7 +6047,7 @@ void GLtoAMB(EnergyPlusData const &state,
 
         // properties of AIR
         rho = state.dataWindowEquivalentLayer->PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
-        beta = 1.0 / Tavg;                                                      // thermal expansion coef(/K)
+        beta = 1.0 / Tavg;                                                      // thermal expansion coeff (/K)
         dvisc = (18.05 + ((Tavg - 290.0) / 10.0) * (18.53 - 18.05)) * 1.0e-6;
         //  dynamic viscosity (kg/m.sec) or (N.sec/m2)
         Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * pow_2(Tavg) - 0.00000027034 * pow_3(Tavg);
@@ -6072,7 +6072,7 @@ void GLtoAMB(EnergyPlusData const &state,
 
         // properties of AIR
         rho = state.dataWindowEquivalentLayer->PAtmSeaLevel / (287.097 * Tavg); // density (kg/m3) <- temperature in (K)
-        beta = 1.0 / Tavg;                                                      // thermal expansion coef(/K)
+        beta = 1.0 / Tavg;                                                      // thermal expansion coeff (/K)
         dvisc = (18.05 + ((Tavg - 290.0) / 10.0) * (18.53 - 18.05)) * 1.0e-6;
         //  dynamic viscosity (kg/m.sec) or (N.sec/m2)
         Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * pow_2(Tavg) - 0.00000027034 * pow_3(Tavg);
@@ -6215,7 +6215,7 @@ void ASHWAT_Solar(int const NL,                                 // # of layers
     // Returns the optical properties of multi-layer fenestration system model given optical
     // properties of the layers
     // METHODOLOGY EMPLOYED:
-    //    Ues combination net radiation method and TDMA solver
+    //    Use combination net radiation method and TDMA solver
     // REFERENCES:
     //  JOHN L. WRIGHT and NATHAN KOTEY (2006). Solar Absorption By each Element in a Glazing/Shading
     //   Layer Array, ASHRAE Transactions, Vol. 112, Pt. 2. pp. 3-12.
@@ -6564,7 +6564,7 @@ bool Specular_OffNormal(Real64 const THETA, // solar beam angle of incidence, fr
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
-    // Returns ratio of off-normal to normal of opetical properties.
+    // Returns ratio of off-normal to normal of optical properties.
     // METHODOLOGY EMPLOYED:
     //  Uses a reference glass property.
     // returns TRUE if RAT_TAU < 1 or RAT_1MR < 1 (and thus Specular_Adjust s/b called)
@@ -6934,7 +6934,7 @@ bool IS_SWP(EnergyPlusData &state,
     // front
     IS_BEAM(state, THETA, RHOFF_BT0, TAUFF_BT0, L.SWP_MAT.TAUSFBB, LSWP.RHOSFBD, LSWP.TAUSFBB, LSWP.TAUSFBD);
 
-    // back -- call with reverse material properies
+    // back -- call with reverse material properties
     IS_BEAM(state, THETA, RHOBF_BT0, TAUBF_BT0, L.SWP_MAT.TAUSBBB, LSWP.RHOSBBD, LSWP.TAUSBBB, LSWP.TAUSBBD);
 
     return true;
@@ -7042,7 +7042,7 @@ bool PD_SWP(EnergyPlusData &state,
             CFSLAYER const &L,      // PD layer
             CFSSWP &LSWP,           // returned: equivalent layer properties set
             const Real64 OHM_V_RAD, // vertical VB profile angles, radians
-            const Real64 OHM_H_RAD  // horizonatl VB profile angles, radians
+            const Real64 OHM_H_RAD  // horizontal VB profile angles, radians
 )
 {
     // FUNCTION INFORMATION:
@@ -7081,7 +7081,7 @@ bool PD_SWP(EnergyPlusData &state,
             LSWP.TAUSFBB,
             LSWP.TAUSFBD);
 
-    // drape back properties: call with reversed fabric properies
+    // drape back properties: call with reversed fabric properties
     PD_BEAM(state,
             L.S,
             L.W,
@@ -7509,7 +7509,7 @@ void BuildGap(EnergyPlusData &state,
 
     // PURPOSE OF THIS SUBROUTINE:
     // fills in the effective gap thickness and calculates the gas density
-    // The gas density is calculated at a standard manufactuered condition
+    // The gas density is calculated at a standard manufactured condition
     // if a different condition is not specified.
 
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7541,7 +7541,7 @@ void AdjustVBGap(CFSGAP &G,        // gap, returned updated
     //       AUTHOR         ASHRAE 1311-RP
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Adjusts thickness of adjacent gaps seperated by in between slatted blind.
+    // Adjusts thickness of adjacent gaps separated by in between slatted blind.
 
     // METHODOLOGY EMPLOYED:
     // Treat VB layer as if it has 70% of actual thickness
@@ -7595,7 +7595,7 @@ int CFSHasControlledShade(EnergyPlusData const &state, CFSTY const &FS)
     // FUNCTION INFORMATION:
     //       AUTHOR         ASHRAE 1311-RP
     // PURPOSE OF THIS FUNCTION:
-    // Returns index of the controlled layer in a fenestratio. If no
+    // Returns index of the controlled layer in a fenestration. If no
     // controlled layer, then returns zero.
 
     int CFSHasControlledShade = 0;
@@ -7921,8 +7921,8 @@ Real64 EQLWindowInsideEffectiveEmiss(EnergyPlusData &state, int const ConstrNum)
     //       DATE WRITTEN   May 2013
 
     // PURPOSE OF THIS FUNCTION:
-    // Given the consruction number, returns the equivalent layer inside
-    // face effective longwave emmisivity.
+    // Given the construction number, returns the equivalent layer inside
+    // face effective longwave emissivity.
 
     return EffectiveEPSLB(state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr));
 }
@@ -7934,8 +7934,8 @@ Real64 EQLWindowOutsideEffectiveEmiss(EnergyPlusData &state, int const ConstrNum
     //       DATE WRITTEN   May 2013
 
     // PURPOSE OF THIS FUNCTION:
-    // Given the consruction number, returns the equivalent layer outside
-    // face effective longwave emmisivity.
+    // Given the construction number, returns the equivalent layer outside
+    // face effective longwave emissivity.
 
     int EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
     return EffectiveEPSLF(state.dataWindowEquivLayer->CFS(EQLNum));

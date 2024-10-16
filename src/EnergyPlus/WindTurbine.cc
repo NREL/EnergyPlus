@@ -183,7 +183,7 @@ namespace WindTurbine {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine provides a "get" method to collect results for individual electic load centers.
+        // This subroutine provides a "get" method to collect results for individual electric load centers.
 
         GeneratorPower = state.dataWindTurbine->WindTurbineSys(GeneratorIndex).Power;
         GeneratorEnergy = state.dataWindTurbine->WindTurbineSys(GeneratorIndex).Energy;
@@ -897,7 +897,7 @@ namespace WindTurbine {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
-        //       DATE WRITTEN   Octorber 2009
+        //       DATE WRITTEN   October 2009
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
@@ -942,7 +942,7 @@ namespace WindTurbine {
         Real64 IntRelFlowVel;    // Integration of relative flow velocity
         Real64 TotTorque;        // Total torque for the number of blades
         Real64 Omega;            // Angular velocity of rotor in rad/s
-        Real64 TanForceCoeff;    // Tnagential force coefficient
+        Real64 TanForceCoeff;    // Tangential force coefficient
         Real64 NorForceCoeff;    // Normal force coefficient
         Real64 Period;           // Period of sine and cosine functions
         Real64 C1;               // Empirical power coefficient C1

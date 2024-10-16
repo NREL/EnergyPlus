@@ -733,11 +733,11 @@ namespace HVACSingleDuctInduc {
         Real64 RhoAir = state.dataEnvrn->StdRhoAir;
         bool ErrorsFound = false;
         bool IsAutoSize = false;
-        Real64 MaxTotAirVolFlowDes = 0.0;     // Desing size maximum air volume flow for reproting
+        Real64 MaxTotAirVolFlowDes = 0.0;     // Design size maximum air volume flow for reporting
         Real64 MaxTotAirVolFlowUser = 0.0;    // User hard-sized maximum air volume flow for reporting
-        Real64 MaxVolHotWaterFlowDes = 0.0;   // Desing size maximum hot water flow for reproting
+        Real64 MaxVolHotWaterFlowDes = 0.0;   // Design size maximum hot water flow for reporting
         Real64 MaxVolHotWaterFlowUser = 0.0;  // User hard-sized maximum hot water flow for reporting
-        Real64 MaxVolColdWaterFlowDes = 0.0;  // Desing size maximum cold water flow for reproting
+        Real64 MaxVolColdWaterFlowDes = 0.0;  // Design size maximum cold water flow for reporting
         Real64 MaxVolColdWaterFlowUser = 0.0; // User hard-sized maximum cold water flow for reporting
 
         if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow == DataSizing::AutoSize) {

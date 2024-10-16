@@ -255,7 +255,7 @@ void SimDXCoilMultiSpeed(EnergyPlusData &state,
                          Real64 const SpeedRatio,   // = (CompressorSpeed - CompressorSpeedMin) /
                          Real64 const CycRatio,     // cycling part load ratio for variable speed
                          int &CompIndex,
-                         ObjexxFCL::Optional_int_const SpeedNum,       // Speed number for multispeed cooling coil onlyn
+                         ObjexxFCL::Optional_int_const SpeedNum,       // Speed number for multispeed cooling coil only
                          ObjexxFCL::Optional<HVAC::FanOp const> fanOp, // Fan operation mode
                          HVAC::CompressorOp compressorOp,              // Compressor on/off; 1=on, 0=off
                          ObjexxFCL::Optional_int_const SingleMode      // Single mode operation Yes/No; 1=Yes, 0=No
@@ -1811,7 +1811,7 @@ void GetDXCoils(EnergyPlusData &state)
 
                         thisDXCoil.RatedEIR(PerfModeNum) = 1.0 / thisDXCoil.RatedCOP(PerfModeNum);
 
-                        // read in user specified SHR modifer curves
+                        // read in user specified SHR modifier curves
                         if (!lAlphaBlanks2(9) && NumAlphas2 > 8) {
                             thisDXCoil.SHRFTemp(PerfModeNum) = GetCurveIndex(state, Alphas2(9)); // convert curve name to number
                             if (thisDXCoil.SHRFTemp(PerfModeNum) == 0) {
@@ -5257,7 +5257,7 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.RatedSHR(1) = Numbers(2);
         thisDXCoil.SH = Numbers(3);
         // @@ DXCoil( DXCoilNum ).RateBFVRFIUEvap = 0.0592; there will be a new field for this, which will be handled in a separate issue to
-        // update VRF-HP idd. It is not hanlded here to avoide tranistion issues for VRF-HP.
+        // update VRF-HP idd. It is not handled here to avoid transition issues for VRF-HP.
 
         int indexSHCurve = GetCurveIndex(state, Alphas(5)); // convert curve name to index number
         // Verify curve name and type
@@ -6836,7 +6836,7 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
                                                 thisDXCoil.RatedAirVolFlowRate(Mode),
                                                 thisDXCoil.RatedSHR(Mode));
 
-            // call coil model with everthing set at rating point
+            // call coil model with everything set at rating point
             thisDXCoil.InletAirMassFlowRate = thisDXCoil.RatedAirMassFlowRate(Mode);
             thisDXCoil.InletAirMassFlowRateMax = thisDXCoil.RatedAirMassFlowRate(Mode);
             thisDXCoil.InletAirTemp = RatedInletAirTemp;
@@ -6998,7 +6998,7 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
                 }
             }
 
-            // call coil model with everthing set at rating point
+            // call coil model with everything set at rating point
             thisDXCoil.InletAirMassFlowRate = thisDXCoil.RatedAirMassFlowRate(Mode);
             thisDXCoil.InletAirMassFlowRateMax = thisDXCoil.RatedAirMassFlowRate(Mode);
 
@@ -7096,7 +7096,7 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
                                            thisDXCoil.RatedAirVolFlowRate2,
                                            thisDXCoil.RatedSHR2);
 
-            // call for standard ratings for two-speeed DX coil
+            // call for standard ratings for two-speed DX coil
             if (thisDXCoil.CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air) {
                 CalcTwoSpeedDXCoilStandardRating(state, DXCoilNum);
             }
@@ -7241,7 +7241,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
     //                      Feb 2005, M. J. Witte, GARD Analytics, Inc. Add new coil type COIL:DX:MultiMode:CoolingEmpirical.
     //                      Jul 2005, R. Raustad, FSEC. Add new coil type COIL:DX:HEATPUMPWATERHEATER
     //                      Jun 2007, L. Gu, FSEC. Add new coil type COIL:DX:MULTISPEED:COOLING and HEATING
-    //                      Jan 2011, B. Griffithn, NREL. add EMS overrides for autosized fields
+    //                      Jan 2011, B. Griffith, NREL. add EMS overrides for autosized fields
     //                      Aug 2013, D. Kang. add component sizing table entries
     //                      May 2014, R. Raustad, FSEC. moved sizing calculations to common routine
     //                      Aug 2015, R. Zhang, LBNL. Add new coil types for VRF_FluidTCtrl
@@ -7391,7 +7391,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                         state.dataSize->DXCoolCap; // pass global variable used only for heat pumps (i.e., DX cooling and heating coils)
                     if ((thisDXCoil.IsSecondaryDXCoilInZone) &&
                         (thisDXCoil.CondenserType(1) ==
-                         DataHeatBalance::RefrigCondenserType::Air)) { // seconday DX coil in secondary zone is specified
+                         DataHeatBalance::RefrigCondenserType::Air)) { // secondary DX coil in secondary zone is specified
                         SizeSecDXCoil = true;
                     }
                 } else if (thisDXCoil.DXCoilType_Num == HVAC::CoilVRF_Heating) {
@@ -7925,7 +7925,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             state.dataSize->DataFractionUsedForSizing = 0.0;
         }
 
-        // Ensure flow rate at lower speed must be lower or equal to the flow rate at higher speed. Otherwise, a severe error is isssued.
+        // Ensure flow rate at lower speed must be lower or equal to the flow rate at higher speed. Otherwise, a severe error is issued.
         for (Mode = 1; Mode <= thisDXCoil.NumOfSpeeds - 1; ++Mode) {
             if (thisDXCoil.MSRatedAirVolFlowRate(Mode) > thisDXCoil.MSRatedAirVolFlowRate(Mode + 1)) {
                 ShowWarningError(state,
@@ -8049,7 +8049,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 thisDXCoil.MSRatedSHR(Mode) = sizerCoolingSHR.size(state, TempSize, ErrorsFound);
                 // added for rated sensible cooling capacity estimate for html reporting, issue #7381
                 thisDXCoil.RatedSHR(1) = thisDXCoil.MSRatedSHR(Mode);
-                // design SHR value at the maxiumum speed calculated above was supposed to be used for all speeds
+                // design SHR value at the maximum speed calculated above was supposed to be used for all speeds
                 // Now user specified SHR value is used when the SHR field is not autosized and design day run is
                 // set to yes unless the code below is commented out
                 MSRatedSHRDes = thisDXCoil.MSRatedSHR(Mode);
@@ -8071,7 +8071,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
         state.dataSize->DataFractionUsedForSizing = 0.0;
         state.dataSize->DataConstantUsedForSizing = 0.0;
 
-        // Rated Evapovative condenser airflow rates
+        // Rated Evaporative condenser airflow rates
         for (Mode = 1; Mode <= thisDXCoil.NumOfSpeeds; ++Mode) {
             IsAutoSize = false;
             if (thisDXCoil.MSEvapCondAirFlow(Mode) == AutoSize) {
@@ -8134,7 +8134,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             }
         }
 
-        // Sizing multispeed rated evapovative condenser pump power
+        // Sizing multispeed rated evaporative condenser pump power
         for (Mode = 1; Mode <= thisDXCoil.NumOfSpeeds; ++Mode) {
             IsAutoSize = false;
             if (thisDXCoil.MSEvapCondPumpElecNomPower(Mode) == AutoSize) {
@@ -8185,7 +8185,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             }
         }
 
-        // Ensure evaporative condesner pump power at lower speed must be lower or equal to one at higher speed.
+        // Ensure evaporative condenser pump power at lower speed must be lower or equal to one at higher speed.
         for (Mode = 1; Mode <= thisDXCoil.NumOfSpeeds - 1; ++Mode) {
             if (thisDXCoil.MSEvapCondPumpElecNomPower(Mode) > thisDXCoil.MSEvapCondPumpElecNomPower(Mode + 1)) {
                 ShowWarningError(state,
@@ -8263,7 +8263,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             state.dataSize->DataFractionUsedForSizing = 0.0;
         }
 
-        // Ensure flow rate at lower speed must be lower or equal to the flow rate at higher speed. Otherwise, a severe error is isssued.
+        // Ensure flow rate at lower speed must be lower or equal to the flow rate at higher speed. Otherwise, a severe error is issued.
         for (Mode = 1; Mode <= thisDXCoil.NumOfSpeeds - 1; ++Mode) {
             if (thisDXCoil.MSRatedAirVolFlowRate(Mode) > thisDXCoil.MSRatedAirVolFlowRate(Mode + 1)) {
                 ShowWarningError(state,
@@ -9234,7 +9234,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     // calculate end time of current time step to determine if error messages should be printed
     state.dataDXCoils->CurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
-    //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
+    //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
     //   Wait for next time step to print warnings. If simulation iterates, print out
     //   the warning for the last iteration only. Must wait for next time step to accomplish this.
     //   If a warning occurs and the simulation down shifts, the warning is not valid.
@@ -9437,7 +9437,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
         }
 
         //  Get total capacity modifying factor (function of temperature) for off-rated conditions
-        //  InletAirHumRat may be modified in this ADP/BF loop, use temporary varible for calculations
+        //  InletAirHumRat may be modified in this ADP/BF loop, use temporary variable for calculations
         InletAirHumRatTemp = InletAirHumRat;
         AirMassFlowRatio = AirMassFlow / thisDXCoil.RatedAirMassFlowRate(Mode);
         while (true) {
@@ -10049,7 +10049,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     // of entering air temperatures and supply air flow rate (actual vs rated flow). The model
     // does NOT employ the exact same methodology to calculate performance as DOE-2.
     // This VRF cooling coil model adjusts the rated total cooling capacity by the CAPFT
-    // and CAP funciton of flow curve/model currently used by the existing DX coil model.
+    // and CAP function of flow curve/model currently used by the existing DX coil model.
     // The part-load ratio is then applied to the total operating capacity to find the capacity
     // required to meet the load. This VRF model then uses the ADP/bypass method to find the
     // SHR and resulting outlet conditions given that total capacity (or delta H).
@@ -10221,7 +10221,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     // calculate end time of current time step to determine if error messages should be printed
     state.dataDXCoils->CalcVRFCoolingCoilCurrentEndTime = state.dataGlobal->CurrentTime + SysTimeElapsed;
 
-    //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
+    //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
     //   Wait for next time step to print warnings. If simulation iterates, print out
     //   the warning for the last iteration only. Must wait for next time step to accomplish this.
     //   If a warning occurs and the simulation down shifts, the warning is not valid.
@@ -10402,7 +10402,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
         }
 
         //  Get total capacity modifying factor (function of temperature) for off-rated conditions
-        //  InletAirHumRat may be modified in this ADP/BF loop, use temporary varible for calculations
+        //  InletAirHumRat may be modified in this ADP/BF loop, use temporary variable for calculations
         InletAirHumRatTemp = InletAirHumRat;
 
     Label50:;
@@ -10742,7 +10742,7 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
 
     // REFERENCES:
     // Winkelmann, F.C., Birdsall, B.E., Buhl W.F., Ellington, K.L., Erdem, A.E. 1993.
-    // DOE-2 Supplement Version 2.1E.  Energy and Environment Division, Larwence Berkely
+    // DOE-2 Supplement Version 2.1E.  Energy and Environment Division, Lawrence Berkeley
     // Laboratory.
     // Henderson, H.I. Jr., Y.J. Huang and Danny Parker. 1999. Residential Equipment Part
     // Load Curves for Use in DOE-2.  Environmental Energy Technologies Division, Ernest
@@ -10912,7 +10912,7 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
         // Get total capacity modifying factor (function of temperature) for off-rated conditions
         // Model was extended to accept bi-quadratic curves. This allows sensitivity of the heating capacity
         // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
-        // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
+        // advised to use the bi-quadratic curve if sufficient manufacturer data is available.
         if (state.dataCurveManager->PerfCurve(thisDXCoil.CCapFTemp(Mode))->numDims == 2) {
             switch (thisDXCoil.HeatingPerformanceOATType) {
             case HVAC::OATType::DryBulb: {
@@ -11051,7 +11051,7 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
         // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
         // Model was extended to accept bi-quadratic curves. This allows sensitivity of the EIR
         // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
-        // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
+        // advised to use the bi-quadratic curve if sufficient manufacturer data is available.
         if (thisDXCoil.DXCoilType_Num != HVAC::CoilVRF_Heating && thisDXCoil.DXCoilType_Num != HVAC::CoilVRF_FluidTCtrl_Heating) {
             if (state.dataCurveManager->PerfCurve(thisDXCoil.EIRFTemp(Mode))->numDims == 1) {
                 EIRTempModFac = CurveValue(state, thisDXCoil.EIRFTemp(Mode), OutdoorDryBulb);
@@ -11623,7 +11623,7 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
             if (thisDXCoil.CoolingCoilRuntimeFraction > 1.0) {
                 thisDXCoil.CoolingCoilRuntimeFraction = 1.0; // Reset coil runtime fraction to 1.0
             }
-            // get the eletrical power consumption
+            // get the electrical power consumption
             thisDXCoil.ElecCoolingPower = TotCapLS * EIRLS * thisDXCoil.CoolingCoilRuntimeFraction;
 
             // Coil total/sensible/latent cooling rates and electrical power
@@ -12052,7 +12052,7 @@ Real64 ValidateADP(EnergyPlusData &state,
     //    DATE WRITTEN   December 2015
 
     // PURPOSE OF THIS FUNCTION:
-    //    Validates that the calcualted bypass factor represents valid SHR based on total capacity and air mass flow rate.
+    //    Validates that the calculated bypass factor represents valid SHR based on total capacity and air mass flow rate.
 
     // METHODOLOGY EMPLOYED:
     //    With model parameters autosized by the user, the SHR is selected based on an empirical model.
@@ -12223,7 +12223,7 @@ Real64 CalcEffectiveSHR(EnergyPlusData &state,
     Twet = min(Twet_Rated * QLatRated / (QLatActual + 1.e-10), Twet_max);
     Gamma = Gamma_Rated * QLatRated * (EnteringDB - EnteringWB) / ((26.7 - 19.4) * QLatActual + 1.e-10);
 
-    //  Calculate the compressor on and off times using a converntional thermostat curve
+    //  Calculate the compressor on and off times using a conventional thermostat curve
     Ton = 3600.0 / (4.0 * Nmax * (1.0 - RTF)); // duration of cooling coil on-cycle (sec)
     Toff = 3600.0 / (4.0 * Nmax * RTF);        // duration of cooling coil off-cycle (sec)
 
@@ -12239,7 +12239,7 @@ Real64 CalcEffectiveSHR(EnergyPlusData &state,
     //  and real world applications would use a single heating coil for both purposes, the actual
     //  fan operation is based on HeatingPLR + ReheatPLR. For cycling fan RH control, latent
     //  degradation only occurs when a heating load exists, in this case the reheat load is
-    //  equal to and oposite in magnitude to the cooling coil sensible output but the reheat
+    //  equal to and opposite in magnitude to the cooling coil sensible output but the reheat
     //  coil is not always active. This additional fan run time has not been accounted for at this time.
     //  Recalculate Toff for cycling fan systems when heating is active
     if (present(HeatingRTF)) {
@@ -12252,7 +12252,7 @@ Real64 CalcEffectiveSHR(EnergyPlusData &state,
         }
     }
 
-    //  Use sucessive substitution to solve for To
+    //  Use successive substitution to solve for To
     aa = (Gamma * Toffa) - (0.25 / Twet) * pow_2(Gamma) * pow_2(Toffa);
     To1 = aa + Tcl;
     Error = 1.0;
@@ -12471,7 +12471,7 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
     Real64 LSOutletAirDryBulbTemp;  // low speed outlet air dry bulb temperature [C]
     Real64 LSOutletAirEnthalpy;     // low speed outlet air enthalpy [J/kg]
     Real64 LSOutletAirHumRat;       // low speed outlet air humidity ratio [kg/kg]
-    Real64 HSOutletAirDryBulbTemp;  // hihg speed outlet air dry bulb temperature [C]
+    Real64 HSOutletAirDryBulbTemp;  // high speed outlet air dry bulb temperature [C]
     Real64 HSOutletAirEnthalpy;     // high speed outlet air enthalpy [J/kg]
     Real64 HSOutletAirHumRat;       // high speed outlet air humidity ratio [kg/kg]
     Real64 hDelta;                  // Change in air enthalpy across the cooling coil [J/kg]
@@ -13147,7 +13147,7 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
             EIRFlowModFacLS = CurveValue(state, thisDXCoil.MSEIRFFlow(SpeedNum), AirMassFlowRatioLS);
             EIRLS = 1.0 / thisDXCoil.MSRatedCOP(SpeedNum) * EIRTempModFacLS * EIRFlowModFacLS;
 
-            // get the eletrical power consumption
+            // get the electrical power consumption
             thisDXCoil.ElecCoolingPower = TotCapLS * EIRLS * thisDXCoil.CoolingCoilRuntimeFraction;
             // calculate cooling output power
             //    AirMassFlow = DXCoil(DXCoilNum)%InletAirMassFlowRate
@@ -13341,22 +13341,22 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
     Real64 CrankcaseHeatingPower;     // Power due to crank case heater
     Real64 AirVolumeFlowRate;         // Air volume flow rate across the heating coil
     Real64 VolFlowperRatedTotCap;     // Air volume flow rate divided by rated total heating capacity
-    Real64 TotCapTempModFac(0.0);     // Total capacity modifier as a function ot temperature
+    Real64 TotCapTempModFac(0.0);     // Total capacity modifier as a function of temperature
     Real64 TotCapFlowModFac;          // Total capacity modifier as a function of flow ratio
     Real64 OutdoorCoilT;              // Outdoor coil temperature
     Real64 OutdoorCoildw;             // Outdoor coil delta w assuming coil temperature of OutdoorCoilT
-    Real64 LoadDueToDefrost;          // Additonal load due to defrost
-    Real64 LoadDueToDefrostLS;        // Additonal load due to defrost at low speed
-    Real64 LoadDueToDefrostHS;        // Additonal load due to defrost at high speed
+    Real64 LoadDueToDefrost;          // Additional load due to defrost
+    Real64 LoadDueToDefrostLS;        // Additional load due to defrost at low speed
+    Real64 LoadDueToDefrostHS;        // Additional load due to defrost at high speed
     Real64 HeatingCapacityMultiplier; // Multiplier for heating capacity when system is in defrost
     Real64 FractionalDefrostTime;     // Fraction of time step when system is in defrost
-    Real64 InputPowerMultiplier;      // Multiplier for poer when system is in defrost
+    Real64 InputPowerMultiplier;      // Multiplier for power when system is in defrost
     Real64 DefrostEIRTempModFac;      // EIR modifier for defrost
     Real64 FullLoadOutAirEnth;        // Outlet full load enthalpy
     Real64 FullLoadOutAirHumRat;      // Outlet humidity ratio at full load
     Real64 FullLoadOutAirTemp;        // Outlet temperature at full load
-    Real64 FullLoadOutAirRH;          // Outler relative humidity at full load
-    Real64 OutletAirTemp;             // Supply ari temperature
+    Real64 FullLoadOutAirRH;          // Outlet relative humidity at full load
+    Real64 OutletAirTemp;             // Supply air temperature
     Real64 EIRTempModFac(0.0);        // EIR modifier as a function of temperature
     Real64 EIRFlowModFac;             // EIR modifier as a function of airflow ratio
     Real64 WasteHeatLS;               // Waste heat at low speed
@@ -13553,7 +13553,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             // Get total capacity modifying factor (function of temperature) for off-rated conditions
             // Model was extended to accept bi-quadratic curves. This allows sensitivity of the heating capacity
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
-            // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
+            // advised to use the bi-quadratic curve if sufficient manufacturer data is available.
             // Low speed
             if (state.dataCurveManager->PerfCurve(thisDXCoil.MSCCapFTemp(SpeedNumLS))->numDims == 1) {
                 TotCapTempModFac = CurveValue(state, thisDXCoil.MSCCapFTemp(SpeedNumLS), OutdoorDryBulb);
@@ -13577,7 +13577,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
             // Model was extended to accept bi-quadratic curves. This allows sensitivity of the EIR
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
-            // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
+            // advised to use the bi-quadratic curve if sufficient manufacturer data is available.
             // Low Speed
             if (state.dataCurveManager->PerfCurve(thisDXCoil.MSEIRFTemp(SpeedNumLS))->numDims == 1) {
                 EIRTempModFac = CurveValue(state, thisDXCoil.MSEIRFTemp(SpeedNumLS), OutdoorDryBulb);
@@ -13798,7 +13798,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             // Get total capacity modifying factor (function of temperature) for off-rated conditions
             // Model was extended to accept bi-quadratic curves. This allows sensitivity of the heating capacity
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
-            // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
+            // advised to use the bi-quadratic curve if sufficient manufacturer data is available.
             if (state.dataCurveManager->PerfCurve(thisDXCoil.MSCCapFTemp(SpeedNum))->numDims == 1) {
                 TotCapTempModFac = CurveValue(state, thisDXCoil.MSCCapFTemp(SpeedNum), OutdoorDryBulb);
             } else {
@@ -14702,7 +14702,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
             newPreDefSubTable(state, state.dataOutRptPredefined->pdrEquip, "VAV DX Cooling Standard Rating Details");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilType =
             newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "DX Cooling Coil Type");
-        state.dataOutRptPredefined->pdchVAVDXFanName = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Assocated Fan");
+        state.dataOutRptPredefined->pdchVAVDXFanName = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Associated Fan");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilNetCapSI =
             newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Net Cooling Capacity [W]");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "COP [W/W]");
@@ -15582,7 +15582,7 @@ int GetDXCoilAvailSchPtr(EnergyPlusData &state,
     // as -1.
 
     // Return value
-    int SchPtr; // returned availabiltiy schedule of matched coil
+    int SchPtr; // returned availability schedule of matched coil
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int WhichCoil;
@@ -15723,7 +15723,7 @@ int GetDXCoilCapFTCurveIndex(EnergyPlusData &state,
         default: {
             //        CALL ShowSevereError(state, 'GetDXCoilCapFTCurveIndex: Could not find Coil, Type="'// &
             //             TRIM(cAllCoilTypes(DXCoil(CoilIndex)%DXCoilType_Num))//'" Name="'//TRIM(DXCoil(CoilIndex)%Name)//  &
-            //              '" when accessing coil capacity as a function of temperture curve.')
+            //              '" when accessing coil capacity as a function of temperature curve.')
             ErrorsFound = true;
             CapFTCurveIndex = 0;
         } break;
@@ -15967,14 +15967,14 @@ Real64 CalcSHRUserDefinedCurves(EnergyPlusData &state,
     //       DATE WRITTEN   December 2012
 
     // PURPOSE OF THIS FUNCTION:
-    //    Returns the oprating sensible heat ratio for a given Rated SHR abd coil entering
+    //    Returns the operating sensible heat ratio for a given Rated SHR and coil entering
     //    air DBT and WBT, and supply air mass flow fraction.
 
     // METHODOLOGY EMPLOYED:
     //    Model uses user specified rated SHR, and SHR modifying curves for temperature and flow
     //    fraction.  The curves adjust the rated SHR based on biquadratic curve for temperatures
     //    and quadratic function for supply air mass flow ratio (actual vs rated).
-    //    The biquadratic and quadratic curves are normalized caurves generated from manufacturer's
+    //    The biquadratic and quadratic curves are normalized curves generated from manufacturer's
     //    performance data
 
     // Using/Aliasing
@@ -16087,10 +16087,10 @@ void CalcSecondaryDXCoils(EnergyPlusData &state, int const DXCoilNum)
     Real64 TotalHeatRejectionRate; // secondary coil total heat rejection rate
     int SecCoilSHRFT;              // index of the SHR modifier curve for temperature of a secondary DX coil
     int SecCoilSHRFF;              // index of the sHR modifier curve for flow fraction of a secondary DX coil
-    int MSSpeedNumLS;              // current low speed number of multspeed HP
-    int MSSpeedNumHS;              // current high speed number of multspeed HP
-    Real64 MSSpeedRatio;           // current speed ratio of multspeed HP
-    Real64 MSCycRatio;             // current cycling ratio of multspeed HP
+    int MSSpeedNumLS;              // current low speed number of multispeed HP
+    int MSSpeedNumHS;              // current high speed number of multispeed HP
+    Real64 MSSpeedRatio;           // current speed ratio of multispeed HP
+    Real64 MSCycRatio;             // current cycling ratio of multispeed HP
     Real64 SHRHighSpeed;           // sensible heat ratio at high speed
     Real64 SHRLowSpeed;            // sensible heat ratio at low speed
 
@@ -16335,9 +16335,9 @@ Real64 CalcSecondaryDXCoilsSHR(EnergyPlusData &state,
 
     // METHODOLOGY EMPLOYED:
     // Energy balance:
-    //  (1) checks if the seconday coil operation is dry and calculates appliavle SHR.
+    //  (1) checks if the secondary coil operation is dry and calculates applicable SHR.
     //  (2) determines SHR from user specified rated SHR values and SHR modifier curves for
-    //      temperature and flor fraction.
+    //      temperature and flow fraction.
     //  (3) if secondary coil operates dry then the larger of the user SHR value and dry
     //      coil operation SHR is selected.
 
@@ -16356,13 +16356,13 @@ Real64 CalcSecondaryDXCoilsSHR(EnergyPlusData &state,
     Real64 DryCoilTestEvapInletWetBulb; // evaporator coil inlet dry bulb temperature test for dry coil
     Real64 FullLoadOutAirEnth;          // evaporator outlet full load enthalpy [J/kg]
     Real64 FullLoadOutAirTemp;          // evaporator outlet air temperature at full load [C]
-    Real64 hTinwADP;                    // enthaly of air at secondary coil entering temperature and Humidity ratio at ADP
+    Real64 hTinwADP;                    // enthalpy of air at secondary coil entering temperature and Humidity ratio at ADP
     Real64 SHRadp;                      // Sensible heat ratio
-    Real64 hADP;                        // enthaly of air at secondary coil at ADP
+    Real64 hADP;                        // enthalpy of air at secondary coil at ADP
     Real64 tADP;                        // dry bulb temperature of air at secondary coil at ADP
     Real64 wADP;                        // humidity ratio of air at secondary coil at ADP
     Real64 HumRatError;                 // humidity ratio error
-    bool CoilMightBeDry;                // TRUE means the secondary DX coi runs dry
+    bool CoilMightBeDry;                // TRUE means the secondary DX coil runs dry
     int Counter;                        // iteration counter
     bool Converged;                     // convergence flag
     Real64 SHR;                         // current time step sensible heat ratio of secondary coil

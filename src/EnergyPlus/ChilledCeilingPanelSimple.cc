@@ -783,7 +783,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     // This subroutine initializes the cooling panel units, and determines the UA values during simulation.
 
     // METHODOLOGY EMPLOYED:
-    // The initialization subrotines borrowed from other sources and heat exchanger formulation for cooling panel.
+    // The initialization subroutines borrowed from other sources and heat exchanger formulation for cooling panel.
 
     // REFERENCES:
     // Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
@@ -1568,7 +1568,7 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
     //       DATE WRITTEN   Sept 2014
 
     // PURPOSE OF THIS SUBROUTINE:
-    // To distribute the gains from the hot water basebaord heater
+    // To distribute the gains from the hot water baseboard heater
     // as specified in the user input file.  This includes distribution
     // of long wavelength radiant gains to surfaces and "people."
 

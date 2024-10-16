@@ -820,7 +820,7 @@ Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
     //  find a more realistic operating point for the plant.
 
     // METHODOLOGY EMPLOYED:
-    // Pressure drop of complete loop is found for a perticular flow rate.
+    // Pressure drop of complete loop is found for a particular flow rate.
     //  i.e. pressuredrop = K * massflow ^ 2
     // System curve is then solved with pump curve already entered
     //  and flow rate provided by the pump will be calculated.
@@ -912,7 +912,7 @@ Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
         // Get the pump curve value from the curve manager
         PsiPump = CurveValue(state, PumpCurveNum, PhiPump);
 
-        // Calcuate Pump Pressure rise
+        // Calculate Pump Pressure rise
         PumpPressureRise = PsiPump * NodeDensity * pow_2(PumpSpeed) * pow_2(PumpImpellerDia);
 
         // Convergence Criteria Based on Pressure

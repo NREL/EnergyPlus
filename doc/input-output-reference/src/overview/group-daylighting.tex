@@ -20,7 +20,7 @@ The name of the Daylighting:Controls object.
 
 The name of the \hyperref[zone]{Zone} or \hyperref[space]{Space} to which the following daylighting-related input applies. If a zone name is specified, the zone must lie completely within a single solar enclosure.
 
-\paragraph{Field: Daylighting Method}\label{field-Daylighting Method}
+\paragraph{Field: Daylighting Method}\label{field-daylighting-method}
 
 The Daylighting Method field can be set to either of the following: SplitFlux or DElight. Different Zones can have different settings in the same file but in a single zone only one method should be used at a time. Guidelines for using the SplitFlux method and additional details on the DElight method are shown in following sections.
 
@@ -89,7 +89,7 @@ The number of steps, excluding off, in a stepped lighting control system (see fi
 
 May be specified if a stepped lighting control system (Lighting Control Type set to Stepped) is manually operated, such as in a simple, one-step (on-off) system. Gives the probability the occupants of a daylit zone will set the electric lights to the correct level to obtain the required illuminance. The rest of the time the lights are assumed to be set one step too high. For example, consider an on-off lighting system (Number of Steps = 1) with a set point of 600 lux and 0.7 reset probability. Then, when daylighting exceeds 600 lux, the electric lights will be off 70\% of the time and on 30\% of the time.
 
-\paragraph{Field: Glare Calculation Daylighting Reference Point Name}\label{field-glare calculation-daylighting-reference-point-name}
+\paragraph{Field: Glare Calculation Daylighting Reference Point Name}\label{field-glare-calculation-daylighting-reference-point-name}
 
 The \hyperref[daylightingreferencepoint-000]{Daylighting:ReferencePoint} name should be specified that is used for determining the glare. Only one reference point is used to calculate the glare. This input is only used in when the Daylighting Method is set to SplitFlux. This input is ignored when Daylighting Method is set to DElight.
 

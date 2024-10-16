@@ -207,7 +207,7 @@ namespace PlantChillers {
         int HeatRecInletLimitSchedNum;             // index for schedule for the inlet high limit for heat recovery operation
         PlantLocation HRPlantLoc;                  // heat recovery water plant loop component index
         std::string EndUseSubcategory;             // identifier use for the end use subcategory
-        Real64 CondOutletHumRat;                   // kg/kg - condenser outlet humditiy ratio, air side
+        Real64 CondOutletHumRat;                   // kg/kg - condenser outlet humidity ratio, air side
         Real64 ActualCOP;
         Real64 QHeatRecovery;
         Real64 EnergyHeatRecovery;

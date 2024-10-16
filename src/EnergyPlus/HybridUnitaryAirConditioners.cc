@@ -200,12 +200,12 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     }
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedLoadToHeatingSetpoint = 0;
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedLoadToCoolingSetpoint = 0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedHumdificationMass = 0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedHumdificationLoad = 0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedHumdificationEnergy = 0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedDeHumdificationMass = 0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedDeHumdificationLoad = 0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedDeHumdificationEnergy = 0;
+    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedHumidificationMass = 0;
+    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedHumidificationLoad = 0;
+    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedHumidificationEnergy = 0;
+    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedDeHumidificationMass = 0;
+    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedDeHumidificationLoad = 0;
+    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedDeHumidificationEnergy = 0;
 
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitTotalCoolingRate = 0.0;
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitTotalCoolingEnergy = 0.0;
@@ -325,7 +325,7 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
 void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
                                           int const UnitNum,              // unit number
                                           int const ZoneNum,              // number of zone being served
-                                          Real64 &SensibleOutputProvided, // sensible capacity delivered to zone cooling negitive
+                                          Real64 &SensibleOutputProvided, // sensible capacity delivered to zone cooling negative
                                           Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
 )
 {
@@ -354,7 +354,7 @@ void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
 
     SensibleOutputProvided = 0;
     LatentOutputProvided = 0;
-    // taking class members out of the object and then using them in the calcualtion is odd but its for clarity with unit testing.
+    // taking class members out of the object and then using them in the calculation is odd but its for clarity with unit testing.
     EnvDryBulbT = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp; // degrees C
     AirTempRoom = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;    // degrees C
     EnvRelHumm = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH;    // RH
@@ -1117,21 +1117,21 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Dehumidification Load to Humidistat Setpoint Moisture Transfer Rate",
                             Constant::Units::kg_s,
-                            hybridUnitaryAC.RequestedDeHumdificationMass,
+                            hybridUnitaryAC.RequestedDeHumidificationMass,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Dehumidification Load to Humidistat Setpoint Heat Transfer Rate",
                             Constant::Units::W,
-                            hybridUnitaryAC.RequestedDeHumdificationLoad,
+                            hybridUnitaryAC.RequestedDeHumidificationLoad,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
-                            "Zone Hybrid Unitary HVAC DehumidificationLoad to Humidistat Setpoint Heat Tansfer Energy",
+                            "Zone Hybrid Unitary HVAC Dehumidification Load to Humidistat Setpoint Heat Transfer Energy",
                             Constant::Units::J,
-                            hybridUnitaryAC.RequestedDeHumdificationEnergy,
+                            hybridUnitaryAC.RequestedDeHumidificationEnergy,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
@@ -1139,21 +1139,21 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Moisture Transfer Rate",
                             Constant::Units::kg_s,
-                            hybridUnitaryAC.RequestedHumdificationMass,
+                            hybridUnitaryAC.RequestedHumidificationMass,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Transfer Rate",
                             Constant::Units::W,
-                            hybridUnitaryAC.RequestedHumdificationLoad,
+                            hybridUnitaryAC.RequestedHumidificationLoad,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);
         SetupOutputVariable(state,
-                            "Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Tansfer Energy",
+                            "Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Transfer Energy",
                             Constant::Units::J,
-                            hybridUnitaryAC.RequestedHumdificationEnergy,
+                            hybridUnitaryAC.RequestedHumidificationEnergy,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             hybridUnitaryAC.Name);

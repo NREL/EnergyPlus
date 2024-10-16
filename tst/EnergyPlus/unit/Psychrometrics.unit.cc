@@ -380,8 +380,8 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
     Real64 Qfrom_mdot_CpAir_DeltaT = MassFlowRate * CpAir * (T1 - T2);
 
     // get enthalpy at state 1 and 2
-    Real64 H1 = PsyHFnTdbW(T1, W1); // enthaly ait state 1
-    Real64 H2 = PsyHFnTdbW(T2, W2); // enthaly ait state 2
+    Real64 H1 = PsyHFnTdbW(T1, W1); // enthalpy air state 1
+    Real64 H2 = PsyHFnTdbW(T2, W2); // enthalpy air state 2
     Real64 Qfrom_mdot_DeltaH = MassFlowRate * (H1 - H2);
 
     // check heat rate
@@ -393,8 +393,8 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
     CpAir = 1.00484e3 + W1 * 1.85895e3;
     Qfrom_mdot_CpAir_DeltaT = MassFlowRate * CpAir * (T2 - T1);
 
-    H1 = PsyHFnTdbW(T1, W1); // enthaly ait state 1
-    H2 = PsyHFnTdbW(T2, W2); // enthaly ait state 2
+    H1 = PsyHFnTdbW(T1, W1); // enthalpy air state 1
+    H2 = PsyHFnTdbW(T2, W2); // enthalpy air state 2
     Qfrom_mdot_DeltaH = MassFlowRate * (H2 - H1);
 
     // check heat transfer rate calc method for heating

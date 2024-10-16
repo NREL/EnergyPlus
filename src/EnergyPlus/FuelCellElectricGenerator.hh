@@ -124,22 +124,22 @@ namespace FuelCellElectricGenerator {
         bool HasBeenOn;
         bool DuringShutDown;
         bool DuringStartUp;
-        Real64 NdotFuel;           // molar fuel use rate.  (kmol/sec)
-        Real64 TotFuelInEnthalphy; // Enthalpy of fuel coming into FCPM (watts)
-        Real64 NdotProdGas;        // (kmol/sec)
+        Real64 NdotFuel;          // molar fuel use rate.  (kmol/sec)
+        Real64 TotFuelInEnthalpy; // Enthalpy of fuel coming into FCPM (watts)
+        Real64 NdotProdGas;       // (kmol/sec)
         Array1D<Real64> ConstitMolalFract;
         Array1D<GasID> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 TprodGasLeavingFCPM;
-        Real64 NdotAir;           // molar air use rate    (kmol/sec)
-        Real64 TotAirInEnthalphy; // Enthalpy of air coming nto FCPM energy balance (watts)
-        Real64 NdotLiqwater;      // molar water use rate (kmol/sec)
+        Real64 NdotAir;          // molar air use rate    (kmol/sec)
+        Real64 TotAirInEnthalpy; // Enthalpy of air coming nto FCPM energy balance (watts)
+        Real64 NdotLiqwater;     // molar water use rate (kmol/sec)
         Real64 TwaterInlet;
         Real64 WaterInEnthalpy;       // Enthalpy of liquid water used for reforming (watts)
         Real64 DilutionAirInEnthalpy; // Enthalpy of Dilution air coming into FCPM (watts)
         Real64 DilutionAirOutEnthalpy;
-        Real64 PelancillariesAC;    // ancillary power (watts)
-        Real64 TotProdGasEnthalphy; // Enthalphy of product gases leaving FCPM   (watts)
-        Real64 WaterOutEnthalpy;    // enthalpy of vapor from water used for reforming
+        Real64 PelancillariesAC;   // ancillary power (watts)
+        Real64 TotProdGasEnthalpy; // Enthalpy of product gases leaving FCPM   (watts)
+        Real64 WaterOutEnthalpy;   // enthalpy of vapor from water used for reforming
         int SeqSubstitIter;
         int RegulaFalsiIter;
 
@@ -151,10 +151,10 @@ namespace FuelCellElectricGenerator {
               SkinLossMode(DataGenerators::SkinLoss::Invalid), ZoneID(0), RadiativeFract(0.0), QdotSkin(0.0), UAskin(0.0), SkinLossCurveID(0),
               WaterSupplyCurveID(0), NdotDilutionAir(0.0), StackHeatLossToDilution(0.0), DilutionInletNode(0), DilutionExhaustNode(0), PelMin(0.0),
               PelMax(0.0), Pel(0.0), PelLastTimeStep(0.0), Eel(0.0), QdotStackCool(0.0), FractionalDayofLastStartUp(0.0),
-              FractionalDayofLastShutDown(0.0), HasBeenOn(true), DuringShutDown(false), DuringStartUp(false), NdotFuel(0.0), TotFuelInEnthalphy(0.0),
+              FractionalDayofLastShutDown(0.0), HasBeenOn(true), DuringShutDown(false), DuringStartUp(false), NdotFuel(0.0), TotFuelInEnthalpy(0.0),
               NdotProdGas(0.0), ConstitMolalFract(14, 0.0), GasLibID(14, GasID::Invalid), TprodGasLeavingFCPM(0.0), NdotAir(0.0),
-              TotAirInEnthalphy(0.0), NdotLiqwater(0.0), TwaterInlet(0.0), WaterInEnthalpy(0.0), DilutionAirInEnthalpy(0.0),
-              DilutionAirOutEnthalpy(0.0), PelancillariesAC(0.0), TotProdGasEnthalphy(0.0), WaterOutEnthalpy(0.0), SeqSubstitIter(0),
+              TotAirInEnthalpy(0.0), NdotLiqwater(0.0), TwaterInlet(0.0), WaterInEnthalpy(0.0), DilutionAirInEnthalpy(0.0),
+              DilutionAirOutEnthalpy(0.0), PelancillariesAC(0.0), TotProdGasEnthalpy(0.0), WaterOutEnthalpy(0.0), SeqSubstitIter(0),
               RegulaFalsiIter(0)
         {
         }
@@ -398,13 +398,13 @@ namespace FuelCellElectricGenerator {
         Real64 HeatRecOutletTemp;    // reporting: Heat Recovery Loop Outlet Temperature (C)
         Real64 HeatRecMdot;          // reporting: Heat Recovery Loop Mass flow rate (kg/s)
         // air supply and blower
-        Real64 TairInlet;         // State point 1
-        Real64 TairIntoFCPM;      // Temperature at State point 4
-        Real64 NdotAir;           // air flow in kmol/sec
-        Real64 TotAirInEnthalphy; // Enthalpy at State point 4
-        Real64 BlowerPower;       // electrical power used by air supply blower
-        Real64 BlowerEnergy;      // electrical energy used by air supply blower
-        Real64 BlowerSkinLoss;    // heat rate of losses by blower
+        Real64 TairInlet;        // State point 1
+        Real64 TairIntoFCPM;     // Temperature at State point 4
+        Real64 NdotAir;          // air flow in kmol/sec
+        Real64 TotAirInEnthalpy; // Enthalpy at State point 4
+        Real64 BlowerPower;      // electrical power used by air supply blower
+        Real64 BlowerEnergy;     // electrical energy used by air supply blower
+        Real64 BlowerSkinLoss;   // heat rate of losses by blower
         // fuel supply and compressor
         Real64 TfuelInlet;           // State point 2 [C]
         Real64 TfuelIntoFCPM;        // state point 5 [C]
@@ -463,7 +463,7 @@ namespace FuelCellElectricGenerator {
         FCReportDataStruct()
             : ACPowerGen(0.0), ACEnergyGen(0.0), QdotExhaust(0.0), TotalHeatEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergyLHV(0.0),
               FuelEnergyUseRateLHV(0.0), FuelEnergyHHV(0.0), FuelEnergyUseRateHHV(0.0), FuelRateMdot(0.0), HeatRecInletTemp(0.0),
-              HeatRecOutletTemp(0.0), HeatRecMdot(0.0), TairInlet(0.0), TairIntoFCPM(0.0), NdotAir(0.0), TotAirInEnthalphy(0.0), BlowerPower(0.0),
+              HeatRecOutletTemp(0.0), HeatRecMdot(0.0), TairInlet(0.0), TairIntoFCPM(0.0), NdotAir(0.0), TotAirInEnthalpy(0.0), BlowerPower(0.0),
               BlowerEnergy(0.0), BlowerSkinLoss(0.0), TfuelInlet(0.0), TfuelIntoFCPM(0.0), NdotFuel(0.0), TotFuelInEnthalpy(0.0),
               FuelCompressPower(0.0), FuelCompressEnergy(0.0), FuelCompressSkinLoss(0.0), TwaterInlet(0.0), TwaterIntoFCPM(0.0), NdotWater(0.0),
               WaterPumpPower(0.0), WaterPumpEnergy(0.0), WaterIntoFCPMEnthalpy(0.0), TprodGas(0.0), EnthalProdGas(0.0), NdotProdGas(0.0),

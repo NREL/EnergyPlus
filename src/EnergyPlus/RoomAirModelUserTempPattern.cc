@@ -170,7 +170,7 @@ void GetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
 
     auto &patternZoneInfo = state.dataRoomAir->AirPatternZoneInfo(ZoneNum);
     auto const &zoneHeatBal = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
-    // intialize in preperation for calculations
+    // initialize in preparation for calculations
     patternZoneInfo.Tstat = zoneHeatBal.MAT;
     patternZoneInfo.Tleaving = zoneHeatBal.MAT;
     patternZoneInfo.Texhaust = zoneHeatBal.MAT;
@@ -733,7 +733,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
 
         Real64 H2OHtOfVap = PsyHgAirFnWTdb(zoneNode.HumRat, returnNode.Temp);
 
-        // Include impact of under case returns for refrigerated display cases when updateing return node
+        // Include impact of under case returns for refrigerated display cases when updating return node
         // humidity ratio
         if (!zone.NoHeatToReturnAir) {
             if (MassFlowRA > 0) {

@@ -1372,11 +1372,11 @@ namespace SimulationManager {
         // unused0909743 Format(' Display Extra Warnings',2(', ',A))
         //  ENDIF
         if (state.dataGlobal->createPerfLog) {
-            writeIntialPerfLogValues(state, overrideModeValue);
+            writeInitialPerfLogValues(state, overrideModeValue);
         }
     }
 
-    void writeIntialPerfLogValues(EnergyPlusData &state, std::string const &currentOverrideModeValue)
+    void writeInitialPerfLogValues(EnergyPlusData &state, std::string const &currentOverrideModeValue)
     // write the input related portions of the .perflog
     // J.Glazer February 2020
     {

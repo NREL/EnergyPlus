@@ -1786,7 +1786,7 @@ namespace SurfaceGeometry {
                                 ++state.dataSurfaceGeometry->ErrCount2;
                                 if (state.dataSurfaceGeometry->ErrCount2 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                                     ShowWarningError(state,
-                                                     format("{}CAUTION -- Interspace surfaces are occuring in the same space(s).", RoutineName));
+                                                     format("{}CAUTION -- Interspace surfaces are occurring in the same space(s).", RoutineName));
                                     ShowContinueError(
                                         state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual occurrences.");
                                 }
@@ -4275,7 +4275,7 @@ namespace SurfaceGeometry {
                                            state.dataSurfaceGeometry->SurfaceTmp(i).Name,
                                            state.dataSurfaceGeometry->SurfaceTmp(i).ExtBoundCondName));
                     ErrorsFound = true;
-                    // If vertex size mistmatch
+                    // If vertex size mismatch
                 } else if (state.dataSurfaceGeometry->SurfaceTmp(i).Vertex.size() !=
                            state.dataSurfaceGeometry->SurfaceTmp(ExtSurfNum).Vertex.size()) {
                     ShowSevereError(state,
@@ -4642,7 +4642,7 @@ namespace SurfaceGeometry {
                                                 s_ipsc->cCurrentModuleObject,
                                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
                                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Height));
-                        ShowContinueError(state, "..which deos not match its construction height.");
+                        ShowContinueError(state, "..which does not match its construction height.");
                     }
                 }
 
@@ -7383,7 +7383,7 @@ namespace SurfaceGeometry {
         int IOStat;                       // IO Status when calling get input subroutine
         int NumAlpha;                     // Number of alpha names being passed
         int NumProp;                      // Number of properties being passed
-        int TotShadingSurfaceReflectance; // Total Shading Surface Refleftance statements
+        int TotShadingSurfaceReflectance; // Total Shading Surface Reflectance statements
         int Loop;                         // DO loop index
         int SurfNum;                      // Surface number
         int GlConstrNum;                  // Glazing construction number
@@ -7484,7 +7484,7 @@ namespace SurfaceGeometry {
         // Write reflectance values to .eio file.
         print(state.files.eio,
               "! <ShadingProperty Reflectance>,Shading Surface Name,Shading Type,Diffuse Solar Reflectance, Diffuse "
-              "Visible Reflectance,Surface Glazing Fraction,Surface Glazing Contruction\n");
+              "Visible Reflectance,Surface Glazing Fraction,Surface Glazing Construction\n");
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             auto const &surf = state.dataSurface->Surface(SurfNum);
@@ -7730,7 +7730,7 @@ namespace SurfaceGeometry {
 
             if (ErrorsFound) continue; // previous inner do loop may have detected problems that need to be cycle'd again to avoid crash
 
-            // now that we should have all the surfaces, do some preperations and checks.
+            // now that we should have all the surfaces, do some preparations and checks.
 
             // are they all similar tilt and azimuth? Issue warnings so people can do it if they really want
             Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs));
@@ -9273,7 +9273,7 @@ namespace SurfaceGeometry {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Ptr;  // Pointer into Vertice array
+        int Ptr;  // Pointer into Vertices array
         int n;    // Loop counter
         int NSrc; // Used for CW -> CCW transformation
         int NTar; // Used for CW -> CCW transformation
@@ -10307,7 +10307,7 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedConstructionList.push_back(curShadedConstruction);
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction = curShadedConstruction;
 
-                    // check to make the window refenced is an exterior window
+                    // check to make the window referenced is an exterior window
                     if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond != ExternalEnvironment) {
                         ErrorsFound = true;
                         ShowSevereError(
@@ -11591,7 +11591,7 @@ namespace SurfaceGeometry {
         //       \units hr
         //       \default 24
         //  N9, \field Previous Other Side Temperature Coefficient
-        //      \note This coeffient multiplies the other side temperature result from the
+        //      \note This coefficient multiplies the other side temperature result from the
         //      \note previous zone timestep
         //      \type real
         //      \default 0
@@ -13785,7 +13785,7 @@ namespace SurfaceGeometry {
             int ConstrNewSt = Util::FindItemInList(ConstrNameSt,
                                                    state.dataConstruction->Construct,
                                                    state.dataHeatBal->TotConstructs); // Number of unshaded storm window construction that is created
-            // If necessary, create new material corresponding to the air layer between the storm winddow and the rest of the window
+            // If necessary, create new material corresponding to the air layer between the storm window and the rest of the window
             int MatNewStAir = createAirMaterialFromDistance(state, state.dataSurface->StormWindow(StormWinNum).StormWinDistance, "AIR:STORMWIN:");
             if (ConstrNewSt == 0) {
                 ConstrNewSt = createConstructionWithStorm(
@@ -13828,7 +13828,7 @@ namespace SurfaceGeometry {
                                                  ChrNum; // Name of shaded construction with storm window
                     int ConstrNewStSh = createConstructionWithStorm(
                         state, ConstrNum, ConstrNameStSh, state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum, MatNewStAir);
-                    surf.shadedStormWinConstructionList[iConstruction] = ConstrNewStSh; // put in same index as the shaded constuction
+                    surf.shadedStormWinConstructionList[iConstruction] = ConstrNewStSh; // put in same index as the shaded construction
                 }
             } // end of loop for shaded constructions
         }     // end of loop over storm window objects
@@ -13993,7 +13993,7 @@ namespace SurfaceGeometry {
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        // If there is a second glazing systme on the Data File, SurfNum+1
+        // If there is a second glazing system on the Data File, SurfNum+1
         // has the construction of the second glazing system.
 
         // 2-glazing system Window5 data file entry
@@ -14163,7 +14163,7 @@ namespace SurfaceGeometry {
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        // If there is a second glazing systme on the Data File, SurfNum+1
+        // If there is a second glazing system on the Data File, SurfNum+1
         // has the construction of the second glazing system.
 
         // 2-glazing system Window5 data file entry
@@ -14762,7 +14762,7 @@ namespace SurfaceGeometry {
                 Real64 Tri2Area(AreaPolygon(3, Triangle2) / TotalArea);
 
                 // check if sum of fractions are slightly greater than 1.0 which is a symptom of the triangles for a non-convex
-                // quadralateral using the wrong two triangles
+                // quadrilateral using the wrong two triangles
                 if ((Tri1Area + Tri2Area) > 1.05) {
 
                     // if so repeat the process with the other two possible triangles (notice the vertices are in a different order this
@@ -14864,7 +14864,7 @@ namespace SurfaceGeometry {
         // METHODOLOGY EMPLOYED:
         // Mine solar renewables input and collect surface names.
         // find shading surfaces with names that match those in solar objects.
-        // setup flags for shading surfaces so that the solar renewables can resuse incident solar calcs
+        // setup flags for shading surfaces so that the solar renewables can reuse incident solar calcs
         // new solar component models that use shading surfaces will have to extend the code here.
 
         // Using/Aliasing
@@ -15644,7 +15644,7 @@ namespace SurfaceGeometry {
         Real64 WidthEff;     // Effective width of the surface
         Real64 WidthMax;     // X difference between the vertex on the most left and the one on the most right
         Real64 HeightEff;    // Effective height of the surface
-        Real64 HeightMax;    // Y difference between the lowest and toppest vertices
+        Real64 HeightMax;    // Y difference between the lowest and highest vertices
         Real64 Xp;
         Real64 Yp;
         Real64 Zp;

@@ -464,7 +464,7 @@ namespace SolarCollectors {
                     ShowSevereError(state, format("{} = {}", CurrentModuleParamObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(
                         state, format("Illegal {} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-                    ShowContinueError(state, " Collector gross area must be always gretaer than zero.");
+                    ShowContinueError(state, " Collector gross area must be always greater than zero.");
                     ErrorsFound = true;
                 }
                 state.dataSolarCollectors->Parameters(ParametersNum).Volume = state.dataIPShortCut->rNumericArgs(2);
@@ -472,7 +472,7 @@ namespace SolarCollectors {
                     ShowSevereError(state, format("{} = {}", CurrentModuleParamObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(
                         state, format("Illegal {} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-                    ShowContinueError(state, " Collector water volume must be always gretaer than zero.");
+                    ShowContinueError(state, " Collector water volume must be always greater than zero.");
                     ErrorsFound = true;
                 }
                 // Note: this value is used to calculate the heat loss through the bottom and side of the collector
@@ -517,7 +517,7 @@ namespace SolarCollectors {
                 }
                 // Solar absorptance of the absorber plate
                 state.dataSolarCollectors->Parameters(ParametersNum).AbsorOfAbsPlate = state.dataIPShortCut->rNumericArgs(16);
-                // thermal emmissivity of the absorber plate
+                // thermal emissivity of the absorber plate
                 state.dataSolarCollectors->Parameters(ParametersNum).EmissOfAbsPlate = state.dataIPShortCut->rNumericArgs(17);
 
             } // end of ParametersNum
@@ -977,8 +977,8 @@ namespace SolarCollectors {
             this->CosTilt = std::cos(Tilt * Constant::DegToRadians);
             this->SinTilt = std::sin(1.8 * Tilt * Constant::DegToRadians);
 
-            // Diffuse reflectance of the cover for solar radiation diffusely reflected back from the absober
-            // plate to the cover.  The diffuse solar radiation reflected back from the absober plate to the
+            // Diffuse reflectance of the cover for solar radiation diffusely reflected back from the absorber
+            // plate to the cover.  The diffuse solar radiation reflected back from the absorber plate to the
             // cover is represented by the 60 degree equivalent incident angle.  This diffuse reflectance is
             // used to calculate the transmittance - absorptance product (Duffie and Beckman, 1991)
             Real64 Theta = 60.0 * Constant::DegToRadians;
@@ -1660,7 +1660,7 @@ namespace SolarCollectors {
         //       DATE WRITTEN   February 2012
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Calculates the transmitance, reflectance, and absorptance of the collector covers based on
+        // Calculates the transmittance, reflectance, and absorptance of the collector covers based on
         // solar collector optical parameters specified.
 
         // METHODOLOGY EMPLOYED:
@@ -1692,7 +1692,7 @@ namespace SolarCollectors {
         AbsCover1 = 0.0;
         AbsCover2 = 0.0;
 
-        bool DiffRefFlag; // flag for calc. diffuse refl of cover from inside to outsidd
+        bool DiffRefFlag; // flag for calc. diffuse refl of cover from inside to outside
         if (present(InOUTFlag)) {
             DiffRefFlag = InOUTFlag;
         } else {
@@ -2036,9 +2036,9 @@ namespace SolarCollectors {
         // PURPOSE OF THIS FUNCTION:
         //  Calculates the free convection coefficient between the absorber plate and water.
         // METHODOLOGY EMPLOYED:
-        //  The convection coefficient calculation were based on the Fujii and Imura emperical correlations
+        //  The convection coefficient calculation were based on the Fujii and Imura empirical correlations
         // REFERENCES:
-        //  T.Fujii, and H.Imura,Natural convection heat transfer from aplate with arbitrary inclination.
+        //  T.Fujii, and H.Imura,Natural convection heat transfer from a plate with arbitrary inclination.
         //  International Journal of Heat and Mass Transfer: 15(4), (1972), 755-764.
 
         Real64 hConvA2W; // convection coefficient, [W/m2K]

@@ -1990,7 +1990,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     int RecircNodeNum;                 // Return air or zone exhaust node
     OpMode OperatingMode;              // current operating mode, Off, Heat, Cool, or DeadBand
     Real64 SupplyMassFlowRate;         // System supply air mass flow rate [kg/s]
-    Real64 SupplyMassFlowRateForHumid; // System supply air mass flow rate required to meet humdification load [kg/s]
+    Real64 SupplyMassFlowRateForHumid; // System supply air mass flow rate required to meet humidification load [kg/s]
     Real64 SupplyMassFlowRateForDehum; // System supply air mass flow rate required to meet dehumidification load [kg/s]
     Real64 SupplyMassFlowRateForCool;  // System supply air mass flow rate required to meet sensible cooling load[kg/s]
     Real64 SupplyMassFlowRateForHeat;  // System supply air mass flow rate required to meet sensible heating load[kg/s]
@@ -2000,10 +2000,10 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     Real64 OAVolFlowRate;              // Outdoor air volume flow rate at standard density [m3/s]
     Real64 MinOASensOutput;            // Minimum Outdoor air sensible output [W], <0 means OA is cooler than zone air
     Real64 MinOALatOutput;             // Minimum Outdoor air moisture load [kg/s]
-    Real64 SensOutput;                 // Sensible output [W] (psitive means heating, negative means cooling)
+    Real64 SensOutput;                 // Sensible output [W] (positive means heating, negative means cooling)
     Real64 HeatSensOutput;             // Heating sensible output [W]
-    Real64 CoolSensOutput;             // Cooling sensible output [W] (positive value menas cooling)
-    Real64 LatOutput;                  // Latent output [W] (positive value means hudmification, negative means dehumidification)
+    Real64 CoolSensOutput;             // Cooling sensible output [W] (positive value means cooling)
+    Real64 LatOutput;                  // Latent output [W] (positive value means humidification, negative means dehumidification)
     Real64 CoolLatOutput;              // Cooling latent output [W] (positive value means dehumidification)
     Real64 CoolTotOutput;              // Cooling total output [W] (positive value means cooling)
     Real64 DeltaT;                     // Delta temperature - reused in multiple places
@@ -2013,8 +2013,8 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     Real64 MdotZnHumidSP;              // Load required to meet humidifying setpoint [kgWater/s] (>0 = a humidify load)
     Real64 MdotZnDehumidSP;            // Load required to meet dehumidifying setpoint [kgWater/s] (<0 = a dehumidify load)
     bool UnitOn;
-    bool HeatOn;             // Flag for heating and humidification availbility schedule, true if heating is on
-    bool CoolOn;             // Flag for cooling and dehumidification availbility schedule, true if cooling is on
+    bool HeatOn;             // Flag for heating and humidification availability schedule, true if heating is on
+    bool CoolOn;             // Flag for cooling and dehumidification availability schedule, true if cooling is on
     bool EconoOn;            // Flag for economizer operation, true if economizer is on
     Real64 SupplyHumRatOrig; // Supply inlet to zone humidity ratio before saturation check [kgWater/kgDryAir]
     Real64 SupplyHumRatSat;  // Supply inlet to zone humidity ratio saturation at SupplyTemp [kgWater/kgDryAir]
@@ -2369,7 +2369,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                                 break;
                             }
                             // Limit supply humidity ratio to saturation at supply outlet temp
-                            // If saturation exceeded, then honor capacity limit and set to dew point at supplyenthalpy
+                            // If saturation exceeded, then honor capacity limit and set to dew point at supply enthalpy
 
                             SupplyHumRatOrig = PurchAir.SupplyHumRat;
                             SupplyHumRatSat = PsyWFnTdbRhPb(state, PurchAir.SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
@@ -2636,7 +2636,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
         } // Cooling or heating required
 
         if (SupplyMassFlowRate > 0.0) {
-            // EMS override point  Purch air supply temp and humidty ratio ..... but only if unit is on, SupplyMassFlowRate>0.0
+            // EMS override point  Purch air supply temp and humidity ratio ..... but only if unit is on, SupplyMassFlowRate>0.0
             if (PurchAir.EMSOverrideSupplyTempOn) {
                 PurchAir.SupplyTemp = PurchAir.EMSValueSupplyTemp;
             }
@@ -2674,7 +2674,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                 PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;
             }
 
-            // Double-check if saturation exceeded, then thow warning, shouldn't happen here, don't reset, just warn
+            // Double-check if saturation exceeded, then throw warning, shouldn't happen here, don't reset, just warn
 
             SupplyHumRatOrig = PurchAir.SupplyHumRat;
             SupplyHumRatSat = PsyWFnTdbRhPb(state, PurchAir.SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
@@ -3004,7 +3004,7 @@ void UpdatePurchasedAir(EnergyPlusData &state, int const PurchAirNum, bool const
     bool FirstCall;
     bool SupPathInletChanged;
 
-    FirstCall = true;            // just used to avoid redundant calulations
+    FirstCall = true;            // just used to avoid redundant calculations
     SupPathInletChanged = false; // don't care if something changes
 
     auto &PurchAir = state.dataPurchasedAirMgr->PurchAir(PurchAirNum);
@@ -3137,7 +3137,7 @@ Real64 GetPurchasedAirOutAirMassFlow(EnergyPlusData &state, int const PurchAirNu
     // lookup function for OA inlet mass flow for ventilation rate reporting
 
     // METHODOLOGY EMPLOYED:
-    // most analagous functions look up an outside air node but this function
+    // most analogous functions look up an outside air node but this function
     // gets the actual mass flow of outdoor air, following the features of the model
 
     if (state.dataPurchasedAirMgr->GetPurchAirInputFlag) {
@@ -3226,7 +3226,7 @@ Real64 GetPurchasedAirMixedAirTemp(EnergyPlusData &state, int const PurchAirNum)
     // lookup function for mixed air Temp for ventilation rate reporting
 
     // METHODOLOGY EMPLOYED:
-    // most analagous functions look up an outside air node but this function
+    // most analogous functions look up an outside air node but this function
     // gets the actual mass flow of outdoor air, following the features of the model
 
     if (state.dataPurchasedAirMgr->GetPurchAirInputFlag) {
@@ -3315,13 +3315,13 @@ void InitializePlenumArrays(EnergyPlusData &state, int const PurchAirNum)
     //      PurchAirPlenumArrays( 1 ).IsSimulated( 1 ) = true, ideal loads air system #1 has been simulated this iteration
     //      PurchAirPlenumArrays( 1 ).IsSimulated( 2 ) = false, ideal loads air system #3 has not yet been simulated this iteration
     //
-    //      Ideal loads air sytems keep track of which plenum they are connected to
+    //      Ideal loads air systems keep track of which plenum they are connected to
     //      PurchAir( 1 ).PlenumArrayIndex = 1
     //      PurchAir( 1 ).ReturnPlenumName = ReturnPlenum2;
     //      PurchAir( 3 ).PlenumArrayIndex = 1
     //      PurchAir( 3 ).ReturnPlenumName = ReturnPlenum2;
     //
-    //      The ideal loads air sytems also keep track of which item they are in the int and bool arrays
+    //      The ideal loads air systems also keep track of which item they are in the int and bool arrays
     //      PurchAir( 1 ).PurchAirArrayIndex = 1
     //      PurchAir( 3 ).PurchAirArrayIndex = 2
     //
@@ -3334,7 +3334,7 @@ void InitializePlenumArrays(EnergyPlusData &state, int const PurchAirNum)
     //      PurchAirPlenumArrays( 2 ).IsSimulated( 2 ) = false, ideal loads air system #5 has not yet been simulated this iteration
     //      PurchAirPlenumArrays( 2 ).IsSimulated( 3 ) = false, ideal loads air system #6 has not yet been simulated this iteration
     //
-    //      Ideal loads air sytems keep track of which plenum they are connected to
+    //      Ideal loads air systems keep track of which plenum they are connected to
     //      PurchAir( 2 ).PlenumArrayIndex = 2;
     //      PurchAir( 2 ).ReturnPlenumName = ReturnPlenum3;
     //      PurchAir( 5 ).PlenumArrayIndex = 2;
@@ -3342,7 +3342,7 @@ void InitializePlenumArrays(EnergyPlusData &state, int const PurchAirNum)
     //      PurchAir( 6 ).PlenumArrayIndex = 2;
     //      PurchAir( 6 ).ReturnPlenumName = ReturnPlenum3;
     //
-    //      The ideal loads air sytems also keep track of which item they are in the int and bool arrays
+    //      The ideal loads air systems also keep track of which item they are in the int and bool arrays
     //      PurchAir( 2 ).PurchAirArrayIndex = 1;
     //      PurchAir( 5 ).PurchAirArrayIndex = 2;
     //      PurchAir( 6 ).PurchAirArrayIndex = 3;

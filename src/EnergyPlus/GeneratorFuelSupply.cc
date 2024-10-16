@@ -77,7 +77,7 @@ namespace GeneratorFuelSupply {
     //   reused among some generators to define gaseous fuel chemistry, optional compressor)
 
     // Module containing the routines dealing with the fuel supply for some generators
-    // different generator modules can reuse the same fuel supply code, hence a seperate module
+    // different generator modules can reuse the same fuel supply code, hence a separate module
 
     // MODULE INFORMATION:
     //       AUTHOR         B Griffith

@@ -1610,7 +1610,7 @@ void InitSetPointManagers(EnergyPlusData &state)
     //                          SetpointManager:MultiZone:Humidity:Minimum
     //                          SetpointManager:MultiZone:Humidity:Maximum
     //                      Sep 2010 B.A. Nigusse, FSEC/UCF
-    //                         Added control varibles for SetpointManage:Scheduled
+    //                         Added control variables for SetpointManage:Scheduled
     //                      Jan 2022 Wooyoung Jung, Jeremy Lerond and Jian Zhang, PNNL
     //                         Added new setpoint managers:
     //                          SetpointManager:SystemNodeReset:Temperature
@@ -3261,8 +3261,8 @@ void SPMReturnAirBypassFlow::calculate(EnergyPlusData &state)
     //       DATE WRITTEN   July 2005
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Given the desired setpoint temperature, calulate the flow rate through the
-    // return asir branch that will deliver the desired temperature at the loop outlet
+    // Given the desired setpoint temperature, calculate the flow rate through the
+    // return air branch that will deliver the desired temperature at the loop outlet
     // node.
 
     auto &mixerRABInNode = state.dataLoopNodes->Node(this->rabMixInNodeNum);
@@ -3458,7 +3458,7 @@ void SPMFollowOutsideAirTemp::calculate(EnergyPlusData &state)
     // Set the setpoint based on outdoor air dry-bulb/wet-bulb temperature
 
     // METHODOLOGY EMPLOYED:
-    // Based on reference temperature type specifed in the setpoint manager,
+    // Based on reference temperature type specified in the setpoint manager,
     // the setpoint is calculated as OutWetBulbTemp(Or OutDryBulbTemp) + Offset.
     // The sign convention is that a positive Offset will increase the resulting setpoint.
     // Final value of the setpoint is limited by the Max and Min limit specified in the setpoint manager.
@@ -3482,7 +3482,7 @@ void SPMFollowSysNodeTemp::calculate(EnergyPlusData &state)
     // to generate setpoint on a second system node.  If the reference node is also designated
     // to be an outdoor air (intake) node, then this setpoint manager can be used to follow
     // outdoor air conditions that are adjusted for altitude.
-    // Also, based on reference temperature type specifed in the setpoint manager, the out door air wet-bulb
+    // Also, based on reference temperature type specified in the setpoint manager, the out door air wet-bulb
     // or dry-bulb temperature at the reference node could be used.
     // A temperature offset will be applied to the value obtained from the reference system node.
     // If this value is zero, and the limits are met, then the resulting setpoint will be exactly the same
@@ -3510,7 +3510,7 @@ void SPMFollowGroundTemp::calculate(EnergyPlusData &state)
     // Set the setpoint based on current ground temperature
 
     // METHODOLOGY EMPLOYED:
-    // Based on reference ground temperature object type specifed in the setpoint manager,
+    // Based on reference ground temperature object type specified in the setpoint manager,
     // the setpoint is calculated as GroundTemperature + Offset.
     // The sign convention is that a positive Offset will increase the resulting setpoint.
     // Final value of the setpoint is limited by the Max and Min limit specified in the setpoint manager.
@@ -3669,7 +3669,7 @@ void SPMCondenserEnteringTemp::calculate(EnergyPlusData &state)
         SetPoint = dspm->CET_DesignEnteringCondenserTemp + 1.0;
     } else if ((state.dataEnvrn->OutWetBulbTemp >= dspm->CET_MinActualWetBulbTemp) &&
                (this->towerDesignInletAirWetBulbTemp >= dspm->CET_DesignMinWetBulbTemp) && (dspm->CET_CurMinLift > this->minLift)) {
-        // Boundaries are satified; use optimized condenser entering water temp
+        // Boundaries are satisfied; use optimized condenser entering water temp
         SetPoint = dspm->CET_OptCondenserEnteringTemp;
     } else {
         // Boundaries violated; Reset to scheduled value of condenser water entering setpoint
@@ -3905,7 +3905,7 @@ void SPMReturnWaterTemp::calculate(EnergyPlusData &state)
                               "The manager is specified to look to the return node setpoint to find a target return temperature, but the node "
                               "setpoint was invalid");
             ShowContinueError(state,
-                              format("Verify that a separate sepoint manager is specified to set the setpoint on the return node named \"{}\"",
+                              format("Verify that a separate setpoint manager is specified to set the setpoint on the return node named \"{}\"",
                                      state.dataLoopNodes->NodeID(this->returnNodeNum)));
             ShowContinueError(state, "Or change the target return temperature input type to constant or scheduled");
             ShowFatalError(state, "Missing reference setpoint");
@@ -4370,7 +4370,7 @@ void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int const NodeNum)
     //       DATE WRITTEN   August 2015
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Resets setpoint control variable type to "Maximum Humidty Ratio" if control variable type
+    // Resets setpoint control variable type to "Maximum Humidity Ratio" if control variable type
     // is "Humidity Ratio".
 
     // METHODOLOGY EMPLOYED:

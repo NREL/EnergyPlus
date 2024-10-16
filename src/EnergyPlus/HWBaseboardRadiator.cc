@@ -250,7 +250,7 @@ namespace HWBaseboardRadiator {
         int constexpr iHeatDesignCapacityNumericNum(3);       // get input index to HW baseboard heating capacity
         int constexpr iHeatCapacityPerFloorAreaNumericNum(1); // get input index to HW baseboard heating capacity per floor area sizing
         int constexpr iHeatFracOfAutosizedCapacityNumericNum(
-            2); //  get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
+            2); //  get input index to HW baseboard heating capacity sizing as fraction of autosized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum; // Baseboard number
@@ -813,7 +813,7 @@ namespace HWBaseboardRadiator {
         // This subroutine initializes the baseboard units, and determines the UA values during simulation.
 
         // METHODOLOGY EMPLOYED:
-        // The initialization subrotines both in high temperature radiant radiator
+        // The initialization subroutines both in high temperature radiant radiator
         // and convective only baseboard radiator are combined and modified. In addition,
         // an UA value calculation by LMTD method is added.
         // The heater is assumed to be crossflow with both fluids unmixed.
@@ -1173,7 +1173,7 @@ namespace HWBaseboardRadiator {
                 BaseSizer::reportSizerOutput(state, cCMO_BBRadiator_Water, hWBaseboard.Name, "U-Factor times Area [W/C]", hWBaseboard.UA);
             }
         } else {
-            // if there is no heating Sizing:Plant object and autosizng was requested, issue an error message
+            // if there is no heating Sizing:Plant object and autosizing was requested, issue an error message
             if (hWBaseboard.WaterVolFlowRateMax == DataSizing::AutoSize || hWBaseboard.RatedCapacity == DataSizing::AutoSize ||
                 hWBaseboard.RatedCapacity == 0.0) {
                 ShowSevereError(state, "Autosizing of hot water baseboard requires a heating loop Sizing:Plant object");
@@ -1246,7 +1246,7 @@ namespace HWBaseboardRadiator {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates both the convective and radiant heat transfer rate
-        // in a hot water baseboard heater.  The heater is assumed to be crossflowwith
+        // in a hot water baseboard heater.  The heater is assumed to be crossflow with
         // both fluids unmixed.  The air flow is buoyancy driven and a constant airflow
         // and a constant airflow velocity of 0.5m/s is assumed.
 
@@ -1391,7 +1391,7 @@ namespace HWBaseboardRadiator {
         //       MODIFIED       Aug 2007 Daeho Kang (Add the update of radiant source)
 
         // METHODOLOGY EMPLOYED:
-        // The update subrotines both in high temperature radiant radiator
+        // The update subroutines both in high temperature radiant radiator
         // and convective only baseboard radiator are combined and modified.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1473,7 +1473,7 @@ namespace HWBaseboardRadiator {
         //                      April 2010 Brent Griffith, max limit to protect surface temperature calcs
 
         // PURPOSE OF THIS SUBROUTINE:
-        // To distribute the gains from the hot water basebaord heater
+        // To distribute the gains from the hot water baseboard heater
         // as specified in the user input file.  This includes distribution
         // of long wavelength radiant gains to surfaces and "people."
 

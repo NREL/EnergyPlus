@@ -114,7 +114,7 @@ namespace EnergyPlus::RefrigeratedCase {
 // sensible case credit). The case (evaporator) fans are assumed to be disabled during hot-gas or
 // electric defrost modes. A stocking schedule (W/m) is available for added load if desired.
 // Walk-In coolers are simulated based on the specified sum of the conductance*area of each wall and door facing
-// up to three (extendible) zones.  Two types of doors are specified, stock doors and glass doors.  For each category
+// up to three (extensible) zones.  Two types of doors are specified, stock doors and glass doors.  For each category
 // of doors, schedules for door openings are used with ASHRAE models for infiltration
 // which are a function of the height of the door.  That
 // infiltration is used to calculate the latent load on the cooler and the latent case credits for each zone.
@@ -3449,7 +3449,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
 
         if (state.dataRefrigCase->NumRefrigSystems > 0 && state.dataRefrigCase->NumRefrigCondensers == 0) {
             ShowSevereError(state,
-                            "Refrigeration:System objects were found during input processing, however no Rrefrigeration condenser objects (which "
+                            "Refrigeration:System objects were found during input processing, however no Refrigeration condenser objects (which "
                             "may be either: ");
             ShowContinueError(state,
                               " Refrigeration:Condenser:AirCooled, Refrigeration:Condenser:WaterCooled, "
@@ -4952,7 +4952,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     ShowWarningError(
                         state,
                         format("{}{}=\"{}\", {} not found even though {} is greater than zero. Distribution piping heat gain will not be "
-                               "calculated unless a Zone is defined to deterimine the environmental temperature surrounding the piping.",
+                               "calculated unless a Zone is defined to determine the environmental temperature surrounding the piping.",
                                RoutineName,
                                CurrentModuleObject,
                                Secondary(SecondaryNum).Name,
@@ -5013,7 +5013,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     ShowWarningError(
                         state,
                         format("{}{}=\"{}\", {} not found even though {} is greater than zero. Receiver heat gain will not be calculated unless "
-                               "a Zone is defined to deterimine the environmental temperature surrounding the Receiver.",
+                               "a Zone is defined to determine the environmental temperature surrounding the Receiver.",
                                RoutineName,
                                CurrentModuleObject,
                                Secondary(SecondaryNum).Name,
@@ -6072,7 +6072,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     ShowSevereError(
                         state,
                         format("{}{}=\"{}\", System Node Number not found for {} = {} even though {} is greater than zero. Suction piping heat gain "
-                               "cannot be calculated unless a Zone is defined to deterimine the environmental temperature surrounding the piping.",
+                               "cannot be calculated unless a Zone is defined to determine the environmental temperature surrounding the piping.",
                                RoutineName,
                                CurrentModuleObject,
                                System(RefrigSysNum).Name,
@@ -6260,7 +6260,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         NominalTotalCompCap += Compressor(CompNum).NomCap;
                         ++Compressor(CompNum).NumSysAttach;
                     }    // NumStages
-                } else { //  Transcritical compressor attached to subcritical refigeration cycle
+                } else { //  Transcritical compressor attached to subcritical refrigeration cycle
                     ShowSevereError(state,
                                     format("{}{}. A transcritical compressor is attached to a subcritical refrigeration system.",
                                            RoutineName,
@@ -6285,7 +6285,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                                                        Condenser(System(RefrigSysNum).CondenserNum(1)).RatedTCondense);
                         NominalTotalHiStageCompCap += Compressor(CompNum).NomCap;
                         ++Compressor(CompNum).NumSysAttach;
-                    } else { //  Transcritical compressor attached to subcritical refigeration cycle
+                    } else { //  Transcritical compressor attached to subcritical refrigeration cycle
                         ShowSevereError(state,
                                         format("{}{}. A transcritical compressor is attached to a subcritical refrigeration system.",
                                                RoutineName,
@@ -7008,7 +7008,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
             // Check subcooler effectiveness value, must be value between 0 and 1
             if ((TransSystem(TransRefrigSysNum).SCEffectiveness < 0) || (TransSystem(TransRefrigSysNum).SCEffectiveness > 1)) {
                 ShowSevereError(state,
-                                format("{}{}=\"{}: The value for subcooler effectivness is invalid.  The subcooler effectivenss must be a value "
+                                format("{}{}=\"{}: The value for subcooler effectiveness is invalid.  The subcooler effectiveness must be a value "
                                        "greater than or equal to zero and less than or equal to one.",
                                        RoutineName,
                                        CurrentModuleObject,
@@ -7040,7 +7040,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                            cNumericFieldNames(3)));
                     ShowContinueError(state,
                                       "  The medium temperature suction piping heat gain cannot be calculated unless a Zone is defined to "
-                                      "deterimine the environmental temperature surrounding the piping.");
+                                      "determine the environmental temperature surrounding the piping.");
                     ErrorsFound = true;
                 } else {
                     state.dataRefrigCase->RefrigPresentInZone(TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumMT) = true;
@@ -7084,7 +7084,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                            cNumericFieldNames(4)));
                     ShowContinueError(state,
                                       "  The low temperature suction piping heat gain cannot be calculated unless a Zone is defined to "
-                                      "deterimine the environmental temperature surrounding the piping.");
+                                      "determine the environmental temperature surrounding the piping.");
                     ErrorsFound = true;
                 } else {
                     state.dataRefrigCase->RefrigPresentInZone(TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumLT) = true;
@@ -7848,7 +7848,7 @@ void SetupReportInput(EnergyPlusData &state)
 
                 // Report walkin variables that are specified for each zone exposed to the walkin
                 // For "IDOut" variable in SetupOutputVariable, need to create a single name that includes
-                //    both the walk-in name and the zone name - see "Walkin_and_zone_name" concatination
+                //    both the walk-in name and the zone name - see "Walkin_and_zone_name" concatenation
                 //    This new variable name is important if using an rvi file!
                 for (int zoneId = 1; zoneId <= walkin.NumZones; ++zoneId) {
 
@@ -7980,7 +7980,7 @@ void SetupReportInput(EnergyPlusData &state)
                                     coil.TotalElecConsumption,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Sum,
-                                    coil.Name); // components are metered seperately
+                                    coil.Name); // components are metered separately
                 SetupOutputVariable(state,
                                     "Refrigeration Zone Air Chiller Fan Electricity Rate",
                                     Constant::Units::W,
@@ -10390,7 +10390,7 @@ void InitRefrigeration(EnergyPlusData &state)
         }
     }
 
-    // Accumulative and carry-over variables are not zeroed at start of each time step, only at begining of environment
+    // Accumulative and carry-over variables are not zeroed at start of each time step, only at beginning of environment
     if (state.dataGlobal->BeginEnvrnFlag && state.dataRefrigCase->InitRefrigerationMyBeginEnvrnFlag) {
         if (state.dataRefrigCase->NumSimulationCases > 0) {
             for (int i = RefrigCase.l(), e = RefrigCase.u(); i <= e; ++i) {
@@ -10811,7 +10811,7 @@ void RefrigRackData::CalcRackSystem(EnergyPlusData &state)
     // In that subroutine, dispatch coils within each set in order specified for each zone
     //  Below will assign loads to refrigeration system or secondary loop
     // Note that this routine will go through all refrigeration systems, but loads for multiple systems
-    // with interactions will not be known for the intital calls with first HVAC time step. They will,
+    // with interactions will not be known for the initial calls with first HVAC time step. They will,
     // however, be repeated when the last chiller set is called from ZoneEquipmentManager
     // that's why important where init goes, don't want to zero out data should keep
     if (state.dataRefrigCase->UseSysTimeStep) {
@@ -11505,7 +11505,7 @@ void RefrigCaseData::CalculateCase(EnergyPlusData &state) // Absolute pointer to
                     ShowContinueError(state, " Total Cooling Capacity.");
                 } else {
                     ShowContinueError(state,
-                                      " This case has insufficient capacity to meet excess energy associated with a zone enviroment temperature "
+                                      " This case has insufficient capacity to meet excess energy associated with a zone environment temperature "
                                       "greater than the design ambient for the case.");
                     ShowContinueError(state, " Refer to documentation for further explanation of ");
                     ShowContinueError(state, " Total Cooling Capacity.");
@@ -11517,7 +11517,7 @@ void RefrigCaseData::CalculateCase(EnergyPlusData &state) // Absolute pointer to
                     ShowContinueError(state, " recommendations regarding Total Cooling Capacity, Sensible Heat Ratio, and Defrost Capacity.");
                 } else {
                     ShowContinueError(state,
-                                      " This case has insufficient capacity to meet excess energy associated with a zone enviroment temperature "
+                                      " This case has insufficient capacity to meet excess energy associated with a zone environment temperature "
                                       "greater than the design ambient for the case.");
                     ShowContinueError(state, " Refer to documentation for further explanation of ");
                     ShowContinueError(state, " Total Cooling Capacity.");
@@ -11954,7 +11954,7 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
     // In that subroutine, dispatch coils within each set in order specified for each zone
     //  Below will assign loads to refrigeration system or secondary loop
     // Note that this routine will go through all refrigeration systems, but loads for multiple systems
-    // with interactions will not be known for the intital calls with first HVAC time step. They will,
+    // with interactions will not be known for the initial calls with first HVAC time step. They will,
     // however, be repeated when the last chiller set is called from ZoneEquipmentManager
     // that's why important where init goes, don't want to zero out data should keep
     if (state.dataRefrigCase->UseSysTimeStep) {
@@ -12233,7 +12233,7 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
                                                                "of the refrigeration loads, ",
                                                            thisSys.HiStageWarnIndex1);
                             ShowRecurringContinueErrorAtEnd(
-                                state, " subcooler loads (if any), and low-stage compressor loads for this sytem.", thisSys.HiStageWarnIndex2);
+                                state, " subcooler loads (if any), and low-stage compressor loads for this system.", thisSys.HiStageWarnIndex2);
                         } // Hi-stage capacity<(load+LSHX load + lo-stage compressor load)
                     }     // CoilFlag (Numcoils > 0) and load > capacity
 
@@ -12273,7 +12273,7 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
                     if (state.dataRefrigCase->ShowUnmetEnergyWarning(SysNum)) {
                         ShowWarningError(state, format("Refrigeration:System: {}", thisSys.Name));
                         ShowContinueError(state, " The specified compressors for this system are unable to meet ");
-                        ShowContinueError(state, " the sum of the refrigerated case loads and subcooler loads (if any) for this sytem.");
+                        ShowContinueError(state, " the sum of the refrigerated case loads and subcooler loads (if any) for this system.");
                         state.dataRefrigCase->ShowUnmetEnergyWarning(SysNum) = false;
                     } // show warning
                 }     // > mylarge number
@@ -12283,7 +12283,7 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
                         ShowWarningError(state, format("Refrigeration:System: {}", thisSys.Name));
                         ShowContinueError(state, " The specified high-stage compressors for this system are unable to meet ");
                         ShowContinueError(state, " the sum of the refrigerated case loads, subcooler loads (if any) and ");
-                        ShowContinueError(state, " low-stage compressor loads for this sytem.");
+                        ShowContinueError(state, " low-stage compressor loads for this system.");
                         state.dataRefrigCase->ShowHiStageUnmetEnergyWarning(SysNum) = false;
                     } // show warning
                 }     // > mylarge number
@@ -12530,7 +12530,7 @@ void SimulateDetailedTransRefrigSystems(EnergyPlusData &state)
                 if (state.dataRefrigCase->ShowUnmetEnergyWarningTrans(SysNum)) {
                     ShowWarningError(state, format("Refrigeration:TranscriticalSystem: {}", sys.Name));
                     ShowContinueError(state, " The specified compressors for this system are unable to meet ");
-                    ShowContinueError(state, " the sum of the refrigerated case loads and subcooler loads (if any) for this sytem.");
+                    ShowContinueError(state, " the sum of the refrigerated case loads and subcooler loads (if any) for this system.");
                     state.dataRefrigCase->ShowUnmetEnergyWarningTrans(SysNum) = false;
                 } // show warning
             }     // > mylarge number
@@ -12895,7 +12895,7 @@ void RefrigSystemData::CalculateCondensers(EnergyPlusData &state, int const SysN
         //  'spectacular' icing problems.  Ideally, the user will use the evaporative schedule input
         //  to set such a schedule.  However, sometimes, users will use a single input deck to model
         //  one building in multiple climates, and may not think to put in such a schedule in the colder
-        //  climates.  To accomodate such applications, the variable EvapCutOutTdb is used as an extra
+        //  climates.  To accommodate such applications, the variable EvapCutOutTdb is used as an extra
         //  check.
 
         if (OutDbTemp < EvapCutOutTdb) EvapAvail = false;
@@ -12989,7 +12989,7 @@ void RefrigSystemData::CalculateCondensers(EnergyPlusData &state, int const SysN
             } break;
             case FanSpeedCtrlType::TwoSpeed: {
                 // low speed setting of 1/2 fan speed can give up to 60% of capacity.
-                // 1/2 speed corresonds to ~1/8 power consumption (FanHalfSpeedRatio = 1/(2**2.5) = 0.1768)
+                // 1/2 speed corresponds to ~1/8 power consumption (FanHalfSpeedRatio = 1/(2**2.5) = 0.1768)
                 // dampers are used to control flow within those two ranges as in FanConstantSpeed
                 Real64 const air_vol_fan_power_fac(std::exp(1.0 - AirVolRatio) * RatedFanPower);
                 ActualFanPower = AirVolRatio * air_vol_fan_power_fac;
@@ -13256,7 +13256,7 @@ void TransRefrigSystemData::CalcGasCooler(EnergyPlusData &state, int const SysNu
     } break;
     case FanSpeedCtrlType::TwoSpeed: {
         // low speed setting of 1/2 fan speed can give up to 60% of capacity.
-        // 1/2 speed corresonds to ~1/8 power consumption (FanHalfSpeedRatio = 1/(2**2.5) = 0.1768)
+        // 1/2 speed corresponds to ~1/8 power consumption (FanHalfSpeedRatio = 1/(2**2.5) = 0.1768)
         // dampers are used to control flow within those two ranges as in FanConstantSpeed
         ActualFanPower = AirVolRatio * std::exp(1.0 - AirVolRatio) * RatedFanPower;
         if (CapFac < CapFac60Percent) ActualFanPower = ((AirVolRatio + 0.4) * (FanHalfSpeedRatio)) * std::exp(1.0 - AirVolRatio) * RatedFanPower;
@@ -13551,7 +13551,7 @@ void RefrigSystemData::CalculateCompressors(EnergyPlusData &state)
             compressor.Capacity = CapacityCorrection * Curve::CurveValue(state, compressor.CapacityCurvePtr, TsatforPsuct, TsatforPdisch);
             compressor.MassFlow = compressor.Capacity / TotalEnthalpyChangeActual;
 
-            // calculate load factor for last compressor addded
+            // calculate load factor for last compressor added
             // assumes either cycling or part load eff = full load eff for last compressor
             if (StageIndex == 1) { // Single-stage or low-stage compressors
                 if ((this->TotCompCapacity + compressor.Capacity) >= NeededCapacity) {
@@ -13650,7 +13650,7 @@ void TransRefrigSystemData::CalculateTransCompressors(EnergyPlusData &state)
 
     // REFERENCES:
     // ANSI/AHRI. 2004. Standard 540, Standard for Performance Rating of Positive Displacement Refrigerant
-    //     Comprssors and Compressor Units. Arlington, VA: Air-Conditioning, Heating, and Refrigeration
+    //     Compressors and Compressor Units. Arlington, VA: Air-Conditioning, Heating, and Refrigeration
     //     Institute.
     // Ge, Y.T., and S.A. Tassou. 2011. Performance evaluation and optimal design of supermarket refrigeration
     //     systems with supermarket model "SuperSim", Part I: Model description and validation. International
@@ -13689,8 +13689,8 @@ void TransRefrigSystemData::CalculateTransCompressors(EnergyPlusData &state)
     Real64 HGCOutlet;                   // Enthalpy at gas cooler outlet, J/kg
     Real64 HIdeal;                      // Ideal enthalpy at subcooler (for 100% effectiveness)
     Real64 HsatLiqforTevapNeededMT;     // Enthalpy of saturated liquid at MT evaporator, J/kg
-    Real64 HsatVaporforTevapneededMT;   // Enthlapy of saturated vapor at MT evaporator (transcritical cycle), J/kg
-    Real64 HsatVaporforTevapneededLT;   // Enthlapy of saturated vapor at LT evaporator (transcritical cycle), J/kg
+    Real64 HsatVaporforTevapneededMT;   // Enthalpy of saturated vapor at MT evaporator (transcritical cycle), J/kg
+    Real64 HsatVaporforTevapneededLT;   // Enthalpy of saturated vapor at LT evaporator (transcritical cycle), J/kg
     Real64 LFLastComp;                  // Load factor for last compressor dispatched
     Real64 MassCorrectionLT;            // Mass flow at existing subcool/superheat over cap at rated conditions for LT loads
     Real64 MassCorrectionMT;            // Mass flow at existing subcool/superheat over cap at rated conditions for MT loads
@@ -14385,7 +14385,7 @@ void ReportRefrigerationComponents(EnergyPlusData &state)
     }                                               //((NumSimulationSubcoolers - NumSimulationMechSubcoolers) > 0)
 
     if (state.dataRefrigCase->NumTransRefrigSystems > 0) {
-        print(state.files.eio, "{}\n", Format_120); // Intro to detailed transcriticial refrigeration system
+        print(state.files.eio, "{}\n", Format_120); // Intro to detailed transcritical refrigeration system
         print(state.files.eio, "{}\n", Format_121); // Detailed system header
         if (state.dataRefrigCase->NumSimulationCases > 0) {
             print(state.files.eio, "{}\n", Format_105); //  Case header
@@ -15146,7 +15146,7 @@ void WalkInData::CalculateWalkIn(EnergyPlusData &state) // Absolute pointer to  
                 MassDryAirRate * (HumRatioZoneAir - HumRatioAirWalkIn); // Walk in cooler removes water at this rate in this zone (kg/s)
             // Just as with cases,  we assume no latent credit (water removal = 0) to zone or load on cooler during dripdown
             // To be consistent with the treatment of refrigerated cases, latent load
-            //  and latent credit are bothbased on reducing the infiltrating vapor to ice.  (This is
+            //  and latent credit are both based on reducing the infiltrating vapor to ice.  (This is
             //  slightly greater than if the latent credit were based upon condensing out the water as liquid.)
             //  then it would be: ZoneLatentLoad = -WaterRemovRate * WaterToVaporEnthalpy * (1.0d0-DefrostDripDownSchedule)
             ZoneLatentLoad = -WaterRemovRate * IcetoVaporEnthalpy * (1.0 - DefrostDripDownSchedule);
@@ -15513,7 +15513,7 @@ void SecondaryLoopData::CalculateSecondary(EnergyPlusData &state, int const Seco
             int CoilID = this->CoilNum(CoilIndex);
             // already CALL CalculateCoil(CoilID) for each coil, dispatched in coilset order for each zone
             // increment TotalCoolingLoad for each system
-            //  here will find out if secondary can serve total load, if not will derate coil outout/case credits
+            //  here will find out if secondary can serve total load, if not will derate coil output/case credits
             RefrigerationLoad += WarehouseCoil(CoilID).TotalCoolingLoad;
             TotalHotDefrostCondCredit += WarehouseCoil(CoilID).HotDefrostCondCredit;
         } // NumCoils on secondary system
@@ -16234,7 +16234,7 @@ void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq
             } break;
             case FanSpeedCtrlType::TwoSpeed: {
                 // low speed setting of 1/2 fan speed can give up to 60% of capacity.
-                // 1/2 speed corresonds to ~1/8 power consumption (FanHalfSpeedRatio = 1/(2**2.5) = 0.1768)
+                // 1/2 speed corresponds to ~1/8 power consumption (FanHalfSpeedRatio = 1/(2**2.5) = 0.1768)
                 // dampers are used to control flow within those two ranges as in FanConstantSpeed
                 if (CapFac < CapFac60Percent) {
                     FanPowerActual = ((AirVolRatio + 0.4) * (FanHalfSpeedRatio)) * std::exp(1.0 - AirVolRatio) * FanPowerMax;
