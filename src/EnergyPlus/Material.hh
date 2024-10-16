@@ -905,7 +905,7 @@ namespace Material {
         ~MaterialGlassTC() = default;
     };
 
-    int GetMaterialNum(EnergyPlusData &state, std::string const &matName);
+    int GetMaterialNum(EnergyPlusData const &state, std::string const &matName);
     MaterialBase *GetMaterial(EnergyPlusData &state, std::string const &matName);
 
     void GetMaterialData(EnergyPlusData &state, bool &errorsFound); // set to true if errors found in input
