@@ -175,7 +175,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
             EnergyType = DataPlant::PlantEquipmentType::PurchHotWater;
             heatWaterIndex++;
             thisIndex = heatWaterIndex;
-        } else if (EnergySourceNum > NumDistrictUnitsHeatWater && EnergySourceNum <= NumDistrictUnitsHeatWater + NumDistrictUnitsCool) {
+        } else if (EnergySourceNum <= NumDistrictUnitsHeatWater + NumDistrictUnitsCool) {
             state.dataIPShortCut->cCurrentModuleObject = "DistrictCooling";
             objType = DataLoopNode::ConnectionObjectType::DistrictCooling;
             nodeNames = "Chilled Water Nodes";

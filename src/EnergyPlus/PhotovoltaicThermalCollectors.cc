@@ -186,11 +186,10 @@ namespace PhotovoltaicThermalCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Get input for PVT Simple objects
 
-        int Item;                // Item to be "gotten"
-        int NumAlphas;           // Number of Alphas for each GetObjectItem call
-        int NumNumbers;          // Number of Numbers for each GetObjectItem call
-        int IOStatus;            // Used in GetObjectItem
-        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        int Item;       // Item to be "gotten"
+        int NumAlphas;  // Number of Alphas for each GetObjectItem call
+        int NumNumbers; // Number of Numbers for each GetObjectItem call
+        int IOStatus;   // Used in GetObjectItem
 
         tmpSimplePVTperf.allocate(NumSimplePVTPerform);
         for (Item = 1; Item <= NumSimplePVTPerform; ++Item) {
@@ -219,7 +218,6 @@ namespace PhotovoltaicThermalCollectors {
                                        state.dataIPShortCut->cAlphaArgs(3),
                                        state.dataIPShortCut->cCurrentModuleObject,
                                        thisTmpSimplePVTperf.Name));
-                ErrorsFound = true;
             }
             thisTmpSimplePVTperf.SurfEmissivity = state.dataIPShortCut->rNumericArgs(3);
         }
@@ -234,8 +232,6 @@ namespace PhotovoltaicThermalCollectors {
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
-        int Found;
-        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         using DataSurfaces::OSCMData;
         using ScheduleManager::GetScheduleIndex;
         using ScheduleManager::ScheduleAlwaysOn;
@@ -257,14 +253,13 @@ namespace PhotovoltaicThermalCollectors {
             auto &thisTmpBIPVTperf = tmpBIPVTperf(Item);
             thisTmpBIPVTperf.Name = state.dataIPShortCut->cAlphaArgs(1);
             thisTmpBIPVTperf.OSCMName = state.dataIPShortCut->cAlphaArgs(2);
-            Found = Util::FindItemInList(thisTmpBIPVTperf.OSCMName, state.dataSurface->OSCM);
+            int Found = Util::FindItemInList(thisTmpBIPVTperf.OSCMName, state.dataSurface->OSCM);
             if (Found == 0) {
                 ShowSevereError(state,
                                 format("GetBIPVTCollectorsInput: Invalid outside model name={}, object type={}, object name={}",
                                        thisTmpBIPVTperf.OSCMName,
                                        state.dataIPShortCut->cCurrentModuleObject,
                                        thisTmpBIPVTperf.Name));
-                ErrorsFound = true;
             }
             thisTmpBIPVTperf.OSCMPtr = Found;
             thisTmpBIPVTperf.PVEffGapWidth = state.dataIPShortCut->rNumericArgs(1);
@@ -290,7 +285,6 @@ namespace PhotovoltaicThermalCollectors {
                                            state.dataIPShortCut->cAlphaArgs(3),
                                            state.dataIPShortCut->cCurrentModuleObject,
                                            thisTmpBIPVTperf.Name));
-                    ErrorsFound = true;
                     continue;
                 }
             }
@@ -772,13 +766,13 @@ namespace PhotovoltaicThermalCollectors {
         }
 
         Real64 DesignVolFlowRateDes = 0.0; // Autosize design volume flow for reporting
-        int PltSizNum = 0;                 // Plant Sizing index corresponding to CurLoopNum
         bool ErrorsFound = false;
 
         if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
 
             if (!allocated(state.dataSize->PlantSizData)) return;
             if (!allocated(state.dataPlnt->PlantLoop)) return;
+            int PltSizNum = 0; // Plant Sizing index corresponding to CurLoopNum
 
             if (this->WPlantLoc.loopNum > 0) {
                 PltSizNum = state.dataPlnt->PlantLoop(this->WPlantLoc.loopNum).PlantSizNum;
@@ -867,7 +861,7 @@ namespace PhotovoltaicThermalCollectors {
                     }
                 } else {
                     CheckSysSizing(state, "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name);
-                    auto &thisFinalSysSizing(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum));
+                    auto const &thisFinalSysSizing = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum);
                     if (state.dataSize->CurOASysNum > 0) {
                         DesignVolFlowRateDes = thisFinalSysSizing.DesOutAirVolFlow;
                     } else {
@@ -1450,11 +1444,10 @@ namespace PhotovoltaicThermalCollectors {
                   110.4)); // Sutherland's formula https://www.grc.nasa.gov/www/k-12/airplane/viscosity.html Sutherland's constant = 198.72 R
                            // converted to K =>110.4. At 273.15, Viscosity is 1.71E-5 as per Incropera, et al 6th ed. Temp range approx 273K - 373K
             k_air = 0.000000000015207 * std::pow(t_film + 273.15, 3.0) - 0.000000048574 * std::pow(t_film + 273.15, 2.0) +
-                    0.00010184 * (t_film + 273.15) - 0.00039333;                        // Dumas, A., and Trancossi, M., SAE Technical Papers, 2009
-            prandtl_air = 0.680 + 0.000000469 * std::pow(t_film + 273.15 - 540.0, 2.0); // The Schock Absorber Handbook, 2nd Ed. John C. Dixon 2007
-            density_air = 101.3 / (0.287 * (t_film + 273.15));                          // Ideal gas law
-            diffusivity_air = k_air / (cp_amb * density_air);                           // definition
-            kin_viscosity_air = mu_air / density_air;                                   // definition
+                    0.00010184 * (t_film + 273.15) - 0.00039333; // Dumas, A., and Trancossi, M., SAE Technical Papers, 2009
+            density_air = 101.3 / (0.287 * (t_film + 273.15));   // Ideal gas law
+            diffusivity_air = k_air / (cp_amb * density_air);    // definition
+            kin_viscosity_air = mu_air / density_air;            // definition
 
             // duffie and beckman correlation for nat convection - This is for exterior
             raleigh = (gravity * (1.0 / (0.5 * (tamb + tpvg) + 273.15)) * (std::max((Real64)(0.000001), std::abs(tpvg - tamb))) * std::pow(dhyd, 3)) /
@@ -1643,17 +1636,17 @@ namespace PhotovoltaicThermalCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Solve a system of linear equations using Gaussian elimination and back substitution method.
 
-        Real64 sum, dummy1, dummy2, mm, small(1.0e-10);
-        int i, j, ii, p, k, m(3);
-        bool coeff_not_zero;
+        int p;
+        int constexpr m = 3;
+        Real64 constexpr small = 1.0e-10;
 
-        for (i = 0; i < m; i++) {
+        for (int i = 0; i < m; i++) {
             y[i] = 0.0;
         }
 
-        for (i = 0; i <= (m - 2); i++) {
-            coeff_not_zero = false;
-            for (j = i; j <= (m - 1); j++) {
+        for (int i = 0; i <= (m - 2); i++) {
+            bool coeff_not_zero = false;
+            for (int j = i; j <= (m - 1); j++) {
                 if (std::abs(jj[j * m + i]) > small) {
                     coeff_not_zero = true;
                     p = j;
@@ -1663,20 +1656,20 @@ namespace PhotovoltaicThermalCollectors {
 
             if (coeff_not_zero) {
                 if (p != i) {
-                    dummy2 = f[i];
+                    Real64 dummy2 = f[i];
                     f[i] = f[p];
                     f[p] = dummy2;
-                    for (j = 0; j <= (m - 1); j++) {
-                        dummy1 = jj[i * m + j];
+                    for (int j = 0; j <= (m - 1); j++) {
+                        Real64 dummy1 = jj[i * m + j];
                         jj[i * m + j] = jj[p * m + j];
                         jj[p * m + j] = dummy1;
                     }
                 }
-                for (j = (i + 1); j <= (m - 1); j++) {
+                for (int j = (i + 1); j <= (m - 1); j++) {
                     if (std::abs(jj[i * m + i]) < small) jj[i * m + i] = small;
-                    mm = jj[j * m + i] / jj[i * m + i];
+                    Real64 mm = jj[j * m + i] / jj[i * m + i];
                     f[j] = f[j] - mm * f[i];
-                    for (k = 0; k <= (m - 1); k++) {
+                    for (int k = 0; k <= (m - 1); k++) {
                         jj[j * m + k] = jj[j * m + k] - mm * jj[i * m + k];
                     }
                 }
@@ -1684,10 +1677,10 @@ namespace PhotovoltaicThermalCollectors {
         }
         if (std::abs(jj[(m - 1) * m + m - 1]) < small) jj[(m - 1) * m + m - 1] = small;
         y[m - 1] = f[m - 1] / jj[(m - 1) * m + m - 1];
-        sum = 0.0;
-        for (i = 0; i <= (m - 2); i++) {
-            ii = m - 2 - i;
-            for (j = ii; j <= (m - 1); j++) {
+        Real64 sum = 0.0;
+        for (int i = 0; i <= (m - 2); i++) {
+            int ii = m - 2 - i;
+            for (int j = ii; j <= (m - 1); j++) {
                 sum = sum + jj[ii * m + j] * y[j];
             }
             if (std::abs(jj[ii * m + ii]) < small) jj[ii * m + ii] = small;
@@ -1745,25 +1738,19 @@ namespace PhotovoltaicThermalCollectors {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   August 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        int InletNode;
-        int OutletNode;
-        int thisOSCM;
 
         {
             switch (this->WorkingFluidType) {
             case WorkingFluidEnum::LIQUID: {
-                InletNode = this->PlantInletNodeNum;
-                OutletNode = this->PlantOutletNodeNum;
+                int InletNode = this->PlantInletNodeNum;
+                int OutletNode = this->PlantOutletNodeNum;
 
                 PlantUtilities::SafeCopyPlantNode(state, InletNode, OutletNode);
                 state.dataLoopNodes->Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
             } break;
             case WorkingFluidEnum::AIR: {
-                InletNode = this->HVACInletNodeNum;
-                OutletNode = this->HVACOutletNodeNum;
+                int InletNode = this->HVACInletNodeNum;
+                int OutletNode = this->HVACOutletNodeNum;
 
                 // Set the outlet nodes for properties that just pass through & not used
                 state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
@@ -1782,7 +1769,7 @@ namespace PhotovoltaicThermalCollectors {
 
                 // update the OtherSideConditionsModel coefficients for BIPVT
                 if (this->ModelType == PVTModelType::BIPVT) {
-                    thisOSCM = this->BIPVT.OSCMPtr;
+                    int thisOSCM = this->BIPVT.OSCMPtr;
                     state.dataSurface->OSCM(thisOSCM).TConv = this->BIPVT.Tplen;
                     state.dataSurface->OSCM(thisOSCM).HConv = this->BIPVT.HcPlen;
                     state.dataSurface->OSCM(thisOSCM).TRad = this->BIPVT.Tcoll;

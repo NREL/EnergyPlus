@@ -213,9 +213,9 @@ namespace Photovoltaics {
 
         GeneratorPower = state.dataPhotovoltaic->PVarray(GeneratorIndex).Report.DCPower;
         GeneratorEnergy = state.dataPhotovoltaic->PVarray(GeneratorIndex).Report.DCEnergy;
-        auto &thisPVarray = state.dataPhotovoltaic->PVarray;
+        auto const &thisPVarray = state.dataPhotovoltaic->PVarray(GeneratorIndex);
         // PVT may add thermal
-        if (thisPVarray(GeneratorIndex).CellIntegrationMode == CellIntegration::PVTSolarCollector) {
+        if (thisPVarray.CellIntegrationMode == CellIntegration::PVTSolarCollector) {
             // get result for thermal power generation
             GetPVTThermalPowerProduction(state, GeneratorIndex, ThermalPower, ThermalEnergy);
         } else {
@@ -1263,8 +1263,6 @@ namespace Photovoltaics {
         Real64 VA;
         Real64 VOCA;
         Real64 PA;
-        int CC;
-        int K;
         Real64 CellTemp(0.0); // cell temperature in Kelvin
         Real64 CellTempC;     // cell temperature in degrees C
 
@@ -1281,14 +1279,14 @@ namespace Photovoltaics {
         // convert ambient temperature from C to K
         Tambient = state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + Constant::Kelvin;
 
-        auto &thisPVarray = state.dataPhotovoltaic->PVarray;
+        auto const &thisPVarray = state.dataPhotovoltaic->PVarray(PVnum);
 
         if ((state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation > MinInsolation) && (RunFlag)) {
 
             // set initial values for eta iteration loop
             DummyErr = 2.0 * ERR;
-            CC = 1;
             EtaOld = EtaIni;
+            int K;
 
             // Begin DO WHILE loop - until the error tolerance is reached.
             ETA = 0.0;
@@ -1332,7 +1330,7 @@ namespace Photovoltaics {
                     CellTemp += Constant::Kelvin;
                 } break;
                 case CellIntegration::PVTSolarCollector: {
-                    GetPVTTsColl(state, thisPVarray(PVnum).PVTPtr, CellTemp);
+                    GetPVTTsColl(state, thisPVarray.PVTPtr, CellTemp);
                     CellTemp += Constant::Kelvin;
                 } break;
                 default:
@@ -1394,7 +1392,6 @@ namespace Photovoltaics {
                     PM / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation / state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.Area;
                 DummyErr = std::abs((ETA - EtaOld) / EtaOld);
                 EtaOld = ETA;
-                ++CC;
 
             } // while
 
@@ -1422,7 +1419,7 @@ namespace Photovoltaics {
                 CellTemp += Constant::Kelvin;
             } break;
             case CellIntegration::PVTSolarCollector: {
-                GetPVTTsColl(state, thisPVarray(PVnum).PVTPtr, CellTemp);
+                GetPVTTsColl(state, thisPVarray.PVTPtr, CellTemp);
                 CellTemp += Constant::Kelvin;
             } break;
             default: {
@@ -1473,7 +1470,7 @@ namespace Photovoltaics {
                Real64 const AA,   // passed in from CalcPV
                Real64 const EPS,  // passed in from CalcPV
                Real64 &II,        // current [A]
-               Real64 &VV,        // voltage [V]
+               Real64 const VV,   // voltage [V]
                Real64 &PP         // power [W]
     )
     {
@@ -1540,10 +1537,10 @@ namespace Photovoltaics {
                 Real64 &B,
                 Real64 &P,
                 int &K,
-                Real64 &IO,
-                Real64 &IL,
-                Real64 &RSER,
-                Real64 &AA,
+                Real64 const IO,
+                Real64 const IL,
+                Real64 const RSER,
+                Real64 const AA,
                 Real64 const EPS,
                 int const KMAX)
     {

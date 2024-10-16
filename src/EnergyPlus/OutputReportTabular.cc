@@ -3892,10 +3892,10 @@ void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSt
     using DataStringGlobals::CharTab;
 
     auto &ort = state.dataOutRptTab;
-    auto &op = state.dataOutputProcessor;
     // if no beps report is called then skip
 
     if ((ort->displayTabularBEPS || ort->displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::Zone)) {
+        auto &op = state.dataOutputProcessor;
         // add the current time to the total elapsed time
         // FOLLOWING LINE MOVED TO UPDATETABULARREPORTS because used even when beps is not called
         // gatherElapsedTimeBEPS = gatherElapsedTimeBEPS + TimeStepZone
@@ -11048,7 +11048,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             SIunit = "[m3]";
             LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->m3_unitName);
             state.dataOutRptTab->m3_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
-            SIunit = "[W/m2]";
+            // SIunit = "[W/m2]";
             // LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->Wm2_unitName);
             state.dataOutRptTab->Wm2_unitName = "[W/ft2]";
             state.dataOutRptTab->Wm2_unitConv = 0.3048 * 0.3048; // ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
@@ -14590,7 +14590,7 @@ void AllocateLoadComponentArrays(EnergyPlusData &state)
     ort->AllocateLoadComponentArraysDoAllocate = false;
 }
 
-void DeallocateLoadComponentArrays(EnergyPlusData &state)
+void DeallocateLoadComponentArrays(EnergyPlusData const &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Jason Glazer
@@ -16467,7 +16467,7 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
 }
 
 // make a list of the zones for the airloop component loads report
-void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const curAirLoop)
+void CreateListOfZonesForAirLoop(EnergyPlusData const &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const curAirLoop)
 {
     int counter = 0;
     for (int zi = 1; zi <= state.dataGlobal->NumOfZones; ++zi) {
@@ -17744,13 +17744,13 @@ void ResetMonthlyGathering(EnergyPlusData &state)
     }
 }
 
-void ResetBinGathering(EnergyPlusData &state)
+void ResetBinGathering(EnergyPlusData const &state)
 {
     // Jason Glazer - October 2015
     // Reset all timebins gathering arrays to zero for multi-year simulations
     // so that only last year is reported in tabular reports
     Real64 constexpr bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
-    auto &ort = state.dataOutRptTab;
+    auto const &ort = state.dataOutRptTab;
 
     // clear the binning arrays to zeros
     for (auto &e : ort->BinResults) {
@@ -17776,12 +17776,12 @@ void ResetBinGathering(EnergyPlusData &state)
     }
 }
 
-void ResetBEPSGathering(EnergyPlusData &state)
+void ResetBEPSGathering(EnergyPlusData const &state)
 {
     // Jason Glazer - October 2015
     // Reset all ABUPS gathering arrays to zero for multi-year simulations
     // so that only last year is reported in tabular reports
-    auto &ort = state.dataOutRptTab;
+    auto const &ort = state.dataOutRptTab;
     ort->gatherTotalsBEPS = 0.0;
     ort->gatherEndUseBEPS = 0.0;
     ort->gatherEndUseSubBEPS = 0.0;
@@ -17809,22 +17809,22 @@ void ResetBEPSGathering(EnergyPlusData &state)
     ort->gatherWaterEndUseTotal = 0.0;
 }
 
-void ResetSourceEnergyEndUseGathering(EnergyPlusData &state)
+void ResetSourceEnergyEndUseGathering(EnergyPlusData const &state)
 {
     // Jason Glazer - October 2015
     // Reset all source energy end use table gathering arrays to zero for multi-year simulations
     // so that only last year is reported in tabular reports
-    auto &ort = state.dataOutRptTab;
+    auto const &ort = state.dataOutRptTab;
     ort->gatherTotalsBySourceBEPS = 0.0;
     ort->gatherEndUseBySourceBEPS = 0.0;
 }
 
-void ResetPeakDemandGathering(EnergyPlusData &state)
+void ResetPeakDemandGathering(EnergyPlusData const &state)
 {
     // Jason Glazer - October 2015
     // Reset all demand end use components table gathering arrays to zero for multi-year simulations
     // so that only last year is reported in tabular reports
-    auto &ort = state.dataOutRptTab;
+    auto const &ort = state.dataOutRptTab;
     ort->gatherDemandTotal = 0.0;
     ort->gatherDemandTimeStamp = 0;
     ort->gatherDemandEndUse = 0.0;
