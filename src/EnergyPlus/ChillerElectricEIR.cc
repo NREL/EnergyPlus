@@ -2703,10 +2703,13 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
         if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations &&
             state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
             ShowWarningError(state,
-                             format("Chiller should be off, evap flow rate={}, but EvapInletTemp={} is != EvapOutletTemp={}",
+                             format("Chiller should be off, evap flow rate={}, but EvapInletTemp={} is != EvapOutletTemp={}, EvapInletNodeNum.Temp "
+                                    "={}, EvapOutletNodeNum).Temp={}",
                                     this->EvapMassFlowRate,
                                     this->EvapInletTemp,
-                                    this->EvapOutletTemp));
+                                    this->EvapOutletTemp,
+                                    state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp,
+                                    state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp));
             ShowContinueErrorTimeStamp(state,
                                        format("MyLoad={}, RunFlag={}, QEvaporator={}, QCondenser={}, EvapMassFlowRate={}, "
                                               "CondMassFlowRate = {}, Power={} ",
