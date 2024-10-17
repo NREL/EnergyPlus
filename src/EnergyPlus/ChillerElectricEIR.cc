@@ -1962,6 +1962,8 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
             state, this->CWPlantLoc, this->CondMassFlowIndex, this->CDPlantLoc, DataPlant::CriteriaType::MassFlowRate, this->CondMassFlowRate);
 
         if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
+            // Shut chiller off if there is no condenser water flow
+            MyLoad = 0.0;
             if (this->EvapMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
                 // Use PlantUtilities::SetComponentFlowRate to decide actual flow
                 PlantUtilities::SetComponentFlowRate(
@@ -2583,23 +2585,6 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
     Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
     if (MyLoad >= 0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
-        // if (MyLoad >= 0 || !RunFlag || this->QEvaporator <= 0.0) { // Chiller not running so pass inlet states to outlet states
-        // if ((MyLoad < 0 && RunFlag) && (this->CondMassFlowRate >= DataBranchAirLoopPlant::MassFlowTolerance ||
-        //                                 this->EvapMassFlowRate >= DataBranchAirLoopPlant::MassFlowTolerance)) {
-        //     if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations &&
-        //         state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Locked)
-        //         { ShowWarningError(state, "Chiller off due to this->QEvaporator <= 0.0 rule"); ShowContinueErrorTimeStamp(
-        //             state,
-        //             format("MyLoad={}, RunFlag={}, this->QEvaporator={}, this->QCondenser={}, this->EvapMassFlowRate={},
-        //             this->CondMassFlowRate={}",
-        //                    MyLoad,
-        //                    RunFlag,
-        //                    this->QEvaporator,
-        //                    this->QCondenser,
-        //                    this->EvapMassFlowRate,
-        //                    this->CondMassFlowRate));
-        //     }
-        // }
         //  Set node conditions
         state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
         state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
