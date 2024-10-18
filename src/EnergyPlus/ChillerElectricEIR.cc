@@ -1346,14 +1346,14 @@ void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFl
             state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum).TempSetPointHi;
     }
 
-    Real64 mdot = 0.0;
+    this->EvapMassFlowRate = 0.0;
     Real64 mdotCond = 0.0;
-    if ((std::abs(MyLoad) > 0.0) && RunFlag) {
-        mdot = this->EvapMassFlowRateMax;
+    if ((MyLoad < 0.0) && RunFlag) {
+        this->EvapMassFlowRate = this->EvapMassFlowRateMax;
         mdotCond = this->CondMassFlowRateMax;
     }
 
-    PlantUtilities::SetComponentFlowRate(state, mdot, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc);
+    PlantUtilities::SetComponentFlowRate(state, this->EvapMassFlowRate, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc);
 
     if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         PlantUtilities::SetComponentFlowRate(state, mdotCond, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDPlantLoc);
@@ -1362,6 +1362,7 @@ void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFl
             PlantUtilities::MinFlowIfBranchHasVSPump(state, this->CDPlantLoc, this->VSBranchPumpFoundCond, this->VSLoopPumpFoundCond, false);
     }
     // Initialize heat recovery flow rates at node
+    Real64 mdot = 0.0;
     if (this->HeatRecActive) {
         mdot = RunFlag ? this->DesignHeatRecMassFlowRate : 0.0; // if RunFlag is true, mdot = this->DesignHeatRecMassFlowRate, else mdot = 0.0
         PlantUtilities::SetComponentFlowRate(state, mdot, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
@@ -1866,18 +1867,24 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
     // if the component control is SERIESACTIVE we set the component flow to inlet flow so that
     // flow resolver will not shut down the branch
     if (MyLoad >= 0 || !RunFlag) {
-        if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive ||
-            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
-            this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
-        }
-        if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-            if (DataPlant::CompData::getPlantComponent(state, this->CDPlantLoc).FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) {
-                this->CondMassFlowRate = state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate;
-            }
-        }
-        if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
+        this->EvapMassFlowRate = 0.0;
+        PlantUtilities::SetComponentFlowRate(state, this->EvapMassFlowRate, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc);
+
+        switch (this->CondenserType) {
+        case DataPlant::CondenserType::AirCooled: {
+            // nothing to do for air cooled
+        } break;
+        case DataPlant::CondenserType::WaterCooled: {
+            this->CondMassFlowRate = 0.0;
+            PlantUtilities::SetComponentFlowRate(state, this->CondMassFlowRate, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDPlantLoc);
+        } break;
+        case DataPlant::CondenserType::EvapCooled: {
             CalcBasinHeaterPower(
                 state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
+        } break;
+        default: {
+        } break;
+            assert(false);
         }
         this->PrintMessage = false;
         return;
@@ -1962,6 +1969,8 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
             state, this->CWPlantLoc, this->CondMassFlowIndex, this->CDPlantLoc, DataPlant::CriteriaType::MassFlowRate, this->CondMassFlowRate);
 
         if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
+            // Shut chiller off if there is no condenser water flow
+            MyLoad = 0.0;
             if (this->EvapMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
                 // Use PlantUtilities::SetComponentFlowRate to decide actual flow
                 PlantUtilities::SetComponentFlowRate(
@@ -2028,27 +2037,26 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
     this->ChillerCapFT = Curve::CurveValue(state, this->ChillerCapFTIndex, EvapOutletTempSetPoint, AvgCondSinkTemp);
 
     if (this->ChillerCapFT < 0) {
-        if (this->ChillerCapFTError < 1 &&
-            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
-            !state.dataGlobal->WarmupFlag) {
+        if (PlantUtilities::okToIssueWarning(state, this->CWPlantLoc)) {
             ++this->ChillerCapFTError;
-            ShowWarningError(state, format("CHILLER:ELECTRIC:EIR \"{}\":", this->Name));
-            ShowContinueError(state, format(" Chiller Capacity as a Function of Temperature curve output is negative ({:.3R}).", this->ChillerCapFT));
-            ShowContinueError(state,
-                              format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.",
-                                     EvapOutletTempSetPoint,
-                                     condInletTemp));
-            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-        } else if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock !=
-                       DataPlant::FlowLock::Unlocked &&
-                   !state.dataGlobal->WarmupFlag) {
-            ++this->ChillerCapFTError;
-            ShowRecurringWarningErrorAtEnd(state,
-                                           "CHILLER:ELECTRIC:EIR \"" + this->Name +
-                                               "\": Chiller Capacity as a Function of Temperature curve output is negative warning continues...",
-                                           this->ChillerCapFTErrorIndex,
-                                           this->ChillerCapFT,
-                                           this->ChillerCapFT);
+            if (this->ChillerCapFTError < 1) {
+                ShowWarningError(state, format("CHILLER:ELECTRIC:EIR \"{}\":", this->Name));
+                ShowContinueError(state,
+                                  format(" Chiller Capacity as a Function of Temperature curve output is negative ({:.3R}).", this->ChillerCapFT));
+                ShowContinueError(state,
+                                  format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.",
+                                         EvapOutletTempSetPoint,
+                                         condInletTemp));
+                ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+            } else {
+                ++this->ChillerCapFTError;
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "CHILLER:ELECTRIC:EIR \"" + this->Name +
+                                                   "\": Chiller Capacity as a Function of Temperature curve output is negative warning continues...",
+                                               this->ChillerCapFTErrorIndex,
+                                               this->ChillerCapFT,
+                                               this->ChillerCapFT);
+            }
         }
         this->ChillerCapFT = 0.0;
     }
@@ -2308,51 +2316,45 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
 
     this->ChillerEIRFT = Curve::CurveValue(state, this->ChillerEIRFTIndex, this->EvapOutletTemp, AvgCondSinkTemp);
     if (this->ChillerEIRFT < 0.0) {
-        if (this->ChillerEIRFTError < 1 &&
-            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
-            !state.dataGlobal->WarmupFlag) {
+        if (PlantUtilities::okToIssueWarning(state, this->CWPlantLoc)) {
             ++this->ChillerEIRFTError;
-            ShowWarningError(state, format("CHILLER:ELECTRIC:EIR \"{}\":", this->Name));
-            ShowContinueError(state, format(" Chiller EIR as a Function of Temperature curve output is negative ({:.3R}).", this->ChillerEIRFT));
-            ShowContinueError(state,
-                              format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.",
-                                     this->EvapOutletTemp,
-                                     condInletTemp));
-            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-        } else if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock !=
-                       DataPlant::FlowLock::Unlocked &&
-                   !state.dataGlobal->WarmupFlag) {
-            ++this->ChillerEIRFTError;
-            ShowRecurringWarningErrorAtEnd(state,
-                                           "CHILLER:ELECTRIC:EIR \"" + this->Name +
-                                               "\": Chiller EIR as a Function of Temperature curve output is negative warning continues...",
-                                           this->ChillerEIRFTErrorIndex,
-                                           this->ChillerEIRFT,
-                                           this->ChillerEIRFT);
+            if (this->ChillerEIRFTError < 1) {
+                ShowWarningError(state, format("CHILLER:ELECTRIC:EIR \"{}\":", this->Name));
+                ShowContinueError(state, format(" Chiller EIR as a Function of Temperature curve output is negative ({:.3R}).", this->ChillerEIRFT));
+                ShowContinueError(state,
+                                  format(" Negative value occurs using an Evaporator Outlet Temp of {:.1R} and a Condenser Inlet Temp of {:.1R}.",
+                                         this->EvapOutletTemp,
+                                         condInletTemp));
+                ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+            } else {
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "CHILLER:ELECTRIC:EIR \"" + this->Name +
+                                                   "\": Chiller EIR as a Function of Temperature curve output is negative warning continues...",
+                                               this->ChillerEIRFTErrorIndex,
+                                               this->ChillerEIRFT,
+                                               this->ChillerEIRFT);
+            }
         }
         this->ChillerEIRFT = 0.0;
     }
 
     this->ChillerEIRFPLR = Curve::CurveValue(state, this->ChillerEIRFPLRIndex, PartLoadRat);
     if (this->ChillerEIRFPLR < 0.0) {
-        if (this->ChillerEIRFPLRError < 1 &&
-            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock != DataPlant::FlowLock::Unlocked &&
-            !state.dataGlobal->WarmupFlag) {
+        if (PlantUtilities::okToIssueWarning(state, this->CWPlantLoc)) {
             ++this->ChillerEIRFPLRError;
-            ShowWarningError(state, format("CHILLER:ELECTRIC:EIR \"{}\":", this->Name));
-            ShowContinueError(state, format(" Chiller EIR as a function of PLR curve output is negative ({:.3R}).", this->ChillerEIRFPLR));
-            ShowContinueError(state, format(" Negative value occurs using a part-load ratio of {:.3R}.", PartLoadRat));
-            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-        } else if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock !=
-                       DataPlant::FlowLock::Unlocked &&
-                   !state.dataGlobal->WarmupFlag) {
-            ++this->ChillerEIRFPLRError;
-            ShowRecurringWarningErrorAtEnd(state,
-                                           "CHILLER:ELECTRIC:EIR \"" + this->Name +
-                                               "\": Chiller EIR as a function of PLR curve output is negative warning continues...",
-                                           this->ChillerEIRFPLRErrorIndex,
-                                           this->ChillerEIRFPLR,
-                                           this->ChillerEIRFPLR);
+            if (this->ChillerEIRFPLRError < 1) {
+                ShowWarningError(state, format("CHILLER:ELECTRIC:EIR \"{}\":", this->Name));
+                ShowContinueError(state, format(" Chiller EIR as a function of PLR curve output is negative ({:.3R}).", this->ChillerEIRFPLR));
+                ShowContinueError(state, format(" Negative value occurs using a part-load ratio of {:.3R}.", PartLoadRat));
+                ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+            } else {
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "CHILLER:ELECTRIC:EIR \"" + this->Name +
+                                                   "\": Chiller EIR as a function of PLR curve output is negative warning continues...",
+                                               this->ChillerEIRFPLRErrorIndex,
+                                               this->ChillerEIRFPLR,
+                                               this->ChillerEIRFPLR);
+            }
         }
         this->ChillerEIRFPLR = 0.0;
     }
