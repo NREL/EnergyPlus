@@ -207,7 +207,7 @@ namespace PlantUtilities {
     Real64 MinFlowIfBranchHasVSPump(
         EnergyPlusData &state, PlantLocation const &pLantLoc, bool &foundBranchPump, bool &foundLoopPump, bool const setFlowStatus);
 
-    bool okToIssueWarning(EnergyPlusData &state, PlantLocation const &plantLoc);
+    bool okToIssueWarning(EnergyPlusData const &state, PlantLocation const &plantLoc);
 
     struct CriteriaData
     {
