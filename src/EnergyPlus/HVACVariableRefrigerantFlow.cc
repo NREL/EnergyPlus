@@ -11696,7 +11696,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
         }
 
         // Key outputs of this subroutine
-        Ncomp *= CyclingRatio;
         Q_c_OU *= CyclingRatio;
         this->CompActSpeed = max(CompSpdActual, 0.0);
         this->Ncomp = max(Ncomp, 0.0) / this->EffCompInverter;
@@ -12197,8 +12196,8 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
         }
     }
 
-    this->TotalCoolingCapacity = TotalCondCoolingCapacity * CoolingPLR * CyclingRatio;
-    this->TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR * CyclingRatio;
+    this->TotalCoolingCapacity = TotalCondCoolingCapacity * CoolingPLR;
+    this->TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR;
 
     if (this->MinPLR > 0.0) {
         bool const plrTooLow = this->VRFCondPLR < this->MinPLR;
@@ -14353,7 +14352,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                     CyclingRatio = 1.0;
                 }
 
-                Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction);
+                Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction) * CyclingRatio;
                 // Cap_Eva1 is the updated compressor min speed capacity
                 OUEvapHeatExtract = Cap_Eva1;
                 this->EvaporatingTemp = T_suction;
