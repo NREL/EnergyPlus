@@ -1969,6 +1969,8 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
             state, this->CWPlantLoc, this->CondMassFlowIndex, this->CDPlantLoc, DataPlant::CriteriaType::MassFlowRate, this->CondMassFlowRate);
 
         if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
+            // Shut chiller off if there is no condenser water flow
+            MyLoad = 0.0;
             if (this->EvapMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
                 // Use PlantUtilities::SetComponentFlowRate to decide actual flow
                 PlantUtilities::SetComponentFlowRate(
