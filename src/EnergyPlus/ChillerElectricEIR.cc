@@ -2585,7 +2585,7 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
     Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
     if (MyLoad >= 0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
-        //  Set node conditions
+        // Set node conditions
         state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
         state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
         if (this->CondenserType != DataPlant::CondenserType::WaterCooled) {
@@ -2680,31 +2680,6 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
             state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
             this->HeatRecInletTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
             this->HeatRecMassFlow = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate;
-        }
-    }
-    if (((this->EvapMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) ||
-         (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance)) &&
-        (this->EvapInletTemp != this->EvapOutletTemp)) {
-        if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations &&
-            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
-            ShowWarningError(state,
-                             format("Chiller should be off, evap flow rate={}, but EvapInletTemp={} is != EvapOutletTemp={}, EvapInletNodeNum.Temp "
-                                    "={}, EvapOutletNodeNum).Temp={}",
-                                    this->EvapMassFlowRate,
-                                    this->EvapInletTemp,
-                                    this->EvapOutletTemp,
-                                    state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp,
-                                    state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp));
-            ShowContinueErrorTimeStamp(state,
-                                       format("MyLoad={}, RunFlag={}, QEvaporator={}, QCondenser={}, EvapMassFlowRate={}, "
-                                              "CondMassFlowRate = {}, Power={} ",
-                                              MyLoad,
-                                              RunFlag,
-                                              this->QEvaporator,
-                                              this->QCondenser,
-                                              this->EvapMassFlowRate,
-                                              this->CondMassFlowRate,
-                                              this->Power));
         }
     }
 }
