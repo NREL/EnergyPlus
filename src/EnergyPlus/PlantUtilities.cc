@@ -915,12 +915,6 @@ void PullCompInterconnectTrigger(EnergyPlusData &state,
         // First store the current check in a single variable instead of array for readability
         CurCriteria = state.dataPlantUtilities->CriteriaChecks(UniqueCriteriaCheckIndex);
 
-        // Check to make sure we didn't reuse the index in multiple components
-        if (CurCriteria.CallingCompLoopNum != plantLoc.loopNum || CurCriteria.CallingCompLoopSideNum != plantLoc.loopSideNum ||
-            CurCriteria.CallingCompBranchNum != plantLoc.branchNum || CurCriteria.CallingCompCompNum != plantLoc.compNum) {
-            // Diagnostic fatal: component does not properly utilize unique indexing
-        }
-
         // Initialize, then check if we are out of range
         switch (CriteriaType) {
         case DataPlant::CriteriaType::MassFlowRate: {
