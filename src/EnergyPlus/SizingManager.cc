@@ -2171,11 +2171,9 @@ void GetOARequirements(EnergyPlusData &state)
 
     static constexpr std::string_view RoutineName("GetOARequirements: "); // include trailing blank space
 
-    int NumAlphas;           // Number of Alphas for each GetObjectItem call
-    int NumNumbers;          // Number of Numbers for each GetObjectItem call
-    int TotalArgs;           // Total number of alpha and numeric arguments (max) for a
-    int IOStatus;            // Used in GetObjectItem
-    bool ErrorsFound(false); // If errors detected in input
+    int NumAlphas;  // Number of Alphas for each GetObjectItem call
+    int NumNumbers; // Number of Numbers for each GetObjectItem call
+    int TotalArgs;  // Total number of alpha and numeric arguments (max) for a
 
     std::string CurrentModuleObject; // for ease in getting objects
     Array1D_string Alphas;           // Alpha input items for object
@@ -2200,6 +2198,8 @@ void GetOARequirements(EnergyPlusData &state)
     lNumericBlanks.dimension(NumNumbers, true);
 
     if (state.dataSize->NumOARequirements > 0) {
+        int IOStatus;            // Used in GetObjectItem
+        bool ErrorsFound(false); // If errors detected in input
         state.dataSize->OARequirements.allocate(state.dataSize->NumOARequirements);
 
         // Start Loading the System Input
@@ -2466,9 +2466,6 @@ void GetZoneAirDistribution(EnergyPlusData &state)
     int NumAlphas;  // Number of Alphas for each GetObjectItem call
     int NumNumbers; // Number of Numbers for each GetObjectItem call
     int TotalArgs;  // Total number of alpha and numeric arguments (max) for a
-    int IOStatus;   // Used in GetObjectItem
-    int ZADIndex;
-    bool ErrorsFound(false); // If errors detected in input
 
     std::string CurrentModuleObject; // for ease in getting objects
     Array1D_string Alphas;           // Alpha input items for object
@@ -2490,10 +2487,12 @@ void GetZoneAirDistribution(EnergyPlusData &state)
     lNumericBlanks.dimension(NumNumbers, true);
 
     if (state.dataSize->NumZoneAirDistribution > 0) {
+        int IOStatus;            // Used in GetObjectItem
+        bool ErrorsFound(false); // If errors detected in input
         state.dataSize->ZoneAirDistribution.allocate(state.dataSize->NumZoneAirDistribution);
 
         // Start Loading the zone air distribution input
-        for (ZADIndex = 1; ZADIndex <= state.dataSize->NumZoneAirDistribution; ++ZADIndex) {
+        for (int ZADIndex = 1; ZADIndex <= state.dataSize->NumZoneAirDistribution; ++ZADIndex) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -2717,25 +2716,17 @@ void GetZoneSizingInput(EnergyPlusData &state)
     // Using/Aliasing
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneSizIndex;        // loop index
     int NumAlphas;           // Number of Alphas for each GetObjectItem call
     int NumNumbers;          // Number of Numbers for each GetObjectItem call
     int IOStatus;            // Used in GetObjectItem
     bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-    int NumDesDays;          // Number of design days in input
     int NumSizingZoneStatements;
     int Item;
     int Item1;
-    int ZLItem;
     bool errFlag;
     Array1D_string ZoneNames;
     int NumZones;
     int NumZoneLists;
-    int OAIndex;  // Index of design specification object
-    int ObjIndex; // Index of zone air distribution effectiveness object name
-    bool DesHeatMaxAirFlowPerAreaUsrInp;
-    bool DesHeatMaxAirFlowUsrInp;
-    bool DesHeatMaxAirFlowFracUsrInp;
 
     struct GlobalMiscObject
     {
@@ -2786,7 +2777,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
         SizingZoneObjects(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
 
         Item1 = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), ZoneNames, NumZones);
-        ZLItem = 0;
+        int ZLItem = 0;
         if (Item1 == 0 && NumZoneLists > 0) ZLItem = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), ZoneListNames);
         if (Item1 > 0) {
             SizingZoneObjects(Item).StartPtr = state.dataSize->NumZoneSizingInput + 1;
@@ -2818,16 +2809,16 @@ void GetZoneSizingInput(EnergyPlusData &state)
     }
 
     if (state.dataSize->NumZoneSizingInput > 0) {
-        NumDesDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
-                     state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
-                     state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
+        int NumDesDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
+                         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
+                         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         if (NumDesDays == 0 && (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing)) {
             ShowSevereError(state, "Zone Sizing calculations need SizingPeriod:* input. None found.");
             ErrorsFound = true;
         }
         state.dataSize->ZoneSizingInput.allocate(state.dataSize->NumZoneSizingInput);
 
-        ZoneSizIndex = 0;
+        int ZoneSizIndex = 0;
         for (Item = 1; Item <= NumSizingZoneStatements; ++Item) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -3003,7 +2994,8 @@ void GetZoneSizingInput(EnergyPlusData &state)
 
                 // Getting zone OA parameters from Design Specification object
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    OAIndex = Util::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).DesignSpecOAObjName, state.dataSize->OARequirements);
+                    int OAIndex =
+                        Util::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).DesignSpecOAObjName, state.dataSize->OARequirements);
                     if (OAIndex > 0) {
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneDesignSpecOAIndex = OAIndex;
                     } else {
@@ -3146,7 +3138,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 //      \default .002032
                 //      \note default is .40 cfm/ft2
                 //      \note This input is not currently used for autosizing any of the components.
-                DesHeatMaxAirFlowPerAreaUsrInp = false;
+                bool DesHeatMaxAirFlowPerAreaUsrInp = false;
                 if (state.dataIPShortCut->lNumericFieldBlanks(14)) {
                     if (state.dataIPShortCut->rNumericArgs(14) <= 0.0) { // in case someone changes the default in the IDD
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).DesHeatMaxAirFlowPerArea = 0.002032;
@@ -3171,7 +3163,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 //      \default .1415762
                 //      \note default is 300 cfm
                 //      \note This input is not currently used for autosizing any of the components.
-                DesHeatMaxAirFlowUsrInp = false;
+                bool DesHeatMaxAirFlowUsrInp = false;
                 if (state.dataIPShortCut->lNumericFieldBlanks(15)) {
                     if (state.dataIPShortCut->rNumericArgs(15) <= 0.0) { // in case someone changes the default in the IDD
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).DesHeatMaxAirFlow = 0.1415762;
@@ -3195,7 +3187,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 //      \type real
                 //      \minimum 0
                 //      \default 0.3
-                DesHeatMaxAirFlowFracUsrInp = false;
+                bool DesHeatMaxAirFlowFracUsrInp = false;
                 if (state.dataIPShortCut->lNumericFieldBlanks(16)) {
                     if (state.dataIPShortCut->rNumericArgs(16) <= 0.0) { // in case someone changes the default in the IDD
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).DesHeatMaxAirFlowFrac = 0.3;
@@ -3229,8 +3221,8 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 //  A7, \field Zone Air Distribution Object Name and add its inputs
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneAirDistEffObjName = state.dataIPShortCut->cAlphaArgs(7);
-                    ObjIndex = Util::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneAirDistEffObjName,
-                                                    state.dataSize->ZoneAirDistribution);
+                    int ObjIndex = Util::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneAirDistEffObjName,
+                                                        state.dataSize->ZoneAirDistribution);
                     if (ObjIndex > 0) {
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneADEffCooling =
                             state.dataSize->ZoneAirDistribution(ObjIndex).ZoneADEffCooling;
