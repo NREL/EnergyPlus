@@ -2010,7 +2010,6 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
 void DetermineSystemPopulationDiversity(EnergyPlusData &state)
 {
 
-    auto &FinalSysSizing = state.dataSize->FinalSysSizing;
     auto &SysSizInput = state.dataSize->SysSizInput;
 
     // determine Pz sum, Ps, and D for each air system for standard 62.1
@@ -2018,18 +2017,19 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
     // first determine if any airloops use VRP, if not then don't need to march thru year of schedules for performance
     bool anyVRPinModel(false);
     for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
-        if (FinalSysSizing(AirLoopNum).SystemOAMethod == SysOAMethod::VRP || FinalSysSizing(AirLoopNum).SystemOAMethod == SysOAMethod::SP) {
+        auto const &finalSysSizing = state.dataSize->FinalSysSizing(AirLoopNum);
+        if (finalSysSizing.SystemOAMethod == SysOAMethod::VRP || finalSysSizing.SystemOAMethod == SysOAMethod::SP) {
             anyVRPinModel = true;
             break;
         }
     }
     // First get the design (max) level of people in all zones connected to air loop
     for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
-        int SysSizNum =
-            Util::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        auto const &finalSysSizing = state.dataSize->FinalSysSizing(AirLoopNum);
+        int SysSizNum = Util::FindItemInList(finalSysSizing.AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
         // only retrieve data if the occupant density is set to be autosized
-        if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
+        if (finalSysSizing.OAAutoSized && SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
             auto &pzSumBySys = state.dataSize->PzSumBySys(AirLoopNum);
             pzSumBySys = 0.0;
             state.dataSize->PsBySys(AirLoopNum) = 0.0;
@@ -2072,10 +2072,11 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
                 Real64 TSfraction(0.0);
                 if (state.dataGlobal->NumOfTimeStepInHour > 0.0) TSfraction = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
                 for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) { // loop over all the air systems
-                    int SysSizNum = Util::FindItemInList(
-                        FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+                    auto const &finalSysSizing = state.dataSize->FinalSysSizing(AirLoopNum);
+                    int SysSizNum =
+                        Util::FindItemInList(finalSysSizing.AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
                     if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
-                    if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
+                    if (finalSysSizing.OAAutoSized && SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
 
                         // Loop over all zones connected to air loop
                         Real64 TotConcurrentPeopleOnSys = 0.0;
@@ -2120,8 +2121,8 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
 
     // compute D for standard 62.1 by system
     for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
-        int SysSizNum =
-            Util::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        auto const &finalSysSizing = state.dataSize->FinalSysSizing(AirLoopNum);
+        int SysSizNum = Util::FindItemInList(finalSysSizing.AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
 
         // compute D if set to autosize
@@ -2144,7 +2145,7 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
                 state,
                 format("The {} air loop serves a single zone. The Occupant Diversity was calculated or set to a value less than 1.0. Single-zone air "
                        "loops should have an Occupant Diversity of 1.0. The Occupant Diversity value for that air loop has been reset to 1.0",
-                       FinalSysSizing(AirLoopNum).AirPriLoopName));
+                       finalSysSizing.AirPriLoopName));
         }
     }
 }
