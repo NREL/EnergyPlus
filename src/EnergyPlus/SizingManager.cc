@@ -768,7 +768,6 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
 
     // Also store zone level flow information for Standard 62.1 calculations, Vpz, Vpz_min, Vdz, and Vdz_min for both cooling and heating
 
-    auto &FinalSysSizing = state.dataSize->FinalSysSizing;
     auto &sd_airterminal = state.dataSingleDuct->sd_airterminal;
 
     if ((state.dataSize->NumSysSizInput > 0) && (state.dataGlobal->DoSystemSizing)) { // only if there is system sizing
@@ -781,6 +780,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
         state.dataGlobal->BeginEnvrnFlag = false;
 
         for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
+            auto &finalSysSizing = state.dataSize->FinalSysSizing(AirLoopNum);
             // Mine data from ATUs to find new design heating flow rates and new maximum flow rates
             Real64 airLoopMaxFlowRateSum(0.0);
             Real64 airLoopHeatingMinimumFlowRateSum(0.0);
@@ -1109,7 +1109,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                 }
             }
 
-            std::string curName = FinalSysSizing(AirLoopNum).AirPriLoopName;
+            std::string curName = finalSysSizing.AirPriLoopName;
             BaseSizer::reportSizerOutput(
                 state, "AirLoopHVAC", curName, "Sum of Air Terminal Maximum Heating Flow Rates [m3/s]", airLoopHeatingMaximumFlowRateSum);
             BaseSizer::reportSizerOutput(
@@ -1117,77 +1117,74 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
             BaseSizer::reportSizerOutput(state, "AirLoopHVAC", curName, "Sum of Air Terminal Maximum Flow Rates [m3/s]", airLoopMaxFlowRateSum);
 
             // Adjust system sizing info
-            if (allocated(FinalSysSizing)) {
+            if (allocated(state.dataSize->FinalSysSizing)) {
                 // correct sizing design heating volume flow rate based on finalized air terminal unit operation
 
-                if (FinalSysSizing(AirLoopNum).SizingOption ==
+                if (finalSysSizing.SizingOption ==
                     DataSizing::SizingConcurrence::NonCoincident) { // If non-coincident sizing method for this air loop, the we can use these sum's
                                                                     // from
                                                                     // air terminals directly
-                    FinalSysSizing(AirLoopNum).DesHeatVolFlow = max(airLoopHeatingMaximumFlowRateSum, FinalSysSizing(AirLoopNum).DesHeatVolFlow);
-                    FinalSysSizing(AirLoopNum).DesMainVolFlow = max(airLoopMaxFlowRateSum, FinalSysSizing(AirLoopNum).DesMainVolFlow);
-                    if (FinalSysSizing(AirLoopNum).sysSizeCoolingDominant) {
-                        FinalSysSizing(AirLoopNum).DesCoolVolFlow = FinalSysSizing(AirLoopNum).DesMainVolFlow;
-                        FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
-                    } else if (FinalSysSizing(AirLoopNum).sysSizeHeatingDominant) { // make sure cooling is at least at minimum.
-                        FinalSysSizing(AirLoopNum).DesCoolVolFlow = max(airLoopHeatingMinimumFlowRateSum, FinalSysSizing(AirLoopNum).DesCoolVolFlow);
-                        FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
+                    finalSysSizing.DesHeatVolFlow = max(airLoopHeatingMaximumFlowRateSum, finalSysSizing.DesHeatVolFlow);
+                    finalSysSizing.DesMainVolFlow = max(airLoopMaxFlowRateSum, finalSysSizing.DesMainVolFlow);
+                    if (finalSysSizing.sysSizeCoolingDominant) {
+                        finalSysSizing.DesCoolVolFlow = finalSysSizing.DesMainVolFlow;
+                        finalSysSizing.MassFlowAtCoolPeak = finalSysSizing.DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
+                    } else if (finalSysSizing.sysSizeHeatingDominant) { // make sure cooling is at least at minimum.
+                        finalSysSizing.DesCoolVolFlow = max(airLoopHeatingMinimumFlowRateSum, finalSysSizing.DesCoolVolFlow);
+                        finalSysSizing.MassFlowAtCoolPeak = finalSysSizing.DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
                     }
-                } else if (FinalSysSizing(AirLoopNum).SizingOption == DataSizing::SizingConcurrence::Coincident) {
+                } else if (finalSysSizing.SizingOption == DataSizing::SizingConcurrence::Coincident) {
 
-                    if (FinalSysSizing(AirLoopNum).sysSizeCoolingDominant) { // use minimum heating flow sum from air terminals
+                    if (finalSysSizing.sysSizeCoolingDominant) { // use minimum heating flow sum from air terminals
                         // know that minimum heating flow is a hard minimum regardless of concurrence situation, so make sure that design is at
                         // least that high.
-                        FinalSysSizing(AirLoopNum).DesHeatVolFlow = max(airLoopHeatingMinimumFlowRateSum, FinalSysSizing(AirLoopNum).DesHeatVolFlow);
-                        FinalSysSizing(AirLoopNum).DesMainVolFlow = max(airLoopHeatingMinimumFlowRateSum, FinalSysSizing(AirLoopNum).DesMainVolFlow);
-                        FinalSysSizing(AirLoopNum).DesCoolVolFlow = FinalSysSizing(AirLoopNum).DesMainVolFlow;
-                        FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
-                    } else if (FinalSysSizing(AirLoopNum).sysSizeHeatingDominant) { // use maximum heating flow sum from air terminals
-                        FinalSysSizing(AirLoopNum).DesHeatVolFlow = max(airLoopHeatingMaximumFlowRateSum, FinalSysSizing(AirLoopNum).DesHeatVolFlow);
-                        FinalSysSizing(AirLoopNum).DesMainVolFlow = max(airLoopHeatingMaximumFlowRateSum, FinalSysSizing(AirLoopNum).DesMainVolFlow);
+                        finalSysSizing.DesHeatVolFlow = max(airLoopHeatingMinimumFlowRateSum, finalSysSizing.DesHeatVolFlow);
+                        finalSysSizing.DesMainVolFlow = max(airLoopHeatingMinimumFlowRateSum, finalSysSizing.DesMainVolFlow);
+                        finalSysSizing.DesCoolVolFlow = finalSysSizing.DesMainVolFlow;
+                        finalSysSizing.MassFlowAtCoolPeak = finalSysSizing.DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
+                    } else if (finalSysSizing.sysSizeHeatingDominant) { // use maximum heating flow sum from air terminals
+                        finalSysSizing.DesHeatVolFlow = max(airLoopHeatingMaximumFlowRateSum, finalSysSizing.DesHeatVolFlow);
+                        finalSysSizing.DesMainVolFlow = max(airLoopHeatingMaximumFlowRateSum, finalSysSizing.DesMainVolFlow);
                         // make sure cooling is at least at minimum.
-                        FinalSysSizing(AirLoopNum).DesCoolVolFlow = max(airLoopHeatingMinimumFlowRateSum, FinalSysSizing(AirLoopNum).DesCoolVolFlow);
-                        FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
+                        finalSysSizing.DesCoolVolFlow = max(airLoopHeatingMinimumFlowRateSum, finalSysSizing.DesCoolVolFlow);
+                        finalSysSizing.MassFlowAtCoolPeak = finalSysSizing.DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
                     }
                 }
                 // report out adjusted design flow rates
                 BaseSizer::reportSizerOutput(
-                    state, "AirLoopHVAC", curName, "Adjusted Heating Design Air Flow Rate [m3/s]", FinalSysSizing(AirLoopNum).DesHeatVolFlow);
+                    state, "AirLoopHVAC", curName, "Adjusted Heating Design Air Flow Rate [m3/s]", finalSysSizing.DesHeatVolFlow);
                 OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchSysSizAdjustedHtAir, curName, FinalSysSizing(AirLoopNum).DesHeatVolFlow, 4);
+                    state, state.dataOutRptPredefined->pdchSysSizAdjustedHtAir, curName, finalSysSizing.DesHeatVolFlow, 4);
                 BaseSizer::reportSizerOutput(
-                    state, "AirLoopHVAC", curName, "Adjusted Cooling Design Air Flow Rate [m3/s]", FinalSysSizing(AirLoopNum).DesCoolVolFlow);
+                    state, "AirLoopHVAC", curName, "Adjusted Cooling Design Air Flow Rate [m3/s]", finalSysSizing.DesCoolVolFlow);
                 OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchSysSizAdjustedClAir, curName, FinalSysSizing(AirLoopNum).DesCoolVolFlow, 4);
+                    state, state.dataOutRptPredefined->pdchSysSizAdjustedClAir, curName, finalSysSizing.DesCoolVolFlow, 4);
                 BaseSizer::reportSizerOutput(
-                    state, "AirLoopHVAC", curName, "Adjusted Main Design Air Flow Rate [m3/s]", FinalSysSizing(AirLoopNum).DesMainVolFlow);
+                    state, "AirLoopHVAC", curName, "Adjusted Main Design Air Flow Rate [m3/s]", finalSysSizing.DesMainVolFlow);
                 OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchSysSizAdjustedMainAir, curName, FinalSysSizing(AirLoopNum).DesMainVolFlow, 4);
+                    state, state.dataOutRptPredefined->pdchSysSizAdjustedMainAir, curName, finalSysSizing.DesMainVolFlow, 4);
 
                 // Autosize central heating min system air flow rate, using corrected design heating flow, using maximum heating flow summation
-                if (FinalSysSizing(AirLoopNum).SysAirMinFlowRatWasAutoSized) {
-                    if (FinalSysSizing(AirLoopNum).DesMainVolFlow > 0.0) { // protect div by zero
-                        FinalSysSizing(AirLoopNum).SysAirMinFlowRat =
-                            FinalSysSizing(AirLoopNum).DesHeatVolFlow / FinalSysSizing(AirLoopNum).DesMainVolFlow;
+                if (finalSysSizing.SysAirMinFlowRatWasAutoSized) {
+                    if (finalSysSizing.DesMainVolFlow > 0.0) { // protect div by zero
+                        finalSysSizing.SysAirMinFlowRat = finalSysSizing.DesHeatVolFlow / finalSysSizing.DesMainVolFlow;
                     } else { // big trouble anyway.
-                        FinalSysSizing(AirLoopNum).SysAirMinFlowRat = 1.0;
+                        finalSysSizing.SysAirMinFlowRat = 1.0;
                     }
                     BaseSizer::reportSizerOutput(
-                        state, "AirLoopHVAC", curName, "Calculated Heating Air Flow Ratio []", FinalSysSizing(AirLoopNum).SysAirMinFlowRat);
+                        state, "AirLoopHVAC", curName, "Calculated Heating Air Flow Ratio []", finalSysSizing.SysAirMinFlowRat);
                     OutputReportPredefined::PreDefTableEntry(
-                        state, state.dataOutRptPredefined->pdchSysSizCalcHeatFlowRatio, curName, FinalSysSizing(AirLoopNum).SysAirMinFlowRat, 4);
-                    BaseSizer::reportSizerOutput(
-                        state, "AirLoopHVAC", curName, "User Heating Air Flow Ratio []", FinalSysSizing(AirLoopNum).SysAirMinFlowRat);
+                        state, state.dataOutRptPredefined->pdchSysSizCalcHeatFlowRatio, curName, finalSysSizing.SysAirMinFlowRat, 4);
+                    BaseSizer::reportSizerOutput(state, "AirLoopHVAC", curName, "User Heating Air Flow Ratio []", finalSysSizing.SysAirMinFlowRat);
                     OutputReportPredefined::PreDefTableEntry(
-                        state, state.dataOutRptPredefined->pdchSysSizUserHeatFlowRatio, curName, FinalSysSizing(AirLoopNum).SysAirMinFlowRat, 4);
+                        state, state.dataOutRptPredefined->pdchSysSizUserHeatFlowRatio, curName, finalSysSizing.SysAirMinFlowRat, 4);
                 } else {
-                    BaseSizer::reportSizerOutput(
-                        state, "AirLoopHVAC", curName, "User Heating Air Flow Ratio []", FinalSysSizing(AirLoopNum).SysAirMinFlowRat);
+                    BaseSizer::reportSizerOutput(state, "AirLoopHVAC", curName, "User Heating Air Flow Ratio []", finalSysSizing.SysAirMinFlowRat);
                     OutputReportPredefined::PreDefTableEntry(
-                        state, state.dataOutRptPredefined->pdchSysSizUserHeatFlowRatio, curName, FinalSysSizing(AirLoopNum).SysAirMinFlowRat, 4);
+                        state, state.dataOutRptPredefined->pdchSysSizUserHeatFlowRatio, curName, finalSysSizing.SysAirMinFlowRat, 4);
                     Real64 calcSysAirMinFlowRat(0.0);
-                    if (FinalSysSizing(AirLoopNum).DesMainVolFlow > 0.0) { // protect div by zero
-                        calcSysAirMinFlowRat = FinalSysSizing(AirLoopNum).DesHeatVolFlow / FinalSysSizing(AirLoopNum).DesMainVolFlow;
+                    if (finalSysSizing.DesMainVolFlow > 0.0) { // protect div by zero
+                        calcSysAirMinFlowRat = finalSysSizing.DesHeatVolFlow / finalSysSizing.DesMainVolFlow;
                     }
                     BaseSizer::reportSizerOutput(state, "AirLoopHVAC", curName, "Calculated Heating Air Flow Ratio []", calcSysAirMinFlowRat);
                     OutputReportPredefined::PreDefTableEntry(
