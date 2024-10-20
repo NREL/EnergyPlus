@@ -178,7 +178,6 @@ namespace SimulationManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false);
-        bool TerminalError(false);
         bool oneTimeUnderwaterBoundaryCheck = true;
         bool AnyUnderwaterBoundaries = false;
 
@@ -280,9 +279,10 @@ namespace SimulationManager {
         state.dataReportFlag->DoWeatherInitReporting = true;
 
         //  Note:  All the inputs have been 'gotten' by the time we get here.
-        bool ErrFound = false;
         if (state.dataGlobal->DoOutputReporting) {
             DisplayString(state, "Reporting Surfaces");
+            bool ErrFound = false;
+            bool TerminalError = false;
 
             ReportSurfaces(state);
 
@@ -1539,8 +1539,6 @@ namespace SimulationManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // EnergyPlus does not automatically produce any results files.  Because of this, users may not request
@@ -1548,26 +1546,22 @@ namespace SimulationManager {
         // results should be produced (either sizing periods or weather files are run) but no reports are
         // requested.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool SimPeriods;
-        bool ReportingRequested;
-
-        ReportingRequested = false;
-        SimPeriods = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") > 0 ||
-                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") > 0 ||
-                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType") > 0 ||
-                      state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0);
+        bool SimPeriods = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") > 0 ||
+                           state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") > 0 ||
+                           state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType") > 0 ||
+                           state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0);
 
         if ((state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim || state.dataGlobal->DoPureLoadCalc) && SimPeriods) {
-            ReportingRequested = (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:Annual") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Variable") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:MeterFileOnly") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative") > 0 ||
-                                  state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative:MeterFileOnly") > 0);
+            bool ReportingRequested =
+                (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:SummaryReports") > 0 ||
+                 state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:TimeBins") > 0 ||
+                 state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:Monthly") > 0 ||
+                 state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Table:Annual") > 0 ||
+                 state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Variable") > 0 ||
+                 state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter") > 0 ||
+                 state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:MeterFileOnly") > 0 ||
+                 state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative") > 0 ||
+                 state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:Meter:Cumulative:MeterFileOnly") > 0);
             // Not testing for : Output:SQLite or Output:EnvironmentalImpactFactors
             if (!ReportingRequested) {
                 ShowWarningError(state, "No reporting elements have been requested. No simulation results produced.");
@@ -2650,9 +2644,9 @@ namespace SimulationManager {
 // EXTERNAL SUBROUTINES:
 
 void Resimulate(EnergyPlusData &state,
-                bool &ResimExt, // Flag to resimulate the exterior energy use simulation
-                bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
-                bool &ResimHVAC // Flag to resimulate the HVAC simulation
+                bool const ResimExt, // Flag to resimulate the exterior energy use simulation
+                bool const ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
+                bool &ResimHVAC      // Flag to resimulate the HVAC simulation
 )
 {
 

@@ -115,9 +115,9 @@ struct SimulationManagerData : BaseGlobalStruct
 };
 
 void Resimulate(EnergyPlusData &state,
-                bool &ResimExt, // Flag to resimulate the exterior energy use simulation
-                bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
-                bool &ResimHVAC // Flag to resimulate the HVAC simulation
+                bool const ResimExt, // Flag to resimulate the exterior energy use simulation
+                bool const ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
+                bool &ResimHVAC      // Flag to resimulate the HVAC simulation
 );
 
 } // namespace EnergyPlus
