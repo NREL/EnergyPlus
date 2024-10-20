@@ -81,7 +81,7 @@ namespace SizingManager {
     void ManageSizing(EnergyPlusData &state);
 
     bool CalcdoLoadComponentPulseNow(
-        EnergyPlusData &state, bool isPulseZoneSizing, bool WarmupFlag, int HourOfDay, int TimeStep, Constant::KindOfSim KindOfSim);
+        EnergyPlusData const &state, bool isPulseZoneSizing, bool WarmupFlag, int HourOfDay, int TimeStep, Constant::KindOfSim KindOfSim);
 
     void ManageSystemSizingAdjustments(EnergyPlusData &state);
 

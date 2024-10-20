@@ -734,7 +734,7 @@ void ManageSizing(EnergyPlusData &state)
     }
 }
 
-bool CalcdoLoadComponentPulseNow(EnergyPlusData &state,
+bool CalcdoLoadComponentPulseNow(EnergyPlusData const &state,
                                  bool const isPulseZoneSizing,
                                  bool const WarmupFlag,
                                  int const HourOfDay,
@@ -789,7 +789,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
             // sum up heating and max flows for any single duct systems, store 62.1 values by zone
             if (allocated(sd_airterminal) && state.dataSingleDuct->NumSDAirTerminal > 0) {
                 for (int singleDuctATUNum = 1; singleDuctATUNum <= state.dataSingleDuct->NumSDAirTerminal; ++singleDuctATUNum) {
-                    auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(sd_airterminal(singleDuctATUNum).ADUNum);
+                    auto const &airDistUnit = state.dataDefineEquipment->AirDistUnit(sd_airterminal(singleDuctATUNum).ADUNum);
                     if (AirLoopNum == sd_airterminal(singleDuctATUNum).AirLoopNum) {
                         int termUnitSizingIndex = airDistUnit.TermUnitSizingNum;
                         airLoopMaxFlowRateSum += sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
@@ -861,7 +861,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
             if (allocated(state.dataDualDuct->dd_airterminal) && state.dataDualDuct->NumDDAirTerminal > 0) {
                 for (int dualDuctATUNum = 1; dualDuctATUNum <= state.dataDualDuct->NumDDAirTerminal; ++dualDuctATUNum) {
                     if (AirLoopNum == state.dataDualDuct->dd_airterminal(dualDuctATUNum).AirLoopNum) {
-                        auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(state.dataDualDuct->dd_airterminal(dualDuctATUNum).ADUNum);
+                        auto const &airDistUnit = state.dataDefineEquipment->AirDistUnit(state.dataDualDuct->dd_airterminal(dualDuctATUNum).ADUNum);
                         int termUnitSizingIndex = airDistUnit.TermUnitSizingNum;
                         airLoopMaxFlowRateSum += state.dataDualDuct->dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
                         state.dataSize->VpzClgByZone(termUnitSizingIndex) =
@@ -927,7 +927,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
             // sum up heating and max flows for any PIU air terminals
             if (allocated(state.dataPowerInductionUnits->PIU) && state.dataPowerInductionUnits->NumPIUs > 0) {
                 for (int pIUATUNum = 1; pIUATUNum <= state.dataPowerInductionUnits->NumPIUs; ++pIUATUNum) {
-                    auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(pIUATUNum).ADUNum);
+                    auto const &airDistUnit = state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(pIUATUNum).ADUNum);
                     if (AirLoopNum == state.dataPowerInductionUnits->PIU(pIUATUNum).AirLoopNum) {
                         int termUnitSizingIndex = airDistUnit.TermUnitSizingNum;
                         auto &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
@@ -1019,7 +1019,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
             // dual path for std 62.1
             if (allocated(IndUnit) && (NumIndUnits > 0)) {
                 for (int indUnitNum = 1; indUnitNum <= NumIndUnits; ++indUnitNum) {
-                    auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(IndUnit(indUnitNum).ADUNum);
+                    auto const &airDistUnit = state.dataDefineEquipment->AirDistUnit(IndUnit(indUnitNum).ADUNum);
                     if (AirLoopNum == IndUnit(indUnitNum).AirLoopNum) {
                         int termUnitSizingIndex = airDistUnit.TermUnitSizingNum;
                         airLoopHeatingMaximumFlowRateSum += IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
@@ -1041,7 +1041,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
             // sum up heating and max flows for any two pipe constant volume cooled beam terminal units
             if (allocated(state.dataHVACCooledBeam->CoolBeam) && (state.dataHVACCooledBeam->NumCB > 0)) {
                 for (int coolBeamNum = 1; coolBeamNum <= state.dataHVACCooledBeam->NumCB; ++coolBeamNum) {
-                    auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(state.dataHVACCooledBeam->CoolBeam(coolBeamNum).ADUNum);
+                    auto const &airDistUnit = state.dataDefineEquipment->AirDistUnit(state.dataHVACCooledBeam->CoolBeam(coolBeamNum).ADUNum);
                     if (AirLoopNum == state.dataHVACCooledBeam->CoolBeam(coolBeamNum).AirLoopNum) {
                         int termUnitSizingIndex = airDistUnit.TermUnitSizingNum;
                         airLoopHeatingMaximumFlowRateSum += state.dataHVACCooledBeam->CoolBeam(coolBeamNum).MaxAirVolFlow;
@@ -1089,7 +1089,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
             // sum up flows for any air terminal mixers
             if (allocated(state.dataSingleDuct->SysATMixer) && (state.dataSingleDuct->NumATMixers > 0)) {
                 for (int aTMixerNum = 1; aTMixerNum <= state.dataSingleDuct->NumATMixers; ++aTMixerNum) {
-                    auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(aTMixerNum).ADUNum);
+                    auto const &airDistUnit = state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(aTMixerNum).ADUNum);
                     if (AirLoopNum == state.dataSingleDuct->SysATMixer(aTMixerNum).AirLoopNum) {
                         int termUnitSizingIndex = airDistUnit.TermUnitSizingNum;
                         airLoopHeatingMaximumFlowRateSum += state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
