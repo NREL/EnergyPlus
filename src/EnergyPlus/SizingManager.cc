@@ -127,8 +127,6 @@ void ManageSizing(EnergyPlusData &state)
     // Design day simulations are run again with central air systems supplied by
     // purchased hot and cold water, yielding central heating and cooling capacities.
 
-    auto &SysSizPeakDDNum = state.dataSize->SysSizPeakDDNum;
-
     // Using/Aliasing
     using SimAirServingZones::ManageAirLoops;
     using SimAirServingZones::UpdateSysSizing;
@@ -621,6 +619,8 @@ void ManageSizing(EnergyPlusData &state)
     if (state.dataSize->SysSizingRunDone) {
         for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             auto &calcSysSizing = state.dataSize->CalcSysSizing(AirLoopNum);
+            auto &sysSizPeakDDNum = state.dataSize->SysSizPeakDDNum(AirLoopNum);
+
             curName = FinalSysSizing(AirLoopNum).AirPriLoopName;
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcClAir, curName, calcSysSizing.DesCoolVolFlow);
             if (std::abs(calcSysSizing.DesCoolVolFlow) <= 1.e-8) {
@@ -646,20 +646,20 @@ void ManageSizing(EnergyPlusData &state)
             int timeStepIndexAtPeakCoolLoad = 0;
             if (FinalSysSizing(AirLoopNum).coolingPeakLoad == DataSizing::PeakLoad::SensibleCooling) {
                 coolPeakLoadKind = "Sensible";
-                coolPeakDDDate = SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate;
-                coolPeakDD = SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD;
+                coolPeakDDDate = sysSizPeakDDNum.cSensCoolPeakDDDate;
+                coolPeakDD = sysSizPeakDDNum.SensCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).SensCoolCap;
-                if (coolPeakDD > 0) timeStepIndexAtPeakCoolLoad = SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk(coolPeakDD);
+                if (coolPeakDD > 0) timeStepIndexAtPeakCoolLoad = sysSizPeakDDNum.TimeStepAtSensCoolPk(coolPeakDD);
             } else if (FinalSysSizing(AirLoopNum).coolingPeakLoad == DataSizing::PeakLoad::TotalCooling) {
                 if (FinalSysSizing(AirLoopNum).loadSizingType == DataSizing::LoadSizing::Latent && state.dataHeatBal->DoLatentSizing) {
                     coolPeakLoadKind = "Total Based on Latent";
                 } else {
                     coolPeakLoadKind = "Total";
                 }
-                coolPeakDDDate = SysSizPeakDDNum(AirLoopNum).cTotCoolPeakDDDate;
-                coolPeakDD = SysSizPeakDDNum(AirLoopNum).TotCoolPeakDD;
+                coolPeakDDDate = sysSizPeakDDNum.cTotCoolPeakDDDate;
+                coolPeakDD = sysSizPeakDDNum.TotCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).TotCoolCap;
-                if (coolPeakDD > 0) timeStepIndexAtPeakCoolLoad = SysSizPeakDDNum(AirLoopNum).TimeStepAtTotCoolPk(coolPeakDD);
+                if (coolPeakDD > 0) timeStepIndexAtPeakCoolLoad = sysSizPeakDDNum.TimeStepAtTotCoolPk(coolPeakDD);
             }
             if (coolPeakDD > 0) {
                 ReportSysSizing(state,
@@ -684,7 +684,7 @@ void ManageSizing(EnergyPlusData &state)
                                 coolPeakDDDate,
                                 0);
             }
-            int heatPeakDD = SysSizPeakDDNum(AirLoopNum).HeatPeakDD;
+            int heatPeakDD = sysSizPeakDDNum.HeatPeakDD;
             if (heatPeakDD > 0) {
                 ReportSysSizing(state,
                                 curName,
@@ -694,8 +694,8 @@ void ManageSizing(EnergyPlusData &state)
                                 calcSysSizing.DesHeatVolFlow,
                                 FinalSysSizing(AirLoopNum).DesHeatVolFlow,
                                 FinalSysSizing(AirLoopNum).HeatDesDay,
-                                SysSizPeakDDNum(AirLoopNum).cHeatPeakDDDate,
-                                SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(heatPeakDD));
+                                sysSizPeakDDNum.cHeatPeakDDDate,
+                                sysSizPeakDDNum.TimeStepAtHeatPk(heatPeakDD));
             } else {
                 ReportSysSizing(state,
                                 curName,
@@ -705,7 +705,7 @@ void ManageSizing(EnergyPlusData &state)
                                 calcSysSizing.DesHeatVolFlow,
                                 FinalSysSizing(AirLoopNum).DesHeatVolFlow,
                                 FinalSysSizing(AirLoopNum).HeatDesDay,
-                                SysSizPeakDDNum(AirLoopNum).cHeatPeakDDDate,
+                                sysSizPeakDDNum.cHeatPeakDDDate,
                                 0);
             }
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizUserHtAir, curName, FinalSysSizing(AirLoopNum).DesHeatVolFlow);
