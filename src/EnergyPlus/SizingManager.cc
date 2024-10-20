@@ -86,12 +86,9 @@ namespace EnergyPlus::SizingManager {
 // MODULE INFORMATION:
 //       AUTHOR         Fred Buhl
 //       DATE WRITTEN   December 2000
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
-// This module contains the data and routines relating to managing the sizing
-// simulations.
+// This module contains the data and routines relating to managing the sizing simulations.
 
 // Using/Aliasing
 using namespace HeatBalanceManager;
@@ -2306,8 +2303,6 @@ void ProcessInputOARequirements(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         R. Raustad - FSEC
     //       DATE WRITTEN   February 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Obtains input data for the OA Requirements object and stores it in
@@ -2318,25 +2313,12 @@ void ProcessInputOARequirements(EnergyPlusData &state,
     // This object requires only a name where the default values are assumed
     // if subsequent fields are not entered.
 
-    // REFERENCES:
-    // na
-
     using ScheduleManager::CheckScheduleValueMinMax;
     using ScheduleManager::GetScheduleIndex;
     using ScheduleManager::GetScheduleMaxValue;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetOARequirements: "); // include trailing blank space
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     auto &thisOARequirements(state.dataSize->OARequirements(OAIndex));
 
@@ -2442,8 +2424,6 @@ void GetZoneAirDistribution(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         T. Hong - LBNL
     //       DATE WRITTEN   March 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Obtains input data for the zone air distribution objects and stores it in
@@ -2582,8 +2562,6 @@ void GetSizingParams(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   January 2002
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Obtains input data for the Sizing Parameters object and stores it in
@@ -2592,17 +2570,14 @@ void GetSizingParams(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Uses InputProcessor "Get" routines to obtain data.
 
-    // Using/Aliasing
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumAlphas;  // Number of Alphas for each GetObjectItem call
     int NumNumbers; // Number of Numbers for each GetObjectItem call
     int IOStatus;   // Used in GetObjectItem
-    int NumSizParams;
-    int Temp;
+
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Sizing:Parameters";
-    NumSizParams = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int NumSizParams = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (NumSizParams == 1) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -2655,7 +2630,7 @@ void GetSizingParams(EnergyPlusData &state)
     }
 
     cCurrentModuleObject = "OutputControl:Sizing:Style";
-    Temp = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    int Temp = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (Temp == 0) {
         state.dataIPShortCut->cAlphaArgs(1) = "Comma";
@@ -2703,16 +2678,10 @@ void GetZoneSizingInput(EnergyPlusData &state)
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   December 2000
     //       MODIFIED       Mangesh Basarkar, 06/2011: Specifying zone outside air based on design specification object
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Obtains input data for zone sizing objects and stores it in
     // appropriate data structures.
-
-    // METHODOLOGY EMPLOYED:
-    // Uses InputProcessor "Get" routines to obtain data.
-
-    // Using/Aliasing
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumAlphas;           // Number of Alphas for each GetObjectItem call
@@ -3372,20 +3341,14 @@ void GetZoneAndZoneListNames(
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   October 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Get Zone and ZoneList Names so Sizing:Zone can use global ZoneList.
     // This is not a full validation of these objects -- only enough to fill
     // structures for the Sizing:Zone object.
 
-    // Using/Aliasing
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Item;
     int Found;
-    int Item1;
     int NumAlphas;
     int NumNumbers;
     int IOStatus;
@@ -3395,7 +3358,7 @@ void GetZoneAndZoneListNames(
     NumZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     ZoneNames.allocate(NumZones);
 
-    for (Item = 1; Item <= NumZones; ++Item) {
+    for (int Item = 1; Item <= NumZones; ++Item) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  Item,
@@ -3421,7 +3384,7 @@ void GetZoneAndZoneListNames(
     NumZoneLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     ZoneListNames.allocate(NumZoneLists);
 
-    for (Item = 1; Item <= NumZoneLists; ++Item) {
+    for (int Item = 1; Item <= NumZoneLists; ++Item) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  Item,
@@ -3443,7 +3406,7 @@ void GetZoneAndZoneListNames(
         }
         ZoneListNames(Item).Zones.allocate(NumAlphas - 1);
         ZoneListNames(Item).NumOfZones = NumAlphas - 1;
-        for (Item1 = 2; Item1 <= NumAlphas; ++Item1) {
+        for (int Item1 = 2; Item1 <= NumAlphas; ++Item1) {
             Found = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(Item1), ZoneNames, NumZones);
             ZoneListNames(Item).Zones(Item1 - 1) = Found;
         }
@@ -3456,8 +3419,6 @@ void GetSystemSizingInput(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   January 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Obtains input data for System Sizing objects and stores it in
@@ -3465,8 +3426,6 @@ void GetSystemSizingInput(EnergyPlusData &state)
 
     // METHODOLOGY EMPLOYED:
     // Uses InputProcessor "Get" routines to obtain data.
-
-    // Using/Aliasing
 
     // Sizing:System;
     constexpr int iNameAlphaNum = 1;                          // A1, \field AirLoop Name
@@ -4040,8 +3999,6 @@ void GetPlantSizingInput(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   October 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Obtains input data for Plant Sizing objects and stores it in
@@ -4049,8 +4006,6 @@ void GetPlantSizingInput(EnergyPlusData &state)
 
     // METHODOLOGY EMPLOYED:
     // Uses InputProcessor "Get" routines to obtain data.
-
-    // Using/Aliasing
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PltSizIndex;         // loop index
@@ -4162,8 +4117,6 @@ void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         L. Lawrie/F. Buhl
     //       DATE WRITTEN   March 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  execute a few (1) time steps of a simulation to facilitate setting up model for zone sizing
@@ -4555,8 +4508,6 @@ void GetZoneHVACSizing(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Nigusse - FSEC
     //       DATE WRITTEN   July 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Obtains input data for the ZoneHVAC sizing methods object and stores it in
@@ -4566,8 +4517,6 @@ void GetZoneHVACSizing(EnergyPlusData &state)
     // Uses InputProcessor "Get" routines to obtain data.
     // This object requires only a name where the default values are assumed
     // if subsequent fields are not entered.
-
-    // Using/Aliasing
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetZoneHVACSizing: "); // include trailing blank space
