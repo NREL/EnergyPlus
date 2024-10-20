@@ -3517,7 +3517,6 @@ void GetSystemSizingInput(EnergyPlusData &state)
     int NumNumbers;          // Number of Numbers for each GetObjectItem call
     int IOStatus;            // Used in GetObjectItem
     bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-    int NumDesDays;          // Number of design days in input
 
     auto &SysSizInput = state.dataSize->SysSizInput;
 
@@ -3527,9 +3526,9 @@ void GetSystemSizingInput(EnergyPlusData &state)
     state.dataSize->NumSysSizInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataSize->NumSysSizInput > 0) {
-        NumDesDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
-                     state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
-                     state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
+        int NumDesDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
+                         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
+                         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         if (NumDesDays == 0 && (state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing)) {
             ShowSevereError(state, "System Sizing calculations need SizingPeriod:* input. None found.");
             ErrorsFound = true;
@@ -4062,15 +4061,14 @@ void GetPlantSizingInput(EnergyPlusData &state)
     int NumNumbers;          // Number of Numbers for each GetObjectItem call
     int IOStatus;            // Used in GetObjectItem
     bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-    int NumDesDays;          // Number of design days in input
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Sizing:Plant";
     state.dataSize->NumPltSizInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataSize->NumPltSizInput > 0) {
-        NumDesDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
-                     state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
-                     state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
+        int NumDesDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
+                         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
+                         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         if (NumDesDays == 0 && state.dataGlobal->DoPlantSizing) {
             ShowSevereError(state, "Plant Sizing calculations need SizingPeriod:* input");
             ErrorsFound = true;
@@ -4636,8 +4634,6 @@ void GetZoneHVACSizing(EnergyPlusData &state)
     int NumAlphas;           // Number of Alphas for each GetObjectItem call
     int NumNumbers;          // Number of Numbers for each GetObjectItem call
     int TotalArgs;           // Total number of alpha and numeric arguments (max) for a
-    int IOStatus;            // Used in GetObjectItem
-    int zSIndex;             // index of "DesignSpecification:ZoneHVAC:Sizing" objects
     bool ErrorsFound(false); // If errors detected in input
     //  REAL(r64) :: CalcAmt
 
@@ -4661,10 +4657,11 @@ void GetZoneHVACSizing(EnergyPlusData &state)
     lNumericBlanks.dimension(NumNumbers, true);
 
     if (state.dataSize->NumZoneHVACSizing > 0) {
+        int IOStatus; // Used in GetObjectItem
         state.dataSize->ZoneHVACSizing.allocate(state.dataSize->NumZoneHVACSizing);
 
         // Start Loading the System Input
-        for (zSIndex = 1; zSIndex <= state.dataSize->NumZoneHVACSizing; ++zSIndex) {
+        for (int zSIndex = 1; zSIndex <= state.dataSize->NumZoneHVACSizing; ++zSIndex) {
 
             Alphas = "";
             cAlphaFields = "";
@@ -5220,7 +5217,6 @@ void GetAirTerminalSizing(EnergyPlusData &state)
     int NumAlphas;           // Number of Alphas for each GetObjectItem call
     int NumNumbers;          // Number of Numbers for each GetObjectItem call
     int TotalArgs;           // Total number of alpha and numeric arguments (max) for a
-    int IOStatus;            // Used in GetObjectItem
     bool ErrorsFound(false); // If errors detected in input
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "DesignSpecification:AirTerminal:Sizing";
@@ -5228,6 +5224,7 @@ void GetAirTerminalSizing(EnergyPlusData &state)
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
     if (state.dataSize->NumAirTerminalSizingSpec > 0) {
+        int IOStatus; // Used in GetObjectItem
         state.dataSize->AirTerminalSizingSpec.allocate(state.dataSize->NumAirTerminalSizingSpec);
 
         // Start Loading the System Input
