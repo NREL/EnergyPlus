@@ -127,7 +127,6 @@ void ManageSizing(EnergyPlusData &state)
     // Design day simulations are run again with central air systems supplied by
     // purchased hot and cold water, yielding central heating and cooling capacities.
 
-    auto &CalcSysSizing = state.dataSize->CalcSysSizing;
     auto &SysSizPeakDDNum = state.dataSize->SysSizPeakDDNum;
 
     // Using/Aliasing
@@ -225,9 +224,6 @@ void ManageSizing(EnergyPlusData &state)
     if ((state.dataSize->NumZoneSizingInput > 0) &&
         (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing)) {
 
-        if (state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim) {
-            state.dataGlobal->DoOutputReporting = false;
-        }
         state.dataGlobal->DoOutputReporting = false;
         state.dataGlobal->ZoneSizingCalc = true;
         Available = true;
@@ -624,9 +620,10 @@ void ManageSizing(EnergyPlusData &state)
 
     if (state.dataSize->SysSizingRunDone) {
         for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
+            auto &calcSysSizing = state.dataSize->CalcSysSizing(AirLoopNum);
             curName = FinalSysSizing(AirLoopNum).AirPriLoopName;
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcClAir, curName, CalcSysSizing(AirLoopNum).DesCoolVolFlow);
-            if (std::abs(CalcSysSizing(AirLoopNum).DesCoolVolFlow) <= 1.e-8) {
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcClAir, curName, calcSysSizing.DesCoolVolFlow);
+            if (std::abs(calcSysSizing.DesCoolVolFlow) <= 1.e-8) {
                 ShowWarningError(state,
                                  format("{}Calculated Cooling Design Air Flow Rate for System={} is zero.",
                                         RoutineName,
@@ -634,8 +631,8 @@ void ManageSizing(EnergyPlusData &state)
                 ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
             }
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizUserClAir, curName, FinalSysSizing(AirLoopNum).DesCoolVolFlow);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcHtAir, curName, CalcSysSizing(AirLoopNum).DesHeatVolFlow);
-            if (std::abs(CalcSysSizing(AirLoopNum).DesHeatVolFlow) <= 1.e-8) {
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcHtAir, curName, calcSysSizing.DesHeatVolFlow);
+            if (std::abs(calcSysSizing.DesHeatVolFlow) <= 1.e-8) {
                 ShowWarningError(state,
                                  format("{}Calculated Heating Design Air Flow Rate for System={} is zero.",
                                         RoutineName,
@@ -670,7 +667,7 @@ void ManageSizing(EnergyPlusData &state)
                                 "Cooling",
                                 coolPeakLoadKind,
                                 coolCap,
-                                CalcSysSizing(AirLoopNum).DesCoolVolFlow,
+                                calcSysSizing.DesCoolVolFlow,
                                 FinalSysSizing(AirLoopNum).DesCoolVolFlow,
                                 FinalSysSizing(AirLoopNum).CoolDesDay,
                                 coolPeakDDDate,
@@ -681,7 +678,7 @@ void ManageSizing(EnergyPlusData &state)
                                 "Cooling",
                                 coolPeakLoadKind,
                                 coolCap,
-                                CalcSysSizing(AirLoopNum).DesCoolVolFlow,
+                                calcSysSizing.DesCoolVolFlow,
                                 FinalSysSizing(AirLoopNum).DesCoolVolFlow,
                                 FinalSysSizing(AirLoopNum).CoolDesDay,
                                 coolPeakDDDate,
@@ -694,7 +691,7 @@ void ManageSizing(EnergyPlusData &state)
                                 "Heating",
                                 "Sensible",
                                 FinalSysSizing(AirLoopNum).HeatCap,
-                                CalcSysSizing(AirLoopNum).DesHeatVolFlow,
+                                calcSysSizing.DesHeatVolFlow,
                                 FinalSysSizing(AirLoopNum).DesHeatVolFlow,
                                 FinalSysSizing(AirLoopNum).HeatDesDay,
                                 SysSizPeakDDNum(AirLoopNum).cHeatPeakDDDate,
@@ -705,7 +702,7 @@ void ManageSizing(EnergyPlusData &state)
                                 "Heating",
                                 "Sensible",
                                 FinalSysSizing(AirLoopNum).HeatCap,
-                                CalcSysSizing(AirLoopNum).DesHeatVolFlow,
+                                calcSysSizing.DesHeatVolFlow,
                                 FinalSysSizing(AirLoopNum).DesHeatVolFlow,
                                 FinalSysSizing(AirLoopNum).HeatDesDay,
                                 SysSizPeakDDNum(AirLoopNum).cHeatPeakDDDate,
