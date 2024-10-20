@@ -3389,9 +3389,7 @@ void GetZoneAndZoneListNames(
     int NumAlphas;
     int NumNumbers;
     int IOStatus;
-    bool InErrFlag; // Preserve (no current use) the input status of ErrorsFound
 
-    InErrFlag = ErrorsFound;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Zone";
     NumZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -4544,7 +4542,7 @@ void ReportSysSizing(EnergyPlusData &state,
 }
 
 // convert an index for the timestep of the day into a hour minute string in the format 00:00
-std::string TimeIndexToHrMinString(EnergyPlusData &state, int timeIndex)
+std::string TimeIndexToHrMinString(EnergyPlusData const &state, int timeIndex)
 {
     int tMinOfDay = timeIndex * state.dataGlobal->MinutesPerTimeStep;
     int tHr = int(tMinOfDay / 60.);
