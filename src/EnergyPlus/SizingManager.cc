@@ -2010,8 +2010,6 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
 void DetermineSystemPopulationDiversity(EnergyPlusData &state)
 {
 
-    auto &SysSizInput = state.dataSize->SysSizInput;
-
     // determine Pz sum, Ps, and D for each air system for standard 62.1
 
     // first determine if any airloops use VRP, if not then don't need to march thru year of schedules for performance
@@ -2029,7 +2027,7 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
         int SysSizNum = Util::FindItemInList(finalSysSizing.AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
         // only retrieve data if the occupant density is set to be autosized
-        if (finalSysSizing.OAAutoSized && SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
+        if (finalSysSizing.OAAutoSized && state.dataSize->SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
             auto &pzSumBySys = state.dataSize->PzSumBySys(AirLoopNum);
             pzSumBySys = 0.0;
             state.dataSize->PsBySys(AirLoopNum) = 0.0;
@@ -2076,7 +2074,7 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
                     int SysSizNum =
                         Util::FindItemInList(finalSysSizing.AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
                     if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
-                    if (finalSysSizing.OAAutoSized && SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
+                    if (finalSysSizing.OAAutoSized && state.dataSize->SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
 
                         // Loop over all zones connected to air loop
                         Real64 TotConcurrentPeopleOnSys = 0.0;
@@ -2126,7 +2124,7 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
 
         // compute D if set to autosize
-        if (SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
+        if (state.dataSize->SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
             if (state.dataSize->PzSumBySys(AirLoopNum) > 0.0) {
                 state.dataSize->DBySys(AirLoopNum) = state.dataSize->PsBySys(AirLoopNum) / state.dataSize->PzSumBySys(AirLoopNum);
             } else {
@@ -2135,7 +2133,7 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
             state.dataSize->DBySys(AirLoopNum) = min(1.0, state.dataSize->DBySys(AirLoopNum));
         } else {
             // set the occupant diversity based on user-specified value
-            state.dataSize->DBySys(AirLoopNum) = SysSizInput(SysSizNum).OccupantDiversity;
+            state.dataSize->DBySys(AirLoopNum) = state.dataSize->SysSizInput(SysSizNum).OccupantDiversity;
         }
 
         // For single zone systems, D should be 1.0.
