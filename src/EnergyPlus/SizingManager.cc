@@ -152,14 +152,10 @@ void ManageSizing(EnergyPlusData &state)
     int TimeStepInDay(0); // time step number
     int LastMonth(0);
     int LastDayOfMonth(0);
-    int AirLoopNum(0); // air loop index
     std::string curName;
     int NumSizingPeriodsPerformed;
     int numZoneSizeIter; // number of times to repeat zone sizing calcs. 1 normal, 2 load component reporting
-    int iZoneCalcIter;   // index for repeating the zone sizing calcs
     bool isUserReqCompLoadReport;
-
-    auto &FinalSysSizing = state.dataSize->FinalSysSizing;
 
     TimeStepInDay = 0;
     state.dataSize->SysSizingRunDone = false;
@@ -252,7 +248,7 @@ void ManageSizing(EnergyPlusData &state)
         SetupZoneSizing(state, ErrorsFound); // Should only be done ONCE
         state.dataGlobal->KickOffSizing = false;
 
-        for (iZoneCalcIter = 1; iZoneCalcIter <= numZoneSizeIter; ++iZoneCalcIter) { // normally this is performed once but if load component
+        for (int iZoneCalcIter = 1; iZoneCalcIter <= numZoneSizeIter; ++iZoneCalcIter) { // normally this is performed once but if load component
             // report is requested, these are repeated with a pulse in
             // each zone.
 
@@ -617,26 +613,28 @@ void ManageSizing(EnergyPlusData &state)
     }
 
     if (state.dataSize->SysSizingRunDone) {
-        for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
+        for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             auto &calcSysSizing = state.dataSize->CalcSysSizing(AirLoopNum);
             auto &sysSizPeakDDNum = state.dataSize->SysSizPeakDDNum(AirLoopNum);
+            auto &finalSysSizing = state.dataSize->FinalSysSizing(AirLoopNum);
 
-            curName = FinalSysSizing(AirLoopNum).AirPriLoopName;
+
+            curName = finalSysSizing.AirPriLoopName;
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcClAir, curName, calcSysSizing.DesCoolVolFlow);
             if (std::abs(calcSysSizing.DesCoolVolFlow) <= 1.e-8) {
                 ShowWarningError(state,
                                  format("{}Calculated Cooling Design Air Flow Rate for System={} is zero.",
                                         RoutineName,
-                                        FinalSysSizing(AirLoopNum).AirPriLoopName));
+                                        finalSysSizing.AirPriLoopName));
                 ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
             }
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizUserClAir, curName, FinalSysSizing(AirLoopNum).DesCoolVolFlow);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizUserClAir, curName, finalSysSizing.DesCoolVolFlow);
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcHtAir, curName, calcSysSizing.DesHeatVolFlow);
             if (std::abs(calcSysSizing.DesHeatVolFlow) <= 1.e-8) {
                 ShowWarningError(state,
                                  format("{}Calculated Heating Design Air Flow Rate for System={} is zero.",
                                         RoutineName,
-                                        FinalSysSizing(AirLoopNum).AirPriLoopName));
+                                        finalSysSizing.AirPriLoopName));
                 ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
             }
             std::string_view coolPeakLoadKind;
@@ -644,21 +642,21 @@ void ManageSizing(EnergyPlusData &state)
             int coolPeakDD = 0;
             Real64 coolCap = 0.;
             int timeStepIndexAtPeakCoolLoad = 0;
-            if (FinalSysSizing(AirLoopNum).coolingPeakLoad == DataSizing::PeakLoad::SensibleCooling) {
+            if (finalSysSizing.coolingPeakLoad == DataSizing::PeakLoad::SensibleCooling) {
                 coolPeakLoadKind = "Sensible";
                 coolPeakDDDate = sysSizPeakDDNum.cSensCoolPeakDDDate;
                 coolPeakDD = sysSizPeakDDNum.SensCoolPeakDD;
-                coolCap = FinalSysSizing(AirLoopNum).SensCoolCap;
+                coolCap = finalSysSizing.SensCoolCap;
                 if (coolPeakDD > 0) timeStepIndexAtPeakCoolLoad = sysSizPeakDDNum.TimeStepAtSensCoolPk(coolPeakDD);
-            } else if (FinalSysSizing(AirLoopNum).coolingPeakLoad == DataSizing::PeakLoad::TotalCooling) {
-                if (FinalSysSizing(AirLoopNum).loadSizingType == DataSizing::LoadSizing::Latent && state.dataHeatBal->DoLatentSizing) {
+            } else if (finalSysSizing.coolingPeakLoad == DataSizing::PeakLoad::TotalCooling) {
+                if (finalSysSizing.loadSizingType == DataSizing::LoadSizing::Latent && state.dataHeatBal->DoLatentSizing) {
                     coolPeakLoadKind = "Total Based on Latent";
                 } else {
                     coolPeakLoadKind = "Total";
                 }
                 coolPeakDDDate = sysSizPeakDDNum.cTotCoolPeakDDDate;
                 coolPeakDD = sysSizPeakDDNum.TotCoolPeakDD;
-                coolCap = FinalSysSizing(AirLoopNum).TotCoolCap;
+                coolCap = finalSysSizing.TotCoolCap;
                 if (coolPeakDD > 0) timeStepIndexAtPeakCoolLoad = sysSizPeakDDNum.TimeStepAtTotCoolPk(coolPeakDD);
             }
             if (coolPeakDD > 0) {
@@ -668,8 +666,8 @@ void ManageSizing(EnergyPlusData &state)
                                 coolPeakLoadKind,
                                 coolCap,
                                 calcSysSizing.DesCoolVolFlow,
-                                FinalSysSizing(AirLoopNum).DesCoolVolFlow,
-                                FinalSysSizing(AirLoopNum).CoolDesDay,
+                                finalSysSizing.DesCoolVolFlow,
+                                finalSysSizing.CoolDesDay,
                                 coolPeakDDDate,
                                 timeStepIndexAtPeakCoolLoad);
             } else {
@@ -679,8 +677,8 @@ void ManageSizing(EnergyPlusData &state)
                                 coolPeakLoadKind,
                                 coolCap,
                                 calcSysSizing.DesCoolVolFlow,
-                                FinalSysSizing(AirLoopNum).DesCoolVolFlow,
-                                FinalSysSizing(AirLoopNum).CoolDesDay,
+                                finalSysSizing.DesCoolVolFlow,
+                                finalSysSizing.CoolDesDay,
                                 coolPeakDDDate,
                                 0);
             }
@@ -690,10 +688,10 @@ void ManageSizing(EnergyPlusData &state)
                                 curName,
                                 "Heating",
                                 "Sensible",
-                                FinalSysSizing(AirLoopNum).HeatCap,
+                                finalSysSizing.HeatCap,
                                 calcSysSizing.DesHeatVolFlow,
-                                FinalSysSizing(AirLoopNum).DesHeatVolFlow,
-                                FinalSysSizing(AirLoopNum).HeatDesDay,
+                                finalSysSizing.DesHeatVolFlow,
+                                finalSysSizing.HeatDesDay,
                                 sysSizPeakDDNum.cHeatPeakDDDate,
                                 sysSizPeakDDNum.TimeStepAtHeatPk(heatPeakDD));
             } else {
@@ -701,14 +699,14 @@ void ManageSizing(EnergyPlusData &state)
                                 curName,
                                 "Heating",
                                 "Sensible",
-                                FinalSysSizing(AirLoopNum).HeatCap,
+                                finalSysSizing.HeatCap,
                                 calcSysSizing.DesHeatVolFlow,
-                                FinalSysSizing(AirLoopNum).DesHeatVolFlow,
-                                FinalSysSizing(AirLoopNum).HeatDesDay,
+                                finalSysSizing.DesHeatVolFlow,
+                                finalSysSizing.HeatDesDay,
                                 sysSizPeakDDNum.cHeatPeakDDDate,
                                 0);
             }
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizUserHtAir, curName, FinalSysSizing(AirLoopNum).DesHeatVolFlow);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizUserHtAir, curName, finalSysSizing.DesHeatVolFlow);
         }
         // Deallocate arrays no longer needed
         state.dataSize->SysSizing.deallocate();
