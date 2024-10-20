@@ -357,7 +357,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
     Real64 Grad; // vertical temperature gradient C/m
 
     auto &patternZoneInfo = state.dataRoomAir->AirPatternZoneInfo(ZoneNum);
-    auto &pattern = state.dataRoomAir->AirPattern(PattrnID);
+    auto const &pattern = state.dataRoomAir->AirPattern(PattrnID);
 
     if (state.dataRoomAirModelTempPattern->MyOneTimeFlag2) {
         state.dataRoomAirModelTempPattern->SetupOutputFlag.dimension(state.dataGlobal->NumOfZones, true); // init
@@ -491,7 +491,7 @@ void FigureConstGradPattern(EnergyPlusData &state, int const PattrnID, int const
     //       DATE WRITTEN   August 2005
 
     auto &patternZoneInfo = state.dataRoomAir->AirPatternZoneInfo(ZoneNum);
-    auto &pattern = state.dataRoomAir->AirPattern(PattrnID);
+    auto const &pattern = state.dataRoomAir->AirPattern(PattrnID);
     Real64 Tmean = patternZoneInfo.TairMean;  // MAT
     Real64 Grad = pattern.GradPatrn.Gradient; // Vertical temperature gradient
 
@@ -539,7 +539,7 @@ Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // inde
     Real64 ZMin = 0.0;
     int Count = 0;
     for (int spaceNum : zone.spaceIndexes) {
-        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+        auto const &thisSpace = state.dataHeatBal->space(spaceNum);
         for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
             auto const &surf = state.dataSurface->Surface(SurfNum);
             if (surf.Class == DataSurfaces::SurfaceClass::Floor) {
@@ -644,7 +644,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     // What if ZoneNodeID is 0?
 
     auto &zoneNode = state.dataLoopNodes->Node(patternZoneInfo.ZoneNodeID);
-    auto &zone = state.dataHeatBal->Zone(ZoneNum);
+    auto const &zone = state.dataHeatBal->Zone(ZoneNum);
     auto &zoneHeatBal = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
     int ZoneMult = zone.Multiplier * zone.ListMultiplier;
@@ -673,7 +673,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
 
         if (zone.HasAirFlowWindowReturn) {
             for (int spaceNum : zone.spaceIndexes) {
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                 for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
                     if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                         state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::WindowAirFlowDestination::Return) {
@@ -772,7 +772,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
 
     // set results for all surface
     for (int spaceNum : zone.spaceIndexes) {
-        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+        auto const &thisSpace = state.dataHeatBal->space(spaceNum);
         for (int i = thisSpace.HTSurfaceFirst, j = 0; i <= thisSpace.HTSurfaceLast; ++i) {
             state.dataHeatBal->SurfTempEffBulkAir(i) = patternZoneInfo.Surf(++j).TadjacentAir;
         }
@@ -780,7 +780,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
 
     // set flag for reference air temperature mode
     for (int spaceNum : zone.spaceIndexes) {
-        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+        auto const &thisSpace = state.dataHeatBal->space(spaceNum);
         for (int i = thisSpace.HTSurfaceFirst; i <= thisSpace.HTSurfaceLast; ++i) {
             state.dataSurface->SurfTAirRef(i) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
             state.dataSurface->SurfTAirRefRpt(i) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(i)];

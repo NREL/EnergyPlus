@@ -240,7 +240,6 @@ void GetPumpInput(EnergyPlusData &state)
     int IOStat;    // IO Status when calling get input subroutine
     bool ErrorsFound;
     int TempCurveIndex;
-    std::string TempCurveType;
     int NumVarSpeedPumps = 0;
     int NumConstSpeedPumps = 0;
     int NumCondensatePumps = 0;
@@ -1365,46 +1364,38 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
     static constexpr std::string_view RoutineName("PlantPumps::InitializePumps ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InletNode;  // pump inlet node number
-    int OutletNode; // pump outlet node number
     Real64 TotalEffic;
     Real64 SteamDensity; // Density of working fluid
-    int DummyWaterIndex(1);
     Real64 TempWaterDensity;
-    bool errFlag;
     Real64 mdotMax; // local fluid mass flow rate maximum
     Real64 mdotMin; // local fluid mass flow rate minimum
-    int plloopnum;
     DataPlant::LoopSideLocation lsnum;
-    int brnum;
-    int cpnum;
 
     // Set some variables for convenience
     auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
-    InletNode = thisPump.InletNodeNum;
-    OutletNode = thisPump.OutletNodeNum;
+    int InletNode = thisPump.InletNodeNum;
+    int OutletNode = thisPump.OutletNodeNum;
 
     // One time inits
     if (thisPump.PumpOneTimeFlag) {
 
-        errFlag = false;
+        bool errFlag = false;
         ScanPlantLoopsForObject(state, thisPump.Name, thisPump.TypeOf_Num, thisPump.plantLoc, errFlag, _, _, _, _, _);
-        plloopnum = thisPump.plantLoc.loopNum;
+        int plloopnum = thisPump.plantLoc.loopNum;
         lsnum = thisPump.plantLoc.loopSideNum;
-        brnum = thisPump.plantLoc.branchNum;
-        cpnum = thisPump.plantLoc.compNum;
+        int brnum = thisPump.plantLoc.branchNum;
+        int cpnum = thisPump.plantLoc.compNum;
         if (plloopnum > 0 && lsnum != DataPlant::LoopSideLocation::Invalid && brnum > 0 && cpnum > 0) {
             auto &thisPumpLoc = state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum);
-            auto &thisLoopNodeID = state.dataLoopNodes->NodeID;
             if (thisPumpLoc.Comp(cpnum).NodeNumIn != InletNode || thisPumpLoc.Comp(cpnum).NodeNumOut != OutletNode) {
                 ShowSevereError(
                     state,
                     format("InitializePumps: {}=\"{}\", non-matching nodes.", pumpTypeIDFNames[static_cast<int>(thisPump.pumpType)], thisPump.Name));
                 ShowContinueError(state, format("...in Branch={}, Component referenced with:", thisPumpLoc.Name));
-                ShowContinueError(state, format("...Inlet Node={}", thisLoopNodeID(thisPumpLoc.Comp(cpnum).NodeNumIn)));
-                ShowContinueError(state, format("...Outlet Node={}", thisLoopNodeID(thisPumpLoc.Comp(cpnum).NodeNumOut)));
-                ShowContinueError(state, format("...Pump Inlet Node={}", thisLoopNodeID(InletNode)));
-                ShowContinueError(state, format("...Pump Outlet Node={}", thisLoopNodeID(OutletNode)));
+                ShowContinueError(state, format("...Inlet Node={}", state.dataLoopNodes->NodeID(thisPumpLoc.Comp(cpnum).NodeNumIn)));
+                ShowContinueError(state, format("...Outlet Node={}", state.dataLoopNodes->NodeID(thisPumpLoc.Comp(cpnum).NodeNumOut)));
+                ShowContinueError(state, format("...Pump Inlet Node={}", state.dataLoopNodes->NodeID(InletNode)));
+                ShowContinueError(state, format("...Pump Outlet Node={}", state.dataLoopNodes->NodeID(OutletNode)));
                 errFlag = true;
             }
         } else { // CR9292
@@ -1498,6 +1489,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
     // Begin environment inits
     if (thisPump.PumpInitFlag && state.dataGlobal->BeginEnvrnFlag) {
         if (thisPump.pumpType == PumpType::Cond) {
+            int DummyWaterIndex = 1;
 
             TempWaterDensity = GetDensityGlycol(state, fluidNameWater, Constant::InitConvTemp, DummyWaterIndex, RoutineName);
             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, thisPump.FluidIndex, RoutineName);
@@ -1539,7 +1531,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
     if (!state.dataGlobal->BeginEnvrnFlag) thisPump.PumpInitFlag = true;
 
     // zero out module level working variables
-    auto &daPumps = state.dataPumps;
+    auto const &daPumps = state.dataPumps;
     daPumps->PumpMassFlowRate = 0.0;
     daPumps->PumpHeattoFluid = 0.0;
     daPumps->Power = 0.0;
@@ -1638,7 +1630,7 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
         // Let the user know that his input file is overconstrained
     }
 
-    auto &thisPumpPlant = state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum);
+    auto const &thisPumpPlant = state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum);
 
     switch (thisPump.pumpType) {
     case PumpType::VarSpeed: {
@@ -2065,7 +2057,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
                 for (int BranchNum = 1; BranchNum <= thisPumpLoop.TotalBranches; ++BranchNum) {
                     auto &thisPumpBranch = thisPumpLoop.Branch(BranchNum);
                     for (int CompNum = 1; CompNum <= thisPumpBranch.TotalComponents; ++CompNum) {
-                        auto &thisPumpComp = thisPumpBranch.Comp(CompNum);
+                        auto const &thisPumpComp = thisPumpBranch.Comp(CompNum);
                         if (thisPump.InletNodeNum == thisPumpComp.NodeNumIn && thisPump.OutletNodeNum == thisPumpComp.NodeNumOut) {
                             if (thisPumpBranch.PumpSizFac > 0.0) {
                                 PumpSizFac = thisPumpBranch.PumpSizFac;
@@ -2223,8 +2215,8 @@ void ReportPumps(EnergyPlusData &state, int const PumpNum)
 
     PumpType = thisPump.pumpType;
     OutletNode = thisPump.OutletNodeNum;
-    auto &thisOutNode = state.dataLoopNodes->Node(OutletNode);
-    auto &daPumps = state.dataPumps;
+    auto const &thisOutNode = state.dataLoopNodes->Node(OutletNode);
+    auto const &daPumps = state.dataPumps;
 
     if (daPumps->PumpMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
         new (&(state.dataPumps->PumpEquipReport(PumpNum))) ReportVars();
@@ -2348,7 +2340,7 @@ void GetRequiredMassFlowRate(EnergyPlusData &state,
 
     // Calculate maximum and minimum mass flow rate associated with maximun and minimum RPM
     if (thisPump.plantLoc.loopNum > 0) {
-        auto &thisPlantLoop = state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum);
+        auto const &thisPlantLoop = state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum);
         if (thisPlantLoop.UsePressureForPumpCalcs && thisPlantLoop.PressureSimType == DataPlant::PressSimType::FlowCorrection &&
             thisPlantLoop.PressureDrop > 0.0) {
             thisPump.PumpMassFlowRateMaxRPM = ResolveLoopFlowVsPressure(state,
@@ -2377,7 +2369,7 @@ void GetRequiredMassFlowRate(EnergyPlusData &state,
 
     // Calculate maximum and minimum mass flow rate associated with operating pressure range
     if (thisPump.plantLoc.loopNum > 0) {
-        auto &thisPlantLoop = state.dataPlnt->PlantLoop(LoopNum);
+        auto const &thisPlantLoop = state.dataPlnt->PlantLoop(LoopNum);
         if (thisPlantLoop.PressureEffectiveK > 0.0) {
             PumpMassFlowRateMaxPress = std::sqrt(MaxPress / thisPlantLoop.PressureEffectiveK);
             PumpMassFlowRateMinPress = std::sqrt(MinPress / thisPlantLoop.PressureEffectiveK);

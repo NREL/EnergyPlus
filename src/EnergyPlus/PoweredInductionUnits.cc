@@ -263,7 +263,7 @@ void GetPIUs(EnergyPlusData &state)
     state.dataPowerInductionUnits->PiuUniqueNames.reserve(static_cast<unsigned>(state.dataPowerInductionUnits->NumPIUs));
     state.dataPowerInductionUnits->CheckEquipName.dimension(state.dataPowerInductionUnits->NumPIUs, true);
 
-    int PIUNum{0};
+    int PIUNum = 0;
     auto &ip = state.dataInputProcessing->inputProcessor;
     // loop over Series PIUs; get and load the input data
     for (const std::string cCurrentModuleObject : {"AirTerminal:SingleDuct:SeriesPIU:Reheat", "AirTerminal:SingleDuct:ParallelPIU:Reheat"}) {
@@ -556,8 +556,8 @@ void GetPIUs(EnergyPlusData &state)
         ShowFatalError(state, format("{} Errors found in getting input.  Preceding conditions cause termination.", RoutineName));
     }
 
-    for (int PIUNum = 1; PIUNum <= state.dataPowerInductionUnits->NumPIUs; ++PIUNum) {
-        auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUNum);
+    for (int PIURpt = 1; PIURpt <= state.dataPowerInductionUnits->NumPIUs; ++PIURpt) {
+        auto &thisPIU = state.dataPowerInductionUnits->PIU(PIURpt);
 
         // Setup Report variables for the PIUs
         SetupOutputVariable(state,
@@ -608,35 +608,35 @@ void GetPIUs(EnergyPlusData &state)
                             thisPIU.TotMassFlowRate,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
-                            state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                            state.dataPowerInductionUnits->PIU(PIURpt).Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Mass Flow Rate",
                             Constant::Units::kg_s,
                             thisPIU.PriMassFlowRate,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
-                            state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                            state.dataPowerInductionUnits->PIU(PIURpt).Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Secondary Air Mass Flow Rate",
                             Constant::Units::kg_s,
                             thisPIU.SecMassFlowRate,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
-                            state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                            state.dataPowerInductionUnits->PIU(PIURpt).Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Outlet Discharge Air Temperature",
                             Constant::Units::C,
                             thisPIU.DischargeAirTemp,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
-                            state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                            state.dataPowerInductionUnits->PIU(PIURpt).Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Current Operation Control Stage",
                             Constant::Units::unknown,
                             thisPIU.CurOperationControlStage,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
-                            state.dataPowerInductionUnits->PIU(PIUNum).Name);
+                            state.dataPowerInductionUnits->PIU(PIURpt).Name);
     }
 }
 
@@ -1230,8 +1230,6 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                         ShowContinueError(state, format("Occurs in{} Object={}", thisPIU.UnitType, thisPIU.Name));
                         ErrorsFound = true;
                     }
-                }
-                if (IsAutoSize) {
                     thisPIU.MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
                     BaseSizer::reportSizerOutput(
                         state, thisPIU.UnitType, thisPIU.Name, "Design Size Maximum Reheat Water Flow Rate [m3/s]", MaxVolHotWaterFlowDes);
@@ -1327,8 +1325,6 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                         ShowContinueError(state, format("Occurs in{} Object={}", thisPIU.UnitType, thisPIU.Name));
                         ErrorsFound = true;
                     }
-                }
-                if (IsAutoSize) {
                     thisPIU.MaxVolHotSteamFlow = MaxVolHotSteamFlowDes;
                     BaseSizer::reportSizerOutput(
                         state, thisPIU.UnitType, thisPIU.Name, "Design Size Maximum Reheat Steam Flow [m3/s]", MaxVolHotSteamFlowDes);
@@ -2076,18 +2072,18 @@ void CalcParallelPIU(EnergyPlusData &state,
 
 void ReportCurOperatingControlStage(EnergyPlusData &state, int const piuNum, bool const unitOn, HeatOpModeType heaterMode, CoolOpModeType coolingMode)
 {
-    int undetermined(-1);
-    int off(0);
-    int constantVolumeCooling(1);
-    int constantVolumeHeating(2);
-    int deadband(3);
-    int variableSpeedFirstStageCooling(4);
-    int variableSpeedSecondStageCooling(5);
-    int variableSpeedStagedHeatFirstStageHeating(6);
-    int variableSpeedStagedHeatSecondStageHeating(7);
-    int variableSpeedModulatedHeatFirstStageHeating(8);
-    int variableSpeedModulatedHeatSecondStageHeating(9);
-    int variableSpeedModulatedHeatThirdStageHeating(10);
+    int constexpr undetermined = -1;
+    int constexpr off = 0;
+    int constexpr constantVolumeCooling = 1;
+    int constexpr constantVolumeHeating = 2;
+    int constexpr deadband = 3;
+    int constexpr variableSpeedFirstStageCooling = 4;
+    int constexpr variableSpeedSecondStageCooling = 5;
+    int constexpr variableSpeedStagedHeatFirstStageHeating = 6;
+    int constexpr variableSpeedStagedHeatSecondStageHeating = 7;
+    int constexpr variableSpeedModulatedHeatFirstStageHeating = 8;
+    int constexpr variableSpeedModulatedHeatSecondStageHeating = 9;
+    int constexpr variableSpeedModulatedHeatThirdStageHeating = 10;
 
     state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = undetermined;
 
@@ -2166,13 +2162,13 @@ void CalcVariableSpeedPIUCoolingBehavior(EnergyPlusData &state,
     } else {
         // check how much cooling provided at max fan and primary air
         state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = thisPIU.MaxPriAirMassFlow;
-        Real64 TotAirMassFlow = thisPIU.MaxTotAirMassFlow;
+        TotAirMassFlow = thisPIU.MaxTotAirMassFlow;
         state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate = max(0.0, TotAirMassFlow - thisPIU.MaxPriAirMassFlow);
         Real64 qdotDelivMaxFan = CalcVariableSpeedPIUQdotDelivered(state, piuNum, zoneNode, false, TotAirMassFlow, 1.0);
 
         if (zoneLoad <= qdotDelivMaxFan) { // not going to make it just run at max
             thisPIU.PriAirMassFlow = thisPIU.PriAirMassFlow;
-            Real64 TotAirMassFlow = thisPIU.MaxTotAirMassFlow;
+            TotAirMassFlow = thisPIU.MaxTotAirMassFlow;
             thisPIU.SecAirMassFlow = max(0.0, TotAirMassFlow - thisPIU.PriAirMassFlow);
             thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
             thisPIU.coolingOperatingMode = CoolOpModeType::CoolSecondStage;
@@ -2200,7 +2196,7 @@ void CalcVariableSpeedPIUCoolingBehavior(EnergyPlusData &state,
                 ShowFatalError(state, format("Series PIU control failed for {}:{}", thisPIU.UnitType, thisPIU.Name));
             } else {
                 thisPIU.PriAirMassFlow = coolSignal * (thisPIU.MaxPriAirMassFlow - thisPIU.MinPriAirMassFlow) + thisPIU.MinPriAirMassFlow;
-                Real64 TotAirMassFlow = coolSignal * (thisPIU.MaxTotAirMassFlow - thisPIU.MinTotAirMassFlow) + thisPIU.MinTotAirMassFlow;
+                TotAirMassFlow = coolSignal * (thisPIU.MaxTotAirMassFlow - thisPIU.MinTotAirMassFlow) + thisPIU.MinTotAirMassFlow;
                 thisPIU.SecAirMassFlow = max(0.0, TotAirMassFlow - thisPIU.PriAirMassFlow);
                 thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
                 thisPIU.coolingOperatingMode = CoolOpModeType::CoolFirstStage;
