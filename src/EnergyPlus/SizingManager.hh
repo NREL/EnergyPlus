@@ -81,7 +81,7 @@ namespace SizingManager {
     void ManageSizing(EnergyPlusData &state);
 
     bool CalcdoLoadComponentPulseNow(
-        EnergyPlusData &state, bool isPulseZoneSizing, bool WarmupFlag, int HourOfDay, int TimeStep, Constant::KindOfSim KindOfSim);
+        EnergyPlusData const &state, bool isPulseZoneSizing, bool WarmupFlag, int HourOfDay, int TimeStep, Constant::KindOfSim KindOfSim);
 
     void ManageSystemSizingAdjustments(EnergyPlusData &state);
 
@@ -166,7 +166,7 @@ namespace SizingManager {
                          int TimeStepIndex              // time step of the peak
     );
 
-    std::string TimeIndexToHrMinString(EnergyPlusData &state, int timeIndex);
+    std::string TimeIndexToHrMinString(EnergyPlusData const &state, int timeIndex);
 
     void UpdateFacilitySizing(EnergyPlusData &state, Constant::CallIndicator CallIndicator);
 
