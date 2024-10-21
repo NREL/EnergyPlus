@@ -8,7 +8,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
 Version,
-    24.2;                    !- Version Identifier
+    25.1;                    !- Version Identifier
 
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
