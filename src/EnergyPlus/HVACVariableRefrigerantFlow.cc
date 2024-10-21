@@ -13720,9 +13720,7 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
                     CompSpdLB = CounterCompSpdTemp - 1;
                     CompSpdUB = CounterCompSpdTemp;
 
-                    CompSpdActual = this->CompressorSpeed(CompSpdLB) + (this->CompressorSpeed(CompSpdUB) - this->CompressorSpeed(CompSpdLB)) /
-                                                                           (CompEvaporatingCAPSpd(CompSpdUB) - CompEvaporatingCAPSpd(CompSpdLB)) *
-                                                                           PLR;
+                    CompSpdActual = this->CompressorSpeed(CompSpdLB) + (this->CompressorSpeed(CompSpdUB) - this->CompressorSpeed(CompSpdLB)) * PLR;
 
                 } else {
                     CompSpdActual = this->CompressorSpeed(1) * PLR;
