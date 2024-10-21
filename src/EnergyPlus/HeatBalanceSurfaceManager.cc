@@ -6823,6 +6823,9 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                 state.dataHeatBalSurf->SurfHGrdExt(SurfNum) = 0.0;
                 state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) = 0.0;
 
+                if (state.dataSurface->SurfTOutsideEMSOverrideOn(SurfNum)) {
+                    state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataSurface->SurfTOutsideEMSOverrideValue(SurfNum);
+                } else {
                 // Calculate the current outside surface temperature TH(SurfNum,1,1) for the
                 // various different boundary conditions
                 switch (Surface(SurfNum).ExtBoundCond) {
@@ -6967,7 +6970,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     //  Allow for modification of TemperatureCoefficient with unitary sine wave.
                     Real64 ConstantTempCoef; // Temperature Coefficient as input or modified using sine wave COP mod
                     if (state.dataSurface->OSC(OPtr).SinusoidalConstTempCoef) { // Sine wave C4
-                        ConstantTempCoef = std::sin(2 * Constant::Pi * state.dataGlobal->CurrentTime / state.dataSurface->OSC(OPtr).SinusoidPeriod);
+                            ConstantTempCoef =
+                                std::sin(2 * Constant::Pi * state.dataGlobal->CurrentTime / state.dataSurface->OSC(OPtr).SinusoidPeriod);
                     } else {
                         ConstantTempCoef = state.dataSurface->OSC(OPtr).ConstTempCoef;
                     }
@@ -7274,9 +7278,10 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                      Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat));
                                 //  check for saturation conditions of air
                                 // Local temporary saturated vapor density for checking
-                                Real64 RhoVaporSat =
-                                    Psychrometrics::PsyRhovFnTdbRh(state, state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0, HBSurfManDrySurfCondFD);
-                                if (state.dataMstBal->RhoVaporAirOut(SurfNum) > RhoVaporSat) state.dataMstBal->RhoVaporAirOut(SurfNum) = RhoVaporSat;
+                                    Real64 RhoVaporSat = Psychrometrics::PsyRhovFnTdbRh(
+                                        state, state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0, HBSurfManDrySurfCondFD);
+                                    if (state.dataMstBal->RhoVaporAirOut(SurfNum) > RhoVaporSat)
+                                        state.dataMstBal->RhoVaporAirOut(SurfNum) = RhoVaporSat;
                                 state.dataMstBal->HSkyFD(SurfNum) = state.dataHeatBalSurf->SurfHSkyExt(SurfNum);
                                 state.dataMstBal->HGrndFD(SurfNum) = state.dataHeatBalSurf->SurfHGrdExt(SurfNum);
                                 state.dataMstBal->HAirFD(SurfNum) = state.dataHeatBalSurf->SurfHAirExt(SurfNum);
@@ -7332,7 +7337,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                         for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
                              SrdSurfNum++) {
                             // View factor of a surrounding surface
-                            Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
+                                Real64 SrdSurfViewFac =
+                                    state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                             // Absolute temperature of a surrounding surface
                             Real64 SrdSurfTempAbs =
                                 ScheduleManager::GetCurrentScheduleValue(
@@ -7386,12 +7392,14 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                             state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
                             state.dataMstBal->HMassConvExtFD(SurfNum) =
                                 state.dataMstBal->HConvExtFD(SurfNum) /
-                                ((Psychrometrics::PsyRhoAirFnPbTdbW(
-                                      state,
+                                    ((Psychrometrics::PsyRhoAirFnPbTdbW(state,
                                       state.dataEnvrn->OutBaroPress,
                                       state.dataMstBal->TempOutsideAirFD(SurfNum),
-                                      Psychrometrics::PsyWFnTdbRhPb(
-                                          state, state.dataMstBal->TempOutsideAirFD(SurfNum), 1.0, state.dataEnvrn->OutBaroPress, RoutineNameOther)) +
+                                                                        Psychrometrics::PsyWFnTdbRhPb(state,
+                                                                                                      state.dataMstBal->TempOutsideAirFD(SurfNum),
+                                                                                                      1.0,
+                                                                                                      state.dataEnvrn->OutBaroPress,
+                                                                                                      RoutineNameOther)) +
                                   state.dataMstBal->RhoVaporAirOut(SurfNum)) *
                                  Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat));
                             state.dataMstBal->HSkyFD(SurfNum) = 0.0;
@@ -7409,7 +7417,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                         if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD ||
                             Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
                             // Set variables used in the FD moisture balance and HAMT
-                            state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataHeatBalSurf->SurfInsideTempHist(1)(Surface(SurfNum).ExtBoundCond);
+                                state.dataMstBal->TempOutsideAirFD(SurfNum) =
+                                    state.dataHeatBalSurf->SurfInsideTempHist(1)(Surface(SurfNum).ExtBoundCond);
                             state.dataMstBal->RhoVaporAirOut(SurfNum) = state.dataMstBal->RhoVaporAirIn(Surface(SurfNum).ExtBoundCond);
                             state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBalSurf->SurfHConvInt(Surface(SurfNum).ExtBoundCond);
                             state.dataMstBal->HMassConvExtFD(SurfNum) =
@@ -7432,7 +7441,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     // This ends the calculations for this surface and goes on to the next SurfNum
                 } break;
                 }
-
+                }
                 state.dataHeatBalSurf->SurfQdotConvOutPerArea(SurfNum) = GetQdotConvOutPerArea(state, SurfNum);
             }
         }
@@ -7718,6 +7727,12 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
             auto const &construct = state.dataConstruction->Construct(ConstrNum);
             Real64 const MAT_zone = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
             Real64 const HConvIn_surf = state.dataMstBal->HConvInFD(SurfNum) = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
+
+            if (state.dataSurface->SurfTInsideEMSOverrideOn(SurfNum)) {
+                state.dataHeatBalSurf->SurfTempInTmp(SurfNum) = state.dataSurface->SurfTInsideEMSOverrideValue(SurfNum);
+                state.dataHeatBalSurf->SurfTempIn(SurfNum) = state.dataSurface->SurfTInsideEMSOverrideValue(SurfNum);
+                continue;
+            }
 
             if (surface.ExtBoundCond == SurfNum) {
                 // CR6869 -- let Window HB take care of it      IF (Surface(SurfNum)%ExtBoundCond == SurfNum) THEN
@@ -8072,7 +8087,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                 // Zone diffuse interior shortwave reflected back into the TDD
 
             } else {                                                // Regular window
-                if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
+                     // if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
                     // Get outside convection coeff for exterior window here to avoid calling
                     // InitExteriorConvectionCoeff from CalcWindowHeatBalance, which avoids circular reference
                     // (HeatBalanceSurfaceManager USEing and WindowManager and
@@ -8154,7 +8169,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     Window::CalcWindowHeatBalance(
                         state, SurfNum, state.dataHeatBalSurf->SurfHConvExt(SurfNum), state.dataHeatBalSurf->SurfTempInTmp(SurfNum), TH11);
                     state.dataHeatBalSurf->SurfTempIn(SurfNum) = state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
-                }
+                //}
             }
         } // ...end of inside surface heat balance equation selection
 
@@ -8597,6 +8612,13 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                     //                                        IsNotAdiabatic*IsNotSource*construct.CTFCross[0]
                     //                                        * TH11) * TempDiv;
 
+                    if (state.dataSurface->SurfTInsideEMSOverrideOn(surfNum)) {
+                        // Is TempSurfInTmp important, or is it really temporary storage?
+                        state.dataHeatBalSurf->SurfTempInTmp(surfNum) = state.dataSurface->SurfTInsideEMSOverrideValue(surfNum);
+                        state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataSurface->SurfTInsideEMSOverrideValue(surfNum);
+                        continue;
+                    }
+
                     // Calculate the current inside surface temperature
                     state.dataHeatBalSurf->SurfTempInTmp(surfNum) =
                         ((!state.dataHeatBalSurf->SurfIsOperatingPool(surfNum)) *
@@ -8760,7 +8782,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                         // Net transmitted solar | Convection | IR exchange | IR
                         // Zone diffuse interior shortwave reflected back into the TDD
                     } else {                                                // Regular window
-                        if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
+                             // if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
                             // Get outside convection coeff for exterior window here to avoid calling
                             // InitExteriorConvectionCoeff from CalcWindowHeatBalance, which avoids circular reference
                             // (HeatBalanceSurfaceManager USEing and WindowManager and
@@ -8843,7 +8865,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                             Window::CalcWindowHeatBalance(
                                 state, surfNum, state.dataHeatBalSurf->SurfHConvExt(surfNum), state.dataHeatBalSurf->SurfTempInTmp(surfNum), TH11);
                             state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataHeatBalSurf->SurfTempInTmp(surfNum);
-                        }
+                        //}
                     }
                 }
 

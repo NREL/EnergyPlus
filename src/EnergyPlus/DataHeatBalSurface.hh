@@ -113,6 +113,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfHConvExt;         // Outside Convection Coefficient
     Array1D<Real64> SurfWinCoeffAdjRatio; // Convective Coefficient Adjustment Ratio assuming highly conductive frames
                                           // Only applicable for exterior window surfaces
+
     Array1D<Real64> SurfHAirExt;          // Outside Radiation Coefficient to Air
     Array1D<Real64> SurfHSkyExt;          // Outside Radiation Coefficient to Sky
     Array1D<Real64> SurfHGrdExt;          // Outside Radiation Coefficient to Ground
