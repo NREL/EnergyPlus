@@ -13709,10 +13709,10 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
                 this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction);
             CompEvaporatingCAPSpd(CounterCompSpdTemp) =
                 this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction);
+            Real64 PLR = Q_cond_req / (CompEvaporatingCAPSpd(CounterCompSpdTemp) / C_cap_operation + CompEvaporatingPWRSpd(CounterCompSpdTemp));
+            Q_evap_req = Q_cond_req - CompEvaporatingPWRSpd(CounterCompSpdTemp) * PLR;
 
-            Q_evap_req = Q_cond_req - CompEvaporatingPWRSpd(CounterCompSpdTemp);
-
-            if (Q_evap_req * C_cap_operation <= CompEvaporatingCAPSpd(CounterCompSpdTemp)) {
+            if (PLR <= 1.0) {
                 // Compressor speed stage CounterCompSpdTemp need not to be increased, finish Iteration DoName1
 
                 if (CounterCompSpdTemp > 1) {
@@ -13722,14 +13722,10 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
 
                     CompSpdActual = this->CompressorSpeed(CompSpdLB) + (this->CompressorSpeed(CompSpdUB) - this->CompressorSpeed(CompSpdLB)) /
                                                                            (CompEvaporatingCAPSpd(CompSpdUB) - CompEvaporatingCAPSpd(CompSpdLB)) *
-                                                                           (Q_evap_req * C_cap_operation - CompEvaporatingCAPSpd(CompSpdLB));
+                                                                           PLR;
 
                 } else {
-                    if (Q_evap_req < 0.0) { // use compressor power to meet condenser required load
-                        CompSpdActual = this->CompressorSpeed(1) * (Q_cond_req * C_cap_operation) / CompEvaporatingPWRSpd(1);
-                    } else {
-                        CompSpdActual = this->CompressorSpeed(1) * (Q_evap_req * C_cap_operation) / CompEvaporatingCAPSpd(1);
-                    }
+                    CompSpdActual = this->CompressorSpeed(1) * PLR;
                 }
 
                 break; // EXIT DoName1
