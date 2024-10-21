@@ -134,7 +134,8 @@ jobs:
       run: |
         set -x
         cmake -G "Visual Studio 16 2019" -A ${{ matrix.vs-generator }} \
-              -DLINK_WITH_PYTHON:BOOL=ON -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
+              -DLINK_WITH_PYTHON:BOOL=ON -DPYTHON_CLI:BOOL=ON \
+              -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }} \
               -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.arch }}/ \
               -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
               -DENABLE_HARDENED_RUNTIME:BOOL=${{ matrix.enable_hardened_runtime }} \

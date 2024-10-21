@@ -2667,27 +2667,27 @@ The fraction of glazing system area that is open on the front of the shading lay
 
 \paragraph{Field: Slat Width}\label{field-slat-width-1}
 
-The width (m) of the venetian slats.~ Used only for ShadingLayerType = Venetian.
+The width (m) of the venetian slats.~ Used only for ShadingLayerType = VenetianHorizontal or VenetianVertical.
 
 \paragraph{Field: Slat Spacing}\label{field-slat-spacing}
 
-The distance (m) between front sides of the venetian slats.~ Used only for ShadingLayerType = Venetian.
+The distance (m) between front sides of the venetian slats.~ Used only for ShadingLayerType = VenetianHorizontal or VenetianVertical.
 
 \paragraph{Field: Slat Thickness}\label{field-slat-thickness-1}
 
-The thickness (m) of the venetian slats.~ Used only for ShadingLayerType = Venetian.
+The thickness (m) of the venetian slats.~ Used only for ShadingLayerType = VenetianHorizontal or VenetianVertical.
 
 \paragraph{Field: Slat Angle}\label{field-slat-angle-1}
 
-The slat tilt angle (degrees) of the venetian slats.~ Used only for ShadingLayerType = Venetian.~ Range of slat angle is from -90 to 90 degrees.
+The slat tilt angle (degrees) of the venetian slats.~ Used only for ShadingLayerType = VenetianHorizontal or VenetianVertical.~ Range of slat angle is from -90 to 90 degrees.
 
 \paragraph{Field: Slat Conductivity}\label{field-slat-conductivity-1}
 
-The conductivity (W/mK) of the venetian slats.~ Used only for ShadingLayerType = Venetian.
+The conductivity (W/mK) of the venetian slats.~ Used only for ShadingLayerType = VenetianHorizontal or VenetianVertical.
 
 \paragraph{Field: Slat Curve}\label{field-slat-curve}
 
-The curvature radius (m) of the venetian slats.~ Setting this value to zero means there is no curvature in the slat (it is flat), while a non-zero value is the radius of the slat curve.~ This value cannot be smaller than Slat Width / 2.~ Used only for ShadingLayerType = Venetian.
+The curvature radius (m) of the venetian slats.~ Setting this value to zero means there is no curvature in the slat (it is flat), while a non-zero value is the radius of the slat curve.~ This value cannot be smaller than Slat Width / 2.~ Used only for ShadingLayerType = VenetianHorizontal or VenetianVertical.
 
 \begin{figure}[hbtp] % fig 18
 \centering
@@ -2695,13 +2695,13 @@ The curvature radius (m) of the venetian slats.~ Setting this value to zero mean
 \caption{Side view of horizontal venetian blind slats or top view of blinds with vertical slats.  Front face of slats is marked with red line. \protect \label{fig:side-view-of-horizontal-venetian-blind-slats}}
 \end{figure}
 
-An IDF example for ShadingLayerType = Venetian
+An IDF example for ShadingLayerType = VenetianHorizontal
 
 \begin{lstlisting}
 
 WindowMaterial:ComplexShade,       !- venetian blind layer
     Shade_30001_Layer,               !- name
-    Venetian,                        !- shading layer type
+    VenetianHorizontal,              !- shading layer type
     0.005,                           !- thickness
     160,                             !- layer conductivity
     0.0,                             !- IR transmittance

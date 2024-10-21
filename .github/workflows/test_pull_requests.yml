@@ -58,6 +58,7 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         brew update
+        brew install tcl-tk
         brew reinstall gcc@13
         echo "FC=$(brew --prefix gcc@13)/bin/gfortran-13" >> $GITHUB_ENV
         echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_dev_target }} >> $GITHUB_ENV
@@ -94,6 +95,7 @@ jobs:
         -DCMAKE_BUILD_TYPE:STRING=Release
         -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }}
         -DLINK_WITH_PYTHON:BOOL=ON
+        -DPYTHON_CLI:BOOL=ON
         -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }}
         -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/
         -DBUILD_TESTING:BOOL=ON
@@ -139,6 +141,7 @@ jobs:
         -DCMAKE_BUILD_TYPE:STRING=Release
         -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }}
         -DLINK_WITH_PYTHON:BOOL=ON
+        -DPYTHON_CLI:BOOL=ON
         -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }}
         -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/
         -DBUILD_TESTING:BOOL=ON

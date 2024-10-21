@@ -85,6 +85,8 @@ ctypes_import_file = os.path.abspath(ctypes.__file__)
 ctypes_package_dir = os.path.dirname(ctypes_import_file)
 standard_lib_dir = os.path.dirname(ctypes_package_dir)
 
+print(f"PYTHON: Analyzing standard library directory at {standard_lib_dir}") 
+
 if os.path.exists(target_dir):
     # Let's check the library files to see if the ABI matches
     # Otherwise if you build with say python 3.8 initially, and then switch to
@@ -122,7 +124,6 @@ if platform.system() == 'Windows':
     python_root_dir = os.path.dirname(standard_lib_dir)
     tcl_dir = os.path.join(python_root_dir, 'tcl')
     shutil.copytree(tcl_dir, target_dir, dirs_exist_ok=True)
-# TODO: Need to do this on Mac as well, see the bottom of cmake/PythonFixUpOnMac.cmake for more info
 
 # then I'm going to try to clean up any __pycache__ folders in the target dir to reduce installer size
 for root, dirs, _ in os.walk(target_dir):

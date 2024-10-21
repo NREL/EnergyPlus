@@ -2,7 +2,7 @@ name: Develop Branch Testing
 
 on:
   push:
-    branches: [ develop ]  # run this on all commits to the develop branch
+    branches: [ develop, fixPythonEngineBuild ]  # run this on all commits to the develop branch
 
 defaults:
   run:
@@ -58,13 +58,13 @@ jobs:
 #          nproc: 4
 #          pretty: "Standard Build on Windows VS 2022"
 #          alternate: false
-#        - os: ubuntu-24.04
-#          arch: x86_64
-#          python-arch: x64
-#          generator: "Unix Makefiles"
-#          nproc: 4
-#          pretty: "Alternate Build on Ubuntu 24.04"
-#          alternate: true
+        - os: ubuntu-24.04
+          arch: x86_64
+          python-arch: x64
+          generator: "Unix Makefiles"
+          nproc: 4
+          pretty: "Alternate Build on Ubuntu 24.04"
+          alternate: true
 
     steps:
 
@@ -106,6 +106,7 @@ jobs:
         -DCMAKE_BUILD_TYPE:STRING=Release
         -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${{ matrix.macos_dev_target }}
         -DLINK_WITH_PYTHON:BOOL=ON
+        -DPYTHON_CLI:BOOL=ON
         -DPython_REQUIRED_VERSION:STRING=${{ steps.setup-python.outputs.python-version }}
         -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/${{ matrix.python-arch }}/
         -DBUILD_TESTING:BOOL=ON

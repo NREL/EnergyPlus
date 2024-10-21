@@ -235,10 +235,7 @@ Built on Platform: {}
         app.add_flag("--debug-cli", debugCLI, "Print the result of the CLI assignments to the console and exit")->group(""); // Empty group to hide it
 
 #if LINK_WITH_PYTHON
-#if __APPLE__
-        // for now on Apple we are not providing the command line interface to EP-Launch due to packaging issues
-        // once that is fixed, this __APPLE__ block will be removed and we'll just have this on all platforms
-#else
+#ifdef PYTHON_CLI
         auto *auxiliaryToolsSubcommand = app.add_subcommand("auxiliary", "Run Auxiliary Python Tools");
         auxiliaryToolsSubcommand->require_subcommand(); // should default to requiring 1 or more additional args?
 
