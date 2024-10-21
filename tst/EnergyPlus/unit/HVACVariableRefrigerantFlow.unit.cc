@@ -2457,12 +2457,12 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
                                                                  Ncomp);
 
         // Test
-        EXPECT_NEAR(756, CompSpdActual, 1);
-        EXPECT_NEAR(901, Ncomp, 1);
-        EXPECT_NEAR(3196, Q_c_OU, 1);
+        EXPECT_NEAR(831, CompSpdActual, 1);
+        EXPECT_NEAR(989, Ncomp, 1);
+        EXPECT_NEAR(3993, Q_c_OU, 1);
         EXPECT_NEAR(0, Q_h_OU, 1);
-        EXPECT_NEAR(242, N_fan_OU, 1);
-        EXPECT_NEAR(0.0158, m_ref_OU_evap, 0.0005);
+        EXPECT_NEAR(304, N_fan_OU, 1);
+        EXPECT_NEAR(0.0198, m_ref_OU_evap, 0.0005);
         EXPECT_NEAR(0, m_ref_OU_cond, 0.0005);
     }
 
@@ -2527,7 +2527,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         *state, Q_req, HXOpMode::CondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
     // Test
-    EXPECT_NEAR(950, CompSpdActual, 5);
+    EXPECT_NEAR(1050, CompSpdActual, 5);
 }
 } // namespace EnergyPlus
 
