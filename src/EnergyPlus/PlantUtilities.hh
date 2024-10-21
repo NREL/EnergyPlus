@@ -210,18 +210,9 @@ namespace PlantUtilities {
     struct CriteriaData
     {
         // Members
-        int CallingCompLoopNum;                             // for debug error handling
-        DataPlant::LoopSideLocation CallingCompLoopSideNum; // for debug error handling
-        int CallingCompBranchNum;                           // for debug error handling
-        int CallingCompCompNum;                             // for debug error handling
-        Real64 ThisCriteriaCheckValue;                      // the previous value, to check the current against
-
-        // Default Constructor
-        CriteriaData()
-            : CallingCompLoopNum(0), CallingCompLoopSideNum(DataPlant::LoopSideLocation::Invalid), CallingCompBranchNum(0), CallingCompCompNum(0),
-              ThisCriteriaCheckValue(0.0)
-        {
-        }
+        int CallingCompLoopNum = 0;                                                                // for debug error handling
+        DataPlant::LoopSideLocation CallingCompLoopSideNum = DataPlant::LoopSideLocation::Invalid; // for debug error handling
+        Real64 ThisCriteriaCheckValue = 0.0;                                                       // the previous value, to check the current against
     };
 
 } // namespace PlantUtilities
