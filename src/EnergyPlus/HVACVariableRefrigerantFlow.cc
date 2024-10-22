@@ -13709,8 +13709,7 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
                 this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction);
             CompEvaporatingCAPSpd(CounterCompSpdTemp) =
                 this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction);
-            Real64 PLR = Q_cond_req / (CompEvaporatingCAPSpd(CounterCompSpdTemp) / C_cap_operation + CompEvaporatingPWRSpd(CounterCompSpdTemp));
-            Q_evap_req = Q_cond_req - CompEvaporatingPWRSpd(CounterCompSpdTemp) * PLR;
+            Real64 PLR = Q_cond_req / (CompEvaporatingCAPSpd(CounterCompSpdTemp) + CompEvaporatingPWRSpd(CounterCompSpdTemp));
 
             if (PLR <= 1.0) {
                 // Compressor speed stage CounterCompSpdTemp need not to be increased, finish Iteration DoName1
