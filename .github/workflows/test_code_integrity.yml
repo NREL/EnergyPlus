@@ -9,7 +9,7 @@ on:
 jobs:
   code_integrity_checks:
     name: Static Code Analysis
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -33,36 +33,7 @@ jobs:
 
       - name: Install cppcheck
         if: always()
-        run: |
-          mkdir cppcheck
-          cd cppcheck
-          wget https://github.com/danmar/cppcheck/archive/2.10.tar.gz
-          tar xfz 2.10.tar.gz
-          mkdir build
-          cd build
-          cmake -DCMAKE_BUILD_TYPE=Release ../cppcheck-2.10/
-          make -j $(nproc)
-          sudo make install
-          cd ..
-          rm -Rf cppcheck
-
-      - name: Cache cppcheck-build-directory
-        if: always()
-        id: cppcheckcache
-        uses: actions/cache@v4
-        with:
-          path: .cppcheck-build-dir/
-          key: cppcheckcache
-
-      - name: cppcheck-build-directory not found
-        # If the build cache wasn't found in the cache
-        if: always() && steps.cppcheckcache.outputs.cache-hit != 'true'
-        run: mkdir .cppcheck-build-dir
-
-      - name: cppcheck-build-directory was found
-        # If the build cache wasn't found in the cache
-        if: always() && steps.cppcheckcache.outputs.cache-hit == 'true'
-        run: ls .cppcheck-build-dir/ || true
+        run: sudo apt-get install cppcheck
 
       - name: Run CppCheck
         id: cpp_check_run
@@ -70,7 +41,6 @@ jobs:
         # TODO: Evaluate the long list of flags here
         run: >
           cppcheck
-          --cppcheck-build-dir=.cppcheck-build-dir
           -D__cppcheck__ -UEP_Count_Calls -DEP_NO_OPENGL -UGROUND_PLOT -DLINK_WITH_PYTHON -DMSVC_DEBUG -DSKYLINE_MATRIX_REMOVE_ZERO_COLUMNS -U_OPENMP -Ugeneratetestdata
           -DEP_cache_GlycolSpecificHeat -DEP_cache_PsyTsatFnPb -UEP_nocache_Psychrometrics -UEP_psych_errors -UEP_psych_stats
           --force

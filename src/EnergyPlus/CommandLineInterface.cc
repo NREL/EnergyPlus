@@ -235,6 +235,7 @@ Built on Platform: {}
         app.add_flag("--debug-cli", debugCLI, "Print the result of the CLI assignments to the console and exit")->group(""); // Empty group to hide it
 
 #if LINK_WITH_PYTHON
+#ifdef PYTHON_CLI
         auto *auxiliaryToolsSubcommand = app.add_subcommand("auxiliary", "Run Auxiliary Python Tools");
         auxiliaryToolsSubcommand->require_subcommand(); // should default to requiring 1 or more additional args?
 
@@ -282,6 +283,7 @@ main_gui()
             engine.exec(cmd);
             exit(0);
         });
+#endif
 #endif
 
         app.footer("Example: energyplus -w weather.epw -r input.idf");
