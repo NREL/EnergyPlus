@@ -3430,9 +3430,14 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                     max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
                         this->MaxAirVolFlowRate * this->ZoneTurndownMinAirFrac);
             } else {
-                TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
-                    max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
-                        this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
+                if (this->SysType_Num == SysType::SingleDuctVAVReheat && this->DamperHeatingAction == Action::ReverseWithLimits) {
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
+                        max(this->MaxAirVolFlowRateDuringReheat, this->MaxAirVolFlowRate * this->ZoneTurndownMinAirFrac);
+                } else {
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
+                        max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
+                            this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
+                }
             }
         } else {
             if (this->SysType_Num == SysType::SingleDuctVAVReheatVSFan) {
