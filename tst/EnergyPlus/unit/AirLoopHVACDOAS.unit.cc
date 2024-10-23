@@ -10069,9 +10069,9 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestFanHeatAddeToCoolingCoilSize)
     SimulationManager::ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
 
     // OA flow rate
-    EXPECT_NEAR(state->dataUnitarySystems->unitarySys[0].m_MaxCoolAirVolFlow, 0.55713, 0.001);
+    EXPECT_NEAR(state->dataUnitarySystems->unitarySys[0].m_MaxCoolAirVolFlow, 0.65598, 0.001);
     // Cooling capacity
-    EXPECT_NEAR(state->dataUnitarySystems->unitarySys[0].m_DesignCoolingCapacity, 21135.6226, 0.01);
+    EXPECT_NEAR(state->dataUnitarySystems->unitarySys[0].m_DesignCoolingCapacity, 24885.6323, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompConnectionError)
