@@ -104,9 +104,9 @@
 ! HTML Report:                    None
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
-Version,
-    24.2;                    !- Version Identifier
 
+Version,
+    25.1;                    !- Version Identifier
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
