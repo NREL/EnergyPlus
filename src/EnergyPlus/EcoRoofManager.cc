@@ -194,7 +194,7 @@ namespace EcoRoofManager {
         auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
         auto const *thisMaterial = state.dataMaterial->materials(thisConstruct.LayerPoint(1));
         RoughSurf = thisMaterial->Roughness;
-        Real64 AbsThermSurf = thisMaterial->AbsorpThermal; // Thermal absoptance of the exterior surface
+        Real64 AbsThermSurf = thisMaterial->AbsorpThermal; // Thermal absorptance of the exterior surface
         Real64 HMovInsul = 0.0;                            // "Convection" coefficient of movable insulation
 
         if (state.dataSurface->Surface(SurfNum).ExtWind) {
@@ -284,7 +284,7 @@ namespace EcoRoofManager {
             // (Deardorff (1987)). Kelvin. based of the previous temperatures
             Tafk = (1.0 - sigmaf) * Tak + sigmaf * (0.3 * Tak + 0.6 * (Tif + Constant::Kelvin) + 0.1 * Tgk);
 
-            Taf = Tafk - Constant::Kelvin;                          // Air Temperature within canopy in Celcius (C).
+            Taf = Tafk - Constant::Kelvin;                          // Air Temperature within canopy in Celsius (C).
             Rhof = state.dataEcoRoofMgr->Pa / (Rair * Tafk);        // Density of air at the leaf temperature
             Rhoaf = (Rhoa + Rhof) / 2.0;                            // Average of air density
             Zd = 0.701 * std::pow(state.dataEcoRoofMgr->Zf, 0.979); // Zero displacement height
@@ -316,7 +316,7 @@ namespace EcoRoofManager {
             ra = 1.0 / (Cf * Waf); // Aerodynamic Resistance. Resistance that is caused
             // by the boundary layer on a leaf surface to transfer water vapor. It is measured in
             // s/m and depends on wind speed, leaf's surface roughness,
-            // and stability of atsmophere.
+            // and stability of atmosphere.
 
             CalculateEcoRoofSolar(state, RS, f1, SurfNum);
             if (state.dataEcoRoofMgr->MoistureMax == state.dataEcoRoofMgr->MoistureResidual) {
@@ -525,9 +525,9 @@ namespace EcoRoofManager {
         thisEcoRoof->LAI = matER->LAI;                         // Leaf Area Index
         thisEcoRoof->Alphag = 1.0 - matER->AbsorpSolar;        // albedo rather than absorptivity
         thisEcoRoof->Alphaf = matER->Lreflectivity;            // Leaf Reflectivity
-        thisEcoRoof->epsilonf = matER->LEmissitivity;          // Leaf Emisivity
+        thisEcoRoof->epsilonf = matER->LEmissitivity;          // Leaf Emissivity
         thisEcoRoof->StomatalResistanceMin = matER->RStomata;  // Leaf min stomatal resistance
-        thisEcoRoof->epsilong = matER->AbsorpThermal;          // Soil Emisivity
+        thisEcoRoof->epsilong = matER->AbsorpThermal;          // Soil Emissivity
         thisEcoRoof->MoistureMax = matER->Porosity;            // Max moisture content in soil
         thisEcoRoof->MoistureResidual = matER->MinMoisture;    // Min moisture content in soil
         thisEcoRoof->Moisture = matER->InitMoisture;           // Initial moisture content in soil
@@ -886,7 +886,7 @@ namespace EcoRoofManager {
         // the water will simply run right off the top and not penetrate at all!
         // At the present time this limit is fairly small due to some minor stability issues
         // in EnergyPlus. If the moisture changes too rapidly the code cannot handle the rapid changes in
-        // surface characteristics and heat fluxes. The result that I've noticed is a non-physical fluctation
+        // surface characteristics and heat fluxes. The result that I've noticed is a non-physical fluctuation
         // in ground surface temperature that oscillates up to 10 deg C from one hour to the next until the
         // code catches up. The temporary solution is to simply limit how much moisture can enter the soil
         // in any time step to 0.5"/hour. In the future this might be fixed by running with finer time steps
@@ -913,12 +913,12 @@ namespace EcoRoofManager {
         if (matER->calcMethod == Material::EcoRoofCalcMethod::Simple) {
 
             // THE SECTION BELOW WAS THE INITIAL MOISTURE DISTRIBUTION MODEL.
-            // Any line with "!-" was code.  A line with "!" was just a comment.  This is done in case this code needs to be resurected in the future.
-            // See below this commented out code for the new moisture distribution model.
+            // Any line with "!-" was code.  A line with "!" was just a comment.  This is done in case this code needs to be resurrected in the
+            // future. See below this commented out code for the new moisture distribution model.
             //*********************************************************************************************************
             //*********************************************************************************************************
             // NEXT Redistribute moisture based on moisture diffusion.
-            // The effective diffusivities should be revisted when better moisture transport data in ecoroof soils are
+            // The effective diffusivities should be revisited when better moisture transport data in ecoroof soils are
             // available.
             // Here the diffusion rate is in units of [1/s]
             // A value of 0.0001 would be ~ 36% / hour
@@ -1072,7 +1072,7 @@ namespace EcoRoofManager {
         // Note wet soil absorptance is generally 25-50% higher than dry soil absorptance (assume linear)
         SoilAbsorpSolar = state.dataEcoRoofMgr->DryAbsorp +
                           (0.92 - state.dataEcoRoofMgr->DryAbsorp) * (Moisture - MoistureResidual) / (MoistureMax - MoistureResidual);
-        // Limit solar absorptivity to 95% so soil abledo is always above 5%
+        // Limit solar absorptivity to 95% so soil albedo is always above 5%
         if (SoilAbsorpSolar > 0.95) SoilAbsorpSolar = 0.95;
         // Limit solar absorptivity to greater than 20% so that albedo is always less than 80%
         if (SoilAbsorpSolar < 0.20) SoilAbsorpSolar = 0.20;

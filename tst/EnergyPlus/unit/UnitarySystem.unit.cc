@@ -21297,7 +21297,7 @@ ScheduleTypeLimits,
     percent;                 !- Unit Type
 
 Schedule:Constant,
-    Schedule_Constant_Humdifier,  !- Name
+    Schedule_Constant_Humidifier,  !- Name
     Percent,                      !- Schedule Type Limits Name
     0;                            !- Hourly Value
 
@@ -21324,7 +21324,7 @@ Schedule:Constant,
     state->dataZoneCtrls->HumidityControlZone(1).ControlName = "East Zone";
     state->dataZoneCtrls->HumidityControlZone(1).ZoneName = "East Zone";
     state->dataZoneCtrls->HumidityControlZone(1).ActualZoneNum = 1;
-    state->dataZoneCtrls->HumidityControlZone(1).HumidifyingSchedIndex = ScheduleManager::GetScheduleIndex(*state, "Schedule_Constant_Humdifier");
+    state->dataZoneCtrls->HumidityControlZone(1).HumidifyingSchedIndex = ScheduleManager::GetScheduleIndex(*state, "Schedule_Constant_Humidifier");
     state->dataZoneCtrls->HumidityControlZone(1).DehumidifyingSchedIndex =
         ScheduleManager::GetScheduleIndex(*state, "Schedule_Constant_Dehumidifier");
 

@@ -118,7 +118,7 @@ void ManageSizing(EnergyPlusData &state)
     //       DATE WRITTEN   December 2000
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine manages the sizing simulations (using design day condiions)
+    // This subroutine manages the sizing simulations (using design day conditions)
     // for zones, central air systems, and central plants and zone heating and cooling
 
     // METHODOLOGY EMPLOYED:
@@ -172,7 +172,7 @@ void ManageSizing(EnergyPlusData &state)
     GetZoneAirDistribution(state); // get zone air distribution objects
     GetZoneHVACSizing(state);      // get zone HVAC sizing object
     GetAirTerminalSizing(state);   // get air terminal sizing object
-    GetSizingParams(state);        // get the building level sizing paramets
+    GetSizingParams(state);        // get the building level sizing parameters
     GetZoneSizingInput(state);     // get the Zone Sizing input
     GetSystemSizingInput(state);   // get the System Sizing input
     GetPlantSizingInput(state);    // get the Plant Sizing input
@@ -988,7 +988,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                                                                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                             state.dataSize->VdzClgByZone(termUnitSizingIndex) =
                                 state.dataPowerInductionUnits->PIU(pIUATUNum)
-                                    .MaxPriAirVolFlow; // for Parallel PIU expect Fan off durign max cooling, so discharge is all primary
+                                    .MaxPriAirVolFlow; // for Parallel PIU expect Fan off during max cooling, so discharge is all primary
                             state.dataSize->VdzMinClgByZone(termUnitSizingIndex) =
                                 state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow +
@@ -1278,7 +1278,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             }
 
             // Fill Vps for cooling VRP calculation, use cooling design flow rate as adjusted in ManageSystemSizingAdjustments ( to use
-            // conincident sizing result if available for block air flow
+            // coincident sizing result if available for block air flow
             state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).DesCoolVolFlow;
 
             // Fill Vps for heating VRP calculation, use heating min by zone from air terminal scan in ManageSystemSizingAdjustments
@@ -1422,7 +1422,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             // redo VpzClgSumBySys( AirLoopNum ) with latest values, for reporting
             state.dataSize->VpzClgSumBySys(AirLoopNum) = 0.0;
             // Fill Vps for cooling VRP calculation, use cooling design flow rate as adjusted in ManageSystemSizingAdjustments ( to use
-            // conincident sizing result if available for block air flow
+            // coincident sizing result if available for block air flow
             state.dataSize->VpsClgBySys(AirLoopNum) = FinalSysSizing(AirLoopNum).DesCoolVolFlow;
             // Fill Vps for heating VRP calculation, use heating min by zone from air terminal scan in ManageSystemSizingAdjustments
             state.dataSize->VpsHtgBySys(AirLoopNum) = 0.0;
@@ -2119,7 +2119,7 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
                                 format("{:02}/{:02} {:02}:{:02}", Month, DayOfMonth, TimeHrsInt, TimeMinsInt);
                             state.dataSize->PeakPsOccurrenceEnvironmentStringBySys(AirLoopNum) = "Full Year Schedule";
                         }
-                    } // if autosizied and VRP
+                    } // if autosized and VRP
                 }     // air loops
             }
         }
@@ -3334,7 +3334,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                             ShowWarningError(
                                 state,
                                 format("{} = \"{}\", maximum value ({}%) of Zone Humidistat Humidification Set Point Schedule Name = {} is "
-                                       "greater than minimum value ({}%) of Zone Humidistat Dehumidifcation Set Point Schedule Name = {}. "
+                                       "greater than minimum value ({}%) of Zone Humidistat Dehumidification Set Point Schedule Name = {}. "
                                        "Humidification set point will be limited by Dehumidification set point during zone sizing and simulation "
                                        "continues.",
                                        cCurrentModuleObject,
@@ -3369,7 +3369,7 @@ void ReportTemperatureInputError(
                                      state.dataIPShortCut->rNumericArgs(paramNum - 2)));
             ShowContinueError(state, "This is not allowed.  Please check and revise your input.");
             ErrorsFound = true;
-        } else { // then input is lower than comparison tempeature--just produce a warning for user to check input
+        } else { // then input is lower than comparison temperature--just produce a warning for user to check input
             ShowWarningError(state, format("{}=\"{}\" has invalid data.", cObjectName, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state,
                               format("... incorrect {}=[{:.2R}] is less than [{:.2R}]",
@@ -4438,7 +4438,7 @@ void reportZoneSizingEio(EnergyPlusData &state,
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   Decenber 2001
+    //       DATE WRITTEN   December 2001
     //       MODIFIED       August 2008, Greg Stark
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -4613,12 +4613,12 @@ void GetZoneHVACSizing(EnergyPlusData &state)
     int iCoolCAPMAlphaNum;                      // get input index to Zone HVAC sizing chilled water flow method
     int iCoolDesignCapacityNumericNum;          // get input index to Zone HVAC sizing chilled water flow
     int iCoolCapacityPerFloorAreaNumericNum;    // get input index to Zone HVAC sizing cooling capacity per floor area
-    int iCoolFracOfAutosizedCapacityNumericNum; // get input index to Zone HVAC sizing capacity as fraction autozized cooling capacity
+    int iCoolFracOfAutosizedCapacityNumericNum; // get input index to Zone HVAC sizing capacity as fraction autosized cooling capacity
 
     int iHeatCAPMAlphaNum;                      // get input index to Zone HVAC sizing heating capacity
     int iHeatDesignCapacityNumericNum;          // get input index to Zone HVAC sizing heating design capacity
     int iHeatCapacityPerFloorAreaNumericNum;    // get input index to Zone HVAC sizing heating capacity per floor area
-    int iHeatFracOfAutosizedCapacityNumericNum; // get input index to Zone HVAC sizing capacity as fraction autozized cooling capacity
+    int iHeatFracOfAutosizedCapacityNumericNum; // get input index to Zone HVAC sizing capacity as fraction autosized cooling capacity
 
     iCoolSAFMAlphaNum = 2;               // get input index to Zone HVAC sizing heat supp air flow method
     iMaxCoolAirVolFlowNumericNum = 1;    // get input index to Zone HVAC sizing cool supply air flow
@@ -4646,7 +4646,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
     iHeatCAPMAlphaNum = 6;                       // get input index to Zone HVAC sizing heating capacity
     iHeatDesignCapacityNumericNum = 16;          // get input index to Zone HVAC sizing heating design capacity
     iHeatCapacityPerFloorAreaNumericNum = 17;    // get input index to Zone HVAC sizing heating capacity per floor area
-    iHeatFracOfAutosizedCapacityNumericNum = 18; // get input index to Zone HVAC sizing capacity as fraction autozized heating capacity
+    iHeatFracOfAutosizedCapacityNumericNum = 18; // get input index to Zone HVAC sizing capacity as fraction autosized heating capacity
 
     int NumAlphas;           // Number of Alphas for each GetObjectItem call
     int NumNumbers;          // Number of Numbers for each GetObjectItem call
@@ -5007,7 +5007,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(iNoCoolHeatFlowPerFracCoolNumericNum)));
                         ErrorsFound = true;
                     } else {
-                        // user input frcation of cooling supply air flow rate during no cooling or heating area is saved in
+                        // user input fraction of cooling supply air flow rate during no cooling or heating area is saved in
                         // ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     }
@@ -5037,7 +5037,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(iNoCoolHeatFlowPerFracHeatNumericNum)));
                         ErrorsFound = true;
                     } else {
-                        // user input frcation of heating supply air flow rate during no cooling or heating area is saved in
+                        // user input fraction of heating supply air flow rate during no cooling or heating area is saved in
                         // ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     }
@@ -5278,7 +5278,7 @@ void GetAirTerminalSizing(EnergyPlusData &state)
     }
 }
 
-// Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
+// Update the sizing for the entire facility to gather values for reporting - Glazer January 2017
 void UpdateFacilitySizing([[maybe_unused]] EnergyPlusData &state, Constant::CallIndicator const CallIndicator)
 {
     int NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;

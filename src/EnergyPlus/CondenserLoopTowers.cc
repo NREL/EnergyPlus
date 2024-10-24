@@ -591,7 +591,7 @@ namespace CondenserLoopTowers {
                                        cCurrentModuleObject,
                                        tower.Name,
                                        ". Tower Performance Input Method must be \"UFactorTimesAreaAndDesignWaterFlowRate\" or \"NominalCapacity\""));
-                ShowContinueError(state, format("Tower Performanace Input Method currently specified as: {}", AlphArray(4)));
+                ShowContinueError(state, format("Tower Performance Input Method currently specified as: {}", AlphArray(4)));
                 ErrorsFound = true;
             }
             if (NumAlphas > 12) {
@@ -988,7 +988,7 @@ namespace CondenserLoopTowers {
                            cCurrentModuleObject,
                            tower.Name,
                            R"(". Tower Performance Input Method must be "UFactorTimesAreaAndDesignWaterFlowRate" or "NominalCapacity".)"));
-                ShowContinueError(state, format("Tower Performanace Input Method currently specified as: {}", AlphArray(4)));
+                ShowContinueError(state, format("Tower Performance Input Method currently specified as: {}", AlphArray(4)));
                 ErrorsFound = true;
             }
             if (NumAlphas > 11) {
@@ -2398,7 +2398,7 @@ namespace CondenserLoopTowers {
         Real64 DesTowerExitWaterTemp;     // design tower exit water temperature
         Real64 DesTowerWaterDeltaT;       // design tower temperature range
         Real64 DesTowerApproachFromPlant; // design tower approach temperature from plant sizing object
-        Real64 TolTemp(0.04);             // DeltaT and DesApproach diffs tollerance between plant sizing data and user input in cooling tower
+        Real64 TolTemp(0.04);             // DeltaT and DesApproach diffs tolerance between plant sizing data and user input in cooling tower
         // for warning message reporting purpose only
 
         Real64 tmpDesignWaterFlowRate = this->DesignWaterFlowRate;
@@ -3429,7 +3429,7 @@ namespace CondenserLoopTowers {
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCTFCRange, this->Name, this->DesignRange);
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCTFCApproach, this->Name, this->DesignApproach);
             OutputReportPredefined::PreDefTableEntry(
-                state, state.dataOutRptPredefined->pdchCTFCDesFanPwr, this->Name, this->HighSpeedFanPower); // eqival to Design Fan Power?
+                state, state.dataOutRptPredefined->pdchCTFCDesFanPwr, this->Name, this->HighSpeedFanPower); // equivalent to Design Fan Power?
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCTFCDesInletAirWBT, this->Name, this->DesInletAirWBTemp);
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchCTFCDesWaterFlowRate, this->Name, this->DesignWaterFlowRate);
@@ -3518,7 +3518,7 @@ namespace CondenserLoopTowers {
         Real64 DesTowerExitWaterTemp;     // design tower exit water temperature
         Real64 DesTowerWaterDeltaT;       // design tower temperature range
         Real64 DesTowerApproachFromPlant; // design tower approach temperature from plant sizing object
-        Real64 TolTemp(0.04);             // DeltaT and DesApproach diffs tollerance between plant sizing data and user input in cooling tower
+        Real64 TolTemp(0.04);             // DeltaT and DesApproach diffs tolerance between plant sizing data and user input in cooling tower
         // for warning message reporting purpose only
 
         // Find the appropriate Plant Sizing object
@@ -3563,9 +3563,9 @@ namespace CondenserLoopTowers {
                                       format("is inconsistent with Design Loop Delta Temperature specified in Sizing:Plant object = {}.",
                                              PlantSizData(PltSizCondNum).PlantLoopName));
                     ShowContinueError(state, format("..The Design Range Temperature specified in tower is = {:.2T}", this->DesRange));
-                    ShowContinueError(state,
-                                      format("..The Design Loop Delta Temperature specified iin plant sizing data is = {:.2T}",
-                                             PlantSizData(PltSizCondNum).DeltaT));
+                    ShowContinueError(
+                        state,
+                        format("..The Design Loop Delta Temperature specified in plant sizing data is = {:.2T}", PlantSizData(PltSizCondNum).DeltaT));
                 }
                 // check if the tower approach is different from plant sizing data
                 DesTowerApproachFromPlant = PlantSizData(PltSizCondNum).ExitTemp - this->DesInletAirWBTemp;
@@ -3867,7 +3867,7 @@ namespace CondenserLoopTowers {
                 }
             }
 
-            // now calcuate UA values from nominal capacities and flow rates
+            // now calculate UA values from nominal capacities and flow rates
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 if (PltSizCondNum > 0) { // user has a plant sizing object
                     Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -4205,7 +4205,7 @@ namespace CondenserLoopTowers {
                         }
                     }
                 }
-                // now calcuate UA values from nominal capacities and flow rates
+                // now calculate UA values from nominal capacities and flow rates
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
@@ -4765,7 +4765,7 @@ namespace CondenserLoopTowers {
         }
 
         // Calculate bypass fraction since OWTLowerLimit < OutletWaterTemp < TempSetPoint.
-        // The iteraction ends when the numer of iteraction exceeds the limit or the difference
+        // The iteration ends when the number of iterations exceeds the limit or the difference
         //  between the new and old bypass fractions is less than the threshold.
         if (BypassFlag == 1) {
             // Inlet water temperature lower than setpoint, assume 100% bypass, tower fan off
@@ -4803,7 +4803,7 @@ namespace CondenserLoopTowers {
                                 this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(
                                     state, WaterMassFlowRatePerCell * (1.0 - BypassFraction2), AirFlowRate, UAdesign);
                                 if (this->OutletWaterTemp < OWTLowerLimit) {
-                                    // Use previous iteraction values
+                                    // Use previous iteration values
                                     BypassFraction2 = BypassFractionPrev;
                                     this->OutletWaterTemp = OutletWaterTempPrev;
                                 }
@@ -4867,7 +4867,7 @@ namespace CondenserLoopTowers {
         // Cyclic losses are neglected. The period of time required to meet the
         // leaving water temperature setpoint is used to determine the required
         // fan power and energy. Free convection regime is also modeled. This
-        // occures when the pump is operating and the fan is off. If free convection
+        // occurs when the pump is operating and the fan is off. If free convection
         // regime cooling is all that is required for a given time step, the leaving
         // water temperature is allowed to fall below the leaving water temperature
         // setpoint (free cooling). At times when the cooling tower fan is required,
@@ -5663,7 +5663,7 @@ namespace CondenserLoopTowers {
                 }
             }
 
-            // now rerun to get peformance with AirFlowRateRatio
+            // now rerun to get performance with AirFlowRateRatio
             AirFlowRatePerCell = this->airFlowRateRatio * this->HighSpeedAirFlowRate / this->NumCell;
 
             UAairflowAdjFac = Curve::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, this->airFlowRateRatio);
@@ -5983,7 +5983,7 @@ namespace CondenserLoopTowers {
         //   calculate end time of current time step
         Real64 CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
 
-        //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
+        //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
@@ -6207,7 +6207,7 @@ namespace CondenserLoopTowers {
         //                      A Flament, July 2010. Added multi-cell capability
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Collect tower water useage calculations for reuse by all the tower models.
+        // Collect tower water usage calculations for reuse by all the tower models.
 
         // REFERENCES:
         // Code for this routine started from VariableSpeedTower
@@ -6351,7 +6351,7 @@ namespace CondenserLoopTowers {
             state.dataGlobal->WarmupFlag)
             return;
 
-        // Check flow rate through tower and compare to design flow rate, show warning if greater than Design * Mulitplier
+        // Check flow rate through tower and compare to design flow rate, show warning if greater than Design * Multiplier
         if (state.dataLoopNodes->Node(this->WaterOutletNodeNum).MassFlowRate > this->DesWaterMassFlowRate * this->TowerMassFlowRateMultiplier) {
             ++this->HighMassFlowErrorCount;
             if (this->HighMassFlowErrorCount < 2) {

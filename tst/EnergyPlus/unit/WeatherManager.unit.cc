@@ -816,7 +816,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation)
 }
 
 // Test for https://github.com/NREL/EnergyPlus/issues/7550
-TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
+TEST_F(SQLiteFixture, DesignDay_EnthalpyAtMaxDB)
 {
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 

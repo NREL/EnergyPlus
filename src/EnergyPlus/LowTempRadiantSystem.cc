@@ -128,7 +128,7 @@ namespace LowTempRadiantSystem {
     // (b) constant flow, variable controlled temperature heating/cooling radiant
     // system; (c) electric resistance heating radiant system.  Systems (a) and
     // (b) are hydronic systems--one which varies hydronic flow as the key control
-    // paramter (a) and one which varies the inlet hydronic temperature while
+    // parameter (a) and one which varies the inlet hydronic temperature while
     // keeping the flow rate through the radiant system constant (b).  In system
     // (b), the injection rate from the main water loop is varied to obtain the
     // proper inlet temperature.
@@ -288,7 +288,7 @@ namespace LowTempRadiantSystem {
         int constexpr iHeatCapacityPerFloorAreaNumericNum(
             2); // get input index to Low Temperature Radiant system electric heating capacity per floor area sizing
         int constexpr iHeatFracOfAutosizedCapacityNumericNum(
-            3); //  get input index to Low Temperature Radiant system electric heating capacity sizing as fraction of autozized heating capacity
+            3); //  get input index to Low Temperature Radiant system electric heating capacity sizing as fraction of autosized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string CurrentModuleObject;       // for ease in getting objects
@@ -2535,14 +2535,14 @@ namespace LowTempRadiantSystem {
     {
         // Since this is only called when the operating mode is something other than "not operating",
         // the status from the previous system time step is what it did in the last or previous time step.
-        // So, we can update the last status of the system using this information before reseting things
+        // So, we can update the last status of the system using this information before resetting things
         // to "not operating".
         this->lastOperatingMode = this->OperatingMode;
 
         if (state.dataGlobal->BeginDayFlag) {
             // The begin day flag is set which mean this is the first time step of the day.
             // This also means that the previous time step was the last time step of yesterday.
-            // So, the day should be the previous day, the hour should bethe last hour of the
+            // So, the day should be the previous day, the hour should be the last hour of the
             // day, and the time step should be the last time step.
             this->lastDayOfSim = state.dataGlobal->DayOfSim - 1;
             this->lastHourOfDay = int(Constant::HoursInDay);
@@ -2659,12 +2659,12 @@ namespace LowTempRadiantSystem {
         Real64 rho;
         Real64 Cp;
         bool IsAutoSize(false);              // Indicator to autosize
-        Real64 WaterVolFlowMaxHeatDes(0.0);  // Design hot water flow for reproting
+        Real64 WaterVolFlowMaxHeatDes(0.0);  // Design hot water flow for reporting
         Real64 WaterVolFlowMaxHeatUser(0.0); // User hard-sized hot water flow for
-        Real64 WaterVolFlowMaxCoolDes(0.0);  // Design chilled water flow for reproting
-        Real64 WaterVolFlowMaxCoolUser(0.0); // User hard-sized chilled water flow for reproting
-        Real64 TubeLengthDes(0.0);           // Design tube length for reproting
-        Real64 TubeLengthUser(0.0);          // User hard-sized tube length for reproting
+        Real64 WaterVolFlowMaxCoolDes(0.0);  // Design chilled water flow for reporting
+        Real64 WaterVolFlowMaxCoolUser(0.0); // User hard-sized chilled water flow for reporting
+        Real64 TubeLengthDes(0.0);           // Design tube length for reporting
+        Real64 TubeLengthUser(0.0);          // User hard-sized tube length for reporting
         std::string CompName;                // component name
         std::string CompType;                // component type
         std::string SizingString;            // input field sizing description (e.g., Nominal Capacity)
@@ -2674,8 +2674,8 @@ namespace LowTempRadiantSystem {
         int CapSizingMethod;        // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                     // FractionOfAutosizedHeatingCapacity )
         Real64 DesCoilLoad;         // design autosized or user specified capacity
-        Real64 WaterVolFlowMaxDes;  // Design water volume flow rate for reproting
-        Real64 WaterVolFlowMaxUser; // User hard-sized water volume flow rate for reproting
+        Real64 WaterVolFlowMaxDes;  // Design water volume flow rate for reporting
+        Real64 WaterVolFlowMaxUser; // User hard-sized water volume flow rate for reporting
 
         DesCoilLoad = 0.0;
         state.dataSize->DataScalableCapSizingON = false;

@@ -425,7 +425,7 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
     // Sign convention: SysOutputProvided <0 Supply air is heated on entering zone (zone is cooled)
     //                  SysOutputProvided >0 Supply air is cooled on entering zone (zone is heated)
     if (!state.dataZoneEnergyDemand->DeadBandOrSetback(zoneNum) && std::abs(zsEnergyDemand.RemainingOutputRequired) > HVAC::SmallLoad) {
-        // Determine design supply air temperture and design supply air temperature difference
+        // Determine design supply air temperature and design supply air temperature difference
         if (zsEnergyDemand.RemainingOutputRequired < 0.0) { // Cooling case
             // If the user specify the design cooling supply air temperature, then
             if (zsCalcSizing.ZnCoolDgnSAMethod == SupplyAirTemperature) {

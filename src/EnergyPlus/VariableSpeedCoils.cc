@@ -845,7 +845,7 @@ namespace VariableSpeedCoils {
                                 OutputProcessor::Group::HVAC,
                                 OutputProcessor::EndUseCat::CoolingCoils);
 
-            // for table output, being consistent with outher water-to-air coils
+            // for table output, being consistent with other water-to-air coils
             //        IF (VarSpeedCoil(DXCoilNum)%RatedCapCoolTotal /= AutoSize) THEN
             //            VarSpeedCoil(DXCoilNum)%RatedCapCoolSens = VarSpeedCoil(DXCoilNum)%RatedCapCoolTotal &
             //                *VarSpeedCoil(DXCoilNum)%MSRatedSHR(VarSpeedCoil(DXCoilNum)%NormSpedLevel)
@@ -4041,7 +4041,7 @@ namespace VariableSpeedCoils {
                     //                                           VarSpeedCoil(DXCoilNum)%MSRatedAirMassFlowRate(Mode), &
                     //                           VarSpeedCoil(DXCoilNum)%MSRatedSHR(Mode))
                 }
-                // call coil model with everthing set at rating point
+                // call coil model with everything set at rating point
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = RatedInletAirTemp;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, RatedInletAirTemp, RatedInletWetBulbTemp, DataEnvironment::StdPressureSeaLevel);

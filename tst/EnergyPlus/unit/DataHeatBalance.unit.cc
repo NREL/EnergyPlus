@@ -873,7 +873,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     state->dataConstruction->Construct(4).LayerPoint(3) = 6; // window blind
     state->dataConstruction->Construct(4).LayerPoint(4) = 5; // air gap
     state->dataConstruction->Construct(4).LayerPoint(5) = 4; // glass
-    // updated contruction and material layers data
+    // updated construction and material layers data
     EXPECT_EQ(state->dataConstruction->Construct(4).TotLayers, 5);      // outer glass, air gap, blind, air gap, inner glass
     EXPECT_EQ(state->dataConstruction->Construct(4).TotGlassLayers, 2); // outer glass, inner glass
     EXPECT_EQ(state->dataConstruction->Construct(4).TotSolidLayers, 3); // glass, blind, glass

@@ -806,7 +806,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
             state, this->reportLoadSideMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
         PlantUtilities::SetComponentFlowRate(
             state, this->reportSourceSideMassFlowRate, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, this->SourcePlantLoc);
-        // if there's no flowin one, turn the entire "heat pump off"
+        // if there's no flowing one, turn the entire "heat pump off"
         if (this->reportLoadSideMassFlowRate <= 0.0 || this->reportSourceSideMassFlowRate <= 0.0) {
 
             this->reportLoadSideMassFlowRate = 0.0;
@@ -1565,7 +1565,7 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
     //       RE-ENGINEERED
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This routine simulate the heat pump peformance in cooling mode
+    // This routine simulate the heat pump performance in cooling mode
 
     // REFERENCES:
     // (1) Tang,C.C.. 2005. Modeling Packaged Heat Pumps in a Quasi-Steady
@@ -1731,7 +1731,7 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
     //       RE-ENGINEERED
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This routine simulate the heat pump peformance in heating mode
+    // This routine simulate the heat pump performance in heating mode
 
     // REFERENCES:
     // (1) Tang,C.C.. 2005. Modeling Packaged Heat Pumps in a Quasi-Steady

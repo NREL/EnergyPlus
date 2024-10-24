@@ -2621,7 +2621,7 @@ namespace UnitarySystems {
 
             // mine capacity from Coil:Cooling:DX object
             auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex];
-            // TODO: Determine operating mode based on dehumdification stuff, using normalMode for now
+            // TODO: Determine operating mode based on dehumidification stuff, using normalMode for now
             if (this->m_NumOfSpeedCooling != (int)newCoil.performance.normalMode.speeds.size()) {
                 ShowWarningError(state, format("{}: {} = {}", RoutineName, CompType, CompName));
                 ShowContinueError(state, "Number of cooling speeds does not match coil object.");
@@ -6946,7 +6946,7 @@ namespace UnitarySystems {
 
                 std::string const &thisObjectName = Util::makeUPPER(instance.key());
                 // only get the current data once all data has been read in and vector unitarySys has been initialized
-                // when UnitarySystems::getInputOnceFlag is true read all unitary systems, otherwise read just the curren object
+                // when UnitarySystems::getInputOnceFlag is true read all unitary systems, otherwise read just the current object
                 if (!Util::SameString(objectName, thisObjectName) && !state.dataUnitarySystems->getInputOnceFlag) continue;
 
                 int sysNum = getUnitarySystemIndex(state, thisObjectName);
@@ -7072,7 +7072,7 @@ namespace UnitarySystems {
 
                     std::string const &thisObjectName = Util::makeUPPER(instance.key());
                     // only get the current data once all data has been read in and vector unitarySys has been initialized
-                    // when UnitarySystems::getInputOnceFlag is true read all unitary systems, otherwise read just the curren object
+                    // when UnitarySystems::getInputOnceFlag is true read all unitary systems, otherwise read just the current object
                     if (!Util::SameString(objectName, thisObjectName) && !state.dataUnitarySystems->getInputOnceFlag) continue;
 
                     int sysNum = getUnitarySystemIndex(state, thisObjectName);
@@ -7387,7 +7387,7 @@ namespace UnitarySystems {
 
                 std::string const &thisObjectName = Util::makeUPPER(instance.key());
                 // only get the current data once all data has been read in and vector unitarySys has been initialized
-                // when UnitarySystems::getInputOnceFlag is true read all unitary systems, otherwise read just the curren object
+                // when UnitarySystems::getInputOnceFlag is true read all unitary systems, otherwise read just the current object
                 if (!Util::SameString(objectName, thisObjectName) && !state.dataUnitarySystems->getInputOnceFlag) continue;
 
                 int sysNum = getUnitarySystemIndex(state, thisObjectName);
@@ -7676,7 +7676,7 @@ namespace UnitarySystems {
                                                 Real64 const OAUCoilOutTemp,      // the coil inlet temperature of OutdoorAirUnit
                                                 bool HXUnitOn,                    // Flag to control HX for HXAssisted Cooling Coil
                                                 Real64 &sysOutputProvided,        // system sensible output at supply air node
-                                                Real64 &latOutputProvided         // sytsem latent output at supply air node
+                                                Real64 &latOutputProvided         // system latent output at supply air node
     )
     {
 
@@ -8118,7 +8118,7 @@ namespace UnitarySystems {
                 if (this->m_EMSOverrideSensZoneLoadRequest) ZoneLoad = this->m_EMSSensibleZoneLoadValue;
                 if (this->m_EMSOverrideMoistZoneLoadRequest) state.dataUnitarySystems->MoistureLoad = this->m_EMSMoistureZoneLoadValue;
 
-                this->m_SimASHRAEModel = false; // flag used to envoke ASHRAE 90.1 model calculations
+                this->m_SimASHRAEModel = false; // flag used to invoke ASHRAE 90.1 model calculations
                 // allows non-ASHSRAE compliant coil types to be modeled using non-ASHAR90 method. Constant fan operating mode is required.
                 if (this->m_FanOpMode == HVAC::FanOp::Continuous) {
                     if (state.dataUnitarySystems->CoolingLoad) {
@@ -10140,7 +10140,7 @@ namespace UnitarySystems {
             this->m_LatLoadLoss = 0.0;
         }
 
-        // Calcuate air distribution losses
+        // Calculate air distribution losses
         if (!FirstHVACIteration && state.afn->AirflowNetworkFanActivated) {
             Real64 DeltaMassRate = 0.0;
             Real64 TotalOutput = 0.0;         // total output rate, {W}
@@ -10426,10 +10426,10 @@ namespace UnitarySystems {
         }
         if (!this->m_RunOnLatentLoad) state.dataUnitarySystems->MoistureLoad = 0.0;
 
-        // Testing heat pump air to air with RH control with CoolReheat dehumidifaction control showed that when there was heating
+        // Testing heat pump air to air with RH control with CoolReheat dehumidification control showed that when there was heating
         // and moisture load, the cooling coil was turning on to meet the moisture load and reheat was then turning on to meet both
         // heating load and excess cooling load caused by cooling coil. Adding the logic below caused the zone temperature,
-        // relative humidity, cooling/heating rate to line up for both the orignal and new file with unitary system object.
+        // relative humidity, cooling/heating rate to line up for both the original and new file with unitary system object.
 
         if (this->m_SuppCoilExists) {
             if (this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
@@ -10551,7 +10551,7 @@ namespace UnitarySystems {
                     if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP ||
                         this->m_sysType == SysType::PackagedWSHP) {
                         state.dataUnitarySystems->OACompOnMassFlow = this->m_HeatOutAirMassFlow;
-                        // does this assume OA flow <= min speed flow? wihtout this there are SolveRoot failures.
+                        // does this assume OA flow <= min speed flow? without this there are SolveRoot failures.
                         if (HeatSpeedNum > 1) {
                             state.dataUnitarySystems->OACompOffMassFlow = this->m_HeatOutAirMassFlow;
                         }
@@ -11049,7 +11049,7 @@ namespace UnitarySystems {
         }
 
         // BEGIN - refactor/move this to Init during FirstHVACIteration, need struct or module level global for turnFansOn and turnFansOff
-        // If the unitary system is scheduled on or nightime cycle overrides fan schedule. Uses same logic as fan.
+        // If the unitary system is scheduled on or nighttime cycle overrides fan schedule. Uses same logic as fan.
         FanOn = (this->m_FanExists) ? ScheduleManager::GetCurrentScheduleValue(state, this->m_FanAvailSchedPtr) > 0 : true;
         // END - move this to Init during FirstHVACIteration
 
@@ -12264,7 +12264,7 @@ namespace UnitarySystems {
             // Multimode coil will switch to enhanced dehumidification IF available and needed, but it
             // still runs to meet the sensible load. Multimode applies to Multimode or HXAssistedCooling coils.
             if ((SensibleLoad && this->m_RunOnSensibleLoad) || (LatentLoad && this->m_RunOnLatentLoad)) {
-                // calculate sensible PLR, don't care IF latent is true here but need to gaurd for
+                // calculate sensible PLR, don't care IF latent is true here but need to guard for
                 // when LatentLoad=TRUE and SensibleLoad=FALSE
                 ReqOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
                             Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DesOutTemp,

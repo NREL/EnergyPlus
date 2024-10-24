@@ -67,7 +67,7 @@ TEST_F(EnergyPlusFixture, XingGroundTempsModelTest)
         "	1.08,			!- Soil Thermal Conductivity {W/m-K}",
         "	962,			!- Soil Density {kg/m3}",
         "	2576,			!- Soil Specific Heat {J/kg-K}",
-        "	11.1,			!- Average Soil Surface Tempeature {C}",
+        "	11.1,			!- Average Soil Surface Temperature {C}",
         "	13.4,			!- Soil Surface Temperature Amplitude 1 {deltaC}",
         "	0.7,			!- Soil Surface Temperature Amplitude 2 {deltaC}",
         "	25,			!- Phase Shift of Temperature Amplitude 1 {days}",

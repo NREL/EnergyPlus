@@ -170,7 +170,7 @@ namespace GeneratorDynamicsManager {
         // Control decision results include:
         //     -- electrical load allowed/resulting/provided
         //     -- new operating mode
-        //     -- part load this timestep for shift to normal mode occuring midway in timestep
+        //     -- part load this timestep for shift to normal mode occurring midway in timestep
         //     -- part load this timestep for shift out of cool down mode
 
         // Input data used to make control decisions include:
@@ -527,7 +527,7 @@ namespace GeneratorDynamicsManager {
 
                         newOpMode = DataGenerators::OperatingMode::Standby;
                     }
-                } else { // not mandetory cool donw
+                } else { // not mandatory cool down
                     // likely to go into warm up but if no warm up then back to normal
                     if (thisGen.WarmUpByTimeDelay) {
                         if (thisGen.StartUpTimeDelay == 0.0) {
@@ -747,7 +747,7 @@ namespace GeneratorDynamicsManager {
         // common place to figure flow rates with internal flow control
 
         // METHODOLOGY EMPLOYED:
-        // apply contraints imposed by plant according to flow lock, first HVAC iteration etc.
+        // apply constraints imposed by plant according to flow lock, first HVAC iteration etc.
 
         // Return value
         Real64 FuncDetermineCWMdotForInternalFlowControl;

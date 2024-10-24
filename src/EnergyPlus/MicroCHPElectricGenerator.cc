@@ -266,7 +266,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
         }
 
         if (!(allocated(state.dataCHPElectGen->MicroCHP))) {
-            state.dataCHPElectGen->MicroCHP.allocate(state.dataCHPElectGen->NumMicroCHPs); // inits handeled in derived type definitions
+            state.dataCHPElectGen->MicroCHP.allocate(state.dataCHPElectGen->NumMicroCHPs); // inits handled in derived type definitions
         }
 
         // load in Micro CHPs
@@ -884,7 +884,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
     Real64 ThermEff = 0.0;
 
     switch (CurrentOpMode) {
-    case DataGenerators::OperatingMode::Off: { // same as standby in model spec but no Pnet standby electicity losses.
+    case DataGenerators::OperatingMode::Off: { // same as standby in model spec but no Pnet standby electricity losses.
 
         Qgenss = 0.0;
         TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp; // C
@@ -959,7 +959,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                 NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
                 Qgross = NdotFuel * (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0);
 
-                for (int i = 1; i <= 20; ++i) { // iterating here  could add use of seach method
+                for (int i = 1; i <= 20; ++i) { // iterating here  could add use of search method
                     Pnetss = Qgross * ElecEff;
                     if (this->A42Model.InternalFlowControl) {
                         MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(state, this->DynamicsControlID, Pnetss, TcwIn);
@@ -1066,7 +1066,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
             Qgross = NdotFuel * (state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000.0 * 1000.0);
 
-            for (int i = 1; i <= 20; ++i) { // iterating here,  could add use of seach method error signal
+            for (int i = 1; i <= 20; ++i) { // iterating here,  could add use of search method error signal
                 Pnetss = Qgross * ElecEff;
                 if (this->A42Model.InternalFlowControl) {
                     MdotCW = GeneratorDynamicsManager::FuncDetermineCWMdotForInternalFlowControl(state, this->DynamicsControlID, Pnetss, TcwIn);
@@ -1219,7 +1219,7 @@ Real64 FuncDetermineEngineTemp(Real64 const TcwOut,   // hot water leaving temp
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
-    // Calculate engine temperaure,
+    // Calculate engine temperature,
 
     // METHODOLOGY EMPLOYED:
     // model is dynamic in that previous condition affects current timestep
@@ -1248,7 +1248,7 @@ Real64 FuncDetermineCoolantWaterExitTemp(Real64 const TcwIn,      // hot water i
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
-    // Calculate coolan water leaving temperaure,
+    // Calculate coolant water leaving temperature,
 
     // METHODOLOGY EMPLOYED:
     // model is dynamic in that previous condition affects current timestep

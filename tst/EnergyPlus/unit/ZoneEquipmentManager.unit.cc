@@ -1311,7 +1311,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     // Set up capacities for PLR calcs
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad = 4000;
-    // For finalzonesizing, desing cooling load is positive
+    // For finalzonesizing, design cooling load is positive
     state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad = 2500;
     auto &thisZEqList(state->dataZoneEquip->ZoneEquipList(ZoneNum));
     thisZEqList.HeatingCapacity(1) = 2000.0;
@@ -1533,7 +1533,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     // Set up capacities for PLR calcs
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad = 4000;
-    // For finalzonesizing, desing cooling load is positive
+    // For finalzonesizing, design cooling load is positive
     state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad = 2500;
     auto &thisZEqList(state->dataZoneEquip->ZoneEquipList(ZoneNum));
     thisZEqList.HeatingCapacity(1) = 2000.0;
