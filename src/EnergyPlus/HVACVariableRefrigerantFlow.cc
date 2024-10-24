@@ -14135,7 +14135,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                                                            T_suction + 8,
                                                            T_discharge - 5);
 
-                Cap_Eva0 = (TU_load + Pipe_Q) * C_cap_operation; // New Pipe_Q & C_cap_operation
+                Cap_Eva0 = TU_load + Pipe_Q; // New Pipe_Q & C_cap_operation
                 Cap_Eva1 = this->CoffEvapCap * this->RatedEvapCapacity *
                            CurveValue(state, this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction); // New Tc
                 CapDiff = std::abs(Cap_Eva1 - Cap_Eva0);
@@ -14336,7 +14336,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                                                            T_suction + 8,
                                                            IUMaxCondTemp - 5);
 
-                Cap_Eva0 = Q_evap_req * C_cap_operation;
+                Cap_Eva0 = Q_evap_req;
                 Cap_Eva1 =
                     this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction);
                 CapDiff = std::abs(Cap_Eva1 - Cap_Eva0);
