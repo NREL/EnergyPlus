@@ -2881,6 +2881,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfFluidCtrlHR.RatedCompPower = thisVrfFluidCtrlHR.RatedCompPowerPerCapcity * thisVrfFluidCtrlHR.RatedEvapCapacity;
         thisVrfFluidCtrlHR.CoolingCapacity = thisVrfFluidCtrlHR.RatedEvapCapacity;
         thisVrfFluidCtrlHR.HeatingCapacity = thisVrfFluidCtrlHR.RatedEvapCapacity * (1 + thisVrfFluidCtrlHR.RatedCompPowerPerCapcity);
+        thisVrfFluidCtrlHR.RatedHeatCapacity = thisVrfFluidCtrlHR.HeatingCapacity;
 
         // Reference system COP
         thisVrfFluidCtrlHR.CoolingCOP = 1 / thisVrfFluidCtrlHR.RatedCompPowerPerCapcity;
@@ -13702,33 +13703,30 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
 
         Q_cond_req = Q_req;
 
-        for (CounterCompSpdTemp = 1; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++) {
-            // Iteration to find the VRF speed that can meet the required load, Iteration DoName1
-
-            CompEvaporatingPWRSpd(CounterCompSpdTemp) =
-                this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction);
-            CompEvaporatingCAPSpd(CounterCompSpdTemp) =
-                this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction);
-
-            Q_evap_req = Q_cond_req - CompEvaporatingPWRSpd(CounterCompSpdTemp);
-
-            if (Q_evap_req * C_cap_operation <= CompEvaporatingCAPSpd(CounterCompSpdTemp)) {
-                // Compressor speed stage CounterCompSpdTemp need not to be increased, finish Iteration DoName1
-
-                if (CounterCompSpdTemp > 1) {
-
-                    CompSpdLB = CounterCompSpdTemp - 1;
-                    CompSpdUB = CounterCompSpdTemp;
-
-                    CompSpdActual = this->CompressorSpeed(CompSpdLB) + (this->CompressorSpeed(CompSpdUB) - this->CompressorSpeed(CompSpdLB)) /
-                                                                           (CompEvaporatingCAPSpd(CompSpdUB) - CompEvaporatingCAPSpd(CompSpdLB)) *
-                                                                           (Q_evap_req * C_cap_operation - CompEvaporatingCAPSpd(CompSpdLB));
-
-                } else {
-                    CompSpdActual = this->CompressorSpeed(1) * (Q_evap_req * C_cap_operation) / CompEvaporatingCAPSpd(1);
+        CounterCompSpdTemp = 1;
+        CompEvaporatingPWRSpd(1) = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(1), T_discharge, T_suction);
+        CompEvaporatingCAPSpd(1) = this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(1), T_discharge, T_suction);
+        Real64 r = (Q_cond_req * C_cap_operation) / (CompEvaporatingCAPSpd(1) + CompEvaporatingPWRSpd(1) * C_cap_operation);
+        if (r < 1.0) {
+            CompSpdActual = this->CompressorSpeed(1) * r;
+            Q_evap_req = Q_cond_req - CompEvaporatingPWRSpd(1) * r;
+        } else {
+            for (CounterCompSpdTemp = 2; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++) {
+                CompEvaporatingPWRSpd(CounterCompSpdTemp) =
+                    this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction);
+                CompEvaporatingCAPSpd(CounterCompSpdTemp) =
+                    this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction);
+                CompSpdLB = CounterCompSpdTemp - 1;
+                CompSpdUB = CounterCompSpdTemp;
+                Real64 deltaCAP = CompEvaporatingCAPSpd(CompSpdUB) - CompEvaporatingCAPSpd(CompSpdLB);
+                Real64 deltaPWR = CompEvaporatingPWRSpd(CompSpdUB) - CompEvaporatingPWRSpd(CompSpdLB);
+                Real64 r = ((Q_cond_req - CompEvaporatingPWRSpd(CompSpdLB)) * C_cap_operation - CompEvaporatingCAPSpd(CompSpdLB)) /
+                           (deltaCAP + deltaPWR * C_cap_operation);
+                if (r < 1.0) {
+                    CompSpdActual = this->CompressorSpeed(CompSpdLB) + (this->CompressorSpeed(CompSpdUB) - this->CompressorSpeed(CompSpdLB)) * r;
+                    Q_evap_req = Q_cond_req - deltaPWR * r - CompEvaporatingPWRSpd(CompSpdLB);
+                    break;
                 }
-
-                break; // EXIT DoName1
             }
         } // End: Iteration DoName1
 
@@ -13740,13 +13738,13 @@ void VRFCondenserEquipment::VRFOU_CompSpd(
 
 void VRFCondenserEquipment::VRFOU_CompCap(
     EnergyPlusData &state,
-    int const CompSpdActual,   // Given compressor speed
-    Real64 const T_suction,    // Compressor suction temperature Te' [C]
-    Real64 const T_discharge,  // Compressor discharge temperature Tc' [C]
-    Real64 const h_IU_evap_in, // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-    Real64 const h_comp_in,    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-    Real64 &Q_c_tot,           // Compressor evaporative capacity [W]
-    Real64 &Ncomp              // Compressor power [W]
+    Real64 const CompSpdActual, // Given compressor speed
+    Real64 const T_suction,     // Compressor suction temperature Te' [C]
+    Real64 const T_discharge,   // Compressor discharge temperature Tc' [C]
+    Real64 const h_IU_evap_in,  // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 const h_comp_in,     // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 &Q_c_tot,            // Compressor evaporative capacity [W]
+    Real64 &Ncomp               // Compressor power [W]
 )
 {
 
