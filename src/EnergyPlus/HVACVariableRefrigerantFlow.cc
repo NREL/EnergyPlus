@@ -1192,10 +1192,9 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
 
         vrf.ElecHeatingPower =
             (vrf.RatedHeatingPower * TotHeatCapTempModFac) * TotHeatEIRTempModFac * EIRFPLRModFac * HREIRAdjustment * VRFRTF * InputPowerMultiplier;
-
-        // adjust defrost power based on heating RTF
-        vrf.DefrostPower *= VRFRTF;
     }
+    // adjust defrost power based on RTF
+    vrf.DefrostPower *= VRFRTF;
     vrf.VRFCondRTF = VRFRTF;
 
     // calculate crankcase heater power
@@ -11592,7 +11591,8 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
         Tdischarge = this->refrig->getSatTemperature(state, max(min(Pdischarge, RefPHigh), RefPLow), RoutineName);
 
         // Evaporative capacity ranges_Min
-        CapMinPe = min(Pdischarge - this->CompMaxDeltaP, RefMinPe);
+        // suction pressure lower bound need to be no less than both terms in the following
+        CapMinPe = max(Pdischarge - this->CompMaxDeltaP, RefMinPe);
         CapMinTe = this->refrig->getSatTemperature(state, max(min(CapMinPe, RefPHigh), RefPLow), RoutineName);
         CompEvaporatingCAPSpdMin = this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(1), Tdischarge, CapMinTe);
         CompEvaporatingPWRSpdMin = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(1), Tdischarge, CapMinTe);
@@ -11664,8 +11664,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
                                   Tdischarge,
                                   h_IU_cond_out_ave,
                                   this->IUCondensingTemp,
-                                  // Te can't be smaller than user input lower bound
-                                  max(this->IUEvapTempLow, CapMinTe),
+                                  CapMinTe,
                                   Tfs,
                                   Pipe_Q_h,
                                   Q_c_OU,
@@ -11697,7 +11696,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
         }
 
         // Key outputs of this subroutine
-        Ncomp *= CyclingRatio;
         Q_c_OU *= CyclingRatio;
         this->CompActSpeed = max(CompSpdActual, 0.0);
         this->Ncomp = max(Ncomp, 0.0) / this->EffCompInverter;
@@ -12237,6 +12235,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state, c
         this->ElecHeatingPower = 0;
     }
     this->VRFCondRTF = VRFRTF;
+    this->DefrostPower *= VRFRTF;
 
     // Calculate CrankCaseHeaterPower: VRF Heat Pump Crankcase Heater Electric Power [W]
     if (this->MaxOATCCHeater > OutdoorDryBulb) {
@@ -14136,7 +14135,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                                                            T_suction + 8,
                                                            T_discharge - 5);
 
-                Cap_Eva0 = (TU_load + Pipe_Q) * C_cap_operation; // New Pipe_Q & C_cap_operation
+                Cap_Eva0 = TU_load + Pipe_Q; // New Pipe_Q & C_cap_operation
                 Cap_Eva1 = this->CoffEvapCap * this->RatedEvapCapacity *
                            CurveValue(state, this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction); // New Tc
                 CapDiff = std::abs(Cap_Eva1 - Cap_Eva0);
@@ -14337,7 +14336,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                                                            T_suction + 8,
                                                            IUMaxCondTemp - 5);
 
-                Cap_Eva0 = Q_evap_req * C_cap_operation;
+                Cap_Eva0 = Q_evap_req;
                 Cap_Eva1 =
                     this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction);
                 CapDiff = std::abs(Cap_Eva1 - Cap_Eva0);
@@ -14353,7 +14352,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                     CyclingRatio = 1.0;
                 }
 
-                Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction);
+                Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction) * CyclingRatio;
                 // Cap_Eva1 is the updated compressor min speed capacity
                 OUEvapHeatExtract = Cap_Eva1;
                 this->EvaporatingTemp = T_suction;
