@@ -65,7 +65,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,26.1;
+  Version,26.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: TIMESTEP ===========
 
@@ -536,8 +536,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,117.239997864; !- Field 3
-
-                             !- Field 4
 
   Schedule:Compact,
     EQUIP-1,                 !- Name
@@ -2334,32 +2332,32 @@
   ZoneControl:Humidistat,
     Space1-1 Humidistat,     !- Name
     SPACE1-1 Thermal Zone,   !- Zone Name
-    HumidifyingHumSetSch,    !- Humidifying Relative Humidity Setpoint Schedule Name
-    DehumidifyingHumSetSch;  !- Dehumidifying Relative Humidity Setpoint Schedule Name
+    HumidifyingHumSetSch,    !- Humidifying Setpoint Schedule Name
+    DehumidifyingHumSetSch;  !- Dehumidifying Setpoint Schedule Name
 
   ZoneControl:Humidistat,
     Space2-1 Humidistat,     !- Name
     SPACE2-1 Thermal Zone,   !- Zone Name
-    HumidifyingHumSetSch,    !- Humidifying Relative Humidity Setpoint Schedule Name
-    DehumidifyingHumSetSch;  !- Dehumidifying Relative Humidity Setpoint Schedule Name
+    HumidifyingHumSetSch,    !- Humidifying Setpoint Schedule Name
+    DehumidifyingHumSetSch;  !- Dehumidifying Setpoint Schedule Name
 
   ZoneControl:Humidistat,
     Space3-1 Humidistat,     !- Name
     SPACE3-1 Thermal Zone,   !- Zone Name
-    HumidifyingHumSetSch,    !- Humidifying Relative Humidity Setpoint Schedule Name
-    DehumidifyingHumSetSch;  !- Dehumidifying Relative Humidity Setpoint Schedule Name
+    HumidifyingHumSetSch,    !- Humidifying Setpoint Schedule Name
+    DehumidifyingHumSetSch;  !- Dehumidifying Setpoint Schedule Name
 
   ZoneControl:Humidistat,
     Space4-1 Humidistat,     !- Name
     SPACE4-1 Thermal Zone,   !- Zone Name
-    HumidifyingHumSetSch,    !- Humidifying Relative Humidity Setpoint Schedule Name
-    DehumidifyingHumSetSch;  !- Dehumidifying Relative Humidity Setpoint Schedule Name
+    HumidifyingHumSetSch,    !- Humidifying Setpoint Schedule Name
+    DehumidifyingHumSetSch;  !- Dehumidifying Setpoint Schedule Name
 
   ZoneControl:Humidistat,
     Space5-1 Humidistat,     !- Name
     SPACE5-1 Thermal Zone,   !- Zone Name
-    HumidifyingHumSetSch,    !- Humidifying Relative Humidity Setpoint Schedule Name
-    DehumidifyingHumSetSch;  !- Dehumidifying Relative Humidity Setpoint Schedule Name
+    HumidifyingHumSetSch,    !- Humidifying Setpoint Schedule Name
+    DehumidifyingHumSetSch;  !- Dehumidifying Setpoint Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONECONTROL:THERMOSTAT ===========
 

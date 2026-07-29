@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,26.1;
+  Version,26.2;
 
   Building,
     Building,                !- Name
@@ -1469,8 +1469,6 @@
     For: AllDays,            !- Field 2
     Until: 24:00,117.239997864; !- Field 3
 
-                             !- Field 4
-
   Schedule:Compact,
     ShadeTransSch,           !- Name
     Fraction,                !- Schedule Type Limits Name
@@ -2628,7 +2626,7 @@
   ZoneControl:Humidistat,
     SPACE5-1 Humidistat,     !- Name
     SPACE5-1,                !- Zone Name
-    Relative Humidity Sched; !- Humidifying Relative Humidity Setpoint Schedule Name
+    Relative Humidity Sched; !- Humidifying Setpoint Schedule Name
 
   Schedule:Compact,
     Relative Humidity Sched, !- Name
@@ -3089,7 +3087,7 @@
   ZoneControl:Humidistat,
     SPACE1-1 Humidistat,     !- Name
     SPACE1-1,                !- Zone Name
-    Relative Humidity Sched; !- Humidifying Relative Humidity Setpoint Schedule Name
+    Relative Humidity Sched; !- Humidifying Setpoint Schedule Name
 
   HeatExchanger:Desiccant:BalancedFlow,
     OA Desiccant Heat Exchanger,  !- Name

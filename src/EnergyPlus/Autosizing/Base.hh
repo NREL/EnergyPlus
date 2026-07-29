@@ -123,6 +123,7 @@ struct BaseSizer
     bool dataScalableSizingON = false;
     bool dataScalableCapSizingON = false;
     bool isCoilReportObject = false; // provides access to coil reporting
+    int coilReportNum = -1;          // Coil report number for direct access
     bool isFanReportObject = false;  // provides access to fan reporting
     bool initialized = false;        // indicates initializeWithinEP was called
     AutoSizingResultType errorType = AutoSizingResultType::NoError;
@@ -139,7 +140,7 @@ struct BaseSizer
     bool sizingDesValueFromParent = false;
     bool airLoopSysFlag = false;
     bool oaSysFlag = false;
-    int coilType_Num = 0;
+    HVAC::CoilType coilType = HVAC::CoilType::Invalid;
     std::string compType;
     std::string compName;
     bool isEpJSON = false;

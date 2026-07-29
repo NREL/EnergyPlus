@@ -28,7 +28,7 @@
 ! Floor Area:              232.25 m2
 ! Number of Stories:       1
 
-  Version,26.1;
+  Version,26.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -555,8 +555,8 @@
   ZoneControl:Humidistat,
     Main Zone Humidistat,    !- Name
     Main Zone,               !- Zone Name
-    HumidifyingHumSetSch,    !- Humidifying Relative Humidity Setpoint Schedule Name
-    DehumidifyingHumSetSch;  !- Dehumidifying Relative Humidity Setpoint Schedule Name
+    HumidifyingHumSetSch,    !- Humidifying Setpoint Schedule Name
+    DehumidifyingHumSetSch;  !- Dehumidifying Setpoint Schedule Name
 
   Schedule:Compact,
     HumidifyingHumSetSch,    !- Name

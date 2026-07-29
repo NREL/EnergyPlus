@@ -62,7 +62,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -88,6 +87,51 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::Window;
+
+TEST_F(EnergyPlusFixture, W5InitGlassParameters_ClearsCoefficients)
+{
+    state->dataHeatBal->MaxSolidWinLayers = 1;
+    state->dataHeatBal->TotConstructs = 1;
+    state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
+
+    auto &construct = state->dataConstruction->Construct(1);
+    construct.setArraysBasedOnMaxSolidWinLayers(*state);
+    construct.TypeIsWindow = true;
+    construct.TotLayers = 1;
+    construct.TotSolidLayers = 1;
+    construct.TotGlassLayers = 1;
+    construct.LayerPoint.allocate(1);
+    construct.LayerPoint(1) = 1;
+    construct.AbsBeamShadeCoef = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+    construct.TransSolBeamCoef = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+    construct.ReflSolBeamFrontCoef = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+    construct.ReflSolBeamBackCoef = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+    construct.TransVisBeamCoef = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+
+    state->dataSurface->TotSurfaces = 0;
+
+    W5InitGlassParameters(*state);
+
+    for (auto const &coeff : construct.AbsBeamShadeCoef) {
+        EXPECT_EQ(0.0, coeff);
+    }
+
+    for (auto const &coeff : construct.TransSolBeamCoef) {
+        EXPECT_EQ(0.0, coeff);
+    }
+
+    for (auto const &coeff : construct.ReflSolBeamFrontCoef) {
+        EXPECT_EQ(0.0, coeff);
+    }
+
+    for (auto const &coeff : construct.ReflSolBeamBackCoef) {
+        EXPECT_EQ(0.0, coeff);
+    }
+
+    for (auto const &coeff : construct.TransVisBeamCoef) {
+        EXPECT_EQ(0.0, coeff);
+    }
+}
 
 TEST_F(EnergyPlusFixture, WindowFrameTest)
 {
@@ -215,7 +259,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     HeatBalanceManager::ManageHeatBalance(*state);
 
     // This test will emulate NFRC 100 U-factor test
-    int winNum;
+    int winNum = 0;
 
     for (size_t i = 1; i <= state->dataSurface->Surface.size(); ++i) {
         if (state->dataSurface->Surface(i).Class == DataSurfaces::SurfaceClass::Window) {
@@ -223,7 +267,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         }
     }
 
-    int cNum;
+    int cNum = 0;
 
     for (size_t i = 1; i <= state->dataConstruction->Construct.size(); ++i) {
         if (state->dataConstruction->Construct(i).TypeIsWindow) {
@@ -274,7 +318,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     Real64 inSurfTempDiff;
 
     int maxIterations = 20;
-    Real64 tolerance = 0.1; // deg C
+    Real64 testTolerance = 0.1; // deg C
 
     // Save tilt information for natural convection calculations
     Real64 tiltSave = state->dataSurface->Surface(winNum).Tilt;
@@ -307,7 +351,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         outSurfTempDiff = std::fabs(outSurfTemp - outSurfTempPrev);
         inSurfTempDiff = std::fabs(inSurfTemp - inSurfTempPrev);
 
-        if ((outSurfTempDiff < tolerance) && (inSurfTempDiff < tolerance)) {
+        if ((outSurfTempDiff < testTolerance) && (inSurfTempDiff < testTolerance)) {
             break;
         }
 
