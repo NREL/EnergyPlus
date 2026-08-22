@@ -7551,6 +7551,10 @@ This numeric field contains the chiller-heater's optimum part-load ratio during 
 
 This optional numeric field allows the user to specify a sizing factor for this component. The Sizing Factor is a multiplier on the design plant chilled water loop flow rate associated with the chiller-heaters parent \hyperref[centralheatpumpsystem]{CentralHeatPumpSystem} object. The chiller-heater's modified chilled water flow can then be used to autocalculate the Design Condenser Water Flow Rate and Reference Cooling Mode Evaporator Capacity values. In general, it is best to autosize all three fields or set fixed values for all three fields.
 
+\subsubsection{Field: Maximum Heating Mode Leaving Condenser Water Temperature}\label{field-maximum-heating-mode-leaving-condenser-water-temperature}
+
+This optional numeric field specifies the maximum hot-water temperature leaving the chiller-heater in heating mode in Celsius. When the field is blank, the model does not infer an equipment operating limit from the Reference Heating Mode Leaving Condenser Water Temperature. Plant setpoint controls and applicable plant or fluid limits govern the leaving temperature.
+
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
@@ -7586,7 +7590,8 @@ ChillerHeaterPerformance:Electric:EIR,
   ChillerHeaterHtgEIRFPLR,    !- Heating Mode Electric Input to Cooling Output Ratio Function of Part Load
                               !- Ratio Curve Name
   1,                          !- Heating Mode Cooling Capacity Optimum Part Load Ratio
-  1;                          !- Sizing Factor
+  1,                          !- Sizing Factor
+  55;                         !- Maximum Heating Mode Leaving Condenser Water Temperature {C}
 \end{lstlisting}
 
 \subsection{ChillerHeaterPerformance:Electric:EIR Outputs}\label{chillerheaterperformanceelectriceir-outputs}

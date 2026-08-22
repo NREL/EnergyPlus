@@ -405,7 +405,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   nodiff=.false.
                   OutArgs(1:17)=InArgs(1:17)
                   OutArgs(18:CurArgs-1)=InArgs(19:CurArgs)
-                  CurArgs = CurArgs - 1
+                  OutArgs(CurArgs) = ''  ! new Maximum Heating Mode Leaving Condenser Water Temperature field
 
               ! If your original object starts with D, insert the rules here
 

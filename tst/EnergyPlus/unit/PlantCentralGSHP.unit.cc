@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -495,7 +496,8 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)
         "    ChillerHeaterHtgEIRFT,   !- Heating Mode Electric Input to Cooling Output Ratio Function of Temperature Curve Name",
         "    ChillerHeaterHtgEIRFPLR, !- Heating Mode Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name",
         "    1,                       !- Heating Mode Cooling Capacity Optimum Part Load Ratio",
-        "    1;                       !- Sizing Factor",
+        "    1,                       !- Sizing Factor",
+        "    55;                      !- Maximum Heating Mode Leaving Condenser Water Temperature {C}",
 
         "Curve:Biquadratic,",
         "    ChillerHeaterClgCapFT,   !- Name",
@@ -601,6 +603,8 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)
 
     // verify that under this scenario of not finding a schedule match, ScheduleAlwaysOn is the treated default
     EXPECT_EQ(state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).chSched, Sched::GetScheduleAlwaysOn(*state));
+    EXPECT_FALSE(state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).MaxHeatingLeavingCondTempWasBlank);
+    EXPECT_DOUBLE_EQ(55.0, state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).MaxHeatingLeavingCondTemp);
 
     // verify that node names were processed correctly
     EXPECT_EQ(state->dataBranchNodeConnections->NumOfNodeConnections, 6);
@@ -1084,6 +1088,161 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_FinalPartLoadContracts)
     // Issue #8191 / current mode-2 signature: post-scaled PLR, full cycling, and a full-load EIRFPLR evaluation.
     PartLoadContract const issue8191Point{10000.0, 1000.0, 1000.0, 0.30, 1.0, 0.10, 1.0, 1.0};
     EXPECT_FALSE(checkPartLoadContract(issue8191Point));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalStateAndCloseEnergyBalances)
+{
+    std::string const idf_objects = delimited_string({
+        "FluidProperties:GlycolConcentration,",
+        "  GSHP Source Fluid,",
+        "  PropyleneGlycol,",
+        "  ,",
+        "  0.30;",
+
+        "Curve:Biquadratic,",
+        "  Constant Temperature Modifier,",
+        "  1.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  -100.0,",
+        "  100.0,",
+        "  -100.0,",
+        "  100.0;",
+
+        "Curve:Quadratic,",
+        "  Linear Part Load EIR,",
+        "  0.0,",
+        "  1.0,",
+        "  0.0,",
+        "  0.3,",
+        "  1.0;",
+
+        "Curve:Bicubic,",
+        "  Bivariate Part Load EIR,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  1.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  0.0,",
+        "  -100.0,",
+        "  100.0,",
+        "  0.3,",
+        "  1.0;",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(has_err_output());
+    state->init_state(*state);
+
+    state->dataPlnt->PlantLoop.allocate(3);
+    auto *water = Fluid::GetWater(*state);
+    auto *sourceGlycol = Fluid::GetGlycol(*state, "GSHP SOURCE FLUID");
+    ASSERT_NE(nullptr, water);
+    ASSERT_NE(nullptr, sourceGlycol);
+    state->dataPlnt->PlantLoop(1).glycol = water;
+    state->dataPlnt->PlantLoop(2).glycol = sourceGlycol;
+    state->dataPlnt->PlantLoop(3).glycol = water;
+
+    PlantCentralGSHP::WrapperSpecs wrapper;
+    wrapper.CWPlantLoc.loopNum = 1;
+    wrapper.GLHEPlantLoc.loopNum = 2;
+    wrapper.HWPlantLoc.loopNum = 3;
+    PlantUtilities::SetPlantLocationLinks(*state, wrapper.CWPlantLoc);
+    PlantUtilities::SetPlantLocationLinks(*state, wrapper.GLHEPlantLoc);
+    PlantUtilities::SetPlantLocationLinks(*state, wrapper.HWPlantLoc);
+
+    state->dataLoopNodes->Node.allocate(2);
+    wrapper.CoolSetPointTempNode = 1;
+    wrapper.HeatSetPointTempNode = 2;
+    state->dataLoopNodes->Node(wrapper.CoolSetPointTempNode).TempSetPoint = 7.0;
+    state->dataLoopNodes->Node(wrapper.HeatSetPointTempNode).TempSetPoint = 45.0;
+
+    wrapper.ChillerHeater.allocate(1);
+    auto &chillerHeater = wrapper.ChillerHeater(1);
+    chillerHeater.RefCap = 10000.0;
+    chillerHeater.RefCOP = 5.0;
+    chillerHeater.OpenMotorEff = 0.80;
+    chillerHeater.TempLowLimitEvapOut = 5.0;
+    chillerHeater.EvapOutletNode.TempMin = 5.0;
+    chillerHeater.ChillerCapFTIDX = Curve::GetCurveIndex(*state, "CONSTANT TEMPERATURE MODIFIER");
+    chillerHeater.ChillerEIRFTIDX = chillerHeater.ChillerCapFTIDX;
+    chillerHeater.ChillerEIRFPLRIDX = Curve::GetCurveIndex(*state, "LINEAR PART LOAD EIR");
+    ASSERT_GT(chillerHeater.ChillerCapFTIDX, 0);
+    ASSERT_GT(chillerHeater.ChillerEIRFPLRIDX, 0);
+
+    chillerHeater.CondMode = PlantCentralGSHP::CondenserModeTemperature::EnteringCondenser;
+    auto coolingResult = wrapper.solveCoolingOnly(*state, 1, 1000.0, 1.0, 1.0, 12.0, 30.0);
+    EXPECT_EQ(CurrentMode::CoolingOnly, coolingResult.currentMode);
+    EXPECT_NEAR(1000.0, coolingResult.qEvaporator, 1.0e-6);
+    EXPECT_NEAR(200.0, coolingResult.coolingPower, 1.0e-6);
+    EXPECT_NEAR(1160.0, coolingResult.qCondenser, 1.0e-6);
+    EXPECT_NEAR(0.30, coolingResult.partLoadRatio, 1.0e-9);
+    EXPECT_NEAR(1.0 / 3.0, coolingResult.cyclingRatio, 1.0e-9);
+    EXPECT_NEAR(coolingResult.partLoadRatio, coolingResult.eirPartLoadCurvePLR, 1.0e-12);
+    EXPECT_NEAR(coolingResult.evaporatorOutletTemp, coolingResult.capacityCurveEvaporatorTemp, 1.0e-12);
+    EXPECT_NEAR(30.0, coolingResult.capacityCurveCondenserTemp, 1.0e-12);
+    EXPECT_NE(7.0, coolingResult.evaporatorOutletTemp);
+    EXPECT_NEAR(0.0, coolingResult.moduleEnergyBalanceResidual(), 1.0e-9);
+    chillerHeater.Result = coolingResult;
+    chillerHeater.mapResultToPlantConnections();
+    EXPECT_NEAR(0.0, chillerHeater.Result.routingEnergyBalanceResidual(), 1.0e-9);
+
+    wrapper.VariableFlowCH = true;
+    chillerHeater.CondMode = PlantCentralGSHP::CondenserModeTemperature::LeavingCondenser;
+    coolingResult = wrapper.solveCoolingOnly(*state, 1, 1000.0, 1.0, 1.0, 12.0, 30.0);
+    Real64 const chilledWaterCp = water->getSpecificHeat(*state, 12.0, "PlantCentralGSHP solver test");
+    EXPECT_NEAR(7.0, coolingResult.evaporatorOutletTemp, 1.0e-9);
+    EXPECT_NEAR(1000.0 / (chilledWaterCp * 5.0), coolingResult.evaporatorMassFlowRate, 1.0e-9);
+    EXPECT_NEAR(coolingResult.condenserOutletTemp, coolingResult.capacityCurveCondenserTemp, 1.0e-12);
+    EXPECT_NEAR(0.0, coolingResult.moduleEnergyBalanceResidual(), 1.0e-9);
+
+    chillerHeater.RefCOP = 4.0;
+    chillerHeater.ChillerEIRFPLRIDX = Curve::GetCurveIndex(*state, "BIVARIATE PART LOAD EIR");
+    ASSERT_GT(chillerHeater.ChillerEIRFPLRIDX, 0);
+    chillerHeater.CondMode = PlantCentralGSHP::CondenserModeTemperature::EnteringCondenser;
+    chillerHeater.MaxHeatingLeavingCondTempWasBlank = true;
+    auto heatingResult = wrapper.solveHeatingOnly(*state, 1, 1200.0, 1.0, 1.0, 15.0, 40.0);
+    EXPECT_EQ(CurrentMode::HeatingOnly, heatingResult.currentMode);
+    EXPECT_NEAR(1000.0, heatingResult.qEvaporator, 1.0e-6);
+    EXPECT_NEAR(250.0, heatingResult.heatingPower, 1.0e-6);
+    EXPECT_NEAR(1200.0, heatingResult.qCondenser, 1.0e-6);
+    EXPECT_NEAR(0.30, heatingResult.partLoadRatio, 1.0e-9);
+    EXPECT_NEAR(1.0 / 3.0, heatingResult.cyclingRatio, 1.0e-9);
+    EXPECT_NEAR(heatingResult.partLoadRatio, heatingResult.eirPartLoadCurvePLR, 1.0e-12);
+    EXPECT_NEAR(40.0, heatingResult.eirPartLoadCurveCondenserTemp, 1.0e-12);
+    EXPECT_NEAR(heatingResult.evaporatorOutletTemp, heatingResult.capacityCurveEvaporatorTemp, 1.0e-12);
+    EXPECT_NEAR(40.0, heatingResult.capacityCurveCondenserTemp, 1.0e-12);
+    EXPECT_NEAR(45.0, heatingResult.condenserOutletTemp, 1.0e-9);
+    EXPECT_NEAR(0.0, heatingResult.moduleEnergyBalanceResidual(), 1.0e-9);
+    chillerHeater.Result = heatingResult;
+    chillerHeater.mapResultToPlantConnections();
+    EXPECT_NEAR(0.0, chillerHeater.Result.routingEnergyBalanceResidual(), 1.0e-9);
+
+    wrapper.VariableFlowCH = false;
+    chillerHeater.CondMode = PlantCentralGSHP::CondenserModeTemperature::LeavingCondenser;
+    chillerHeater.TempRefCondOut = 40.5;
+    heatingResult = wrapper.solveHeatingOnly(*state, 1, 5000.0, 1.0, 1.0, 15.0, 40.0);
+    EXPECT_GT(heatingResult.condenserOutletTemp, chillerHeater.TempRefCondOut);
+    EXPECT_NEAR(heatingResult.condenserOutletTemp, heatingResult.capacityCurveCondenserTemp, 1.0e-12);
+    EXPECT_NEAR(heatingResult.condenserOutletTemp, heatingResult.eirPartLoadCurveCondenserTemp, 1.0e-12);
+    EXPECT_NEAR(0.0, heatingResult.unmetHeatingLoad, 1.0e-6);
+    EXPECT_NEAR(0.0, heatingResult.moduleEnergyBalanceResidual(), 1.0e-9);
+
+    chillerHeater.MaxHeatingLeavingCondTempWasBlank = false;
+    chillerHeater.MaxHeatingLeavingCondTemp = 40.1;
+    heatingResult = wrapper.solveHeatingOnly(*state, 1, 5000.0, 1.0, 1.0, 15.0, 40.0);
+    EXPECT_NEAR(40.1, heatingResult.condenserOutletTemp, 1.0e-9);
+    EXPECT_GT(heatingResult.unmetHeatingLoad, 0.0);
+    EXPECT_NEAR(heatingResult.qCondenser, heatingResult.availableCondenserCapacity, 1.0e-6);
+    EXPECT_NEAR(0.0, heatingResult.moduleEnergyBalanceResidual(), 1.0e-9);
 }
 
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SequentialFlowAllocationContracts)

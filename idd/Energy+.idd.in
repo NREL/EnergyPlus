@@ -79268,11 +79268,16 @@ ChillerHeaterPerformance:Electric:EIR,
        \note The Min/Max PLR are taken from their associated EIR-FPLR curve references.
        \minimum> 0.0
        \default 1.0
-  N18; \field Sizing Factor
+  N18, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
        \type real
        \minimum> 0.0
        \default 1.0
+  N19; \field Maximum Heating Mode Leaving Condenser Water Temperature
+       \note Optional operating limit for the hot-water temperature leaving the chiller heater in heating mode.
+       \note Leave blank when plant controls and fluid or plant limits alone should govern the leaving temperature.
+       \type real
+       \units C
 
 \group Condenser Equipment and Heat Exchangers
 

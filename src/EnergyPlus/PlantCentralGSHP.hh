@@ -182,11 +182,12 @@ namespace PlantCentralGSHP {
         Real64 capacityTemperatureModifier = 0.0;
         Real64 eirTemperatureModifier = 0.0;
         Real64 eirPartLoadModifier = 0.0;
-        Real64 capacityCurveEvaporatorTemp = 0.0; // Evaporator temperature used by the capacity curve [C]
-        Real64 capacityCurveCondenserTemp = 0.0;  // Condenser temperature used by the capacity curve [C]
-        Real64 eirCurveEvaporatorTemp = 0.0;      // Evaporator temperature used by the EIR temperature curve [C]
-        Real64 eirCurveCondenserTemp = 0.0;       // Condenser temperature used by the EIR temperature curve [C]
-        Real64 eirPartLoadCurvePLR = 0.0;         // PLR used to evaluate the EIR part-load curve
+        Real64 capacityCurveEvaporatorTemp = 0.0;   // Evaporator temperature used by the capacity curve [C]
+        Real64 capacityCurveCondenserTemp = 0.0;    // Condenser temperature used by the capacity curve [C]
+        Real64 eirCurveEvaporatorTemp = 0.0;        // Evaporator temperature used by the EIR temperature curve [C]
+        Real64 eirCurveCondenserTemp = 0.0;         // Condenser temperature used by the EIR temperature curve [C]
+        Real64 eirPartLoadCurvePLR = 0.0;           // PLR used to evaluate the EIR part-load curve
+        Real64 eirPartLoadCurveCondenserTemp = 0.0; // Condenser temperature used by a bivariate EIR part-load curve [C]
         Real64 actualCOP = 0.0;
 
         Real64 evaporatorInletTemp = 0.0;
@@ -320,11 +321,13 @@ namespace PlantCentralGSHP {
         Real64 TempRefEvapOut = 0.0;              // Reference evaporator leaving temperature [C]
         Real64 TempRefCondIn = 0.0;               // Reference condenser entering temperature [C]
         Real64 TempRefCondOut = 0.0;              // Reference condenser leaving temperature [C]
-        Real64 OptPartLoadRat = 0.0;              // Optimal operating fraction of full load
-        Real64 ChillerEIRFPLRMin = 0.0;           // Minimum value of PLR from EIRFPLR curve
-        Real64 ChillerEIRFPLRMax = 0.0;           // Maximum value of PLR from EIRFPLR curve
-        ChillerHeaterResult Result;               // Authoritative result for the current module calculation
-        ChillerHeaterResult SimulResult;          // Cooling-side snapshot retained while simultaneous loads are dispatched
+        Real64 MaxHeatingLeavingCondTemp = 0.0;   // Optional maximum heating leaving condenser water temperature [C]
+        bool MaxHeatingLeavingCondTempWasBlank = true;
+        Real64 OptPartLoadRat = 0.0;     // Optimal operating fraction of full load
+        Real64 ChillerEIRFPLRMin = 0.0;  // Minimum value of PLR from EIRFPLR curve
+        Real64 ChillerEIRFPLRMax = 0.0;  // Maximum value of PLR from EIRFPLR curve
+        ChillerHeaterResult Result;      // Authoritative result for the current module calculation
+        ChillerHeaterResult SimulResult; // Cooling-side snapshot retained while simultaneous loads are dispatched
         CHReportVars Report;
 
         void mapResultToPlantConnections();
@@ -447,6 +450,22 @@ namespace PlantCentralGSHP {
         void CalcChillerModel(EnergyPlusData &state);
 
         void CalcChillerHeaterModel(EnergyPlusData &state);
+
+        ChillerHeaterResult solveCoolingOnly(EnergyPlusData &state,
+                                             int chillerHeaterNum,
+                                             Real64 requestedCoolingLoad,
+                                             Real64 evaporatorMassFlowRateMax,
+                                             Real64 condenserMassFlowRate,
+                                             Real64 evaporatorInletTemp,
+                                             Real64 condenserInletTemp);
+
+        ChillerHeaterResult solveHeatingOnly(EnergyPlusData &state,
+                                             int chillerHeaterNum,
+                                             Real64 requestedHeatingLoad,
+                                             Real64 evaporatorMassFlowRate,
+                                             Real64 condenserMassFlowRateMax,
+                                             Real64 evaporatorInletTemp,
+                                             Real64 condenserInletTemp);
 
         void adjustChillerHeaterCondFlowTemp(EnergyPlusData &state,
                                              Real64 &QCondenser,
