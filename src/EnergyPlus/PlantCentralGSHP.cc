@@ -368,20 +368,6 @@ void WrapperSpecs::simulate(
                                                             this->Report.GLHEOutletTemp,
                                                             this->Report.GLHEmdot,
                                                             FirstHVACIteration);
-
-        // Use the first chiller heater's evaporator capacity ratio to determine dominant load
-        this->SimulClgDominant = false;
-        this->SimulHtgDominant = false;
-        if (this->WrapperCoolingLoad > 0 && this->WrapperHeatingLoad > 0) {
-            Real64 SimulLoadRatio = this->WrapperCoolingLoad / this->WrapperHeatingLoad;
-            if (SimulLoadRatio > this->ChillerHeater(1).ClgHtgToCoolingCapRatio) {
-                this->SimulClgDominant = true;
-                this->SimulHtgDominant = false;
-            } else {
-                this->SimulHtgDominant = true;
-                this->SimulClgDominant = false;
-            }
-        }
     }
 }
 
@@ -2277,6 +2263,316 @@ ChillerHeaterResult WrapperSpecs::solveHeatingOnly(EnergyPlusData &state,
     return result;
 }
 
+ChillerHeaterResult WrapperSpecs::solveSimultaneous(EnergyPlusData &state,
+                                                    int const chillerHeaterNum,
+                                                    Real64 const requestedCoolingLoad,
+                                                    Real64 const requestedHeatingLoad,
+                                                    Real64 const chilledWaterMassFlowRateMax,
+                                                    Real64 const hotWaterMassFlowRateMax,
+                                                    Real64 const sourceMassFlowRateMax,
+                                                    Real64 const chilledWaterInletTemp,
+                                                    Real64 const hotWaterInletTemp,
+                                                    Real64 const sourceInletTemp)
+{
+    static constexpr std::string_view routineName("CentralGSHP simultaneous solver");
+    constexpr int maxIterations = 100;
+    constexpr int maxPartLoadIterations = 80;
+    constexpr Real64 convergenceTolerance = 1.0e-8;
+
+    auto &chillerHeater = this->ChillerHeater(chillerHeaterNum);
+    ChillerHeaterResult result;
+    result.requestedCoolingLoad = max(0.0, requestedCoolingLoad);
+    result.requestedHeatingLoad = max(0.0, requestedHeatingLoad);
+    result.unmetCoolingLoad = result.requestedCoolingLoad;
+    result.unmetHeatingLoad = result.requestedHeatingLoad;
+    result.chilledWaterInletTemp = chilledWaterInletTemp;
+    result.chilledWaterOutletTemp = chilledWaterInletTemp;
+    result.hotWaterInletTemp = hotWaterInletTemp;
+    result.hotWaterOutletTemp = hotWaterInletTemp;
+    result.sourceInletTemp = sourceInletTemp;
+    result.sourceOutletTemp = sourceInletTemp;
+
+    if (result.requestedCoolingLoad <= HVAC::SmallLoad || result.requestedHeatingLoad <= HVAC::SmallLoad ||
+        chilledWaterMassFlowRateMax <= DataBranchAirLoopPlant::MassFlowTolerance ||
+        hotWaterMassFlowRateMax <= DataBranchAirLoopPlant::MassFlowTolerance || chillerHeater.RefCap <= 0.0 || chillerHeater.RefCOP <= 0.0) {
+        result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+        return result;
+    }
+
+    Real64 minPartLoadRatio = 0.0;
+    Real64 maxPartLoadRatio = 1.0;
+    getPartLoadCurveMinMax(state, chillerHeater.ChillerEIRFPLRIDX, minPartLoadRatio, maxPartLoadRatio);
+    minPartLoadRatio = max(0.0, minPartLoadRatio);
+    maxPartLoadRatio = max(minPartLoadRatio, maxPartLoadRatio);
+
+    Real64 const chilledWaterCp = this->CWPlantLoc.loop->glycol->getSpecificHeat(state, chilledWaterInletTemp, routineName);
+    Real64 const hotWaterCp = this->HWPlantLoc.loop->glycol->getSpecificHeat(state, hotWaterInletTemp, routineName);
+    Real64 const sourceCp = this->GLHEPlantLoc.loop->glycol->getSpecificHeat(state, sourceInletTemp, routineName);
+
+    Real64 chilledWaterOutletTarget = state.dataLoopNodes->Node(this->CoolSetPointTempNode).TempSetPoint;
+    if (chilledWaterOutletTarget == Node::SensedNodeFlagValue) {
+        chilledWaterOutletTarget = chillerHeater.EvapOutletNode.TempMin;
+    }
+    chilledWaterOutletTarget = max(chilledWaterOutletTarget, chillerHeater.EvapOutletNode.TempMin);
+    Real64 const chilledWaterDeltaTempTarget = max(0.0, chilledWaterInletTemp - chilledWaterOutletTarget);
+    Real64 const coolingTarget = min(result.requestedCoolingLoad, chilledWaterMassFlowRateMax * chilledWaterCp * chilledWaterDeltaTempTarget);
+
+    bool hasHotWaterOutletLimit = false;
+    Real64 hotWaterOutletLimit = 0.0;
+    Real64 const plantHeatingSetPoint = state.dataLoopNodes->Node(this->HeatSetPointTempNode).TempSetPoint;
+    if (plantHeatingSetPoint != Node::SensedNodeFlagValue) {
+        hotWaterOutletLimit = plantHeatingSetPoint;
+        hasHotWaterOutletLimit = true;
+    }
+    if (!chillerHeater.MaxHeatingLeavingCondTempWasBlank) {
+        hotWaterOutletLimit =
+            hasHotWaterOutletLimit ? min(hotWaterOutletLimit, chillerHeater.MaxHeatingLeavingCondTemp) : chillerHeater.MaxHeatingLeavingCondTemp;
+        hasHotWaterOutletLimit = true;
+    }
+    Real64 const hotWaterDeltaTempTarget = hasHotWaterOutletLimit ? max(0.0, hotWaterOutletLimit - hotWaterInletTemp) : 0.0;
+    Real64 const hotWaterLimitedHeating =
+        hasHotWaterOutletLimit ? hotWaterMassFlowRateMax * hotWaterCp * hotWaterDeltaTempTarget : std::numeric_limits<Real64>::max();
+    Real64 const heatingTarget = min(result.requestedHeatingLoad, hotWaterLimitedHeating);
+
+    auto sourceFlowLimit = [sourceMassFlowRateMax](Real64 const nodeFlowLimit, Real64 const designFlowLimit) {
+        Real64 flowLimit = nodeFlowLimit;
+        if (flowLimit <= DataBranchAirLoopPlant::MassFlowTolerance) {
+            flowLimit = designFlowLimit;
+        }
+        if (flowLimit <= DataBranchAirLoopPlant::MassFlowTolerance) {
+            flowLimit = sourceMassFlowRateMax;
+        }
+        return min(sourceMassFlowRateMax, max(0.0, flowLimit));
+    };
+    Real64 const sourceEvaporatorMassFlowRateMax =
+        sourceFlowLimit(chillerHeater.EvapInletNode.MassFlowRateMaxAvail, chillerHeater.EvapMassFlowRateMax);
+    Real64 const sourceCondenserMassFlowRateMax =
+        sourceFlowLimit(chillerHeater.CondInletNode.MassFlowRateMaxAvail, chillerHeater.CondMassFlowRateMax);
+    Real64 const sourceOutletLowLimit = max(chillerHeater.TempLowLimitEvapOut, chillerHeater.EvapOutletNode.TempMin);
+    Real64 const sourceExtractionCapacity = sourceEvaporatorMassFlowRateMax > DataBranchAirLoopPlant::MassFlowTolerance
+                                                ? max(0.0, sourceEvaporatorMassFlowRateMax * sourceCp * (sourceInletTemp - sourceOutletLowLimit))
+                                                : 0.0;
+    bool const canRejectToSource = sourceCondenserMassFlowRateMax > DataBranchAirLoopPlant::MassFlowTolerance;
+
+    if (coolingTarget <= HVAC::SmallLoad || heatingTarget <= HVAC::SmallLoad) {
+        result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+        return result;
+    }
+
+    Real64 evaporatorCurveTempGuess = chilledWaterOutletTarget;
+    Real64 condenserEnteringTempGuess = hotWaterInletTemp;
+    Real64 condenserLeavingTempGuess = hasHotWaterOutletLimit
+                                           ? min(hotWaterOutletLimit, hotWaterInletTemp + heatingTarget / (hotWaterMassFlowRateMax * hotWaterCp))
+                                           : hotWaterInletTemp;
+
+    Real64 availableEvaporatorCapacity = 0.0;
+    Real64 availableCondenserCapacity = 0.0;
+    Real64 qEvaporator = 0.0;
+    Real64 qCondenser = 0.0;
+    Real64 compressorPower = 0.0;
+    Real64 falseLoadRate = 0.0;
+    Real64 partLoadRatio = 0.0;
+    Real64 cyclingRatio = 0.0;
+    Real64 capacityModifier = 0.0;
+    Real64 eirTemperatureModifier = 0.0;
+    Real64 eirPartLoadModifier = 0.0;
+    Real64 condenserCurveTemp = condenserEnteringTempGuess;
+
+    Real64 coolingDelivered = 0.0;
+    Real64 heatingDelivered = 0.0;
+    Real64 sourceExtraction = 0.0;
+    Real64 sourceRejection = 0.0;
+    Real64 chilledWaterMassFlowRate = 0.0;
+    Real64 hotWaterMassFlowRate = 0.0;
+    Real64 sourceMassFlowRate = 0.0;
+    Real64 chilledWaterOutletTemp = chilledWaterInletTemp;
+    Real64 hotWaterOutletTemp = hotWaterInletTemp;
+    Real64 sourceOutletTemp = sourceInletTemp;
+    Real64 evaporatorInletTemp = chilledWaterInletTemp;
+    Real64 evaporatorOutletTemp = chilledWaterInletTemp;
+    Real64 evaporatorMassFlowRate = 0.0;
+    Real64 condenserInletTemp = hotWaterInletTemp;
+    Real64 condenserOutletTemp = hotWaterInletTemp;
+    Real64 condenserMassFlowRate = 0.0;
+
+    for (int iteration = 0; iteration < maxIterations; ++iteration) {
+        condenserCurveTemp = this->setChillerHeaterCondTemp(state, chillerHeaterNum, condenserEnteringTempGuess, condenserLeavingTempGuess);
+        capacityModifier = this->calcChillerCapFT(state, chillerHeaterNum, evaporatorCurveTempGuess, condenserCurveTemp);
+        availableEvaporatorCapacity = chillerHeater.RefCap * capacityModifier;
+        eirTemperatureModifier = max(0.0, Curve::CurveValue(state, chillerHeater.ChillerEIRFTIDX, evaporatorCurveTempGuess, condenserCurveTemp));
+        if (availableEvaporatorCapacity <= 0.0) {
+            break;
+        }
+
+        auto operatingPointAtEvaporatorLoad = [&](Real64 const evaporatorLoad) {
+            std::array<Real64, 6> point{};
+            if (evaporatorLoad <= HVAC::SmallLoad) {
+                return point;
+            }
+            Real64 const requestedPartLoadRatio = evaporatorLoad / availableEvaporatorCapacity;
+            Real64 const operatingPartLoadRatio = min(maxPartLoadRatio, max(requestedPartLoadRatio, minPartLoadRatio));
+            Real64 const operatingCyclingRatio =
+                requestedPartLoadRatio < minPartLoadRatio && minPartLoadRatio > 0.0 ? requestedPartLoadRatio / minPartLoadRatio : 1.0;
+            Real64 const partLoadModifier =
+                max(0.0, evaluatePartLoadCurve(state, chillerHeater.ChillerEIRFPLRIDX, condenserCurveTemp, operatingPartLoadRatio));
+            Real64 const power =
+                (availableEvaporatorCapacity / chillerHeater.RefCOP) * eirTemperatureModifier * partLoadModifier * operatingCyclingRatio;
+            Real64 const falseLoad = max(0.0, availableEvaporatorCapacity * operatingPartLoadRatio * operatingCyclingRatio - evaporatorLoad);
+            Real64 const condenserLoad = evaporatorLoad + falseLoad + power * chillerHeater.OpenMotorEff;
+            return std::array<Real64, 6>{evaporatorLoad, condenserLoad, power, falseLoad, operatingPartLoadRatio, operatingCyclingRatio};
+        };
+
+        Real64 const maximumEvaporatorLoad = min(availableEvaporatorCapacity * maxPartLoadRatio, coolingTarget + sourceExtractionCapacity);
+        auto coolingPoint = operatingPointAtEvaporatorLoad(min(coolingTarget, maximumEvaporatorLoad));
+        auto maximumPoint = operatingPointAtEvaporatorLoad(maximumEvaporatorLoad);
+        availableCondenserCapacity = maximumPoint[1];
+        auto selectedPoint = coolingPoint;
+
+        bool const heatingDrivesCycle = coolingPoint[1] + HVAC::SmallLoad < heatingTarget;
+        bool const excessHeatCannotBeRejected = !canRejectToSource && coolingPoint[1] > heatingTarget + HVAC::SmallLoad;
+        if (heatingDrivesCycle || excessHeatCannotBeRejected) {
+            Real64 lowerEvaporatorLoad = heatingDrivesCycle ? coolingPoint[0] : 0.0;
+            Real64 upperEvaporatorLoad = heatingDrivesCycle ? maximumEvaporatorLoad : coolingPoint[0];
+            Real64 const boundedHeatingTarget = min(heatingTarget, operatingPointAtEvaporatorLoad(upperEvaporatorLoad)[1]);
+            for (int partLoadIteration = 0; partLoadIteration < maxPartLoadIterations; ++partLoadIteration) {
+                Real64 const candidateEvaporatorLoad = 0.5 * (lowerEvaporatorLoad + upperEvaporatorLoad);
+                if (operatingPointAtEvaporatorLoad(candidateEvaporatorLoad)[1] < boundedHeatingTarget) {
+                    lowerEvaporatorLoad = candidateEvaporatorLoad;
+                } else {
+                    upperEvaporatorLoad = candidateEvaporatorLoad;
+                }
+            }
+            selectedPoint = operatingPointAtEvaporatorLoad(0.5 * (lowerEvaporatorLoad + upperEvaporatorLoad));
+        }
+
+        qEvaporator = selectedPoint[0];
+        qCondenser = selectedPoint[1];
+        compressorPower = selectedPoint[2];
+        falseLoadRate = selectedPoint[3];
+        partLoadRatio = selectedPoint[4];
+        cyclingRatio = selectedPoint[5];
+        eirPartLoadModifier = max(0.0, evaluatePartLoadCurve(state, chillerHeater.ChillerEIRFPLRIDX, condenserCurveTemp, partLoadRatio));
+
+        coolingDelivered = min(coolingTarget, qEvaporator);
+        sourceExtraction = max(0.0, qEvaporator - coolingDelivered);
+        heatingDelivered = min(heatingTarget, qCondenser);
+        sourceRejection = max(0.0, qCondenser - heatingDelivered);
+
+        if (this->VariableFlowCH) {
+            chilledWaterMassFlowRate = coolingDelivered > HVAC::SmallLoad && chilledWaterDeltaTempTarget > 0.0
+                                           ? min(chilledWaterMassFlowRateMax, coolingDelivered / (chilledWaterCp * chilledWaterDeltaTempTarget))
+                                           : 0.0;
+            hotWaterMassFlowRate = heatingDelivered > HVAC::SmallLoad && hotWaterDeltaTempTarget > 0.0
+                                       ? min(hotWaterMassFlowRateMax, heatingDelivered / (hotWaterCp * hotWaterDeltaTempTarget))
+                                       : hotWaterMassFlowRateMax;
+        } else {
+            chilledWaterMassFlowRate = coolingDelivered > HVAC::SmallLoad ? chilledWaterMassFlowRateMax : 0.0;
+            hotWaterMassFlowRate = heatingDelivered > HVAC::SmallLoad ? hotWaterMassFlowRateMax : 0.0;
+        }
+        if (sourceExtraction > HVAC::SmallLoad) {
+            sourceMassFlowRate = sourceEvaporatorMassFlowRateMax;
+        } else if (sourceRejection > HVAC::SmallLoad) {
+            sourceMassFlowRate = sourceCondenserMassFlowRateMax;
+        } else {
+            sourceMassFlowRate = 0.0;
+        }
+
+        chilledWaterOutletTemp = chilledWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance
+                                     ? chilledWaterInletTemp - coolingDelivered / (chilledWaterMassFlowRate * chilledWaterCp)
+                                     : chilledWaterInletTemp;
+        hotWaterOutletTemp = hotWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance
+                                 ? hotWaterInletTemp + heatingDelivered / (hotWaterMassFlowRate * hotWaterCp)
+                                 : hotWaterInletTemp;
+        sourceOutletTemp = sourceMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance
+                               ? sourceInletTemp + (sourceRejection - sourceExtraction) / (sourceMassFlowRate * sourceCp)
+                               : sourceInletTemp;
+
+        Real64 const evaporatorSourceMassFlowRate = sourceExtraction > HVAC::SmallLoad ? sourceMassFlowRate : 0.0;
+        evaporatorMassFlowRate = chilledWaterMassFlowRate + evaporatorSourceMassFlowRate;
+        if (evaporatorMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+            evaporatorInletTemp =
+                (chilledWaterMassFlowRate * chilledWaterInletTemp + evaporatorSourceMassFlowRate * sourceInletTemp) / evaporatorMassFlowRate;
+            evaporatorOutletTemp =
+                (chilledWaterMassFlowRate * chilledWaterOutletTemp + evaporatorSourceMassFlowRate * sourceOutletTemp) / evaporatorMassFlowRate;
+        }
+
+        Real64 const condenserSourceMassFlowRate = sourceRejection > HVAC::SmallLoad ? sourceMassFlowRate : 0.0;
+        condenserMassFlowRate = hotWaterMassFlowRate + condenserSourceMassFlowRate;
+        if (condenserMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+            condenserInletTemp = (hotWaterMassFlowRate * hotWaterInletTemp + condenserSourceMassFlowRate * sourceInletTemp) / condenserMassFlowRate;
+            condenserOutletTemp =
+                (hotWaterMassFlowRate * hotWaterOutletTemp + condenserSourceMassFlowRate * sourceOutletTemp) / condenserMassFlowRate;
+        }
+
+        Real64 const temperatureResidual = max({std::abs(evaporatorOutletTemp - evaporatorCurveTempGuess),
+                                                std::abs(condenserInletTemp - condenserEnteringTempGuess),
+                                                std::abs(condenserOutletTemp - condenserLeavingTempGuess)});
+        if (temperatureResidual <= convergenceTolerance) {
+            break;
+        }
+        evaporatorCurveTempGuess = 0.5 * (evaporatorCurveTempGuess + evaporatorOutletTemp);
+        condenserEnteringTempGuess = 0.5 * (condenserEnteringTempGuess + condenserInletTemp);
+        condenserLeavingTempGuess = 0.5 * (condenserLeavingTempGuess + condenserOutletTemp);
+    }
+
+    if (qEvaporator <= HVAC::SmallLoad || qCondenser <= HVAC::SmallLoad) {
+        result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+        return result;
+    }
+
+    Real64 const sourceHeatTransfer = sourceRejection - sourceExtraction;
+    Real64 const modeTolerance = max(HVAC::SmallLoad, 1.0e-8 * max(qEvaporator, qCondenser));
+    if (sourceHeatTransfer > modeTolerance) {
+        result.currentMode = CurrentMode::CoolingDominant;
+        result.coolingPower = compressorPower;
+    } else if (sourceHeatTransfer < -modeTolerance) {
+        result.currentMode = CurrentMode::HeatingDominant;
+        result.heatingPower = compressorPower;
+    } else {
+        result.currentMode = CurrentMode::HeatRecovery;
+        result.coolingPower = compressorPower;
+    }
+
+    result.availableEvaporatorCapacity = availableEvaporatorCapacity;
+    result.availableCondenserCapacity = availableCondenserCapacity;
+    result.qEvaporator = qEvaporator;
+    result.qCondenser = qCondenser;
+    result.falseLoadRate = falseLoadRate;
+    result.partLoadRatio = partLoadRatio;
+    result.cyclingRatio = cyclingRatio;
+    result.unloadingRatio = partLoadRatio;
+    result.capacityTemperatureModifier = capacityModifier;
+    result.eirTemperatureModifier = eirTemperatureModifier;
+    result.eirPartLoadModifier = eirPartLoadModifier;
+    result.capacityCurveEvaporatorTemp = evaporatorOutletTemp;
+    result.capacityCurveCondenserTemp = this->setChillerHeaterCondTemp(state, chillerHeaterNum, condenserInletTemp, condenserOutletTemp);
+    result.eirCurveEvaporatorTemp = evaporatorOutletTemp;
+    result.eirCurveCondenserTemp = result.capacityCurveCondenserTemp;
+    result.eirPartLoadCurvePLR = partLoadRatio;
+    result.eirPartLoadCurveCondenserTemp = result.capacityCurveCondenserTemp;
+    result.actualCOP = compressorPower > 0.0 ? qCondenser / compressorPower : 0.0;
+    result.evaporatorInletTemp = evaporatorInletTemp;
+    result.evaporatorOutletTemp = evaporatorOutletTemp;
+    result.evaporatorMassFlowRate = evaporatorMassFlowRate;
+    result.condenserInletTemp = condenserInletTemp;
+    result.condenserOutletTemp = condenserOutletTemp;
+    result.condenserMassFlowRate = condenserMassFlowRate;
+    result.chilledWaterOutletTemp = chilledWaterOutletTemp;
+    result.chilledWaterMassFlowRate = chilledWaterMassFlowRate;
+    result.hotWaterOutletTemp = hotWaterOutletTemp;
+    result.hotWaterMassFlowRate = hotWaterMassFlowRate;
+    result.sourceOutletTemp = sourceOutletTemp;
+    result.sourceMassFlowRate = sourceMassFlowRate;
+    result.coolingDelivered = coolingDelivered;
+    result.heatingDelivered = heatingDelivered;
+    result.heatRecovered = heatingDelivered;
+    result.sourceHeatTransfer = sourceHeatTransfer;
+    result.unmetCoolingLoad = max(0.0, result.requestedCoolingLoad - coolingDelivered);
+    result.unmetHeatingLoad = max(0.0, result.requestedHeatingLoad - heatingDelivered);
+    result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+    return result;
+}
+
 void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -3269,6 +3565,241 @@ void WrapperSpecs::calcPLRAndCyclingRatio(EnergyPlusData &state,
     }
 }
 
+void WrapperSpecs::CalcSimultaneousModel(EnergyPlusData &state,
+                                         Real64 const chilledWaterMassFlowRate,
+                                         Real64 const hotWaterMassFlowRate,
+                                         Real64 const sourceMassFlowRate,
+                                         Real64 const chilledWaterInletTemp,
+                                         Real64 const hotWaterInletTemp,
+                                         Real64 const sourceInletTemp)
+{
+    Real64 remainingCoolingLoad = this->WrapperCoolingLoad;
+    Real64 remainingHeatingLoad = this->WrapperHeatingLoad;
+    Real64 remainingChilledWaterMassFlowRate = max(0.0, chilledWaterMassFlowRate);
+    Real64 remainingHotWaterMassFlowRate = max(0.0, hotWaterMassFlowRate);
+    Real64 remainingSourceMassFlowRate = max(0.0, sourceMassFlowRate);
+    Real64 const secondsInTimeStep = state.dataHVACGlobal->TimeStepSysSec;
+
+    Real64 totalCoolingRate = 0.0;
+    Real64 totalHeatingRate = 0.0;
+    Real64 totalSourceHeatTransfer = 0.0;
+    Real64 totalCoolingPower = 0.0;
+    Real64 totalHeatingPower = 0.0;
+    Real64 usedChilledWaterMassFlowRate = 0.0;
+    Real64 usedHotWaterMassFlowRate = 0.0;
+    Real64 usedSourceMassFlowRate = 0.0;
+    Real64 chilledWaterOutletTemperatureSum = 0.0;
+    Real64 hotWaterOutletTemperatureSum = 0.0;
+    Real64 sourceOutletTemperatureSum = 0.0;
+
+    int componentNum = 1;
+    int unitsUsedInComponent = 0;
+    for (int chillerHeaterNum = 1; chillerHeaterNum <= this->ChillerHeaterNums; ++chillerHeaterNum) {
+        auto &chillerHeater = this->ChillerHeater(chillerHeaterNum);
+        bool moduleIsAvailable = true;
+        if (this->NumOfComp > 0 && allocated(this->WrapperComp)) {
+            while (componentNum <= this->NumOfComp && unitsUsedInComponent >= this->WrapperComp(componentNum).WrapperIdenticalObjectNum) {
+                ++componentNum;
+                unitsUsedInComponent = 0;
+            }
+            if (componentNum <= this->NumOfComp) {
+                moduleIsAvailable =
+                    this->WrapperComp(componentNum).chSched == nullptr || this->WrapperComp(componentNum).chSched->getCurrentVal() > 0.0;
+                ++unitsUsedInComponent;
+            } else {
+                moduleIsAvailable = false;
+            }
+        }
+
+        chillerHeater.RefCap = chillerHeater.RefCapClgHtg;
+        chillerHeater.RefCOP = chillerHeater.RefCOPClgHtg;
+        chillerHeater.TempRefEvapOut = chillerHeater.TempRefEvapOutClgHtg;
+        chillerHeater.TempRefCondIn = chillerHeater.TempRefCondInClgHtg;
+        chillerHeater.TempRefCondOut = chillerHeater.TempRefCondOutClgHtg;
+        chillerHeater.OptPartLoadRat = chillerHeater.OptPartLoadRatClgHtg;
+        chillerHeater.CondMode = chillerHeater.CondModeHeating;
+        chillerHeater.ChillerCapFTIDX = chillerHeater.ChillerCapFTHeatingIDX;
+        chillerHeater.ChillerEIRFTIDX = chillerHeater.ChillerEIRFTHeatingIDX;
+        chillerHeater.ChillerEIRFPLRIDX = chillerHeater.ChillerEIRFPLRHeatingIDX;
+
+        auto moduleFlowLimit = [](Real64 const remainingFlow, Real64 const nodeFlowLimit, Real64 const designFlowLimit) {
+            Real64 flowLimit = nodeFlowLimit;
+            if (flowLimit <= DataBranchAirLoopPlant::MassFlowTolerance) {
+                flowLimit = designFlowLimit;
+            }
+            if (flowLimit <= DataBranchAirLoopPlant::MassFlowTolerance) {
+                flowLimit = remainingFlow;
+            }
+            return min(remainingFlow, max(0.0, flowLimit));
+        };
+
+        Real64 const moduleChilledWaterMassFlowRate =
+            moduleFlowLimit(remainingChilledWaterMassFlowRate, chillerHeater.EvapInletNode.MassFlowRateMaxAvail, chillerHeater.EvapMassFlowRateMax);
+        Real64 const moduleHotWaterMassFlowRate =
+            moduleFlowLimit(remainingHotWaterMassFlowRate, chillerHeater.CondInletNode.MassFlowRateMaxAvail, chillerHeater.CondMassFlowRateMax);
+        Real64 moduleSourceMassFlowRate = 0.0;
+        ChillerHeaterResult result;
+
+        if (moduleIsAvailable && remainingCoolingLoad > HVAC::SmallLoad && remainingHeatingLoad > HVAC::SmallLoad &&
+            moduleChilledWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance &&
+            moduleHotWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+            moduleSourceMassFlowRate =
+                moduleFlowLimit(remainingSourceMassFlowRate,
+                                max(chillerHeater.EvapInletNode.MassFlowRateMaxAvail, chillerHeater.CondInletNode.MassFlowRateMaxAvail),
+                                max(chillerHeater.EvapMassFlowRateMax, chillerHeater.CondMassFlowRateMax));
+            result = this->solveSimultaneous(state,
+                                             chillerHeaterNum,
+                                             remainingCoolingLoad,
+                                             remainingHeatingLoad,
+                                             moduleChilledWaterMassFlowRate,
+                                             moduleHotWaterMassFlowRate,
+                                             moduleSourceMassFlowRate,
+                                             chilledWaterInletTemp,
+                                             hotWaterInletTemp,
+                                             sourceInletTemp);
+        } else if (moduleIsAvailable && remainingCoolingLoad > HVAC::SmallLoad &&
+                   moduleChilledWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+            moduleSourceMassFlowRate =
+                moduleFlowLimit(remainingSourceMassFlowRate, chillerHeater.CondInletNode.MassFlowRateMaxAvail, chillerHeater.CondMassFlowRateMax);
+            result = this->solveCoolingOnly(state,
+                                            chillerHeaterNum,
+                                            remainingCoolingLoad,
+                                            moduleChilledWaterMassFlowRate,
+                                            moduleSourceMassFlowRate,
+                                            chilledWaterInletTemp,
+                                            sourceInletTemp);
+            chillerHeater.Result = result;
+            chillerHeater.mapResultToPlantConnections();
+            result = chillerHeater.Result;
+            if (result.currentMode == CurrentMode::CoolingOnly) {
+                result.currentMode = CurrentMode::CoolingDominant;
+            }
+            result.requestedHeatingLoad = remainingHeatingLoad;
+            result.unmetHeatingLoad = remainingHeatingLoad;
+        } else if (moduleIsAvailable && remainingHeatingLoad > HVAC::SmallLoad &&
+                   moduleHotWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+            moduleSourceMassFlowRate =
+                moduleFlowLimit(remainingSourceMassFlowRate, chillerHeater.EvapInletNode.MassFlowRateMaxAvail, chillerHeater.EvapMassFlowRateMax);
+            result = this->solveHeatingOnly(state,
+                                            chillerHeaterNum,
+                                            remainingHeatingLoad,
+                                            moduleSourceMassFlowRate,
+                                            moduleHotWaterMassFlowRate,
+                                            sourceInletTemp,
+                                            hotWaterInletTemp);
+            chillerHeater.Result = result;
+            chillerHeater.mapResultToPlantConnections();
+            result = chillerHeater.Result;
+            if (result.currentMode == CurrentMode::HeatingOnly) {
+                result.currentMode = CurrentMode::HeatingDominant;
+            }
+            result.requestedCoolingLoad = remainingCoolingLoad;
+            result.unmetCoolingLoad = remainingCoolingLoad;
+        } else {
+            result.requestedCoolingLoad = remainingCoolingLoad;
+            result.requestedHeatingLoad = remainingHeatingLoad;
+            result.unmetCoolingLoad = remainingCoolingLoad;
+            result.unmetHeatingLoad = remainingHeatingLoad;
+            result.chilledWaterInletTemp = chilledWaterInletTemp;
+            result.chilledWaterOutletTemp = chilledWaterInletTemp;
+            result.hotWaterInletTemp = hotWaterInletTemp;
+            result.hotWaterOutletTemp = hotWaterInletTemp;
+            result.sourceInletTemp = sourceInletTemp;
+            result.sourceOutletTemp = sourceInletTemp;
+        }
+
+        result.isAvailable = moduleIsAvailable;
+        remainingCoolingLoad = max(0.0, remainingCoolingLoad - result.coolingDelivered);
+        remainingHeatingLoad = max(0.0, remainingHeatingLoad - result.heatingDelivered);
+        result.unmetCoolingLoad = remainingCoolingLoad;
+        result.unmetHeatingLoad = remainingHeatingLoad;
+        remainingChilledWaterMassFlowRate = max(0.0, remainingChilledWaterMassFlowRate - result.chilledWaterMassFlowRate);
+        remainingHotWaterMassFlowRate = max(0.0, remainingHotWaterMassFlowRate - result.hotWaterMassFlowRate);
+        remainingSourceMassFlowRate = max(0.0, remainingSourceMassFlowRate - result.sourceMassFlowRate);
+
+        chillerHeater.Result = result;
+        chillerHeater.updateResultEnergies(secondsInTimeStep, false);
+        chillerHeater.saveCurrentResultForSimultaneous();
+
+        auto const &finalResult = chillerHeater.Result;
+        totalCoolingRate += finalResult.coolingDelivered;
+        totalHeatingRate += finalResult.heatingDelivered;
+        totalSourceHeatTransfer += finalResult.sourceHeatTransfer;
+        totalCoolingPower += finalResult.coolingPower;
+        totalHeatingPower += finalResult.heatingPower;
+        usedChilledWaterMassFlowRate += finalResult.chilledWaterMassFlowRate;
+        usedHotWaterMassFlowRate += finalResult.hotWaterMassFlowRate;
+        usedSourceMassFlowRate += finalResult.sourceMassFlowRate;
+        chilledWaterOutletTemperatureSum += finalResult.chilledWaterOutletTemp * finalResult.chilledWaterMassFlowRate;
+        hotWaterOutletTemperatureSum += finalResult.hotWaterOutletTemp * finalResult.hotWaterMassFlowRate;
+        sourceOutletTemperatureSum += finalResult.sourceOutletTemp * finalResult.sourceMassFlowRate;
+    }
+
+    Real64 const sourceModeTolerance = max(HVAC::SmallLoad, 1.0e-8 * max({totalCoolingRate, totalHeatingRate, std::abs(totalSourceHeatTransfer)}));
+    this->SimulClgDominant = totalSourceHeatTransfer > sourceModeTolerance;
+    this->SimulHtgDominant = totalSourceHeatTransfer < -sourceModeTolerance;
+
+    if (this->ancillaryPowerSched != nullptr) {
+        Real64 const ancillaryPower = this->AncillaryPower * this->ancillaryPowerSched->getCurrentVal();
+        if (this->SimulHtgDominant) {
+            totalHeatingPower += ancillaryPower;
+        } else {
+            totalCoolingPower += ancillaryPower;
+        }
+    }
+
+    Real64 chilledWaterOutletTemp = chilledWaterInletTemp;
+    if (chilledWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+        Real64 const bypassMassFlowRate = max(0.0, chilledWaterMassFlowRate - usedChilledWaterMassFlowRate);
+        chilledWaterOutletTemp = (chilledWaterOutletTemperatureSum + bypassMassFlowRate * chilledWaterInletTemp) / chilledWaterMassFlowRate;
+    }
+    Real64 hotWaterOutletTemp = hotWaterInletTemp;
+    if (hotWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+        Real64 const bypassMassFlowRate = max(0.0, hotWaterMassFlowRate - usedHotWaterMassFlowRate);
+        hotWaterOutletTemp = (hotWaterOutletTemperatureSum + bypassMassFlowRate * hotWaterInletTemp) / hotWaterMassFlowRate;
+    }
+    Real64 sourceOutletTemp = sourceInletTemp;
+    if (sourceMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+        Real64 const bypassMassFlowRate = max(0.0, sourceMassFlowRate - usedSourceMassFlowRate);
+        sourceOutletTemp = (sourceOutletTemperatureSum + bypassMassFlowRate * sourceInletTemp) / sourceMassFlowRate;
+    }
+
+    this->Report.CHWInletTemp = chilledWaterInletTemp;
+    this->Report.CHWOutletTemp = chilledWaterOutletTemp;
+    this->Report.HWInletTemp = hotWaterInletTemp;
+    this->Report.HWOutletTemp = hotWaterOutletTemp;
+    this->Report.GLHEInletTemp = sourceInletTemp;
+    this->Report.GLHEOutletTemp = sourceOutletTemp;
+    this->Report.CHWmdot = chilledWaterMassFlowRate;
+    this->Report.HWmdot = hotWaterMassFlowRate;
+    this->Report.GLHEmdot = sourceMassFlowRate;
+    this->Report.TotElecCoolingPwr = totalCoolingPower;
+    this->Report.TotElecHeatingPwr = totalHeatingPower;
+    this->Report.CoolingRate = totalCoolingRate;
+    this->Report.HeatingRate = totalHeatingRate;
+    this->Report.GLHERate = totalSourceHeatTransfer;
+    this->Report.TotElecCooling = totalCoolingPower * secondsInTimeStep;
+    this->Report.TotElecHeating = totalHeatingPower * secondsInTimeStep;
+    this->Report.CoolingEnergy = totalCoolingRate * secondsInTimeStep;
+    this->Report.HeatingEnergy = totalHeatingRate * secondsInTimeStep;
+    this->Report.GLHEEnergy = totalSourceHeatTransfer * secondsInTimeStep;
+
+    this->Report.CHWInletTempSimul = chilledWaterInletTemp;
+    this->Report.CHWOutletTempSimul = chilledWaterOutletTemp;
+    this->Report.CHWmdotSimul = chilledWaterMassFlowRate;
+    this->Report.GLHEInletTempSimul = sourceInletTemp;
+    this->Report.GLHEOutletTempSimul = sourceOutletTemp;
+    this->Report.GLHEmdotSimul = sourceMassFlowRate;
+    this->Report.TotElecCoolingPwrSimul = totalCoolingPower;
+    this->Report.TotElecCoolingSimul = totalCoolingPower * secondsInTimeStep;
+    this->Report.CoolingRateSimul = totalCoolingRate;
+    this->Report.CoolingEnergySimul = totalCoolingRate * secondsInTimeStep;
+
+    state.dataLoopNodes->Node(this->CHWOutletNodeNum).Temp = chilledWaterOutletTemp;
+    state.dataLoopNodes->Node(this->HWOutletNodeNum).Temp = hotWaterOutletTemp;
+    state.dataLoopNodes->Node(this->GLHEOutletNodeNum).Temp = sourceOutletTemp;
+}
+
 void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int const LoopNum)
 {
     // SUBROUTINE INFORMATION:
@@ -3348,6 +3879,34 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
             GLHEInletMassFlowRate = 0.0;
         }
     }
+
+    if (this->WrapperCoolingLoad > HVAC::SmallLoad && this->WrapperHeatingLoad > HVAC::SmallLoad) {
+        auto availablePlantFlow = [&state](int const inletNodeNum, Real64 const currentFlow, PlantLocation const &plantLocation) {
+            auto const &node = state.dataLoopNodes->Node(inletNodeNum);
+            if (plantLocation.loop->LoopSide(plantLocation.loopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
+                return node.MassFlowRate;
+            }
+            Real64 const availableFlow =
+                node.MassFlowRateMaxAvail > DataBranchAirLoopPlant::MassFlowTolerance ? node.MassFlowRateMaxAvail : node.MassFlowRate;
+            return max(currentFlow, availableFlow);
+        };
+        CHWInletMassFlowRate = availablePlantFlow(this->CHWInletNodeNum, CHWInletMassFlowRate, this->CWPlantLoc);
+        HWInletMassFlowRate = availablePlantFlow(this->HWInletNodeNum, HWInletMassFlowRate, this->HWPlantLoc);
+        GLHEInletMassFlowRate = availablePlantFlow(this->GLHEInletNodeNum, GLHEInletMassFlowRate, this->GLHEPlantLoc);
+
+        this->CalcSimultaneousModel(
+            state, CHWInletMassFlowRate, HWInletMassFlowRate, GLHEInletMassFlowRate, CHWInletTemp, HWInletTemp, GLHEInletTemp);
+
+        PlantUtilities::SetComponentFlowRate(state, CHWInletMassFlowRate, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWPlantLoc);
+        PlantUtilities::SetComponentFlowRate(state, HWInletMassFlowRate, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWPlantLoc);
+        PlantUtilities::SetComponentFlowRate(state, GLHEInletMassFlowRate, this->GLHEInletNodeNum, this->GLHEOutletNodeNum, this->GLHEPlantLoc);
+
+        MyLoad = LoopNum == this->CWPlantLoc.loopNum ? -this->Report.CoolingRate : this->Report.HeatingRate;
+        return;
+    }
+
+    this->SimulClgDominant = false;
+    this->SimulHtgDominant = false;
 
     if (LoopNum == this->CWPlantLoc.loopNum) {
         if (CurCoolingLoad > 0.0 && CHWInletMassFlowRate > 0.0 && GLHEInletMassFlowRate > 0) {

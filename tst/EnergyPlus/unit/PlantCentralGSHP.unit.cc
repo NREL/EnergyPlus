@@ -1159,13 +1159,16 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     PlantUtilities::SetPlantLocationLinks(*state, wrapper.GLHEPlantLoc);
     PlantUtilities::SetPlantLocationLinks(*state, wrapper.HWPlantLoc);
 
-    state->dataLoopNodes->Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(5);
     wrapper.CoolSetPointTempNode = 1;
     wrapper.HeatSetPointTempNode = 2;
+    wrapper.CHWOutletNodeNum = 3;
+    wrapper.HWOutletNodeNum = 4;
+    wrapper.GLHEOutletNodeNum = 5;
     state->dataLoopNodes->Node(wrapper.CoolSetPointTempNode).TempSetPoint = 7.0;
     state->dataLoopNodes->Node(wrapper.HeatSetPointTempNode).TempSetPoint = 45.0;
 
-    wrapper.ChillerHeater.allocate(1);
+    wrapper.ChillerHeater.allocate(2);
     auto &chillerHeater = wrapper.ChillerHeater(1);
     chillerHeater.RefCap = 10000.0;
     chillerHeater.RefCOP = 5.0;
@@ -1226,6 +1229,52 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     chillerHeater.mapResultToPlantConnections();
     EXPECT_NEAR(0.0, chillerHeater.Result.routingEnergyBalanceResidual(), 1.0e-9);
 
+    auto simultaneousResult = wrapper.solveSimultaneous(*state, 1, 1000.0, 1200.0, 1.0, 1.0, 1.0, 12.0, 40.0, 15.0);
+    EXPECT_EQ(CurrentMode::HeatRecovery, simultaneousResult.currentMode);
+    EXPECT_NEAR(1000.0, simultaneousResult.qEvaporator, 1.0e-6);
+    EXPECT_NEAR(250.0, simultaneousResult.compressorPower, 1.0e-6);
+    EXPECT_NEAR(1200.0, simultaneousResult.qCondenser, 1.0e-6);
+    EXPECT_NEAR(1000.0, simultaneousResult.coolingDelivered, 1.0e-6);
+    EXPECT_NEAR(1200.0, simultaneousResult.heatingDelivered, 1.0e-6);
+    EXPECT_NEAR(0.0, simultaneousResult.sourceHeatTransfer, 1.0e-6);
+    EXPECT_NEAR(0.0, simultaneousResult.moduleEnergyBalanceResidual(), 1.0e-9);
+    EXPECT_NEAR(0.0, simultaneousResult.routingEnergyBalanceResidual(), 1.0e-9);
+
+    simultaneousResult = wrapper.solveSimultaneous(*state, 1, 1000.0, 600.0, 1.0, 1.0, 1.0, 12.0, 40.0, 15.0);
+    EXPECT_EQ(CurrentMode::CoolingDominant, simultaneousResult.currentMode);
+    EXPECT_NEAR(1000.0, simultaneousResult.qEvaporator, 1.0e-6);
+    EXPECT_NEAR(1200.0, simultaneousResult.qCondenser, 1.0e-6);
+    EXPECT_NEAR(1000.0, simultaneousResult.coolingDelivered, 1.0e-6);
+    EXPECT_NEAR(600.0, simultaneousResult.heatingDelivered, 1.0e-6);
+    EXPECT_NEAR(600.0, simultaneousResult.sourceHeatTransfer, 1.0e-6);
+    EXPECT_GT(simultaneousResult.capacityCurveCondenserTemp, 15.0);
+    EXPECT_LT(simultaneousResult.capacityCurveCondenserTemp, 40.0);
+    EXPECT_NEAR(0.0, simultaneousResult.moduleEnergyBalanceResidual(), 1.0e-9);
+    EXPECT_NEAR(0.0, simultaneousResult.routingEnergyBalanceResidual(), 1.0e-9);
+
+    simultaneousResult = wrapper.solveSimultaneous(*state, 1, 1000.0, 600.0, 1.0, 1.0, 0.0, 12.0, 40.0, 15.0);
+    EXPECT_EQ(CurrentMode::HeatRecovery, simultaneousResult.currentMode);
+    EXPECT_NEAR(500.0, simultaneousResult.qEvaporator, 1.0e-6);
+    EXPECT_NEAR(600.0, simultaneousResult.qCondenser, 1.0e-6);
+    EXPECT_NEAR(500.0, simultaneousResult.coolingDelivered, 1.0e-6);
+    EXPECT_NEAR(600.0, simultaneousResult.heatingDelivered, 1.0e-6);
+    EXPECT_NEAR(500.0, simultaneousResult.unmetCoolingLoad, 1.0e-6);
+    EXPECT_NEAR(0.0, simultaneousResult.sourceHeatTransfer, 1.0e-6);
+    EXPECT_NEAR(0.0, simultaneousResult.moduleEnergyBalanceResidual(), 1.0e-9);
+    EXPECT_NEAR(0.0, simultaneousResult.routingEnergyBalanceResidual(), 1.0e-9);
+
+    simultaneousResult = wrapper.solveSimultaneous(*state, 1, 500.0, 1200.0, 1.0, 1.0, 1.0, 12.0, 40.0, 15.0);
+    EXPECT_EQ(CurrentMode::HeatingDominant, simultaneousResult.currentMode);
+    EXPECT_NEAR(1000.0, simultaneousResult.qEvaporator, 1.0e-6);
+    EXPECT_NEAR(1200.0, simultaneousResult.qCondenser, 1.0e-6);
+    EXPECT_NEAR(500.0, simultaneousResult.coolingDelivered, 1.0e-6);
+    EXPECT_NEAR(1200.0, simultaneousResult.heatingDelivered, 1.0e-6);
+    EXPECT_NEAR(-500.0, simultaneousResult.sourceHeatTransfer, 1.0e-6);
+    EXPECT_GT(simultaneousResult.capacityCurveEvaporatorTemp, 7.0);
+    EXPECT_LT(simultaneousResult.capacityCurveEvaporatorTemp, 15.0);
+    EXPECT_NEAR(0.0, simultaneousResult.moduleEnergyBalanceResidual(), 1.0e-9);
+    EXPECT_NEAR(0.0, simultaneousResult.routingEnergyBalanceResidual(), 1.0e-9);
+
     wrapper.VariableFlowCH = false;
     chillerHeater.CondMode = PlantCentralGSHP::CondenserModeTemperature::LeavingCondenser;
     chillerHeater.TempRefCondOut = 40.5;
@@ -1243,6 +1292,49 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     EXPECT_GT(heatingResult.unmetHeatingLoad, 0.0);
     EXPECT_NEAR(heatingResult.qCondenser, heatingResult.availableCondenserCapacity, 1.0e-6);
     EXPECT_NEAR(0.0, heatingResult.moduleEnergyBalanceResidual(), 1.0e-9);
+
+    chillerHeater.MaxHeatingLeavingCondTempWasBlank = true;
+    chillerHeater.RefCapClgHtg = 10000.0;
+    chillerHeater.RefCOPClgHtg = 4.0;
+    chillerHeater.ChillerCapFTHeatingIDX = chillerHeater.ChillerCapFTIDX;
+    chillerHeater.ChillerEIRFTHeatingIDX = chillerHeater.ChillerEIRFTIDX;
+    chillerHeater.ChillerEIRFPLRHeatingIDX = chillerHeater.ChillerEIRFPLRIDX;
+    chillerHeater.CondModeHeating = PlantCentralGSHP::CondenserModeTemperature::EnteringCondenser;
+    chillerHeater.EvapMassFlowRateMax = 1.0;
+    chillerHeater.CondMassFlowRateMax = 1.0;
+    chillerHeater.EvapInletNode.MassFlowRateMaxAvail = 1.0;
+    chillerHeater.CondInletNode.MassFlowRateMaxAvail = 1.0;
+    wrapper.ChillerHeater(2) = chillerHeater;
+    wrapper.ChillerHeater(2).RefCapClgHtg = 5000.0;
+    wrapper.ChillerHeaterNums = 2;
+    wrapper.WrapperCoolingLoad = 18000.0;
+    wrapper.WrapperHeatingLoad = 21600.0;
+
+    wrapper.CalcSimultaneousModel(*state, 2.0, 2.0, 2.0, 12.0, 40.0, 15.0);
+    EXPECT_FALSE(wrapper.SimulClgDominant);
+    EXPECT_FALSE(wrapper.SimulHtgDominant);
+    EXPECT_EQ(CurrentMode::HeatRecovery, wrapper.ChillerHeater(1).Result.currentMode);
+    EXPECT_EQ(CurrentMode::HeatRecovery, wrapper.ChillerHeater(2).Result.currentMode);
+    EXPECT_NEAR(10000.0, wrapper.ChillerHeater(1).Result.coolingDelivered, 1.0e-6);
+    EXPECT_NEAR(12000.0, wrapper.ChillerHeater(1).Result.heatingDelivered, 1.0e-6);
+    EXPECT_NEAR(8000.0, wrapper.ChillerHeater(2).Result.requestedCoolingLoad, 1.0e-6);
+    EXPECT_NEAR(9600.0, wrapper.ChillerHeater(2).Result.requestedHeatingLoad, 1.0e-6);
+    EXPECT_NEAR(5000.0, wrapper.ChillerHeater(2).Result.coolingDelivered, 1.0e-6);
+    EXPECT_NEAR(6000.0, wrapper.ChillerHeater(2).Result.heatingDelivered, 1.0e-6);
+    EXPECT_NEAR(3000.0, wrapper.ChillerHeater(2).Result.unmetCoolingLoad, 1.0e-6);
+    EXPECT_NEAR(3600.0, wrapper.ChillerHeater(2).Result.unmetHeatingLoad, 1.0e-6);
+    EXPECT_NEAR(15000.0, wrapper.Report.CoolingRate, 1.0e-6);
+    EXPECT_NEAR(18000.0, wrapper.Report.HeatingRate, 1.0e-6);
+    EXPECT_NEAR(0.0, wrapper.Report.GLHERate, 1.0e-6);
+    EXPECT_NEAR(3750.0, wrapper.Report.TotElecCoolingPwr + wrapper.Report.TotElecHeatingPwr, 1.0e-6);
+
+    auto const firstDispatchResult = wrapper.ChillerHeater(2).Result;
+    wrapper.CalcSimultaneousModel(*state, 2.0, 2.0, 2.0, 12.0, 40.0, 15.0);
+    EXPECT_EQ(firstDispatchResult.currentMode, wrapper.ChillerHeater(2).Result.currentMode);
+    EXPECT_NEAR(firstDispatchResult.qEvaporator, wrapper.ChillerHeater(2).Result.qEvaporator, 1.0e-9);
+    EXPECT_NEAR(firstDispatchResult.qCondenser, wrapper.ChillerHeater(2).Result.qCondenser, 1.0e-9);
+    EXPECT_NEAR(firstDispatchResult.unmetCoolingLoad, wrapper.ChillerHeater(2).Result.unmetCoolingLoad, 1.0e-9);
+    EXPECT_NEAR(firstDispatchResult.unmetHeatingLoad, wrapper.ChillerHeater(2).Result.unmetHeatingLoad, 1.0e-9);
 }
 
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SequentialFlowAllocationContracts)

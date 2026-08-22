@@ -467,6 +467,25 @@ namespace PlantCentralGSHP {
                                              Real64 evaporatorInletTemp,
                                              Real64 condenserInletTemp);
 
+        ChillerHeaterResult solveSimultaneous(EnergyPlusData &state,
+                                              int chillerHeaterNum,
+                                              Real64 requestedCoolingLoad,
+                                              Real64 requestedHeatingLoad,
+                                              Real64 chilledWaterMassFlowRateMax,
+                                              Real64 hotWaterMassFlowRateMax,
+                                              Real64 sourceMassFlowRateMax,
+                                              Real64 chilledWaterInletTemp,
+                                              Real64 hotWaterInletTemp,
+                                              Real64 sourceInletTemp);
+
+        void CalcSimultaneousModel(EnergyPlusData &state,
+                                   Real64 chilledWaterMassFlowRate,
+                                   Real64 hotWaterMassFlowRate,
+                                   Real64 sourceMassFlowRate,
+                                   Real64 chilledWaterInletTemp,
+                                   Real64 hotWaterInletTemp,
+                                   Real64 sourceInletTemp);
+
         void adjustChillerHeaterCondFlowTemp(EnergyPlusData &state,
                                              Real64 &QCondenser,
                                              Real64 &CondMassFlowRate,
