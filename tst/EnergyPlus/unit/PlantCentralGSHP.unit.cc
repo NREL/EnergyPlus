@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -386,17 +387,23 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataPlnt->PlantLoop(PltSizCondNum).FluidName = "WATER";
     state->dataPlnt->PlantLoop(PltSizCondNum).glycol = Fluid::GetWater(*state);
     state->dataSize->PlantSizData(PltSizCondNum).DeltaT = 5.6;
+    state->dataSize->PlantSizData(PltSizCondNum).DesVolFlowRate = 1.0;
     state->dataSize->PlantSizData(PltSizCondNum).LoopType = DataSizing::TypeOfPlantLoop::Condenser;
     // Assign to the wrapper
     state->dataPlantCentralGSHP->Wrapper(1).GLHEPlantLoc.loopNum = PltSizCondNum;
     PlantUtilities::SetPlantLocationLinks(*state, state->dataPlantCentralGSHP->Wrapper(1).GLHEPlantLoc);
+    state->dataPlantCentralGSHP->Wrapper(1).CHWInletNodeNum = 1;
+    state->dataPlantCentralGSHP->Wrapper(1).HWInletNodeNum = 2;
+    state->dataPlantCentralGSHP->Wrapper(1).GLHEInletNodeNum = 3;
 
     // Calculate expected values
     Real64 rho_evap = state->dataPlnt->PlantLoop(PltSizNum).glycol->getDensity(*state, Constant::CWInitConvTemp, "ChillerHeater_Autosize_TEST");
 
     Real64 Cp_evap = state->dataPlnt->PlantLoop(PltSizNum).glycol->getSpecificHeat(*state, Constant::CWInitConvTemp, "ChillerHeater_Autosize_TEST");
 
-    Real64 rho_cond = state->dataPlnt->PlantLoop(PltSizCondNum).glycol->getDensity(*state, Constant::CWInitConvTemp, "ChillerHeater_Autosize_TEST");
+    Real64 rho_cond =
+        state->dataPlnt->PlantLoop(PltSizCondNum)
+            .glycol->getDensity(*state, state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).TempRefCondInCooling, "ChillerHeater_Autosize_TEST");
 
     Real64 Cp_cond = state->dataPlnt->PlantLoop(PltSizCondNum)
                          .glycol->getSpecificHeat(
@@ -440,6 +447,207 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     // Heating COP = Heating Cap / Heating Power
     Real64 RefCOPClgHtgExpected = RefCapClgHtgExpected / RefPowerClgHtgExpected;
     EXPECT_DOUBLE_EQ(RefCOPClgHtgExpected, state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).RefCOPClgHtg);
+
+    ASSERT_EQ(3u, state->dataSize->CompDesWaterFlow.size());
+    EXPECT_DOUBLE_EQ(2.0 * EvapVolFlowRateExpected, state->dataSize->CompDesWaterFlow(1).DesVolFlowRate);
+    EXPECT_DOUBLE_EQ(0.0, state->dataSize->CompDesWaterFlow(2).DesVolFlowRate);
+    EXPECT_DOUBLE_EQ(2.0 * std::max(EvapVolFlowRateExpected, CondVolFlowRateExpected), state->dataSize->CompDesWaterFlow(3).DesVolFlowRate);
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_DesignCapacityReportingUsesConnectionsAndStageability)
+{
+    state->init_state(*state);
+
+    PlantCentralGSHP::WrapperSpecs wrapper;
+    wrapper.CWPlantLoc.loopNum = 1;
+    wrapper.HWPlantLoc.loopNum = 2;
+    wrapper.GLHEPlantLoc.loopNum = 3;
+    wrapper.ChillerHeaterNums = 2;
+    wrapper.ChillerHeater.allocate(2);
+
+    auto &module1 = wrapper.ChillerHeater(1);
+    module1.RefCapCooling = 10000.0;
+    module1.RefCOPCooling = 5.0;
+    module1.MinPartLoadRatCooling = 0.20;
+    module1.MaxPartLoadRatCooling = 1.00;
+    module1.OptPartLoadRatCooling = 0.80;
+    module1.RefCapClgHtg = 8000.0;
+    module1.RefPowerClgHtg = 2000.0;
+    module1.MinPartLoadRatClgHtg = 0.25;
+    module1.MaxPartLoadRatClgHtg = 1.10;
+    module1.OptPartLoadRatClgHtg = 0.75;
+    module1.OpenMotorEff = 0.80;
+
+    auto &module2 = wrapper.ChillerHeater(2);
+    module2.RefCapCooling = 6000.0;
+    module2.RefCOPCooling = 3.0;
+    module2.MinPartLoadRatCooling = 0.10;
+    module2.MaxPartLoadRatCooling = 1.20;
+    module2.OptPartLoadRatCooling = 0.70;
+    module2.RefCapClgHtg = 12000.0;
+    module2.RefPowerClgHtg = 3000.0;
+    module2.MinPartLoadRatClgHtg = 0.30;
+    module2.MaxPartLoadRatClgHtg = 0.90;
+    module2.OptPartLoadRatClgHtg = 0.60;
+    module2.OpenMotorEff = 0.50;
+
+    Real64 maximumLoad = 0.0;
+    Real64 minimumLoad = 0.0;
+    Real64 optimumLoad = 0.0;
+    PlantLocation calledFromLocation;
+
+    calledFromLocation.loopNum = wrapper.CWPlantLoc.loopNum;
+    wrapper.getDesignCapacities(*state, calledFromLocation, maximumLoad, minimumLoad, optimumLoad);
+    EXPECT_DOUBLE_EQ(17200.0, maximumLoad);
+    EXPECT_DOUBLE_EQ(600.0, minimumLoad);
+    EXPECT_DOUBLE_EQ(12200.0, optimumLoad);
+
+    calledFromLocation.loopNum = wrapper.HWPlantLoc.loopNum;
+    wrapper.getDesignCapacities(*state, calledFromLocation, maximumLoad, minimumLoad, optimumLoad);
+    EXPECT_DOUBLE_EQ(22710.0, maximumLoad);
+    EXPECT_DOUBLE_EQ(2400.0, minimumLoad);
+    EXPECT_DOUBLE_EQ(15300.0, optimumLoad);
+
+    calledFromLocation.loopNum = wrapper.GLHEPlantLoc.loopNum;
+    wrapper.getDesignCapacities(*state, calledFromLocation, maximumLoad, minimumLoad, optimumLoad);
+    EXPECT_DOUBLE_EQ(20000.0, maximumLoad);
+    EXPECT_DOUBLE_EQ(700.0, minimumLoad);
+    EXPECT_DOUBLE_EQ(14180.0, optimumLoad);
+
+    module2.MaxPartLoadRatClgHtg = 1.20;
+    module2.OptPartLoadRatClgHtg = 0.80;
+    wrapper.getDesignCapacities(*state, calledFromLocation, maximumLoad, minimumLoad, optimumLoad);
+    EXPECT_DOUBLE_EQ(23200.0, maximumLoad);
+    EXPECT_DOUBLE_EQ(700.0, minimumLoad);
+    EXPECT_DOUBLE_EQ(15600.0, optimumLoad);
+
+    calledFromLocation.loopNum = 4;
+    wrapper.getDesignCapacities(*state, calledFromLocation, maximumLoad, minimumLoad, optimumLoad);
+    EXPECT_DOUBLE_EQ(0.0, maximumLoad);
+    EXPECT_DOUBLE_EQ(0.0, minimumLoad);
+    EXPECT_DOUBLE_EQ(0.0, optimumLoad);
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SourceOnlySizingUsesSourcePlantSizingData)
+{
+    state->init_state(*state);
+
+    state->dataPlnt->PlantLoop.allocate(3);
+    state->dataSize->PlantSizData.allocate(1);
+    auto *water = Fluid::GetWater(*state);
+    ASSERT_NE(nullptr, water);
+
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 0;
+    state->dataPlnt->PlantLoop(1).glycol = water;
+    state->dataPlnt->PlantLoop(2).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(2).glycol = water;
+    state->dataPlnt->PlantLoop(3).PlantSizNum = 0;
+    state->dataPlnt->PlantLoop(3).glycol = water;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Condenser;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.002;
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
+
+    PlantCentralGSHP::WrapperSpecs wrapper;
+    wrapper.CWPlantLoc.loopNum = 1;
+    wrapper.GLHEPlantLoc.loopNum = 2;
+    wrapper.HWPlantLoc.loopNum = 3;
+    PlantUtilities::SetPlantLocationLinks(*state, wrapper.CWPlantLoc);
+    PlantUtilities::SetPlantLocationLinks(*state, wrapper.GLHEPlantLoc);
+    PlantUtilities::SetPlantLocationLinks(*state, wrapper.HWPlantLoc);
+    wrapper.CHWInletNodeNum = 11;
+    wrapper.HWInletNodeNum = 12;
+    wrapper.GLHEInletNodeNum = 13;
+    wrapper.ChillerHeaterNums = 1;
+    wrapper.ChillerHeater.allocate(1);
+
+    auto &module = wrapper.ChillerHeater(1);
+    module.Name = "SOURCE SIZING ONLY";
+    module.SizFac = 1.0;
+    module.EvapVolFlowRate = 0.001;
+    module.RefCapCooling = 10000.0;
+    module.RefCOPCooling = 4.0;
+    module.OpenMotorEff = 0.80;
+    module.TempRefCondInCooling = 30.0;
+    module.CondVolFlowRate = DataSizing::AutoSize;
+    module.CondVolFlowRateWasAutoSized = true;
+    module.DesignHotWaterVolFlowRate = 0.0007;
+
+    Real64 const sourceDensity = water->getDensity(*state, module.TempRefCondInCooling, "PlantCentralGSHP source sizing test");
+    Real64 const sourceSpecificHeat = water->getSpecificHeat(*state, module.TempRefCondInCooling, "PlantCentralGSHP source sizing test");
+    Real64 const expectedSourceCondenserFlow = module.RefCapCooling * (1.0 + module.OpenMotorEff / module.RefCOPCooling) /
+                                               (state->dataSize->PlantSizData(1).DeltaT * sourceSpecificHeat * sourceDensity);
+
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
+    wrapper.SizeWrapper(*state);
+
+    EXPECT_NEAR(expectedSourceCondenserFlow, module.CondVolFlowRate, 1.0e-12);
+    EXPECT_DOUBLE_EQ(module.EvapVolFlowRate, module.tmpEvapVolFlowRate);
+    EXPECT_NEAR(expectedSourceCondenserFlow, module.tmpCondVolFlowRate, 1.0e-12);
+    ASSERT_EQ(3u, state->dataSize->CompDesWaterFlow.size());
+    EXPECT_DOUBLE_EQ(module.EvapVolFlowRate, state->dataSize->CompDesWaterFlow(1).DesVolFlowRate);
+    EXPECT_DOUBLE_EQ(module.DesignHotWaterVolFlowRate, state->dataSize->CompDesWaterFlow(2).DesVolFlowRate);
+    EXPECT_NEAR(std::max(module.EvapVolFlowRate, expectedSourceCondenserFlow), state->dataSize->CompDesWaterFlow(3).DesVolFlowRate, 1.0e-12);
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_HardSizedWarningsRetainCalculatedDesignValues)
+{
+    state->init_state(*state);
+    OutputReportPredefined::SetPredefinedTables(*state);
+
+    state->dataPlnt->PlantLoop.allocate(3);
+    state->dataSize->PlantSizData.allocate(2);
+    auto *water = Fluid::GetWater(*state);
+    ASSERT_NE(nullptr, water);
+    for (int loopNum = 1; loopNum <= 3; ++loopNum) {
+        state->dataPlnt->PlantLoop(loopNum).glycol = water;
+    }
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(2).PlantSizNum = 2;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Cooling;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.010;
+    state->dataSize->PlantSizData(1).DeltaT = 6.0;
+    state->dataSize->PlantSizData(2).LoopType = DataSizing::TypeOfPlantLoop::Condenser;
+    state->dataSize->PlantSizData(2).DesVolFlowRate = 0.020;
+    state->dataSize->PlantSizData(2).DeltaT = 5.0;
+
+    PlantCentralGSHP::WrapperSpecs wrapper;
+    wrapper.CWPlantLoc.loopNum = 1;
+    wrapper.GLHEPlantLoc.loopNum = 2;
+    wrapper.HWPlantLoc.loopNum = 3;
+    PlantUtilities::SetPlantLocationLinks(*state, wrapper.CWPlantLoc);
+    PlantUtilities::SetPlantLocationLinks(*state, wrapper.GLHEPlantLoc);
+    PlantUtilities::SetPlantLocationLinks(*state, wrapper.HWPlantLoc);
+    wrapper.CHWInletNodeNum = 21;
+    wrapper.HWInletNodeNum = 22;
+    wrapper.GLHEInletNodeNum = 23;
+    wrapper.ChillerHeaterNums = 1;
+    wrapper.ChillerHeater.allocate(1);
+
+    auto &module = wrapper.ChillerHeater(1);
+    module.Name = "HARD SIZED MODULE";
+    module.SizFac = 1.0;
+    module.EvapVolFlowRate = 0.001;
+    module.RefCapCooling = 1000.0;
+    module.RefCOPCooling = 5.0;
+    module.OpenMotorEff = 1.0;
+    module.TempRefCondInCooling = 30.0;
+    module.CondVolFlowRate = 0.001;
+    module.DesignHotWaterVolFlowRate = 0.002;
+
+    state->dataGlobal->DisplayExtraWarnings = true;
+    state->dataSize->AutoVsHardSizingThreshold = 0.01;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    wrapper.SizeWrapper(*state);
+
+    EXPECT_DOUBLE_EQ(0.001, module.EvapVolFlowRate);
+    EXPECT_DOUBLE_EQ(1000.0, module.RefCapCooling);
+    EXPECT_DOUBLE_EQ(0.001, module.CondVolFlowRate);
+    EXPECT_DOUBLE_EQ(0.001, module.tmpEvapVolFlowRate);
+    EXPECT_DOUBLE_EQ(0.001, module.tmpCondVolFlowRate);
+    EXPECT_TRUE(compare_err_stream_substring("User-Specified Reference Chilled Water Flow Rate", false));
+    EXPECT_TRUE(compare_err_stream_substring("User-Specified Reference Capacity", false));
+    EXPECT_TRUE(compare_err_stream_substring("User-Specified Reference Condenser Water Flow Rate", true));
 }
 
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)

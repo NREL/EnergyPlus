@@ -326,20 +326,67 @@ void WrapperSpecs::getDesignCapacities(
     MinLoad = 0.0;
     MaxLoad = 0.0;
     OptLoad = 0.0;
-    if (calledFromLocation.loopNum == this->CWPlantLoc.loopNum) { // Chilled water loop
-        for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
-            auto const &chillerHeater = this->ChillerHeater(NumChillerHeater);
-            MaxLoad += chillerHeater.RefCapCooling * chillerHeater.MaxPartLoadRatCooling;
-            OptLoad += chillerHeater.RefCapCooling * chillerHeater.OptPartLoadRatCooling;
-            MinLoad += chillerHeater.RefCapCooling * chillerHeater.MinPartLoadRatCooling;
+    Real64 minimumStageLoad = std::numeric_limits<Real64>::max();
+    auto accumulateCapacity = [&minimumStageLoad](Real64 const referenceCapacity,
+                                                  Real64 const minimumPartLoadRatio,
+                                                  Real64 const maximumPartLoadRatio,
+                                                  Real64 const optimumPartLoadRatio,
+                                                  Real64 &maximumLoad,
+                                                  Real64 &optimumLoad) {
+        if (referenceCapacity <= 0.0) {
+            return;
         }
-    } else if (calledFromLocation.loopNum == this->HWPlantLoc.loopNum) { // Hot water loop
-        for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
-            auto const &chillerHeater = this->ChillerHeater(NumChillerHeater);
-            MaxLoad += chillerHeater.RefCapClgHtg * chillerHeater.MaxPartLoadRatClgHtg;
-            OptLoad += chillerHeater.RefCapClgHtg * chillerHeater.OptPartLoadRatClgHtg;
-            MinLoad += chillerHeater.RefCapClgHtg * chillerHeater.MinPartLoadRatClgHtg;
+        maximumLoad += referenceCapacity * max(0.0, maximumPartLoadRatio);
+        optimumLoad += referenceCapacity * max(0.0, optimumPartLoadRatio);
+        minimumStageLoad = min(minimumStageLoad, referenceCapacity * max(0.0, minimumPartLoadRatio));
+    };
+
+    if (calledFromLocation.loopNum == this->CWPlantLoc.loopNum) { // Chilled-water useful cooling
+        for (auto const &chillerHeater : this->ChillerHeater) {
+            accumulateCapacity(chillerHeater.RefCapCooling,
+                               chillerHeater.MinPartLoadRatCooling,
+                               chillerHeater.MaxPartLoadRatCooling,
+                               chillerHeater.OptPartLoadRatCooling,
+                               MaxLoad,
+                               OptLoad);
         }
+    } else if (calledFromLocation.loopNum == this->HWPlantLoc.loopNum) { // Hot-water useful heating
+        for (auto const &chillerHeater : this->ChillerHeater) {
+            Real64 const referenceHeatingCapacity = chillerHeater.RefCapClgHtg + max(0.0, chillerHeater.RefPowerClgHtg) * chillerHeater.OpenMotorEff;
+            accumulateCapacity(referenceHeatingCapacity,
+                               chillerHeater.MinPartLoadRatClgHtg,
+                               chillerHeater.MaxPartLoadRatClgHtg,
+                               chillerHeater.OptPartLoadRatClgHtg,
+                               MaxLoad,
+                               OptLoad);
+        }
+    } else if (calledFromLocation.loopNum == this->GLHEPlantLoc.loopNum) { // Absolute source rejection/extraction envelope
+        Real64 maximumSourceRejection = 0.0;
+        Real64 optimumSourceRejection = 0.0;
+        Real64 maximumSourceExtraction = 0.0;
+        Real64 optimumSourceExtraction = 0.0;
+        for (auto const &chillerHeater : this->ChillerHeater) {
+            Real64 const referenceCoolingPower = chillerHeater.RefCOPCooling > 0.0 ? chillerHeater.RefCapCooling / chillerHeater.RefCOPCooling : 0.0;
+            Real64 const referenceSourceRejection = chillerHeater.RefCapCooling + referenceCoolingPower * chillerHeater.OpenMotorEff;
+            accumulateCapacity(referenceSourceRejection,
+                               chillerHeater.MinPartLoadRatCooling,
+                               chillerHeater.MaxPartLoadRatCooling,
+                               chillerHeater.OptPartLoadRatCooling,
+                               maximumSourceRejection,
+                               optimumSourceRejection);
+            accumulateCapacity(chillerHeater.RefCapClgHtg,
+                               chillerHeater.MinPartLoadRatClgHtg,
+                               chillerHeater.MaxPartLoadRatClgHtg,
+                               chillerHeater.OptPartLoadRatClgHtg,
+                               maximumSourceExtraction,
+                               optimumSourceExtraction);
+        }
+        MaxLoad = max(maximumSourceRejection, maximumSourceExtraction);
+        OptLoad = max(optimumSourceRejection, optimumSourceExtraction);
+    }
+
+    if (minimumStageLoad < std::numeric_limits<Real64>::max()) {
+        MinLoad = minimumStageLoad;
     }
 }
 
@@ -402,71 +449,55 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
 
         auto &chillerHeater = this->ChillerHeater(NumChillerHeater);
 
-        Real64 tmpNomCap = chillerHeater.RefCapCooling;
-        Real64 tmpEvapVolFlowRate = chillerHeater.EvapVolFlowRate;
-        Real64 tmpCondVolFlowRate = chillerHeater.CondVolFlowRate;
+        Real64 sizingNomCap = chillerHeater.RefCapCooling;
+        Real64 sizingEvapVolFlowRate = chillerHeater.EvapVolFlowRate;
+        Real64 sizingCondVolFlowRate = chillerHeater.CondVolFlowRate;
 
         // auto-size the Evaporator Flow Rate
         if (PltSizNum > 0) {
+            Real64 designEvapVolFlowRate = 0.0;
             if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
-                tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * chillerHeater.SizFac;
-                chillerHeater.tmpEvapVolFlowRate = tmpEvapVolFlowRate;
-                if (!chillerHeater.EvapVolFlowRateWasAutoSized) {
-                    tmpEvapVolFlowRate = chillerHeater.EvapVolFlowRate;
-                }
-
-            } else {
-                if (chillerHeater.EvapVolFlowRateWasAutoSized) {
-                    tmpEvapVolFlowRate = 0.0;
-                }
-                chillerHeater.tmpEvapVolFlowRate = tmpEvapVolFlowRate;
+                designEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * chillerHeater.SizFac;
             }
+            sizingEvapVolFlowRate = chillerHeater.EvapVolFlowRateWasAutoSized ? designEvapVolFlowRate : chillerHeater.EvapVolFlowRate;
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 if (chillerHeater.EvapVolFlowRateWasAutoSized) {
-                    chillerHeater.EvapVolFlowRate = tmpEvapVolFlowRate;
+                    chillerHeater.EvapVolFlowRate = designEvapVolFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
                         BaseSizer::reportSizerOutput(state,
                                                      "ChillerHeaterPerformance:Electric:EIR",
                                                      chillerHeater.Name,
                                                      "Design Size Reference Chilled Water Flow Rate [m3/s]",
-                                                     tmpEvapVolFlowRate);
+                                                     designEvapVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      "ChillerHeaterPerformance:Electric:EIR",
                                                      chillerHeater.Name,
                                                      "Initial Design Size Reference Chilled Water Flow Rate [m3/s]",
-                                                     tmpEvapVolFlowRate);
+                                                     designEvapVolFlowRate);
                     }
-                } else {
-                    if (chillerHeater.EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport &&
-                        !this->mySizesReported) {
-
-                        // Hardsized evaporator design volume flow rate for reporting
-                        Real64 EvapVolFlowRateUser = chillerHeater.EvapVolFlowRate;
-                        BaseSizer::reportSizerOutput(state,
-                                                     "ChillerHeaterPerformance:Electric:EIR",
-                                                     chillerHeater.Name,
-                                                     "Design Size Reference Chilled Water Flow Rate [m3/s]",
-                                                     tmpEvapVolFlowRate,
-                                                     "User-Specified Reference Chilled Water Flow Rate [m3/s]",
-                                                     EvapVolFlowRateUser);
-                        tmpEvapVolFlowRate = EvapVolFlowRateUser;
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
-                                state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(state,
-                                            std::format("SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for {}",
-                                                        chillerHeater.Name));
-                                ShowContinueError(
-                                    state, std::format("User-Specified Reference Chilled Water Flow Rate of {:.5f} [m3/s]", EvapVolFlowRateUser));
-                                ShowContinueError(
-                                    state,
-                                    std::format("differs from Design Size Reference Chilled Water Flow Rate of {:.5f} [m3/s]", tmpEvapVolFlowRate));
-                                ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
-                                ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
-                            }
-                        }
+                } else if (chillerHeater.EvapVolFlowRate > 0.0 && designEvapVolFlowRate > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport &&
+                           !this->mySizesReported) {
+                    Real64 const evapVolFlowRateUser = chillerHeater.EvapVolFlowRate;
+                    BaseSizer::reportSizerOutput(state,
+                                                 "ChillerHeaterPerformance:Electric:EIR",
+                                                 chillerHeater.Name,
+                                                 "Design Size Reference Chilled Water Flow Rate [m3/s]",
+                                                 designEvapVolFlowRate,
+                                                 "User-Specified Reference Chilled Water Flow Rate [m3/s]",
+                                                 evapVolFlowRateUser);
+                    if (state.dataGlobal->DisplayExtraWarnings &&
+                        (std::abs(designEvapVolFlowRate - evapVolFlowRateUser) / evapVolFlowRateUser) > state.dataSize->AutoVsHardSizingThreshold) {
+                        ShowMessage(
+                            state,
+                            std::format("SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for {}", chillerHeater.Name));
+                        ShowContinueError(state,
+                                          std::format("User-Specified Reference Chilled Water Flow Rate of {:.5f} [m3/s]", evapVolFlowRateUser));
+                        ShowContinueError(
+                            state, std::format("differs from Design Size Reference Chilled Water Flow Rate of {:.5f} [m3/s]", designEvapVolFlowRate));
+                        ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                        ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }
                 }
             }
@@ -487,26 +518,21 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
                 }
             }
         }
+        chillerHeater.tmpEvapVolFlowRate = max(0.0, sizingEvapVolFlowRate);
 
         // auto-size the Reference Cooling Capacity
         // each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow && tmpEvapVolFlowRate > 0.0) {
-                Real64 Cp = this->CWPlantLoc.loop->glycol->getSpecificHeat(state, Constant::CWInitConvTemp, RoutineName);
-
-                Real64 rho = this->CWPlantLoc.loop->glycol->getDensity(state, Constant::CWInitConvTemp, RoutineName);
-                tmpNomCap = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * tmpEvapVolFlowRate;
-                if (!chillerHeater.RefCapCoolingWasAutoSized) {
-                    tmpNomCap = chillerHeater.RefCapCooling;
-                }
-            } else {
-                if (chillerHeater.RefCapCoolingWasAutoSized) {
-                    tmpNomCap = 0.0;
-                }
+            Real64 designNomCap = 0.0;
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow && sizingEvapVolFlowRate > 0.0) {
+                Real64 const cp = this->CWPlantLoc.loop->glycol->getSpecificHeat(state, Constant::CWInitConvTemp, RoutineName);
+                Real64 const rho = this->CWPlantLoc.loop->glycol->getDensity(state, Constant::CWInitConvTemp, RoutineName);
+                designNomCap = cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * sizingEvapVolFlowRate;
             }
+            sizingNomCap = chillerHeater.RefCapCoolingWasAutoSized ? designNomCap : chillerHeater.RefCapCooling;
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 if (chillerHeater.RefCapCoolingWasAutoSized) {
-                    chillerHeater.RefCapCooling = tmpNomCap;
+                    chillerHeater.RefCapCooling = designNomCap;
 
                     // Now that we have the Reference Cooling Capacity, we need to also initialize the Heating side
                     // given the ratios
@@ -518,40 +544,34 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
 
                     if (state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
                         BaseSizer::reportSizerOutput(
-                            state, "ChillerHeaterPerformance:Electric:EIR", chillerHeater.Name, "Design Size Reference Capacity [W]", tmpNomCap);
+                            state, "ChillerHeaterPerformance:Electric:EIR", chillerHeater.Name, "Design Size Reference Capacity [W]", designNomCap);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      "ChillerHeaterPerformance:Electric:EIR",
                                                      chillerHeater.Name,
                                                      "Initial Design Size Reference Capacity [W]",
-                                                     tmpNomCap);
+                                                     designNomCap);
                     }
-                } else {
-                    if (chillerHeater.RefCapCooling > 0.0 && tmpNomCap > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport &&
-                        !this->mySizesReported) {
-
-                        // Hardsized nominal capacity cooling power for reporting
-                        Real64 NomCapUser = chillerHeater.RefCapCooling;
-                        BaseSizer::reportSizerOutput(state,
-                                                     "ChillerHeaterPerformance:Electric:EIR",
-                                                     chillerHeater.Name,
-                                                     "Design Size Reference Capacity [W]",
-                                                     tmpNomCap,
-                                                     "User-Specified Reference Capacity [W]",
-                                                     NomCapUser);
-                        tmpNomCap = NomCapUser;
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(state,
-                                            std::format("SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for {}",
-                                                        chillerHeater.Name));
-                                ShowContinueError(state, std::format("User-Specified Reference Capacity of {:.2f} [W]", NomCapUser));
-                                ShowContinueError(state, std::format("differs from Design Size Reference Capacity of {:.2f} [W]", tmpNomCap));
-                                ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
-                                ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
-                            }
-                        }
+                } else if (chillerHeater.RefCapCooling > 0.0 && designNomCap > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport &&
+                           !this->mySizesReported) {
+                    Real64 const nomCapUser = chillerHeater.RefCapCooling;
+                    BaseSizer::reportSizerOutput(state,
+                                                 "ChillerHeaterPerformance:Electric:EIR",
+                                                 chillerHeater.Name,
+                                                 "Design Size Reference Capacity [W]",
+                                                 designNomCap,
+                                                 "User-Specified Reference Capacity [W]",
+                                                 nomCapUser);
+                    if (state.dataGlobal->DisplayExtraWarnings &&
+                        (std::abs(designNomCap - nomCapUser) / nomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
+                        ShowMessage(
+                            state,
+                            std::format("SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for {}", chillerHeater.Name));
+                        ShowContinueError(state, std::format("User-Specified Reference Capacity of {:.2f} [W]", nomCapUser));
+                        ShowContinueError(state, std::format("differs from Design Size Reference Capacity of {:.2f} [W]", designNomCap));
+                        ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                        ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }
                 }
             }
@@ -577,68 +597,55 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
         // auto-size the condenser volume flow rate
         // each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
         if (PltSizCondNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
-                Real64 rho = this->GLHEPlantLoc.loop->glycol->getDensity(state, Constant::CWInitConvTemp, RoutineName);
-                // TODO: JM 2018-12-06 I wonder why Cp isn't calculated at the same temp as rho...
-                Real64 Cp = this->GLHEPlantLoc.loop->glycol->getSpecificHeat(state, chillerHeater.TempRefCondInCooling, RoutineName);
-                tmpCondVolFlowRate = tmpNomCap * (1.0 + (1.0 / chillerHeater.RefCOPCooling) * chillerHeater.OpenMotorEff) /
-                                     (state.dataSize->PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
-                chillerHeater.tmpCondVolFlowRate = tmpCondVolFlowRate;
-                if (!chillerHeater.CondVolFlowRateWasAutoSized) {
-                    tmpCondVolFlowRate = chillerHeater.CondVolFlowRate;
-                }
-
-            } else {
-                if (chillerHeater.CondVolFlowRateWasAutoSized) {
-                    tmpCondVolFlowRate = 0.0;
-                }
-                chillerHeater.tmpCondVolFlowRate = tmpCondVolFlowRate;
+            auto const &sourceSizing = state.dataSize->PlantSizData(PltSizCondNum);
+            Real64 designCondVolFlowRate = 0.0;
+            if (sourceSizing.DesVolFlowRate >= HVAC::SmallWaterVolFlow && sizingNomCap > 0.0 && sourceSizing.DeltaT > 0.0 &&
+                chillerHeater.RefCOPCooling > 0.0) {
+                Real64 const rho = this->GLHEPlantLoc.loop->glycol->getDensity(state, chillerHeater.TempRefCondInCooling, RoutineName);
+                Real64 const cp = this->GLHEPlantLoc.loop->glycol->getSpecificHeat(state, chillerHeater.TempRefCondInCooling, RoutineName);
+                designCondVolFlowRate =
+                    sizingNomCap * (1.0 + chillerHeater.OpenMotorEff / chillerHeater.RefCOPCooling) / (sourceSizing.DeltaT * cp * rho);
             }
+            sizingCondVolFlowRate = chillerHeater.CondVolFlowRateWasAutoSized ? designCondVolFlowRate : chillerHeater.CondVolFlowRate;
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 if (chillerHeater.CondVolFlowRateWasAutoSized) {
-                    chillerHeater.CondVolFlowRate = tmpCondVolFlowRate;
+                    chillerHeater.CondVolFlowRate = designCondVolFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
                         BaseSizer::reportSizerOutput(state,
                                                      "ChillerHeaterPerformance:Electric:EIR",
                                                      chillerHeater.Name,
                                                      "Design Size Reference Condenser Water Flow Rate [m3/s]",
-                                                     tmpCondVolFlowRate);
+                                                     designCondVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      "ChillerHeaterPerformance:Electric:EIR",
                                                      chillerHeater.Name,
                                                      "Initial Design Size Reference Condenser Water Flow Rate [m3/s]",
-                                                     tmpCondVolFlowRate);
+                                                     designCondVolFlowRate);
                     }
-                } else {
-                    if (chillerHeater.CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport &&
-                        !this->mySizesReported) {
-
-                        // Hardsized condenser design volume flow rate for reporting
-                        Real64 CondVolFlowRateUser = chillerHeater.CondVolFlowRate;
-                        BaseSizer::reportSizerOutput(state,
-                                                     "ChillerHeaterPerformance:Electric:EIR",
-                                                     chillerHeater.Name,
-                                                     "Design Size Reference Condenser Water Flow Rate [m3/s]",
-                                                     tmpCondVolFlowRate,
-                                                     "User-Specified Reference Condenser Water Flow Rate [m3/s]",
-                                                     CondVolFlowRateUser);
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
-                                state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(state,
-                                            std::format("SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for {}",
-                                                        chillerHeater.Name));
-                                ShowContinueError(
-                                    state, std::format("User-Specified Reference Condenser Water Flow Rate of {:.5f} [m3/s]", CondVolFlowRateUser));
-                                ShowContinueError(
-                                    state,
-                                    std::format("differs from Design Size Reference Condenser Water Flow Rate of {:.5f} [m3/s]", tmpCondVolFlowRate));
-                                ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
-                                ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
-                            }
-                        }
+                } else if (chillerHeater.CondVolFlowRate > 0.0 && designCondVolFlowRate > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport &&
+                           !this->mySizesReported) {
+                    Real64 const condVolFlowRateUser = chillerHeater.CondVolFlowRate;
+                    BaseSizer::reportSizerOutput(state,
+                                                 "ChillerHeaterPerformance:Electric:EIR",
+                                                 chillerHeater.Name,
+                                                 "Design Size Reference Condenser Water Flow Rate [m3/s]",
+                                                 designCondVolFlowRate,
+                                                 "User-Specified Reference Condenser Water Flow Rate [m3/s]",
+                                                 condVolFlowRateUser);
+                    if (state.dataGlobal->DisplayExtraWarnings &&
+                        (std::abs(designCondVolFlowRate - condVolFlowRateUser) / condVolFlowRateUser) > state.dataSize->AutoVsHardSizingThreshold) {
+                        ShowMessage(
+                            state,
+                            std::format("SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for {}", chillerHeater.Name));
+                        ShowContinueError(state,
+                                          std::format("User-Specified Reference Condenser Water Flow Rate of {:.5f} [m3/s]", condVolFlowRateUser));
+                        ShowContinueError(
+                            state,
+                            std::format("differs from Design Size Reference Condenser Water Flow Rate of {:.5f} [m3/s]", designCondVolFlowRate));
+                        ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                        ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }
                 }
             }
@@ -660,6 +667,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
                 }
             }
         }
+        chillerHeater.tmpCondVolFlowRate = max(0.0, sizingCondVolFlowRate);
 
         if (state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
             // create predefined report
@@ -677,19 +685,19 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
 
     // sum individual volume flows and register wrapper inlets
     Real64 TotalEvapVolFlowRate = 0.0;
-    Real64 TotalCondVolFlowRate = 0.0;
+    Real64 TotalSourceVolFlowRate = 0.0;
     Real64 TotalHotWaterVolFlowRate = 0.0;
     for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
         auto const &chillerHeater = this->ChillerHeater(NumChillerHeater);
         TotalEvapVolFlowRate += chillerHeater.tmpEvapVolFlowRate;
-        TotalCondVolFlowRate += chillerHeater.tmpCondVolFlowRate;
+        TotalSourceVolFlowRate += max(chillerHeater.tmpEvapVolFlowRate, chillerHeater.tmpCondVolFlowRate);
         TotalHotWaterVolFlowRate += chillerHeater.DesignHotWaterVolFlowRate;
     }
 
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->CHWInletNodeNum, TotalEvapVolFlowRate);
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->HWInletNodeNum, TotalHotWaterVolFlowRate);
-    // save the reference condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
-    PlantUtilities::RegisterPlantCompDesignFlow(state, this->GLHEInletNodeNum, TotalCondVolFlowRate);
+    // Source extraction uses evaporator flow and source rejection uses condenser flow; only one direction is active per module.
+    PlantUtilities::RegisterPlantCompDesignFlow(state, this->GLHEInletNodeNum, TotalSourceVolFlowRate);
 
     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
         this->mySizesReported = true;
