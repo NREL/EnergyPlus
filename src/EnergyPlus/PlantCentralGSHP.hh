@@ -311,6 +311,10 @@ namespace PlantCentralGSHP {
         Real64 tmpCondVolFlowRate = 0.0;          // temporary ref water vol flow rate for intermediate sizing [m3/s]
         Real64 CondMassFlowRateMax = 0.0;         // Reference water mass flow rate through condenser [kg/s]
         Real64 EvapMassFlowRateMax = 0.0;         // Reference water mass flow rate through evaporator [kg/s]
+        Real64 ChilledWaterMassFlowRateMax = 0.0; // Evaporator design mass flow on the chilled-water connection [kg/s]
+        Real64 HotWaterMassFlowRateMax = 0.0;     // Condenser design mass flow on the hot-water connection [kg/s]
+        Real64 SourceEvapMassFlowRateMax = 0.0;   // Evaporator design mass flow on the source connection [kg/s]
+        Real64 SourceCondMassFlowRateMax = 0.0;   // Condenser design mass flow on the source connection [kg/s]
         Real64 Evapmdot = 0.0;                    // Evaporator mass flow rate [kg/s]
         Real64 Condmdot = 0.0;                    // Condenser mass flow rate [kg/s]
         Real64 DesignHotWaterVolFlowRate = 0.0;   // Design hot water volumetric flow rate through the condenser [m3/s]
@@ -437,6 +441,8 @@ namespace PlantCentralGSHP {
                         int LoopNum    // Loop Number Index
         );
 
+        void initializeDesignFlowLimits(EnergyPlusData &state);
+
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,
                       bool FirstHVACIteration,
@@ -450,6 +456,12 @@ namespace PlantCentralGSHP {
         void CalcChillerModel(EnergyPlusData &state);
 
         void CalcChillerHeaterModel(EnergyPlusData &state);
+
+        void CalcCoolingOnlyModel(
+            EnergyPlusData &state, Real64 chilledWaterMassFlowRate, Real64 sourceMassFlowRate, Real64 chilledWaterInletTemp, Real64 sourceInletTemp);
+
+        void CalcHeatingOnlyModel(
+            EnergyPlusData &state, Real64 hotWaterMassFlowRate, Real64 sourceMassFlowRate, Real64 hotWaterInletTemp, Real64 sourceInletTemp);
 
         ChillerHeaterResult solveCoolingOnly(EnergyPlusData &state,
                                              int chillerHeaterNum,
@@ -485,6 +497,15 @@ namespace PlantCentralGSHP {
                                    Real64 chilledWaterInletTemp,
                                    Real64 hotWaterInletTemp,
                                    Real64 sourceInletTemp);
+
+        void updateWrapperReportingAndNodes(EnergyPlusData &state,
+                                            Real64 chilledWaterMassFlowRate,
+                                            Real64 hotWaterMassFlowRate,
+                                            Real64 sourceMassFlowRate,
+                                            Real64 chilledWaterInletTemp,
+                                            Real64 hotWaterInletTemp,
+                                            Real64 sourceInletTemp,
+                                            bool simultaneousOperation);
 
         void adjustChillerHeaterCondFlowTemp(EnergyPlusData &state,
                                              Real64 &QCondenser,

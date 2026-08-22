@@ -1159,12 +1159,18 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     PlantUtilities::SetPlantLocationLinks(*state, wrapper.GLHEPlantLoc);
     PlantUtilities::SetPlantLocationLinks(*state, wrapper.HWPlantLoc);
 
-    state->dataLoopNodes->Node.allocate(5);
+    state->dataLoopNodes->Node.allocate(8);
     wrapper.CoolSetPointTempNode = 1;
     wrapper.HeatSetPointTempNode = 2;
-    wrapper.CHWOutletNodeNum = 3;
-    wrapper.HWOutletNodeNum = 4;
-    wrapper.GLHEOutletNodeNum = 5;
+    wrapper.CHWInletNodeNum = 3;
+    wrapper.CHWOutletNodeNum = 4;
+    wrapper.HWInletNodeNum = 5;
+    wrapper.HWOutletNodeNum = 6;
+    wrapper.GLHEInletNodeNum = 7;
+    wrapper.GLHEOutletNodeNum = 8;
+    state->dataLoopNodes->Node(wrapper.CHWInletNodeNum).Temp = 12.0;
+    state->dataLoopNodes->Node(wrapper.HWInletNodeNum).Temp = 40.0;
+    state->dataLoopNodes->Node(wrapper.GLHEInletNodeNum).Temp = 15.0;
     state->dataLoopNodes->Node(wrapper.CoolSetPointTempNode).TempSetPoint = 7.0;
     state->dataLoopNodes->Node(wrapper.HeatSetPointTempNode).TempSetPoint = 45.0;
 
@@ -1335,6 +1341,120 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     EXPECT_NEAR(firstDispatchResult.qCondenser, wrapper.ChillerHeater(2).Result.qCondenser, 1.0e-9);
     EXPECT_NEAR(firstDispatchResult.unmetCoolingLoad, wrapper.ChillerHeater(2).Result.unmetCoolingLoad, 1.0e-9);
     EXPECT_NEAR(firstDispatchResult.unmetHeatingLoad, wrapper.ChillerHeater(2).Result.unmetHeatingLoad, 1.0e-9);
+
+    auto configureConnectionPerformance = [&wrapper](int const moduleNum, Real64 const referenceCapacity) {
+        auto &module = wrapper.ChillerHeater(moduleNum);
+        module.RefCapCooling = referenceCapacity;
+        module.RefCOPCooling = 4.0;
+        module.ChillerCapFTCoolingIDX = module.ChillerCapFTHeatingIDX;
+        module.ChillerEIRFTCoolingIDX = module.ChillerEIRFTHeatingIDX;
+        module.ChillerEIRFPLRCoolingIDX = module.ChillerEIRFPLRHeatingIDX;
+        module.CondModeCooling = PlantCentralGSHP::CondenserModeTemperature::EnteringCondenser;
+        module.RefCapClgHtg = referenceCapacity;
+        module.RefCOPClgHtg = 4.0;
+        module.ChilledWaterMassFlowRateMax = 0.20;
+        module.HotWaterMassFlowRateMax = 0.10;
+        module.SourceEvapMassFlowRateMax = 0.12;
+        module.SourceCondMassFlowRateMax = 0.15;
+    };
+    configureConnectionPerformance(1, 10000.0);
+    configureConnectionPerformance(2, 5000.0);
+
+    wrapper.WrapperCoolingLoad = 20000.0;
+    wrapper.WrapperHeatingLoad = 0.0;
+    wrapper.CalcCoolingOnlyModel(*state, 0.30, 0.25, 12.0, 15.0);
+    auto const &coolingModule1 = wrapper.ChillerHeater(1).Result;
+    auto const &coolingModule2 = wrapper.ChillerHeater(2).Result;
+    EXPECT_EQ(CurrentMode::CoolingOnly, coolingModule1.currentMode);
+    EXPECT_EQ(CurrentMode::CoolingOnly, coolingModule2.currentMode);
+    EXPECT_NEAR(0.20, coolingModule1.chilledWaterMassFlowRate, 1.0e-12);
+    EXPECT_NEAR(0.10, coolingModule2.chilledWaterMassFlowRate, 1.0e-12);
+    EXPECT_NEAR(0.15, coolingModule1.sourceMassFlowRate, 1.0e-12);
+    EXPECT_NEAR(0.10, coolingModule2.sourceMassFlowRate, 1.0e-12);
+    EXPECT_LE(coolingModule1.chilledWaterMassFlowRate + coolingModule2.chilledWaterMassFlowRate, 0.30);
+    EXPECT_LE(coolingModule1.sourceMassFlowRate + coolingModule2.sourceMassFlowRate, 0.25);
+    EXPECT_NEAR(7.0, wrapper.Report.CHWOutletTemp, 1.0e-9);
+    Real64 const sourceCp = sourceGlycol->getSpecificHeat(*state, 15.0, "PlantCentralGSHP connection test");
+    EXPECT_NEAR(wrapper.Report.GLHERate, 0.25 * sourceCp * (wrapper.Report.GLHEOutletTemp - wrapper.Report.GLHEInletTemp), 1.0e-6);
+    EXPECT_NEAR(0.0, coolingModule1.routingEnergyBalanceResidual(), 1.0e-9);
+    EXPECT_NEAR(0.0, coolingModule2.routingEnergyBalanceResidual(), 1.0e-9);
+
+    wrapper.VariableFlowCH = true;
+    wrapper.WrapperCoolingLoad = 1000.0;
+    wrapper.CalcCoolingOnlyModel(*state, 0.30, 0.25, 12.0, 15.0);
+    Real64 const expectedVariableChilledWaterFlow = 1000.0 / (chilledWaterCp * 5.0);
+    EXPECT_NEAR(expectedVariableChilledWaterFlow, wrapper.ChillerHeater(1).Result.chilledWaterMassFlowRate, 1.0e-9);
+    EXPECT_NEAR(0.0, wrapper.ChillerHeater(2).Result.chilledWaterMassFlowRate, 1.0e-12);
+    EXPECT_NEAR(12.0 - 1000.0 / (0.30 * chilledWaterCp), wrapper.Report.CHWOutletTemp, 1.0e-9);
+    EXPECT_NEAR(wrapper.Report.GLHERate, 0.25 * sourceCp * (wrapper.Report.GLHEOutletTemp - wrapper.Report.GLHEInletTemp), 1.0e-6);
+
+    wrapper.VariableFlowCH = false;
+    wrapper.WrapperCoolingLoad = 0.0;
+    wrapper.WrapperHeatingLoad = 20000.0;
+    wrapper.CalcHeatingOnlyModel(*state, 0.15, 0.18, 40.0, 15.0);
+    auto const &heatingModule1 = wrapper.ChillerHeater(1).Result;
+    auto const &heatingModule2 = wrapper.ChillerHeater(2).Result;
+    EXPECT_EQ(CurrentMode::HeatingOnly, heatingModule1.currentMode);
+    EXPECT_EQ(CurrentMode::HeatingOnly, heatingModule2.currentMode);
+    EXPECT_NEAR(0.10, heatingModule1.hotWaterMassFlowRate, 1.0e-12);
+    EXPECT_NEAR(0.05, heatingModule2.hotWaterMassFlowRate, 1.0e-12);
+    EXPECT_NEAR(0.12, heatingModule1.sourceMassFlowRate, 1.0e-12);
+    EXPECT_NEAR(0.06, heatingModule2.sourceMassFlowRate, 1.0e-12);
+    EXPECT_LE(heatingModule1.hotWaterMassFlowRate + heatingModule2.hotWaterMassFlowRate, 0.15);
+    EXPECT_LE(heatingModule1.sourceMassFlowRate + heatingModule2.sourceMassFlowRate, 0.18);
+    EXPECT_NEAR(45.0, wrapper.Report.HWOutletTemp, 1.0e-9);
+    EXPECT_NEAR(-wrapper.Report.GLHERate, 0.18 * sourceCp * (wrapper.Report.GLHEInletTemp - wrapper.Report.GLHEOutletTemp), 1.0e-6);
+    EXPECT_NEAR(0.0, heatingModule1.routingEnergyBalanceResidual(), 1.0e-9);
+    EXPECT_NEAR(0.0, heatingModule2.routingEnergyBalanceResidual(), 1.0e-9);
+
+    wrapper.WrapperCoolingLoad = 1000.0;
+    wrapper.WrapperHeatingLoad = 500.0;
+    wrapper.CalcSimultaneousModel(*state, 0.20, 0.10, 0.30, 12.0, 40.0, 15.0);
+    EXPECT_EQ(CurrentMode::CoolingDominant, wrapper.ChillerHeater(1).Result.currentMode);
+    EXPECT_NEAR(0.15, wrapper.ChillerHeater(1).Result.sourceMassFlowRate, 1.0e-12);
+
+    wrapper.WrapperCoolingLoad = 500.0;
+    wrapper.WrapperHeatingLoad = 1200.0;
+    wrapper.CalcSimultaneousModel(*state, 0.20, 0.10, 0.30, 12.0, 40.0, 15.0);
+    EXPECT_EQ(CurrentMode::HeatingDominant, wrapper.ChillerHeater(1).Result.currentMode);
+    EXPECT_NEAR(0.12, wrapper.ChillerHeater(1).Result.sourceMassFlowRate, 1.0e-12);
+
+    auto &overAllocatedResult1 = wrapper.ChillerHeater(1).Result;
+    auto &overAllocatedResult2 = wrapper.ChillerHeater(2).Result;
+    overAllocatedResult1 = PlantCentralGSHP::ChillerHeaterResult();
+    overAllocatedResult2 = PlantCentralGSHP::ChillerHeaterResult();
+    overAllocatedResult1.hotWaterMassFlowRate = 0.20;
+    overAllocatedResult1.hotWaterOutletTemp = 46.0;
+    overAllocatedResult2.hotWaterMassFlowRate = 0.10;
+    overAllocatedResult2.hotWaterOutletTemp = 44.0;
+    wrapper.updateWrapperReportingAndNodes(*state, 0.0, 0.15, 0.0, 12.0, 40.0, 15.0, false);
+    EXPECT_NEAR((0.20 * 46.0 + 0.10 * 44.0) / 0.30, wrapper.Report.HWOutletTemp, 1.0e-12);
+    EXPECT_NE(40.0, wrapper.Report.HWOutletTemp);
+
+    wrapper.ChillerHeater(1).EvapVolFlowRate = 0.0010;
+    wrapper.ChillerHeater(1).CondVolFlowRate = 0.0005;
+    wrapper.ChillerHeater(1).DesignHotWaterVolFlowRate = 0.0003;
+    wrapper.ChillerHeater(2).EvapVolFlowRate = 0.0020;
+    wrapper.ChillerHeater(2).CondVolFlowRate = 0.0025;
+    wrapper.ChillerHeater(2).DesignHotWaterVolFlowRate = 0.0004;
+    wrapper.initializeDesignFlowLimits(*state);
+
+    Real64 const chilledWaterDensity = water->getDensity(*state, Constant::CWInitConvTemp, "PlantCentralGSHP design flow test");
+    Real64 const hotWaterDensity = water->getDensity(*state, Constant::HWInitConvTemp, "PlantCentralGSHP design flow test");
+    Real64 const sourceDensity = sourceGlycol->getDensity(*state, Constant::CWInitConvTemp, "PlantCentralGSHP design flow test");
+    EXPECT_NEAR(0.0030, wrapper.CHWVolFlowRate, 1.0e-12);
+    EXPECT_NEAR(0.0007, wrapper.HWVolFlowRate, 1.0e-12);
+    EXPECT_NEAR(0.0035, wrapper.GLHEVolFlowRate, 1.0e-12);
+    EXPECT_NEAR(0.0030 * chilledWaterDensity, wrapper.CHWMassFlowRateMax, 1.0e-9);
+    EXPECT_NEAR(0.0007 * hotWaterDensity, wrapper.HWMassFlowRateMax, 1.0e-9);
+    EXPECT_NEAR(0.0035 * sourceDensity, wrapper.GLHEMassFlowRateMax, 1.0e-9);
+    EXPECT_NEAR(0.0010 * chilledWaterDensity, wrapper.ChillerHeater(1).ChilledWaterMassFlowRateMax, 1.0e-9);
+    EXPECT_NEAR(0.0003 * hotWaterDensity, wrapper.ChillerHeater(1).HotWaterMassFlowRateMax, 1.0e-9);
+    EXPECT_NEAR(0.0010 * sourceDensity, wrapper.ChillerHeater(1).SourceEvapMassFlowRateMax, 1.0e-9);
+    EXPECT_NEAR(0.0005 * sourceDensity, wrapper.ChillerHeater(1).SourceCondMassFlowRateMax, 1.0e-9);
+    EXPECT_NEAR(wrapper.CHWMassFlowRateMax, state->dataLoopNodes->Node(wrapper.CHWInletNodeNum).MassFlowRateMax, 1.0e-9);
+    EXPECT_NEAR(wrapper.HWMassFlowRateMax, state->dataLoopNodes->Node(wrapper.HWInletNodeNum).MassFlowRateMax, 1.0e-9);
+    EXPECT_NEAR(wrapper.GLHEMassFlowRateMax, state->dataLoopNodes->Node(wrapper.GLHEInletNodeNum).MassFlowRateMax, 1.0e-9);
 }
 
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SequentialFlowAllocationContracts)
