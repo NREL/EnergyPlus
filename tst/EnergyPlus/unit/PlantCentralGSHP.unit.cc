@@ -60,7 +60,259 @@
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <numeric>
+#include <string_view>
+#include <vector>
+
 using namespace EnergyPlus;
+
+namespace {
+
+using EnergyPlus::PlantCentralGSHP::CurrentMode;
+
+struct LoopRouting
+{
+    Real64 cooling = 0.0; // Heat removed from the chilled-water loop [W]
+    Real64 heating = 0.0; // Heat added to the hot-water loop [W]
+    Real64 source = 0.0;  // Positive rejects heat to source; negative extracts heat from source [W]
+};
+
+struct ModeEnergyContract
+{
+    CurrentMode mode = CurrentMode::Invalid;
+    Real64 qEvaporator = 0.0;
+    Real64 qCondenser = 0.0;
+    Real64 compressorPower = 0.0;
+    Real64 falseLoad = 0.0;
+    Real64 openMotorEfficiency = 1.0;
+    Real64 partLoadRatio = 0.0;
+    Real64 cyclingRatio = 0.0;
+    LoopRouting routing;
+};
+
+struct PartLoadContract
+{
+    Real64 availableCapacity = 0.0;
+    Real64 requestedLoad = 0.0;
+    Real64 deliveredLoad = 0.0;
+    Real64 minimumPartLoadRatio = 0.0;
+    Real64 maximumPartLoadRatio = 1.0;
+    Real64 reportedPartLoadRatio = 0.0;
+    Real64 cyclingRatio = 0.0;
+    Real64 curveEvaluationPartLoadRatio = 0.0;
+};
+
+struct FlowAllocationContract
+{
+    Real64 wrapperAvailableFlow = 0.0;
+    std::vector<Real64> requestedFlows;
+    std::vector<Real64> moduleMaximumFlows;
+    std::vector<Real64> allocatedFlows;
+};
+
+constexpr Real64 contractTolerance = 1.0e-9;
+
+bool contractNear(Real64 const actual, Real64 const expected, Real64 const tolerance = contractTolerance)
+{
+    Real64 const scale = std::max({1.0, std::abs(actual), std::abs(expected)});
+    return std::abs(actual - expected) <= tolerance * scale;
+}
+
+std::string_view modeName(CurrentMode const mode)
+{
+    switch (mode) {
+    case CurrentMode::Off:
+        return "Off";
+    case CurrentMode::CoolingOnly:
+        return "CoolingOnly";
+    case CurrentMode::HeatingOnly:
+        return "HeatingOnly";
+    case CurrentMode::HeatRecovery:
+        return "HeatRecovery";
+    case CurrentMode::CoolingDominant:
+        return "CoolingDominant";
+    case CurrentMode::HeatingDominant:
+        return "HeatingDominant";
+    default:
+        return "Invalid";
+    }
+}
+
+::testing::AssertionResult checkModeEnergyContract(ModeEnergyContract const &point)
+{
+    auto fail = [&point](std::string_view const message) { return ::testing::AssertionFailure() << modeName(point.mode) << ": " << message; };
+
+    if (point.mode == CurrentMode::Invalid || point.mode == CurrentMode::Num) {
+        return fail("invalid operating mode");
+    }
+
+    std::array<Real64, 10> const values = {point.qEvaporator,
+                                           point.qCondenser,
+                                           point.compressorPower,
+                                           point.falseLoad,
+                                           point.openMotorEfficiency,
+                                           point.partLoadRatio,
+                                           point.cyclingRatio,
+                                           point.routing.cooling,
+                                           point.routing.heating,
+                                           point.routing.source};
+    if (!std::all_of(values.begin(), values.end(), [](Real64 const value) { return std::isfinite(value); })) {
+        return fail("contract contains a non-finite value");
+    }
+    if (point.qEvaporator < 0.0 || point.qCondenser < 0.0 || point.compressorPower < 0.0 || point.falseLoad < 0.0) {
+        return fail("heat-transfer rates, power, and false load must be nonnegative");
+    }
+    if (point.openMotorEfficiency < 0.0 || point.openMotorEfficiency > 1.0) {
+        return fail("open motor efficiency is outside [0, 1]");
+    }
+
+    if (point.mode == CurrentMode::Off) {
+        Real64 const magnitude = point.qEvaporator + point.qCondenser + point.compressorPower + point.falseLoad + std::abs(point.routing.cooling) +
+                                 std::abs(point.routing.heating) + std::abs(point.routing.source) + std::abs(point.partLoadRatio) +
+                                 std::abs(point.cyclingRatio);
+        if (!contractNear(magnitude, 0.0)) {
+            return fail("off mode has nonzero heat transfer, power, routing, PLR, or cycling");
+        }
+        return ::testing::AssertionSuccess();
+    }
+
+    if (point.compressorPower <= 0.0) {
+        return fail("an active Electric:EIR operating point must have positive compressor power");
+    }
+    if (point.partLoadRatio <= 0.0 || point.partLoadRatio > 1.0) {
+        return fail("active-mode PLR is outside (0, 1]");
+    }
+    if (point.cyclingRatio <= 0.0 || point.cyclingRatio > 1.0) {
+        return fail("active-mode cycling ratio is outside (0, 1]");
+    }
+
+    Real64 const refrigerantPower = point.compressorPower * point.openMotorEfficiency;
+    Real64 const moduleResidual = point.qCondenser - point.qEvaporator - refrigerantPower - point.falseLoad;
+    if (!contractNear(moduleResidual, 0.0)) {
+        return fail("module energy residual is " + std::to_string(moduleResidual) + " W");
+    }
+
+    if (point.routing.cooling < 0.0 || point.routing.heating < 0.0) {
+        return fail("useful cooling and heating routing must be nonnegative");
+    }
+
+    switch (point.mode) {
+    case CurrentMode::CoolingOnly:
+        if (!contractNear(point.routing.cooling, point.qEvaporator) || !contractNear(point.routing.heating, 0.0) ||
+            !contractNear(point.routing.source, point.qCondenser)) {
+            return fail("cooling-only heat is not fully routed to chilled water and the source loop");
+        }
+        break;
+    case CurrentMode::HeatingOnly:
+        if (!contractNear(point.routing.cooling, 0.0) || !contractNear(point.routing.heating, point.qCondenser) ||
+            !contractNear(point.routing.source, -point.qEvaporator)) {
+            return fail("heating-only heat is not fully routed from the source loop to hot water");
+        }
+        break;
+    case CurrentMode::HeatRecovery:
+        if (!contractNear(point.routing.cooling, point.qEvaporator) || !contractNear(point.routing.heating, point.qCondenser) ||
+            !contractNear(point.routing.source, 0.0)) {
+            return fail("balanced heat recovery must route the complete evaporator and condenser loads with zero source transfer");
+        }
+        break;
+    case CurrentMode::CoolingDominant:
+        if (point.routing.heating <= 0.0 || point.routing.heating >= point.qCondenser || !contractNear(point.routing.cooling, point.qEvaporator) ||
+            !contractNear(point.routing.source, point.qCondenser - point.routing.heating)) {
+            return fail("cooling-dominant operation must recover part of condenser heat and reject the residual to source");
+        }
+        break;
+    case CurrentMode::HeatingDominant:
+        if (point.routing.cooling <= 0.0 || point.routing.cooling >= point.qEvaporator || !contractNear(point.routing.heating, point.qCondenser) ||
+            !contractNear(point.routing.source, -(point.qEvaporator - point.routing.cooling))) {
+            return fail("heating-dominant operation must preserve useful cooling and extract only the residual from source");
+        }
+        break;
+    default:
+        return fail("unsupported operating mode");
+    }
+
+    Real64 const wrapperResidual = point.routing.heating + point.routing.source - point.routing.cooling - refrigerantPower - point.falseLoad;
+    if (!contractNear(wrapperResidual, 0.0)) {
+        return fail("three-loop routing energy residual is " + std::to_string(wrapperResidual) + " W");
+    }
+
+    return ::testing::AssertionSuccess();
+}
+
+::testing::AssertionResult checkPartLoadContract(PartLoadContract const &point)
+{
+    if (point.availableCapacity <= 0.0) {
+        return ::testing::AssertionFailure() << "available capacity must be positive";
+    }
+    if (point.minimumPartLoadRatio <= 0.0 || point.maximumPartLoadRatio < point.minimumPartLoadRatio) {
+        return ::testing::AssertionFailure() << "invalid PLR bounds";
+    }
+
+    Real64 const requestedPLR = std::max(0.0, point.requestedLoad / point.availableCapacity);
+    Real64 const expectedPLR = std::clamp(requestedPLR, point.minimumPartLoadRatio, point.maximumPartLoadRatio);
+    Real64 const expectedCycling = requestedPLR < point.minimumPartLoadRatio ? requestedPLR / point.minimumPartLoadRatio : 1.0;
+    Real64 const expectedDeliveredLoad = std::min(point.requestedLoad, point.availableCapacity * point.maximumPartLoadRatio);
+
+    if (!contractNear(point.reportedPartLoadRatio, expectedPLR)) {
+        return ::testing::AssertionFailure() << "reported PLR " << point.reportedPartLoadRatio << " does not equal final operating PLR "
+                                             << expectedPLR;
+    }
+    if (!contractNear(point.cyclingRatio, expectedCycling)) {
+        return ::testing::AssertionFailure() << "cycling ratio " << point.cyclingRatio << " does not equal " << expectedCycling;
+    }
+    if (!contractNear(point.deliveredLoad, expectedDeliveredLoad)) {
+        return ::testing::AssertionFailure() << "delivered load " << point.deliveredLoad << " does not equal " << expectedDeliveredLoad;
+    }
+    if (!contractNear(point.curveEvaluationPartLoadRatio, point.reportedPartLoadRatio)) {
+        return ::testing::AssertionFailure() << "EIRFPLR was evaluated at " << point.curveEvaluationPartLoadRatio << " instead of final reported PLR "
+                                             << point.reportedPartLoadRatio;
+    }
+    return ::testing::AssertionSuccess();
+}
+
+::testing::AssertionResult checkSequentialFlowAllocation(FlowAllocationContract const &flow)
+{
+    if (flow.requestedFlows.size() != flow.moduleMaximumFlows.size() || flow.requestedFlows.size() != flow.allocatedFlows.size()) {
+        return ::testing::AssertionFailure() << "flow vectors have different sizes";
+    }
+    if (flow.wrapperAvailableFlow < 0.0) {
+        return ::testing::AssertionFailure() << "wrapper available flow is negative";
+    }
+
+    Real64 remainingFlow = flow.wrapperAvailableFlow;
+    for (std::size_t module = 0; module < flow.allocatedFlows.size(); ++module) {
+        Real64 const expected = std::min({flow.requestedFlows[module], flow.moduleMaximumFlows[module], remainingFlow});
+        if (!contractNear(flow.allocatedFlows[module], expected)) {
+            return ::testing::AssertionFailure() << "module " << module + 1 << " allocation " << flow.allocatedFlows[module]
+                                                 << " does not equal sequentially available flow " << expected;
+        }
+        remainingFlow -= expected;
+    }
+
+    Real64 const totalAllocated = std::accumulate(flow.allocatedFlows.begin(), flow.allocatedFlows.end(), 0.0);
+    if (totalAllocated > flow.wrapperAvailableFlow && !contractNear(totalAllocated, flow.wrapperAvailableFlow)) {
+        return ::testing::AssertionFailure() << "module flow sum " << totalAllocated << " exceeds wrapper flow " << flow.wrapperAvailableFlow;
+    }
+    return ::testing::AssertionSuccess();
+}
+
+::testing::AssertionResult
+checkLoopHeatTransfer(Real64 const reportedHeat, Real64 const massFlow, Real64 const specificHeat, Real64 const inletTemp, Real64 const outletTemp)
+{
+    if (reportedHeat < 0.0 || massFlow < 0.0 || specificHeat <= 0.0) {
+        return ::testing::AssertionFailure() << "invalid loop heat-transfer input";
+    }
+    Real64 const nodeHeat = massFlow * specificHeat * std::abs(outletTemp - inletTemp);
+    if (!contractNear(reportedHeat, nodeHeat)) {
+        return ::testing::AssertionFailure() << "reported heat " << reportedHeat << " W does not match node heat " << nodeHeat << " W";
+    }
+    return ::testing::AssertionSuccess();
+}
+
+} // namespace
 
 TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
 {
@@ -783,4 +1035,107 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_calcPLRAndCyclingRatio)
     EXPECT_NEAR(state->dataPlantCentralGSHP->ChillerCyclingRatio, expFrac, allowedTolerance);
     EXPECT_NEAR(state->dataPlantCentralGSHP->ChillerPartLoadRatio, expPLR, allowedTolerance);
     EXPECT_NEAR(state->dataPlantCentralGSHP->ChillerFalseLoadRate, expFalseLoad, allowedTolerance);
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_ModeEnergyAndRoutingContracts)
+{
+    std::array<ModeEnergyContract, 6> const operatingPoints = {
+        ModeEnergyContract{CurrentMode::Off, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, {0.0, 0.0, 0.0}},
+        ModeEnergyContract{CurrentMode::CoolingOnly, 9000.0, 10900.0, 2000.0, 0.0, 0.95, 0.75, 1.0, {9000.0, 0.0, 10900.0}},
+        ModeEnergyContract{CurrentMode::HeatingOnly, 7500.0, 9750.0, 2500.0, 0.0, 0.90, 0.60, 1.0, {0.0, 9750.0, -7500.0}},
+        ModeEnergyContract{CurrentMode::HeatRecovery, 8000.0, 10000.0, 2000.0, 0.0, 1.0, 0.80, 1.0, {8000.0, 10000.0, 0.0}},
+        ModeEnergyContract{CurrentMode::CoolingDominant, 8000.0, 10000.0, 2000.0, 0.0, 1.0, 0.80, 1.0, {8000.0, 3500.0, 6500.0}},
+        ModeEnergyContract{CurrentMode::HeatingDominant, 8000.0, 10000.0, 2000.0, 0.0, 1.0, 0.80, 1.0, {3000.0, 10000.0, -5000.0}},
+    };
+
+    for (auto const &point : operatingPoints) {
+        SCOPED_TRACE(modeName(point.mode));
+        EXPECT_TRUE(checkModeEnergyContract(point));
+    }
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_ModeContractsRejectKnownDefectSignatures)
+{
+    // Issue #7838 / current mode-3 example signature: most condenser energy disappears and there is no source transfer.
+    ModeEnergyContract const issue7838Point{CurrentMode::HeatRecovery, 10790.844, 48.8987, 9602.5995, 0.0, 1.0, 0.20, 1.0, {10790.844, 48.8987, 0.0}};
+    EXPECT_FALSE(checkModeEnergyContract(issue7838Point));
+
+    // Issue #10065 signature: an active Electric:EIR module meets simultaneous loads with zero compressor power.
+    ModeEnergyContract const issue10065Point{CurrentMode::HeatRecovery, 8000.0, 8000.0, 0.0, 0.0, 1.0, 0.80, 1.0, {8000.0, 8000.0, 0.0}};
+    EXPECT_FALSE(checkModeEnergyContract(issue10065Point));
+
+    // Heating-dominant useful cooling cannot be silently reclassified as source extraction.
+    ModeEnergyContract const lostCoolingRoute{CurrentMode::HeatingDominant, 8000.0, 10000.0, 2000.0, 0.0, 1.0, 0.80, 1.0, {0.0, 10000.0, -8000.0}};
+    EXPECT_FALSE(checkModeEnergyContract(lostCoolingRoute));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_FinalPartLoadContracts)
+{
+    std::array<PartLoadContract, 3> const points = {
+        PartLoadContract{10000.0, 1000.0, 1000.0, 0.30, 1.0, 0.30, 1.0 / 3.0, 0.30},
+        PartLoadContract{10000.0, 6000.0, 6000.0, 0.30, 1.0, 0.60, 1.0, 0.60},
+        PartLoadContract{10000.0, 12000.0, 10000.0, 0.30, 1.0, 1.00, 1.0, 1.00},
+    };
+
+    for (auto const &point : points) {
+        EXPECT_TRUE(checkPartLoadContract(point));
+    }
+
+    // Issue #8191 / current mode-2 signature: post-scaled PLR, full cycling, and a full-load EIRFPLR evaluation.
+    PartLoadContract const issue8191Point{10000.0, 1000.0, 1000.0, 0.30, 1.0, 0.10, 1.0, 1.0};
+    EXPECT_FALSE(checkPartLoadContract(issue8191Point));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SequentialFlowAllocationContracts)
+{
+    FlowAllocationContract const variableFlow{1.20, {0.40, 0.80}, {0.75, 1.00}, {0.40, 0.80}};
+    EXPECT_TRUE(checkSequentialFlowAllocation(variableFlow));
+
+    FlowAllocationContract const heterogeneousConstantFlow{1.50, {0.80, 0.80, 0.80}, {1.00, 0.50, 1.00}, {0.80, 0.50, 0.20}};
+    EXPECT_TRUE(checkSequentialFlowAllocation(heterogeneousConstantFlow));
+
+    FlowAllocationContract const overAllocated{1.50, {0.80, 0.80, 0.80}, {1.00, 0.50, 1.00}, {0.80, 0.50, 0.80}};
+    EXPECT_FALSE(checkSequentialFlowAllocation(overAllocated));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_WaterAndGlycolNodeHeatTransferContracts)
+{
+    std::string const idf_objects = delimited_string({"FluidProperties:GlycolConcentration,",
+                                                      "  GLHXFluid,        !- Name",
+                                                      "  PropyleneGlycol, !- Glycol Type",
+                                                      "  ,                 !- User Defined Glycol Name",
+                                                      "  0.3;              !- Glycol Concentration"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(has_err_output());
+    state->init_state(*state);
+
+    auto *water = Fluid::GetWater(*state);
+    auto *sourceGlycol = Fluid::GetGlycol(*state, "GLHXFLUID");
+    ASSERT_NE(nullptr, water);
+    ASSERT_NE(nullptr, sourceGlycol);
+
+    Real64 constexpr chilledWaterInletTemp = 12.0;
+    Real64 constexpr chilledWaterOutletTemp = 7.0;
+    Real64 constexpr chilledWaterMassFlow = 1.0;
+    Real64 const chilledWaterCp = water->getSpecificHeat(*state, chilledWaterInletTemp, "PlantCentralGSHP contract test");
+    Real64 const cooling = chilledWaterMassFlow * chilledWaterCp * (chilledWaterInletTemp - chilledWaterOutletTemp);
+    EXPECT_TRUE(checkLoopHeatTransfer(cooling, chilledWaterMassFlow, chilledWaterCp, chilledWaterInletTemp, chilledWaterOutletTemp));
+
+    Real64 constexpr hotWaterInletTemp = 40.0;
+    Real64 constexpr hotWaterOutletTemp = 45.0;
+    Real64 constexpr hotWaterMassFlow = 0.8;
+    Real64 const hotWaterCp = water->getSpecificHeat(*state, hotWaterInletTemp, "PlantCentralGSHP contract test");
+    Real64 const heating = hotWaterMassFlow * hotWaterCp * (hotWaterOutletTemp - hotWaterInletTemp);
+    EXPECT_TRUE(checkLoopHeatTransfer(heating, hotWaterMassFlow, hotWaterCp, hotWaterInletTemp, hotWaterOutletTemp));
+
+    Real64 constexpr sourceInletTemp = 15.0;
+    Real64 constexpr sourceOutletTemp = 17.0;
+    Real64 constexpr sourceMassFlow = 1.2;
+    Real64 const sourceCp = sourceGlycol->getSpecificHeat(*state, sourceInletTemp, "PlantCentralGSHP contract test");
+    Real64 const sourceHeat = sourceMassFlow * sourceCp * (sourceOutletTemp - sourceInletTemp);
+    EXPECT_TRUE(checkLoopHeatTransfer(sourceHeat, sourceMassFlow, sourceCp, sourceInletTemp, sourceOutletTemp));
+
+    EXPECT_FALSE(contractNear(sourceCp, chilledWaterCp));
+    EXPECT_FALSE(checkLoopHeatTransfer(sourceHeat, sourceMassFlow, chilledWaterCp, sourceInletTemp, sourceOutletTemp));
 }
