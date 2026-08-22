@@ -98,6 +98,178 @@ namespace EnergyPlus::PlantCentralGSHP {
 //  which in turn calls the electric PlantCentralGSHP model. The PlantCentralGSHP model is based on
 //  polynomial fits of chiller/heater or heat pump performance data.
 
+void ChillerHeaterSpecs::mapResultToPlantConnections()
+{
+    auto &result = this->Result;
+
+    result.chilledWaterInletTemp = 0.0;
+    result.chilledWaterOutletTemp = 0.0;
+    result.chilledWaterMassFlowRate = 0.0;
+    result.hotWaterInletTemp = 0.0;
+    result.hotWaterOutletTemp = 0.0;
+    result.hotWaterMassFlowRate = 0.0;
+    result.sourceInletTemp = 0.0;
+    result.sourceOutletTemp = 0.0;
+    result.sourceMassFlowRate = 0.0;
+    result.coolingDelivered = 0.0;
+    result.heatingDelivered = 0.0;
+    result.heatRecovered = 0.0;
+    result.sourceHeatTransfer = 0.0;
+
+    switch (result.currentMode) {
+    case CurrentMode::CoolingOnly:
+    case CurrentMode::CoolingDominant:
+        result.chilledWaterInletTemp = result.evaporatorInletTemp;
+        result.chilledWaterOutletTemp = result.evaporatorOutletTemp;
+        result.chilledWaterMassFlowRate = result.evaporatorMassFlowRate;
+        result.sourceInletTemp = result.condenserInletTemp;
+        result.sourceOutletTemp = result.condenserOutletTemp;
+        result.sourceMassFlowRate = result.condenserMassFlowRate;
+        result.coolingDelivered = result.qEvaporator;
+        result.sourceHeatTransfer = result.qCondenser;
+        break;
+    case CurrentMode::HeatingOnly:
+    case CurrentMode::HeatingDominant:
+        result.hotWaterInletTemp = result.condenserInletTemp;
+        result.hotWaterOutletTemp = result.condenserOutletTemp;
+        result.hotWaterMassFlowRate = result.condenserMassFlowRate;
+        result.sourceInletTemp = result.evaporatorInletTemp;
+        result.sourceOutletTemp = result.evaporatorOutletTemp;
+        result.sourceMassFlowRate = result.evaporatorMassFlowRate;
+        result.heatingDelivered = result.qCondenser;
+        result.sourceHeatTransfer = -result.qEvaporator;
+        break;
+    case CurrentMode::HeatRecovery:
+        result.chilledWaterInletTemp = result.evaporatorInletTemp;
+        result.chilledWaterOutletTemp = result.evaporatorOutletTemp;
+        result.chilledWaterMassFlowRate = result.evaporatorMassFlowRate;
+        result.hotWaterInletTemp = result.condenserInletTemp;
+        result.hotWaterOutletTemp = result.condenserOutletTemp;
+        result.hotWaterMassFlowRate = result.condenserMassFlowRate;
+        result.coolingDelivered = result.qEvaporator;
+        result.heatingDelivered = result.qCondenser;
+        result.heatRecovered = result.qCondenser;
+        break;
+    case CurrentMode::Off:
+    case CurrentMode::Invalid:
+    case CurrentMode::Num:
+        break;
+    }
+
+    result.updatePowerAccounting(this->OpenMotorEff);
+}
+
+void ChillerHeaterSpecs::applySimultaneousCoolingConnection()
+{
+    auto &result = this->Result;
+    auto const &coolingResult = this->SimulResult;
+
+    result.requestedCoolingLoad = coolingResult.requestedCoolingLoad;
+    result.unmetCoolingLoad = coolingResult.unmetCoolingLoad;
+    result.chilledWaterInletTemp = coolingResult.chilledWaterInletTemp;
+    result.chilledWaterOutletTemp = coolingResult.chilledWaterOutletTemp;
+    result.chilledWaterMassFlowRate = coolingResult.chilledWaterMassFlowRate;
+    result.coolingDelivered = coolingResult.coolingDelivered;
+
+    if (result.currentMode == CurrentMode::HeatingDominant) {
+        result.sourceHeatTransfer = -(result.qEvaporator - result.coolingDelivered);
+    }
+}
+
+void ChillerHeaterSpecs::syncLegacyReportAndNodes()
+{
+    auto const &result = this->Result;
+
+    this->EvapInletNode.Temp = result.evaporatorInletTemp;
+    this->EvapOutletNode.Temp = result.evaporatorOutletTemp;
+    this->EvapOutletNode.MassFlowRate = result.evaporatorMassFlowRate;
+    this->CondInletNode.Temp = result.condenserInletTemp;
+    this->CondOutletNode.Temp = result.condenserOutletTemp;
+    this->CondOutletNode.MassFlowRate = result.condenserMassFlowRate;
+
+    this->Report.currentMode = result.currentMode;
+    this->Report.ChillerPartLoadRatio = result.partLoadRatio;
+    this->Report.ChillerCyclingRatio = result.cyclingRatio;
+    this->Report.ChillerFalseLoadRate = result.falseLoadRate;
+    this->Report.ChillerFalseLoad = result.falseLoadEnergy;
+    this->Report.ChillerCapFT = result.capacityTemperatureModifier;
+    this->Report.ChillerEIRFT = result.eirTemperatureModifier;
+    this->Report.ChillerEIRFPLR = result.eirPartLoadModifier;
+    this->Report.CoolingPower = result.coolingPower;
+    this->Report.HeatingPower = result.heatingPower;
+    this->Report.CoolingEnergy = result.coolingEnergy;
+    this->Report.HeatingEnergy = result.heatingEnergy;
+    this->Report.QEvap = result.qEvaporator;
+    this->Report.QCond = result.qCondenser;
+    this->Report.EvapEnergy = result.evaporatorEnergy;
+    this->Report.CondEnergy = result.condenserEnergy;
+    this->Report.EvapOutletTemp = result.evaporatorOutletTemp;
+    this->Report.EvapInletTemp = result.evaporatorInletTemp;
+    this->Report.CondOutletTemp = result.condenserOutletTemp;
+    this->Report.CondInletTemp = result.condenserInletTemp;
+    this->Report.Evapmdot = result.evaporatorMassFlowRate;
+    this->Report.Condmdot = result.condenserMassFlowRate;
+    this->Report.ActualCOP = result.actualCOP;
+}
+
+void ChillerHeaterSpecs::saveCurrentResultForSimultaneous()
+{
+    this->SimulResult = this->Result;
+    auto const &result = this->SimulResult;
+
+    this->Report.ChillerPartLoadRatioSimul = result.partLoadRatio;
+    this->Report.ChillerCyclingRatioSimul = result.cyclingRatio;
+    this->Report.ChillerFalseLoadRateSimul = result.falseLoadRate;
+    this->Report.ChillerFalseLoadSimul = result.falseLoadEnergy;
+    this->Report.ChillerCapFTSimul = result.capacityTemperatureModifier;
+    this->Report.ChillerEIRFTSimul = result.eirTemperatureModifier;
+    this->Report.ChillerEIRFPLRSimul = result.eirPartLoadModifier;
+    this->Report.CoolingPowerSimul = result.coolingPower;
+    this->Report.CoolingEnergySimul = result.coolingEnergy;
+    this->Report.QEvapSimul = result.qEvaporator;
+    this->Report.QCondSimul = result.qCondenser;
+    this->Report.EvapEnergySimul = result.evaporatorEnergy;
+    this->Report.CondEnergySimul = result.condenserEnergy;
+    this->Report.EvapOutletTempSimul = result.evaporatorOutletTemp;
+    this->Report.EvapInletTempSimul = result.evaporatorInletTemp;
+    this->Report.EvapmdotSimul = result.evaporatorMassFlowRate;
+    this->Report.CondOutletTempSimul = result.condenserOutletTemp;
+    this->Report.CondInletTempSimul = result.condenserInletTemp;
+    this->Report.CondmdotSimul = result.condenserMassFlowRate;
+}
+
+void ChillerHeaterSpecs::updateResultEnergies(Real64 const secondsInTimeStep, bool const updateSimultaneousResult)
+{
+    auto update = [secondsInTimeStep](ChillerHeaterResult &result) {
+        result.falseLoadEnergy = result.falseLoadRate * secondsInTimeStep;
+        result.coolingEnergy = result.coolingPower * secondsInTimeStep;
+        result.heatingEnergy = result.heatingPower * secondsInTimeStep;
+        result.evaporatorEnergy = result.qEvaporator * secondsInTimeStep;
+        result.condenserEnergy = result.qCondenser * secondsInTimeStep;
+    };
+
+    update(this->Result);
+    this->syncLegacyReportAndNodes();
+    if (updateSimultaneousResult) {
+        update(this->SimulResult);
+        this->Report.ChillerFalseLoadSimul = this->SimulResult.falseLoadEnergy;
+        this->Report.CoolingEnergySimul = this->SimulResult.coolingEnergy;
+        this->Report.EvapEnergySimul = this->SimulResult.evaporatorEnergy;
+        this->Report.CondEnergySimul = this->SimulResult.condenserEnergy;
+    }
+}
+
+void ChillerHeaterSpecs::resetCurrentResult(Real64 const evaporatorInletTemp, Real64 const condenserInletTemp)
+{
+    this->Result = ChillerHeaterResult();
+    this->Result.evaporatorInletTemp = evaporatorInletTemp;
+    this->Result.evaporatorOutletTemp = evaporatorInletTemp;
+    this->Result.condenserInletTemp = condenserInletTemp;
+    this->Result.condenserOutletTemp = condenserInletTemp;
+    this->mapResultToPlantConnections();
+    this->syncLegacyReportAndNodes();
+}
+
 PlantComponent *WrapperSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data
@@ -1776,13 +1948,21 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
         Real64 QEvaporator = 0.0;
         Real64 FRAC = 1.0;
         Real64 ActualCOP = 0.0;
+        Real64 AvailableEvaporatorCapacity = 0.0;
+        Real64 CapacityCurveEvaporatorTemp = 0.0;
+        Real64 CapacityCurveCondenserTemp = 0.0;
+        Real64 EIRCurveEvaporatorTemp = 0.0;
+        Real64 EIRCurveCondenserTemp = 0.0;
+        Real64 EIRPartLoadCurvePLR = 0.0;
+        bool ModuleIsAvailable = false;
         Real64 EvapInletTemp = state.dataLoopNodes->Node(this->CHWInletNodeNum).Temp;
         Real64 CondInletTemp = state.dataLoopNodes->Node(this->GLHEInletNodeNum).Temp;
         Real64 EvapOutletTemp = EvapInletTemp;
         Real64 CondOutletTemp = CondInletTemp;
 
         auto &chillerHeater = this->ChillerHeater(ChillerHeaterNum);
-        chillerHeater.Report.currentMode = CurrentMode::Off;
+        chillerHeater.Result = ChillerHeaterResult();
+        chillerHeater.Result.requestedCoolingLoad = EvaporatorLoad;
 
         // Find proper schedule values
         if (this->NumOfComp != this->ChillerHeaterNums) { // Identical units exist
@@ -1816,6 +1996,7 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
         } else if (this->NumOfComp == this->ChillerHeaterNums) {
             ++CompNum;
         }
+        ModuleIsAvailable = this->WrapperComp(CompNum).chSched->getCurrentVal() > 0.0;
 
         if (CompNum > this->NumOfComp) {
             ShowSevereError(state, std::format("CalcChillerModel: ChillerHeater=\"{}\", calculated component number too big.", this->Name));
@@ -1904,6 +2085,8 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
             Real64 EvapOutletTempSetPoint = chillerHeater.TempRefEvapOutCooling;
 
             // Calculate Chiller Capacity as a function of temperature and error check
+            CapacityCurveEvaporatorTemp = EvapOutletTempSetPoint;
+            CapacityCurveCondenserTemp = CondTempforCurve;
             state.dataPlantCentralGSHP->ChillerCapFT = this->calcChillerCapFT(state, ChillerHeaterNum, EvapOutletTempSetPoint, CondTempforCurve);
 
             // Calculate the specific heat of chilled water
@@ -1921,6 +2104,7 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
             // Available chiller capacity as a function of temperature
             // Chiller available capacity at current operating conditions [W]
             Real64 AvailChillerCap = ChillerRefCap * state.dataPlantCentralGSHP->ChillerCapFT;
+            AvailableEvaporatorCapacity = AvailChillerCap;
 
             Real64 PartLoadRat;    // Operating part load ratio
             Real64 MinPartLoadRat; // Min allowed operating fraction of full load
@@ -1974,6 +2158,9 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
             WrapperSpecs::calcPLRAndCyclingRatio(state, AvailChillerCap, PartLoadRat, MinPartLoadRat, MaxPartLoadRat, QEvaporator, FRAC);
 
             // Determine chiller compressor power and transfer heat calculation
+            EIRCurveEvaporatorTemp = EvapOutletTemp;
+            EIRCurveCondenserTemp = CondTempforCurve;
+            EIRPartLoadCurvePLR = PartLoadRat;
             state.dataPlantCentralGSHP->ChillerEIRFT =
                 max(0.0, Curve::CurveValue(state, chillerHeater.ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
             state.dataPlantCentralGSHP->ChillerEIRFPLR = max(0.0, Curve::CurveValue(state, chillerHeater.ChillerEIRFPLRIDX, PartLoadRat));
@@ -2025,51 +2212,40 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
 
         } // End of calculation for cooling
 
-        // Set variables to the arrays
-        chillerHeater.EvapOutletNode.MassFlowRate = EvapMassFlowRate;
-        chillerHeater.CondOutletNode.MassFlowRate = CondMassFlowRate;
-        chillerHeater.EvapOutletNode.Temp = EvapOutletTemp;
-        chillerHeater.EvapInletNode.Temp = EvapInletTemp;
-        chillerHeater.CondOutletNode.Temp = CondOutletTemp;
-        chillerHeater.CondInletNode.Temp = CondInletTemp;
-        chillerHeater.Report.currentMode = currentMode;
-        chillerHeater.Report.ChillerPartLoadRatio = state.dataPlantCentralGSHP->ChillerPartLoadRatio;
-        chillerHeater.Report.ChillerCyclingRatio = state.dataPlantCentralGSHP->ChillerCyclingRatio;
-        chillerHeater.Report.ChillerFalseLoadRate = state.dataPlantCentralGSHP->ChillerFalseLoadRate;
-        chillerHeater.Report.ChillerCapFT = state.dataPlantCentralGSHP->ChillerCapFT;
-        chillerHeater.Report.ChillerEIRFT = state.dataPlantCentralGSHP->ChillerEIRFT;
-        chillerHeater.Report.ChillerEIRFPLR = state.dataPlantCentralGSHP->ChillerEIRFPLR;
-        chillerHeater.Report.CoolingPower = CHPower;
-        chillerHeater.Report.HeatingPower = 0.0;
-        chillerHeater.Report.QEvap = QEvaporator;
-        chillerHeater.Report.QCond = QCondenser;
-        chillerHeater.Report.EvapOutletTemp = EvapOutletTemp;
-        chillerHeater.Report.EvapInletTemp = EvapInletTemp;
-        chillerHeater.Report.CondOutletTemp = CondOutletTemp;
-        chillerHeater.Report.CondInletTemp = CondInletTemp;
-        chillerHeater.Report.Evapmdot = EvapMassFlowRate;
-        chillerHeater.Report.Condmdot = CondMassFlowRate;
-        chillerHeater.Report.ActualCOP = ActualCOP;
+        auto &result = chillerHeater.Result;
+        result.currentMode = currentMode;
+        result.isAvailable = ModuleIsAvailable;
+        result.availableEvaporatorCapacity = AvailableEvaporatorCapacity;
+        result.availableCondenserCapacity = QCondenser;
+        result.qEvaporator = QEvaporator;
+        result.qCondenser = QCondenser;
+        result.coolingPower = CHPower;
+        result.heatingPower = 0.0;
+        result.falseLoadRate = state.dataPlantCentralGSHP->ChillerFalseLoadRate;
+        result.partLoadRatio = state.dataPlantCentralGSHP->ChillerPartLoadRatio;
+        result.cyclingRatio = state.dataPlantCentralGSHP->ChillerCyclingRatio;
+        result.unloadingRatio = result.partLoadRatio;
+        result.capacityTemperatureModifier = state.dataPlantCentralGSHP->ChillerCapFT;
+        result.eirTemperatureModifier = state.dataPlantCentralGSHP->ChillerEIRFT;
+        result.eirPartLoadModifier = state.dataPlantCentralGSHP->ChillerEIRFPLR;
+        result.capacityCurveEvaporatorTemp = CapacityCurveEvaporatorTemp;
+        result.capacityCurveCondenserTemp = CapacityCurveCondenserTemp;
+        result.eirCurveEvaporatorTemp = EIRCurveEvaporatorTemp;
+        result.eirCurveCondenserTemp = EIRCurveCondenserTemp;
+        result.eirPartLoadCurvePLR = EIRPartLoadCurvePLR;
+        result.actualCOP = ActualCOP;
+        result.evaporatorOutletTemp = EvapOutletTemp;
+        result.evaporatorInletTemp = EvapInletTemp;
+        result.condenserOutletTemp = CondOutletTemp;
+        result.condenserInletTemp = CondInletTemp;
+        result.evaporatorMassFlowRate = EvapMassFlowRate;
+        result.condenserMassFlowRate = CondMassFlowRate;
+        result.unmetCoolingLoad = EvaporatorLoad;
+        chillerHeater.mapResultToPlantConnections();
+        chillerHeater.syncLegacyReportAndNodes();
 
         if (this->SimulClgDominant || this->SimulHtgDominant) { // Store for using these cooling side data in the hot water loop
-            chillerHeater.Report.currentMode = currentMode;
-            chillerHeater.Report.ChillerPartLoadRatioSimul = state.dataPlantCentralGSHP->ChillerPartLoadRatio;
-            chillerHeater.Report.ChillerCyclingRatioSimul = state.dataPlantCentralGSHP->ChillerCyclingRatio;
-            chillerHeater.Report.ChillerFalseLoadRateSimul = state.dataPlantCentralGSHP->ChillerFalseLoadRate;
-            chillerHeater.Report.ChillerCapFTSimul = state.dataPlantCentralGSHP->ChillerCapFT;
-            chillerHeater.Report.ChillerEIRFTSimul = state.dataPlantCentralGSHP->ChillerEIRFT;
-            chillerHeater.Report.ChillerEIRFPLRSimul = state.dataPlantCentralGSHP->ChillerEIRFPLR;
-            chillerHeater.Report.CoolingPowerSimul = CHPower;
-            chillerHeater.Report.QEvapSimul = QEvaporator;
-            chillerHeater.Report.EvapOutletTempSimul = EvapOutletTemp;
-            chillerHeater.Report.EvapInletTempSimul = EvapInletTemp;
-            chillerHeater.Report.EvapmdotSimul = EvapMassFlowRate;
-            if (this->SimulClgDominant) {
-                chillerHeater.Report.QCondSimul = QCondenser;
-                chillerHeater.Report.CondOutletTempSimul = CondOutletTemp;
-                chillerHeater.Report.CondInletTempSimul = CondInletTemp;
-                chillerHeater.Report.CondmdotSimul = CondMassFlowRate;
-            }
+            chillerHeater.saveCurrentResultForSimultaneous();
         }
     }
 }
@@ -2120,6 +2296,15 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
         Real64 CondDeltaTemp = 0.0;
         Real64 CoolingPower = 0.0;
         Real64 ActualCOP = 0.0;
+        Real64 RequestedHeatingLoad = CondenserLoad;
+        Real64 AvailableEvaporatorCapacity = 0.0;
+        Real64 AvailableCondenserCapacity = 0.0;
+        Real64 CapacityCurveEvaporatorTemp = 0.0;
+        Real64 CapacityCurveCondenserTemp = 0.0;
+        Real64 EIRCurveEvaporatorTemp = 0.0;
+        Real64 EIRCurveCondenserTemp = 0.0;
+        Real64 EIRPartLoadCurvePLR = 0.0;
+        bool ModuleIsAvailable = false;
         Real64 EvapInletTemp = state.dataLoopNodes->Node(this->GLHEInletNodeNum).Temp;
         Real64 CondInletTemp = state.dataLoopNodes->Node(this->HWInletNodeNum).Temp;
         Real64 EvapOutletTemp = EvapInletTemp;
@@ -2157,6 +2342,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
         } else if (this->NumOfComp == this->ChillerHeaterNums) {
             ++CompNum;
         }
+        ModuleIsAvailable = this->WrapperComp(CompNum).chSched->getCurrentVal() > 0.0;
 
         Real64 CondMassFlowRate; // Condenser mass flow rate through this chiller heater
         Real64 EvapMassFlowRate; // Evaporator mass flow rate through this chiller heater
@@ -2223,7 +2409,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                 // Operation mode needs to be set in a simultaneous clg/htg mode
                 // Always off even heating load remains if this CH is assumed to be off in the loop 1
                 if (this->SimulClgDominant) {
-                    if (chillerHeater.Report.QEvapSimul == 0.0) {
+                    if (chillerHeater.SimulResult.qEvaporator == 0.0) {
                         currentMode = CurrentMode::Off;
                         IsLoadHeatRemaining = false;
                     } else { // Heat recovery
@@ -2238,7 +2424,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
             EvapMassFlowRate = 0.0;
             currentMode = CurrentMode::Off;
             if (this->SimulClgDominant) {
-                if (chillerHeater.Report.QEvapSimul > 0.0) {
+                if (chillerHeater.SimulResult.qEvaporator > 0.0) {
                     currentMode = CurrentMode::CoolingDominant;
                 }
             } // End of mode determination
@@ -2247,7 +2433,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
         if (IsLoadHeatRemaining && CondMassFlowRate > 0.0 && (this->WrapperComp(CompNum).chSched->getCurrentVal() > 0)) { // System is on
             // Operation mode
             if (this->SimulHtgDominant) {
-                if (chillerHeater.Report.QEvapSimul == 0.0) {
+                if (chillerHeater.SimulResult.qEvaporator == 0.0) {
                     currentMode = CurrentMode::HeatingDominant; // No cooling necessary
                 } else { // Heat recovery mode. Both chilled water and hot water loops are connected. No condenser flow.
                     currentMode = CurrentMode::HeatRecovery;
@@ -2261,7 +2447,14 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
             // Otherwise, the power consumption could come back zero for heating and cooling.
             if (this->SimulClgDominant || (currentMode == CurrentMode::HeatRecovery && !this->SimulHtgDominant)) {
                 currentMode = CurrentMode::HeatRecovery;
-                QCondenser = chillerHeater.Report.QCondSimul;
+                QCondenser = chillerHeater.SimulResult.qCondenser;
+                AvailableEvaporatorCapacity = chillerHeater.SimulResult.availableEvaporatorCapacity;
+                AvailableCondenserCapacity = chillerHeater.SimulResult.availableCondenserCapacity;
+                CapacityCurveEvaporatorTemp = chillerHeater.SimulResult.capacityCurveEvaporatorTemp;
+                CapacityCurveCondenserTemp = chillerHeater.SimulResult.capacityCurveCondenserTemp;
+                EIRCurveEvaporatorTemp = chillerHeater.SimulResult.eirCurveEvaporatorTemp;
+                EIRCurveCondenserTemp = chillerHeater.SimulResult.eirCurveCondenserTemp;
+                EIRPartLoadCurvePLR = chillerHeater.SimulResult.eirPartLoadCurvePLR;
                 this->adjustChillerHeaterCondFlowTemp(state, QCondenser, CondMassFlowRate, CondOutletTemp, CondInletTemp, CondDeltaTemp);
             } else { // Either Mode 2 (HeatingOnly) or 3 (HeatRecovery) or 5 (HeatingDominant)
                 if (this->SimulHtgDominant) {
@@ -2296,10 +2489,13 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                 Real64 EvapOutletTempSetPoint = state.dataLoopNodes->Node(this->CoolSetPointTempNode).TempSetPoint;
 
                 // Calculate Chiller Capacity as a function of temperature and error check
+                CapacityCurveEvaporatorTemp = EvapOutletTempSetPoint;
+                CapacityCurveCondenserTemp = CondTempforCurve;
                 state.dataPlantCentralGSHP->ChillerCapFT = this->calcChillerCapFT(state, ChillerHeaterNum, EvapOutletTempSetPoint, CondTempforCurve);
 
                 // Available chiller capacity as a function of temperature
                 Real64 AvailChillerCap = ChillerRefCap * state.dataPlantCentralGSHP->ChillerCapFT;
+                AvailableEvaporatorCapacity = AvailChillerCap;
 
                 Real64 PartLoadRat;    // Operating part load ratio
                 Real64 MinPartLoadRat; // Min allowed operating fraction of full load
@@ -2335,6 +2531,9 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
 
                 WrapperSpecs::calcPLRAndCyclingRatio(state, AvailChillerCap, PartLoadRat, MinPartLoadRat, MaxPartLoadRat, QEvaporator, FRAC);
 
+                EIRCurveEvaporatorTemp = EvapOutletTemp;
+                EIRCurveCondenserTemp = CondTempforCurve;
+                EIRPartLoadCurvePLR = PartLoadRat;
                 state.dataPlantCentralGSHP->ChillerEIRFT =
                     max(0.0, Curve::CurveValue(state, chillerHeater.ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
                 state.dataPlantCentralGSHP->ChillerEIRFPLR = max(0.0, Curve::CurveValue(state, chillerHeater.ChillerEIRFPLRIDX, PartLoadRat));
@@ -2349,6 +2548,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
 
                 QCondenser = CHPower * chillerHeater.OpenMotorEff + QEvaporator + state.dataPlantCentralGSHP->ChillerFalseLoadRate;
                 Real64 qCondenserFullLoad = QCondenser;
+                AvailableCondenserCapacity = qCondenserFullLoad;
 
                 // Determine heating load for this heater and pass the remaining load to the next chiller heater
                 Real64 CondenserCapMin = QCondenser * MinPartLoadRat;
@@ -2416,51 +2616,71 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
 
             // Heat recovery or cooling dominant modes need to use the evaporator side information
             if (currentMode == CurrentMode::HeatRecovery || currentMode == CurrentMode::CoolingDominant) {
-                state.dataPlantCentralGSHP->ChillerPartLoadRatio = chillerHeater.Report.ChillerPartLoadRatioSimul;
-                state.dataPlantCentralGSHP->ChillerCyclingRatio = chillerHeater.Report.ChillerCyclingRatioSimul;
-                state.dataPlantCentralGSHP->ChillerFalseLoadRate = chillerHeater.Report.ChillerFalseLoadRateSimul;
-                state.dataPlantCentralGSHP->ChillerCapFT = chillerHeater.Report.ChillerCapFTSimul;
-                state.dataPlantCentralGSHP->ChillerEIRFT = chillerHeater.Report.ChillerEIRFTSimul;
-                state.dataPlantCentralGSHP->ChillerEIRFPLR = chillerHeater.Report.ChillerEIRFPLRSimul;
-                QEvaporator = chillerHeater.Report.QEvapSimul;
-                EvapOutletTemp = chillerHeater.Report.EvapOutletTempSimul;
-                EvapInletTemp = chillerHeater.Report.EvapInletTempSimul;
-                EvapMassFlowRate = chillerHeater.Report.EvapmdotSimul;
+                state.dataPlantCentralGSHP->ChillerPartLoadRatio = chillerHeater.SimulResult.partLoadRatio;
+                state.dataPlantCentralGSHP->ChillerCyclingRatio = chillerHeater.SimulResult.cyclingRatio;
+                state.dataPlantCentralGSHP->ChillerFalseLoadRate = chillerHeater.SimulResult.falseLoadRate;
+                state.dataPlantCentralGSHP->ChillerCapFT = chillerHeater.SimulResult.capacityTemperatureModifier;
+                state.dataPlantCentralGSHP->ChillerEIRFT = chillerHeater.SimulResult.eirTemperatureModifier;
+                state.dataPlantCentralGSHP->ChillerEIRFPLR = chillerHeater.SimulResult.eirPartLoadModifier;
+                QEvaporator = chillerHeater.SimulResult.qEvaporator;
+                EvapOutletTemp = chillerHeater.SimulResult.evaporatorOutletTemp;
+                EvapInletTemp = chillerHeater.SimulResult.evaporatorInletTemp;
+                EvapMassFlowRate = chillerHeater.SimulResult.evaporatorMassFlowRate;
                 if (this->SimulClgDominant) {
-                    CHPower = chillerHeater.Report.CoolingPowerSimul;
-                    chillerHeater.Report.HeatingPower = 0.0;
+                    CHPower = chillerHeater.SimulResult.coolingPower;
                 }
             }
         }
 
         // Check if it is mode 4 (CoolingDominant), then skip binding local variables
         if (currentMode == CurrentMode::CoolingDominant) {
-            chillerHeater.Report.currentMode = currentMode;
+            chillerHeater.Result = chillerHeater.SimulResult;
+            chillerHeater.Result.currentMode = currentMode;
+            chillerHeater.Result.isAvailable = ModuleIsAvailable;
+            chillerHeater.Result.requestedHeatingLoad = RequestedHeatingLoad;
+            chillerHeater.Result.unmetHeatingLoad = CondenserLoad;
+            chillerHeater.mapResultToPlantConnections();
+            chillerHeater.applySimultaneousCoolingConnection();
+            chillerHeater.syncLegacyReportAndNodes();
         } else {
-            chillerHeater.EvapOutletNode.MassFlowRate = EvapMassFlowRate;
-            chillerHeater.CondOutletNode.MassFlowRate = CondMassFlowRate;
-            chillerHeater.EvapOutletNode.Temp = EvapOutletTemp;
-            chillerHeater.EvapInletNode.Temp = EvapInletTemp;
-            chillerHeater.CondOutletNode.Temp = CondOutletTemp;
-            chillerHeater.CondInletNode.Temp = CondInletTemp;
-            chillerHeater.Report.currentMode = currentMode;
-            chillerHeater.Report.ChillerPartLoadRatio = state.dataPlantCentralGSHP->ChillerPartLoadRatio;
-            chillerHeater.Report.ChillerCyclingRatio = state.dataPlantCentralGSHP->ChillerCyclingRatio;
-            chillerHeater.Report.ChillerFalseLoadRate = state.dataPlantCentralGSHP->ChillerFalseLoadRate;
-            chillerHeater.Report.ChillerCapFT = state.dataPlantCentralGSHP->ChillerCapFT;
-            chillerHeater.Report.ChillerEIRFT = state.dataPlantCentralGSHP->ChillerEIRFT;
-            chillerHeater.Report.ChillerEIRFPLR = state.dataPlantCentralGSHP->ChillerEIRFPLR;
-            chillerHeater.Report.CoolingPower = CoolingPower;
-            chillerHeater.Report.HeatingPower = CHPower;
-            chillerHeater.Report.QEvap = QEvaporator;
-            chillerHeater.Report.QCond = QCondenser;
-            chillerHeater.Report.EvapOutletTemp = EvapOutletTemp;
-            chillerHeater.Report.EvapInletTemp = EvapInletTemp;
-            chillerHeater.Report.CondOutletTemp = CondOutletTemp;
-            chillerHeater.Report.CondInletTemp = CondInletTemp;
-            chillerHeater.Report.Evapmdot = EvapMassFlowRate;
-            chillerHeater.Report.Condmdot = CondMassFlowRate;
-            chillerHeater.Report.ActualCOP = ActualCOP;
+            auto &result = chillerHeater.Result;
+            result = ChillerHeaterResult();
+            result.currentMode = currentMode;
+            result.isAvailable = ModuleIsAvailable;
+            result.requestedCoolingLoad = (this->SimulClgDominant || this->SimulHtgDominant) ? chillerHeater.SimulResult.requestedCoolingLoad : 0.0;
+            result.requestedHeatingLoad = RequestedHeatingLoad;
+            result.availableEvaporatorCapacity = AvailableEvaporatorCapacity;
+            result.availableCondenserCapacity = AvailableCondenserCapacity;
+            result.qEvaporator = QEvaporator;
+            result.qCondenser = QCondenser;
+            result.coolingPower = CoolingPower;
+            result.heatingPower = CHPower;
+            result.falseLoadRate = state.dataPlantCentralGSHP->ChillerFalseLoadRate;
+            result.partLoadRatio = state.dataPlantCentralGSHP->ChillerPartLoadRatio;
+            result.cyclingRatio = state.dataPlantCentralGSHP->ChillerCyclingRatio;
+            result.unloadingRatio = result.partLoadRatio;
+            result.capacityTemperatureModifier = state.dataPlantCentralGSHP->ChillerCapFT;
+            result.eirTemperatureModifier = state.dataPlantCentralGSHP->ChillerEIRFT;
+            result.eirPartLoadModifier = state.dataPlantCentralGSHP->ChillerEIRFPLR;
+            result.capacityCurveEvaporatorTemp = CapacityCurveEvaporatorTemp;
+            result.capacityCurveCondenserTemp = CapacityCurveCondenserTemp;
+            result.eirCurveEvaporatorTemp = EIRCurveEvaporatorTemp;
+            result.eirCurveCondenserTemp = EIRCurveCondenserTemp;
+            result.eirPartLoadCurvePLR = EIRPartLoadCurvePLR;
+            result.actualCOP = ActualCOP;
+            result.evaporatorOutletTemp = EvapOutletTemp;
+            result.evaporatorInletTemp = EvapInletTemp;
+            result.condenserOutletTemp = CondOutletTemp;
+            result.condenserInletTemp = CondInletTemp;
+            result.evaporatorMassFlowRate = EvapMassFlowRate;
+            result.condenserMassFlowRate = CondMassFlowRate;
+            result.unmetCoolingLoad = (this->SimulClgDominant || this->SimulHtgDominant) ? chillerHeater.SimulResult.unmetCoolingLoad : 0.0;
+            result.unmetHeatingLoad = CondenserLoad;
+            chillerHeater.mapResultToPlantConnections();
+            if (this->SimulClgDominant || this->SimulHtgDominant) {
+                chillerHeater.applySimultaneousCoolingConnection();
+            }
+            chillerHeater.syncLegacyReportAndNodes();
         }
     }
 }
@@ -2733,22 +2953,23 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
 
             for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
                 auto const &chillerHeater = this->ChillerHeater(ChillerHeaterNum);
+                auto const &result = chillerHeater.Result;
 
                 // Calculated mass flow rate used by individual chiller heater and bypasses
-                CHWOutletMassFlowRate += chillerHeater.Report.Evapmdot;
-                CHWOutletTemp += chillerHeater.Report.EvapOutletTemp * (chillerHeater.Report.Evapmdot / CHWInletMassFlowRate);
-                WrapperElecPowerCool += chillerHeater.Report.CoolingPower;
-                WrapperCoolRate += chillerHeater.Report.QEvap;
-                WrapperElecEnergyCool += chillerHeater.Report.CoolingEnergy;
-                WrapperCoolEnergy += chillerHeater.Report.EvapEnergy;
+                CHWOutletMassFlowRate += result.chilledWaterMassFlowRate;
+                CHWOutletTemp += result.chilledWaterOutletTemp * (result.chilledWaterMassFlowRate / CHWInletMassFlowRate);
+                WrapperElecPowerCool += result.coolingPower;
+                WrapperCoolRate += result.coolingDelivered;
+                WrapperElecEnergyCool += result.coolingEnergy;
+                WrapperCoolEnergy += result.evaporatorEnergy;
                 if (GLHEInletMassFlowRate > 0.0) {
-                    GLHEOutletMassFlowRate += chillerHeater.Report.Condmdot;
+                    GLHEOutletMassFlowRate += result.sourceMassFlowRate;
                     if (GLHEOutletMassFlowRate > GLHEInletMassFlowRate) {
                         GLHEOutletMassFlowRate = GLHEInletMassFlowRate;
                     }
-                    GLHEOutletTemp += chillerHeater.Report.CondOutletTemp * (chillerHeater.Report.Condmdot / GLHEInletMassFlowRate);
-                    WrapperGLHERate += chillerHeater.Report.QCond;
-                    WrapperGLHEEnergy += chillerHeater.Report.CondEnergy;
+                    GLHEOutletTemp += result.sourceOutletTemp * (result.sourceMassFlowRate / GLHEInletMassFlowRate);
+                    WrapperGLHERate += result.sourceHeatTransfer;
+                    WrapperGLHEEnergy += result.condenserEnergy;
                 } else {
                     GLHEInletMassFlowRate = 0.0;
                     GLHEOutletMassFlowRate = 0.0;
@@ -2796,35 +3017,10 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
 
             for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
                 auto &chillerHeater = this->ChillerHeater(ChillerHeaterNum);
-                chillerHeater.EvapOutletNode.MassFlowRate = 0.0;
-                chillerHeater.CondOutletNode.MassFlowRate = 0.0;
-                chillerHeater.EvapOutletNode.Temp = CHWInletTemp;
-                chillerHeater.EvapInletNode.Temp = CHWInletTemp;
-                chillerHeater.CondOutletNode.Temp = GLHEInletTemp;
-                chillerHeater.CondInletNode.Temp = GLHEInletTemp;
-                chillerHeater.Report.currentMode = CurrentMode::Off;
-                chillerHeater.Report.ChillerPartLoadRatio = 0.0;
-                chillerHeater.Report.ChillerCyclingRatio = 0.0;
-                chillerHeater.Report.ChillerFalseLoadRate = 0.0;
-                chillerHeater.Report.ChillerCapFT = 0.0;
-                chillerHeater.Report.ChillerEIRFT = 0.0;
-                chillerHeater.Report.ChillerEIRFPLR = 0.0;
-                chillerHeater.Report.CoolingPower = 0.0;
-                chillerHeater.Report.HeatingPower = 0.0;
-                chillerHeater.Report.QEvap = 0.0;
-                chillerHeater.Report.QCond = 0.0;
-                chillerHeater.Report.EvapOutletTemp = CHWOutletTemp;
-                chillerHeater.Report.EvapInletTemp = CHWInletTemp;
-                chillerHeater.Report.CondOutletTemp = GLHEOutletTemp;
-                chillerHeater.Report.CondInletTemp = GLHEInletTemp;
-                chillerHeater.Report.Evapmdot = 0.0;
-                chillerHeater.Report.Condmdot = 0.0;
-                chillerHeater.Report.ChillerFalseLoad = 0.0;
-                chillerHeater.Report.CoolingEnergy = 0.0;
-                chillerHeater.Report.HeatingEnergy = 0.0;
-                chillerHeater.Report.EvapEnergy = 0.0;
-                chillerHeater.Report.CondEnergy = 0.0;
-                chillerHeater.Report.ActualCOP = 0.0;
+                chillerHeater.resetCurrentResult(CHWInletTemp, GLHEInletTemp);
+                if (this->SimulHtgDominant || this->SimulClgDominant) {
+                    chillerHeater.saveCurrentResultForSimultaneous();
+                }
             }
         }
 
@@ -2892,7 +3088,9 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                 if (this->SimulClgDominant) {
                     for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
                         auto const &chillerHeater = this->ChillerHeater(ChillerHeaterNum);
-                        CurrentMode currentMode = chillerHeater.Report.currentMode;
+                        auto const &result = chillerHeater.Result;
+                        auto const &simulResult = chillerHeater.SimulResult;
+                        CurrentMode currentMode = result.currentMode;
                         CHWInletTemp = this->Report.CHWInletTempSimul;
                         GLHEInletTemp = this->Report.GLHEInletTempSimul;
                         CHWInletMassFlowRate = this->Report.CHWmdotSimul;
@@ -2900,26 +3098,24 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
 
                         if (currentMode != CurrentMode::Off) {              // This chiller heater unit is on
                             if (currentMode == CurrentMode::HeatRecovery) { // Heat recovery mode. Both chilled water and hot water connections
-                                CHWOutletMassFlowRate += chillerHeater.Report.EvapmdotSimul; // Wrapper evaporator side to plant chilled water loop
-                                HWOutletMassFlowRate += chillerHeater.Report.Condmdot;       // Wrapper condenser side to plant hot water loop
+                                CHWOutletMassFlowRate += result.chilledWaterMassFlowRate;
+                                HWOutletMassFlowRate += result.hotWaterMassFlowRate;
                                 if (HWInletMassFlowRate > 0.0) {
-                                    HWOutletTemp += chillerHeater.Report.CondOutletTemp *
-                                                    (chillerHeater.Report.Condmdot / HWInletMassFlowRate); // Only calculate in the heat recovery mode
+                                    HWOutletTemp += result.hotWaterOutletTemp * (result.hotWaterMassFlowRate / HWInletMassFlowRate);
                                 } else {
                                     HWOutletTemp = HWInletTemp;
                                 }
                             } else { // Mode 4. Cooling-only mode with other heat recovery units. Condenser flows.
-                                CHWOutletMassFlowRate += chillerHeater.Report.EvapmdotSimul; // Wrapper evaporator side to plant chilled water loop
+                                CHWOutletMassFlowRate += result.chilledWaterMassFlowRate;
                                 // Sum condenser node mass flow rates and mass weighed temperatures
                                 if (GLHEInletMassFlowRate > 0.0) {
-                                    GLHEOutletMassFlowRate += chillerHeater.Report.CondmdotSimul;
+                                    GLHEOutletMassFlowRate += result.sourceMassFlowRate;
                                     if (GLHEOutletMassFlowRate > GLHEInletMassFlowRate) {
                                         GLHEOutletMassFlowRate = GLHEInletMassFlowRate;
                                     }
-                                    GLHEOutletTemp +=
-                                        chillerHeater.Report.CondOutletTempSimul * (chillerHeater.Report.CondmdotSimul / GLHEInletMassFlowRate);
-                                    WrapperGLHERate += chillerHeater.Report.QCondSimul;
-                                    WrapperGLHEEnergy += chillerHeater.Report.CondEnergySimul;
+                                    GLHEOutletTemp += result.sourceOutletTemp * (result.sourceMassFlowRate / GLHEInletMassFlowRate);
+                                    WrapperGLHERate += result.sourceHeatTransfer;
+                                    WrapperGLHEEnergy += result.condenserEnergy;
                                 } else {
                                     GLHEInletMassFlowRate = 0.0;
                                     GLHEOutletMassFlowRate = 0.0;
@@ -2941,15 +3137,15 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                         }
                         // Calculate mass weighed chilled water temperatures
                         if (CHWInletMassFlowRate > 0.0) {
-                            CHWOutletTemp += chillerHeater.Report.EvapOutletTempSimul * (chillerHeater.Report.EvapmdotSimul / CHWInletMassFlowRate);
+                            CHWOutletTemp += result.chilledWaterOutletTemp * (result.chilledWaterMassFlowRate / CHWInletMassFlowRate);
                         } else {
                             CHWOutletTemp = CHWInletTemp;
                         }
 
-                        WrapperElecPowerCool += chillerHeater.Report.CoolingPowerSimul; // Cooling electricity
-                        WrapperCoolRate += chillerHeater.Report.QEvapSimul;
-                        WrapperElecEnergyCool += chillerHeater.Report.CoolingEnergySimul;
-                        WrapperCoolEnergy += chillerHeater.Report.EvapEnergySimul;
+                        WrapperElecPowerCool += simulResult.coolingPower; // Cooling electricity
+                        WrapperCoolRate += simulResult.coolingDelivered;
+                        WrapperElecEnergyCool += simulResult.coolingEnergy;
+                        WrapperCoolEnergy += simulResult.evaporatorEnergy;
                         // Avoid double counting wrapper energy use
                         WrapperElecPowerHeat = 0.0;
                         WrapperHeatRate = 0.0;
@@ -3001,33 +3197,32 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                 } else if (this->SimulHtgDominant) { // Heating dominant simultaneous clg/htg mode
 
                     for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
-                        auto &chillerHeater = this->ChillerHeater(ChillerHeaterNum);
+                        auto const &chillerHeater = this->ChillerHeater(ChillerHeaterNum);
+                        auto const &result = chillerHeater.Result;
                         // Set temperatures and mass flow rates for the cooling side
-                        CurrentMode currentMode = chillerHeater.Report.currentMode;
+                        CurrentMode currentMode = result.currentMode;
                         CHWInletTemp = this->Report.CHWInletTempSimul;
                         CHWInletMassFlowRate = this->Report.CHWmdotSimul;
 
                         if (currentMode != CurrentMode::Off) {              // This chiller heater unit is on
                             if (currentMode == CurrentMode::HeatRecovery) { // Heat recovery mode. Both chilled water and hot water connections
-                                CHWOutletMassFlowRate += chillerHeater.Report.EvapmdotSimul; // Wrapper evaporator side to plant chilled water loop
-                                HWOutletMassFlowRate += chillerHeater.Report.Condmdot;       // Wrapper condenser side to plant hot water loop
+                                CHWOutletMassFlowRate += result.chilledWaterMassFlowRate;
+                                HWOutletMassFlowRate += result.hotWaterMassFlowRate;
                                 if (CHWInletMassFlowRate > 0.0) {
-                                    CHWOutletTemp += chillerHeater.Report.EvapOutletTempSimul *
-                                                     (chillerHeater.Report.EvapmdotSimul /
-                                                      CHWInletMassFlowRate); // Only need to calculate in the heat recovery mode
+                                    CHWOutletTemp += result.chilledWaterOutletTemp * (result.chilledWaterMassFlowRate / CHWInletMassFlowRate);
                                 } else {
                                     CHWOutletTemp = CHWInletTemp;
                                 }
-                            } else {                                                   // Mode 5. Heating only mode with other heat recovery units
-                                HWOutletMassFlowRate += chillerHeater.Report.Condmdot; // Wrapper condenser side to plant hot water loop
+                            } else { // Mode 5. Heating only mode with other heat recovery units
+                                HWOutletMassFlowRate += result.hotWaterMassFlowRate;
                                 if (GLHEInletMassFlowRate > 0.0) {
-                                    GLHEOutletMassFlowRate += chillerHeater.Report.Evapmdot; // Wrapper evaporator side to plant condenser loop
+                                    GLHEOutletMassFlowRate += result.sourceMassFlowRate;
                                     if (GLHEOutletMassFlowRate > GLHEInletMassFlowRate) {
                                         GLHEOutletMassFlowRate = GLHEInletMassFlowRate;
                                     }
-                                    GLHEOutletTemp += chillerHeater.Report.EvapOutletTemp * (chillerHeater.Report.Evapmdot / GLHEInletMassFlowRate);
-                                    WrapperGLHERate += chillerHeater.Report.QEvap;
-                                    WrapperGLHEEnergy += chillerHeater.Report.EvapEnergy;
+                                    GLHEOutletTemp += result.sourceOutletTemp * (result.sourceMassFlowRate / GLHEInletMassFlowRate);
+                                    WrapperGLHERate -= result.sourceHeatTransfer;
+                                    WrapperGLHEEnergy += result.evaporatorEnergy;
                                 } else {
                                     GLHEInletMassFlowRate = 0.0;
                                     GLHEOutletMassFlowRate = 0.0;
@@ -3052,16 +3247,16 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
 
                         // Calculate mass weighed hot water temperatures
                         if (HWInletMassFlowRate > 0.0) {
-                            HWOutletTemp += chillerHeater.Report.CondOutletTemp *
-                                            (chillerHeater.Report.Condmdot / HWInletMassFlowRate); // Always heating as long as heating load remains
+                            HWOutletTemp += result.hotWaterOutletTemp *
+                                            (result.hotWaterMassFlowRate / HWInletMassFlowRate); // Always heating as long as heating load remains
                         } else {
                             HWOutletTemp = HWInletTemp;
                         }
 
-                        WrapperElecPowerHeat += chillerHeater.Report.HeatingPower;
-                        WrapperHeatRate += chillerHeater.Report.QCond;
-                        WrapperElecEnergyHeat += chillerHeater.Report.HeatingEnergy;
-                        WrapperHeatEnergy += chillerHeater.Report.CondEnergy;
+                        WrapperElecPowerHeat += result.heatingPower;
+                        WrapperHeatRate += result.heatingDelivered;
+                        WrapperElecEnergyHeat += result.heatingEnergy;
+                        WrapperHeatEnergy += result.condenserEnergy;
 
                         // Avoid double counting wrapper energy use
                         WrapperElecPowerCool = 0.0;
@@ -3115,21 +3310,22 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
 
                 for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
                     auto const &chillerHeater = this->ChillerHeater(ChillerHeaterNum);
-                    HWOutletMassFlowRate += chillerHeater.Report.Condmdot;
-                    HWOutletTemp += chillerHeater.Report.CondOutletTemp * chillerHeater.Report.Condmdot / HWInletMassFlowRate;
-                    WrapperElecPowerHeat += chillerHeater.Report.HeatingPower;
-                    WrapperHeatRate += chillerHeater.Report.QCond;
-                    WrapperElecEnergyHeat += chillerHeater.Report.HeatingEnergy;
-                    WrapperHeatEnergy += chillerHeater.Report.CondEnergy;
+                    auto const &result = chillerHeater.Result;
+                    HWOutletMassFlowRate += result.hotWaterMassFlowRate;
+                    HWOutletTemp += result.hotWaterOutletTemp * result.hotWaterMassFlowRate / HWInletMassFlowRate;
+                    WrapperElecPowerHeat += result.heatingPower;
+                    WrapperHeatRate += result.heatingDelivered;
+                    WrapperElecEnergyHeat += result.heatingEnergy;
+                    WrapperHeatEnergy += result.condenserEnergy;
 
                     if (GLHEInletMassFlowRate > 0.0) {
-                        GLHEOutletMassFlowRate += chillerHeater.Report.Evapmdot;
+                        GLHEOutletMassFlowRate += result.sourceMassFlowRate;
                         if (GLHEOutletMassFlowRate > GLHEInletMassFlowRate) {
                             GLHEOutletMassFlowRate = GLHEInletMassFlowRate;
                         }
-                        GLHEOutletTemp += chillerHeater.Report.EvapOutletTemp * (chillerHeater.Report.Evapmdot / GLHEInletMassFlowRate);
-                        WrapperGLHERate += chillerHeater.Report.QEvap;
-                        WrapperGLHEEnergy += chillerHeater.Report.EvapEnergy;
+                        GLHEOutletTemp += result.sourceOutletTemp * (result.sourceMassFlowRate / GLHEInletMassFlowRate);
+                        WrapperGLHERate -= result.sourceHeatTransfer;
+                        WrapperGLHEEnergy += result.evaporatorEnergy;
                     } else { // No source water flow
                         GLHEOutletMassFlowRate = 0.0;
                         GLHEInletMassFlowRate = 0.0;
@@ -3219,35 +3415,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
 
                 for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
                     auto &chillerHeater = this->ChillerHeater(ChillerHeaterNum);
-                    chillerHeater.EvapOutletNode.MassFlowRate = 0.0;
-                    chillerHeater.CondOutletNode.MassFlowRate = 0.0;
-                    chillerHeater.EvapOutletNode.Temp = CHWInletTemp;
-                    chillerHeater.EvapInletNode.Temp = CHWInletTemp;
-                    chillerHeater.CondOutletNode.Temp = GLHEInletTemp;
-                    chillerHeater.CondInletNode.Temp = GLHEInletTemp;
-                    chillerHeater.Report.currentMode = CurrentMode::Off;
-                    chillerHeater.Report.ChillerPartLoadRatio = 0.0;
-                    chillerHeater.Report.ChillerCyclingRatio = 0.0;
-                    chillerHeater.Report.ChillerFalseLoadRate = 0.0;
-                    chillerHeater.Report.ChillerCapFT = 0.0;
-                    chillerHeater.Report.ChillerEIRFT = 0.0;
-                    chillerHeater.Report.ChillerEIRFPLR = 0.0;
-                    chillerHeater.Report.CoolingPower = 0.0;
-                    chillerHeater.Report.HeatingPower = 0.0;
-                    chillerHeater.Report.QEvap = 0.0;
-                    chillerHeater.Report.QCond = 0.0;
-                    chillerHeater.Report.EvapOutletTemp = CHWOutletTemp;
-                    chillerHeater.Report.EvapInletTemp = CHWInletTemp;
-                    chillerHeater.Report.CondOutletTemp = GLHEOutletTemp;
-                    chillerHeater.Report.CondInletTemp = GLHEInletTemp;
-                    chillerHeater.Report.Evapmdot = 0.0;
-                    chillerHeater.Report.Condmdot = 0.0;
-                    chillerHeater.Report.ChillerFalseLoad = 0.0;
-                    chillerHeater.Report.CoolingEnergy = 0.0;
-                    chillerHeater.Report.HeatingEnergy = 0.0;
-                    chillerHeater.Report.EvapEnergy = 0.0;
-                    chillerHeater.Report.CondEnergy = 0.0;
-                    chillerHeater.Report.ActualCOP = 0.0;
+                    chillerHeater.resetCurrentResult(CHWInletTemp, GLHEInletTemp);
                 }
 
                 this->Report.CHWInletTemp = CHWInletTemp;
@@ -3300,17 +3468,7 @@ void WrapperSpecs::UpdateChillerRecords(EnergyPlusData &state) // Wrapper number
 
     for (ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
         auto &chillerHeater = this->ChillerHeater(ChillerHeaterNum);
-        chillerHeater.Report.ChillerFalseLoad = chillerHeater.Report.ChillerFalseLoadRate * SecInTimeStep;
-        chillerHeater.Report.CoolingEnergy = chillerHeater.Report.CoolingPower * SecInTimeStep;
-        chillerHeater.Report.HeatingEnergy = chillerHeater.Report.HeatingPower * SecInTimeStep;
-        chillerHeater.Report.EvapEnergy = chillerHeater.Report.QEvap * SecInTimeStep;
-        chillerHeater.Report.CondEnergy = chillerHeater.Report.QCond * SecInTimeStep;
-        if (this->SimulClgDominant || this->SimulHtgDominant) {
-            chillerHeater.Report.ChillerFalseLoadSimul = chillerHeater.Report.ChillerFalseLoad;
-            chillerHeater.Report.CoolingEnergySimul = chillerHeater.Report.CoolingEnergy;
-            chillerHeater.Report.EvapEnergySimul = chillerHeater.Report.EvapEnergy;
-            chillerHeater.Report.CondEnergySimul = chillerHeater.Report.CondEnergy;
-        }
+        chillerHeater.updateResultEnergies(SecInTimeStep, this->SimulClgDominant || this->SimulHtgDominant);
     }
 }
 
@@ -3326,11 +3484,7 @@ void WrapperSpecs::UpdateChillerHeaterRecords(EnergyPlusData &state) // Wrapper 
 
     for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
         auto &chillerHeater = this->ChillerHeater(ChillerHeaterNum);
-        chillerHeater.Report.ChillerFalseLoad = chillerHeater.Report.ChillerFalseLoadRate * SecInTimeStep;
-        chillerHeater.Report.CoolingEnergy = chillerHeater.Report.CoolingPower * SecInTimeStep;
-        chillerHeater.Report.HeatingEnergy = chillerHeater.Report.HeatingPower * SecInTimeStep;
-        chillerHeater.Report.EvapEnergy = chillerHeater.Report.QEvap * SecInTimeStep;
-        chillerHeater.Report.CondEnergy = chillerHeater.Report.QCond * SecInTimeStep;
+        chillerHeater.updateResultEnergies(SecInTimeStep, false);
     }
 }
 void WrapperSpecs::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)

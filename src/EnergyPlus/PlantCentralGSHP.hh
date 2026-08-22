@@ -156,6 +156,90 @@ namespace PlantCentralGSHP {
         Real64 ChillerEIRFPLRSimul = 0.0;               // Chiller EIRFPLR curve output value for simul clg/htg mode
     };
 
+    struct ChillerHeaterResult
+    {
+        CurrentMode currentMode = CurrentMode::Off;
+        bool isAvailable = false;
+        bool isRunning = false;
+
+        Real64 requestedCoolingLoad = 0.0;        // Cooling load presented to this module [W]
+        Real64 requestedHeatingLoad = 0.0;        // Heating load presented to this module [W]
+        Real64 availableEvaporatorCapacity = 0.0; // Available evaporator capacity at the operating temperatures [W]
+        Real64 availableCondenserCapacity = 0.0;  // Available condenser capacity at the operating temperatures [W]
+        Real64 qEvaporator = 0.0;                 // Refrigerant evaporator heat transfer [W]
+        Real64 qCondenser = 0.0;                  // Refrigerant condenser heat transfer [W]
+
+        Real64 compressorPower = 0.0;        // Compressor electric power counted once [W]
+        Real64 coolingPower = 0.0;           // Compressor power assigned to cooling reporting [W]
+        Real64 heatingPower = 0.0;           // Compressor power assigned to heating reporting [W]
+        Real64 motorHeatToRefrigerant = 0.0; // Compressor power delivered to the refrigerant [W]
+        Real64 motorHeatLoss = 0.0;          // Compressor power rejected outside the refrigerant cycle [W]
+        Real64 falseLoadRate = 0.0;          // False loading above useful water-side load [W]
+
+        Real64 partLoadRatio = 0.0;
+        Real64 cyclingRatio = 0.0;
+        Real64 unloadingRatio = 0.0;
+        Real64 capacityTemperatureModifier = 0.0;
+        Real64 eirTemperatureModifier = 0.0;
+        Real64 eirPartLoadModifier = 0.0;
+        Real64 capacityCurveEvaporatorTemp = 0.0; // Evaporator temperature used by the capacity curve [C]
+        Real64 capacityCurveCondenserTemp = 0.0;  // Condenser temperature used by the capacity curve [C]
+        Real64 eirCurveEvaporatorTemp = 0.0;      // Evaporator temperature used by the EIR temperature curve [C]
+        Real64 eirCurveCondenserTemp = 0.0;       // Condenser temperature used by the EIR temperature curve [C]
+        Real64 eirPartLoadCurvePLR = 0.0;         // PLR used to evaluate the EIR part-load curve
+        Real64 actualCOP = 0.0;
+
+        Real64 evaporatorInletTemp = 0.0;
+        Real64 evaporatorOutletTemp = 0.0;
+        Real64 evaporatorMassFlowRate = 0.0;
+        Real64 condenserInletTemp = 0.0;
+        Real64 condenserOutletTemp = 0.0;
+        Real64 condenserMassFlowRate = 0.0;
+
+        Real64 chilledWaterInletTemp = 0.0;
+        Real64 chilledWaterOutletTemp = 0.0;
+        Real64 chilledWaterMassFlowRate = 0.0;
+        Real64 hotWaterInletTemp = 0.0;
+        Real64 hotWaterOutletTemp = 0.0;
+        Real64 hotWaterMassFlowRate = 0.0;
+        Real64 sourceInletTemp = 0.0;
+        Real64 sourceOutletTemp = 0.0;
+        Real64 sourceMassFlowRate = 0.0;
+
+        Real64 coolingDelivered = 0.0;   // Useful chilled-water cooling [W]
+        Real64 heatingDelivered = 0.0;   // Useful hot-water heating [W]
+        Real64 heatRecovered = 0.0;      // Condenser heat routed to heat recovery [W]
+        Real64 sourceHeatTransfer = 0.0; // Positive rejects to source; negative extracts from source [W]
+        Real64 unmetCoolingLoad = 0.0;   // Remaining wrapper cooling load after this module [W]
+        Real64 unmetHeatingLoad = 0.0;   // Remaining wrapper heating load after this module [W]
+
+        Real64 falseLoadEnergy = 0.0;
+        Real64 coolingEnergy = 0.0;
+        Real64 heatingEnergy = 0.0;
+        Real64 evaporatorEnergy = 0.0;
+        Real64 condenserEnergy = 0.0;
+
+        void updatePowerAccounting(Real64 openMotorEfficiency)
+        {
+            this->compressorPower = this->coolingPower + this->heatingPower;
+            this->motorHeatToRefrigerant = this->compressorPower * openMotorEfficiency;
+            this->motorHeatLoss = this->compressorPower - this->motorHeatToRefrigerant;
+            this->isRunning = this->currentMode == CurrentMode::CoolingOnly || this->currentMode == CurrentMode::HeatingOnly ||
+                              this->currentMode == CurrentMode::HeatRecovery || this->currentMode == CurrentMode::CoolingDominant ||
+                              this->currentMode == CurrentMode::HeatingDominant;
+        }
+
+        Real64 moduleEnergyBalanceResidual() const
+        {
+            return this->qCondenser - this->qEvaporator - this->motorHeatToRefrigerant - this->falseLoadRate;
+        }
+
+        Real64 routingEnergyBalanceResidual() const
+        {
+            return this->heatingDelivered + this->sourceHeatTransfer - this->coolingDelivered - this->motorHeatToRefrigerant - this->falseLoadRate;
+        }
+    };
+
     struct ChillerHeaterSpecs
     {
         std::string Name;                                                             // Name of the Chiller Heater object
@@ -239,7 +323,16 @@ namespace PlantCentralGSHP {
         Real64 OptPartLoadRat = 0.0;              // Optimal operating fraction of full load
         Real64 ChillerEIRFPLRMin = 0.0;           // Minimum value of PLR from EIRFPLR curve
         Real64 ChillerEIRFPLRMax = 0.0;           // Maximum value of PLR from EIRFPLR curve
+        ChillerHeaterResult Result;               // Authoritative result for the current module calculation
+        ChillerHeaterResult SimulResult;          // Cooling-side snapshot retained while simultaneous loads are dispatched
         CHReportVars Report;
+
+        void mapResultToPlantConnections();
+        void applySimultaneousCoolingConnection();
+        void syncLegacyReportAndNodes();
+        void saveCurrentResultForSimultaneous();
+        void updateResultEnergies(Real64 secondsInTimeStep, bool updateSimultaneousResult);
+        void resetCurrentResult(Real64 evaporatorInletTemp, Real64 condenserInletTemp);
     };
 
     struct WrapperReportVars

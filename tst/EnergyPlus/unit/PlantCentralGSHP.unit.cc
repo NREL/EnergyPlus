@@ -1139,3 +1139,202 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_WaterAndGlycolNodeHeatTrans
     EXPECT_FALSE(contractNear(sourceCp, chilledWaterCp));
     EXPECT_FALSE(checkLoopHeatTransfer(sourceHeat, sourceMassFlow, chilledWaterCp, sourceInletTemp, sourceOutletTemp));
 }
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_AuthoritativeResultMapsPlantConnections)
+{
+    PlantCentralGSHP::ChillerHeaterSpecs chillerHeater;
+    chillerHeater.OpenMotorEff = 0.80;
+
+    auto configureResult = [&chillerHeater](CurrentMode const mode) {
+        auto &result = chillerHeater.Result;
+        result = PlantCentralGSHP::ChillerHeaterResult();
+        result.currentMode = mode;
+        result.isAvailable = true;
+        result.qEvaporator = 8000.0;
+        result.qCondenser = 9600.0;
+        result.coolingPower = 2000.0;
+        result.evaporatorInletTemp = 12.0;
+        result.evaporatorOutletTemp = 7.0;
+        result.evaporatorMassFlowRate = 0.40;
+        result.condenserInletTemp = 30.0;
+        result.condenserOutletTemp = 35.0;
+        result.condenserMassFlowRate = 0.50;
+        chillerHeater.mapResultToPlantConnections();
+    };
+
+    std::array<CurrentMode, 2> const coolingModes = {CurrentMode::CoolingOnly, CurrentMode::CoolingDominant};
+    for (CurrentMode const mode : coolingModes) {
+        SCOPED_TRACE(modeName(mode));
+        configureResult(mode);
+        auto const &result = chillerHeater.Result;
+        EXPECT_TRUE(result.isAvailable);
+        EXPECT_TRUE(result.isRunning);
+        EXPECT_DOUBLE_EQ(8000.0, result.coolingDelivered);
+        EXPECT_DOUBLE_EQ(9600.0, result.sourceHeatTransfer);
+        EXPECT_DOUBLE_EQ(0.40, result.chilledWaterMassFlowRate);
+        EXPECT_DOUBLE_EQ(0.50, result.sourceMassFlowRate);
+        EXPECT_DOUBLE_EQ(0.0, result.hotWaterMassFlowRate);
+        EXPECT_NEAR(0.0, result.moduleEnergyBalanceResidual(), contractTolerance);
+        EXPECT_NEAR(0.0, result.routingEnergyBalanceResidual(), contractTolerance);
+    }
+
+    std::array<CurrentMode, 2> const heatingModes = {CurrentMode::HeatingOnly, CurrentMode::HeatingDominant};
+    for (CurrentMode const mode : heatingModes) {
+        SCOPED_TRACE(modeName(mode));
+        configureResult(mode);
+        auto const &result = chillerHeater.Result;
+        EXPECT_DOUBLE_EQ(9600.0, result.heatingDelivered);
+        EXPECT_DOUBLE_EQ(-8000.0, result.sourceHeatTransfer);
+        EXPECT_DOUBLE_EQ(0.50, result.hotWaterMassFlowRate);
+        EXPECT_DOUBLE_EQ(0.40, result.sourceMassFlowRate);
+        EXPECT_DOUBLE_EQ(0.0, result.chilledWaterMassFlowRate);
+        EXPECT_NEAR(0.0, result.routingEnergyBalanceResidual(), contractTolerance);
+    }
+
+    configureResult(CurrentMode::HeatRecovery);
+    auto const &result = chillerHeater.Result;
+    EXPECT_DOUBLE_EQ(8000.0, result.coolingDelivered);
+    EXPECT_DOUBLE_EQ(9600.0, result.heatingDelivered);
+    EXPECT_DOUBLE_EQ(9600.0, result.heatRecovered);
+    EXPECT_DOUBLE_EQ(0.0, result.sourceHeatTransfer);
+    EXPECT_DOUBLE_EQ(0.40, result.chilledWaterMassFlowRate);
+    EXPECT_DOUBLE_EQ(0.50, result.hotWaterMassFlowRate);
+    EXPECT_DOUBLE_EQ(0.0, result.sourceMassFlowRate);
+    EXPECT_DOUBLE_EQ(2000.0, result.compressorPower);
+    EXPECT_DOUBLE_EQ(1600.0, result.motorHeatToRefrigerant);
+    EXPECT_DOUBLE_EQ(400.0, result.motorHeatLoss);
+    EXPECT_NEAR(0.0, result.moduleEnergyBalanceResidual(), contractTolerance);
+    EXPECT_NEAR(0.0, result.routingEnergyBalanceResidual(), contractTolerance);
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_AuthoritativeResultDrivesReportsAndSnapshots)
+{
+    PlantCentralGSHP::ChillerHeaterSpecs chillerHeater;
+    chillerHeater.OpenMotorEff = 0.80;
+    auto &result = chillerHeater.Result;
+    result.currentMode = CurrentMode::HeatRecovery;
+    result.isAvailable = true;
+    result.qEvaporator = 8000.0;
+    result.qCondenser = 9725.0;
+    result.coolingPower = 2000.0;
+    result.falseLoadRate = 125.0;
+    result.partLoadRatio = 0.75;
+    result.cyclingRatio = 0.50;
+    result.capacityTemperatureModifier = 0.95;
+    result.eirTemperatureModifier = 1.05;
+    result.eirPartLoadModifier = 0.90;
+    result.actualCOP = 4.0;
+    result.evaporatorInletTemp = 12.0;
+    result.evaporatorOutletTemp = 7.0;
+    result.evaporatorMassFlowRate = 0.40;
+    result.condenserInletTemp = 30.0;
+    result.condenserOutletTemp = 35.0;
+    result.condenserMassFlowRate = 0.50;
+    chillerHeater.mapResultToPlantConnections();
+    chillerHeater.syncLegacyReportAndNodes();
+    chillerHeater.saveCurrentResultForSimultaneous();
+
+    result.qEvaporator = 7000.0;
+    result.qCondenser = 7800.0;
+    result.coolingPower = 1000.0;
+    result.falseLoadRate = 0.0;
+    result.evaporatorOutletTemp = 8.0;
+    chillerHeater.mapResultToPlantConnections();
+    chillerHeater.updateResultEnergies(60.0, true);
+
+    EXPECT_DOUBLE_EQ(7000.0, chillerHeater.Report.QEvap);
+    EXPECT_DOUBLE_EQ(7800.0, chillerHeater.Report.QCond);
+    EXPECT_DOUBLE_EQ(1000.0, chillerHeater.Report.CoolingPower);
+    EXPECT_DOUBLE_EQ(60000.0, chillerHeater.Report.CoolingEnergy);
+    EXPECT_DOUBLE_EQ(420000.0, chillerHeater.Report.EvapEnergy);
+    EXPECT_DOUBLE_EQ(8.0, chillerHeater.EvapOutletNode.Temp);
+
+    EXPECT_DOUBLE_EQ(8000.0, chillerHeater.SimulResult.qEvaporator);
+    EXPECT_DOUBLE_EQ(9725.0, chillerHeater.SimulResult.qCondenser);
+    EXPECT_DOUBLE_EQ(2000.0, chillerHeater.SimulResult.coolingPower);
+    EXPECT_DOUBLE_EQ(120000.0, chillerHeater.SimulResult.coolingEnergy);
+    EXPECT_DOUBLE_EQ(480000.0, chillerHeater.SimulResult.evaporatorEnergy);
+    EXPECT_DOUBLE_EQ(8000.0, chillerHeater.Report.QEvapSimul);
+    EXPECT_DOUBLE_EQ(9725.0, chillerHeater.Report.QCondSimul);
+    EXPECT_DOUBLE_EQ(120000.0, chillerHeater.Report.CoolingEnergySimul);
+    EXPECT_DOUBLE_EQ(480000.0, chillerHeater.Report.EvapEnergySimul);
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_AuthoritativeResultCombinesSimultaneousConnections)
+{
+    PlantCentralGSHP::ChillerHeaterSpecs chillerHeater;
+    chillerHeater.OpenMotorEff = 0.80;
+    auto &coolingResult = chillerHeater.Result;
+    coolingResult.currentMode = CurrentMode::CoolingOnly;
+    coolingResult.requestedCoolingLoad = 3500.0;
+    coolingResult.unmetCoolingLoad = 500.0;
+    coolingResult.qEvaporator = 3000.0;
+    coolingResult.qCondenser = 3800.0;
+    coolingResult.coolingPower = 1000.0;
+    coolingResult.evaporatorInletTemp = 12.0;
+    coolingResult.evaporatorOutletTemp = 7.0;
+    coolingResult.evaporatorMassFlowRate = 0.25;
+    coolingResult.condenserInletTemp = 20.0;
+    coolingResult.condenserOutletTemp = 21.0;
+    coolingResult.condenserMassFlowRate = 0.30;
+    chillerHeater.mapResultToPlantConnections();
+    chillerHeater.saveCurrentResultForSimultaneous();
+
+    auto &result = chillerHeater.Result;
+    result = PlantCentralGSHP::ChillerHeaterResult();
+    result.currentMode = CurrentMode::HeatingDominant;
+    result.qEvaporator = 8000.0;
+    result.qCondenser = 9600.0;
+    result.heatingPower = 2000.0;
+    result.evaporatorInletTemp = 18.0;
+    result.evaporatorOutletTemp = 14.0;
+    result.evaporatorMassFlowRate = 0.40;
+    result.condenserInletTemp = 40.0;
+    result.condenserOutletTemp = 45.0;
+    result.condenserMassFlowRate = 0.50;
+    chillerHeater.mapResultToPlantConnections();
+    chillerHeater.applySimultaneousCoolingConnection();
+
+    EXPECT_DOUBLE_EQ(3500.0, result.requestedCoolingLoad);
+    EXPECT_DOUBLE_EQ(500.0, result.unmetCoolingLoad);
+    EXPECT_DOUBLE_EQ(3000.0, result.coolingDelivered);
+    EXPECT_DOUBLE_EQ(12.0, result.chilledWaterInletTemp);
+    EXPECT_DOUBLE_EQ(7.0, result.chilledWaterOutletTemp);
+    EXPECT_DOUBLE_EQ(0.25, result.chilledWaterMassFlowRate);
+    EXPECT_DOUBLE_EQ(9600.0, result.heatingDelivered);
+    EXPECT_DOUBLE_EQ(-5000.0, result.sourceHeatTransfer);
+    EXPECT_DOUBLE_EQ(0.40, result.sourceMassFlowRate);
+    EXPECT_NEAR(0.0, result.routingEnergyBalanceResidual(), contractTolerance);
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_AuthoritativeResultResetIsComplete)
+{
+    PlantCentralGSHP::ChillerHeaterSpecs chillerHeater;
+    chillerHeater.Result.currentMode = CurrentMode::CoolingOnly;
+    chillerHeater.Result.isAvailable = true;
+    chillerHeater.Result.qEvaporator = 8000.0;
+    chillerHeater.Result.qCondenser = 9600.0;
+    chillerHeater.Result.coolingPower = 2000.0;
+    chillerHeater.Result.evaporatorMassFlowRate = 0.40;
+    chillerHeater.Result.condenserMassFlowRate = 0.50;
+    chillerHeater.mapResultToPlantConnections();
+    chillerHeater.saveCurrentResultForSimultaneous();
+
+    chillerHeater.resetCurrentResult(12.0, 30.0);
+
+    EXPECT_EQ(CurrentMode::Off, chillerHeater.Result.currentMode);
+    EXPECT_FALSE(chillerHeater.Result.isRunning);
+    EXPECT_FALSE(chillerHeater.Result.isAvailable);
+    EXPECT_DOUBLE_EQ(0.0, chillerHeater.Result.compressorPower);
+    EXPECT_DOUBLE_EQ(0.0, chillerHeater.Result.qEvaporator);
+    EXPECT_DOUBLE_EQ(0.0, chillerHeater.Result.qCondenser);
+    EXPECT_DOUBLE_EQ(0.0, chillerHeater.Result.evaporatorMassFlowRate);
+    EXPECT_DOUBLE_EQ(0.0, chillerHeater.Result.condenserMassFlowRate);
+    EXPECT_DOUBLE_EQ(12.0, chillerHeater.EvapOutletNode.Temp);
+    EXPECT_DOUBLE_EQ(30.0, chillerHeater.CondOutletNode.Temp);
+    EXPECT_EQ(CurrentMode::Off, chillerHeater.Report.currentMode);
+    EXPECT_DOUBLE_EQ(0.0, chillerHeater.Report.QEvap);
+
+    EXPECT_EQ(CurrentMode::CoolingOnly, chillerHeater.SimulResult.currentMode);
+    EXPECT_DOUBLE_EQ(8000.0, chillerHeater.SimulResult.qEvaporator);
+}
