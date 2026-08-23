@@ -79123,6 +79123,7 @@ ChillerHeaterPerformance:Electric:EIR,
        \units C
   A2 , \field Chilled Water Flow Mode Type
        \note Sets chilled water flow rate to either constant or variable.
+       \note All modules in one CentralHeatPumpSystem should use the same mode. Mixed input warns and falls back to ConstantFlow.
        \type choice
        \key ConstantFlow
        \key VariableFlow
@@ -79136,11 +79137,11 @@ ChillerHeaterPerformance:Electric:EIR,
   N13, \field Design Condenser Water Flow Rate
        \type real
        \units m3/s
-       \autosizable
        \minimum> 0.0
        \autosizable
        \ip-units gal/min
   N14, \field Design Hot Water Flow Rate
+       \note This is an explicit input and is not autosizable.
        \type real
        \units m3/s
        \minimum 0.0
@@ -79148,7 +79149,8 @@ ChillerHeaterPerformance:Electric:EIR,
        \ip-units gal/min
   N15, \field Compressor Motor Efficiency
        \type real
-       \note Fraction of compressor electrical energy that must be rejected by the condenser.
+       \note Fraction of compressor electrical energy delivered to the refrigerant and included in the condenser heat balance.
+       \note The remaining motor loss is external to the modeled water-side cycle.
        \note Enter 1.0 or leave this field blank for a hermetic compressor.
        \minimum 0.0
        \maximum 1.0
@@ -79254,9 +79256,9 @@ ChillerHeaterPerformance:Electric:EIR,
        \type object-list
        \object-list UnivariateFunctions
        \object-list BivariateFunctions
-       \note  Bicubic = a + b*LCT + c*LCT**2 + d*PLR + e*PLR**2 + f*LCT*PLR + g*0 + h*PLR**3 + i*0 + j*0
-       \note    Normally, a bicubic curve here should be in terms of LCT rather than ECT
-       \note    Also, a bicubic curve is more applicable for variable-speed compressor motor drives
+       \note  Bicubic = a + b*TCond + c*TCond**2 + d*PLR + e*PLR**2 + f*TCond*PLR + g*TCond**3 + h*PLR**3 + i*TCond**2*PLR + j*TCond*PLR**2
+       \note    TCond uses the Heating Mode Temperature Curve Condenser Water Independent Variable selection
+       \note    A bicubic curve is most commonly used for variable-speed compressor motor drives
        \note or
        \note  Quadratic = a + b*PLR + c*PLR**2
        \note PLR = part load ratio (cooling load/steady-state capacity)
@@ -79277,6 +79279,7 @@ ChillerHeaterPerformance:Electric:EIR,
        \default 1.0
   N19; \field Maximum Heating Mode Leaving Condenser Water Temperature
        \note Optional operating limit for the hot-water temperature leaving the chiller heater in heating mode.
+       \note When entered, this must be greater than the Reference Heating Mode Entering Condenser Fluid Temperature.
        \note Leave blank when plant controls and fluid or plant limits alone should govern the leaving temperature.
        \type real
        \units C
