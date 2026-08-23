@@ -1132,6 +1132,83 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_OffStateClearsCurrentAndSim
     EXPECT_DOUBLE_EQ(0.0, state->dataLoopNodes->Node(5).MassFlowRateRequest);
 }
 
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InactiveConnectionPreservesActiveLoad)
+{
+    state->init_state(*state);
+    state->dataLoopNodes->Node.allocate(6);
+    state->dataPlnt->PlantLoop.allocate(3);
+
+    auto *water = Fluid::GetWater(*state);
+    ASSERT_NE(nullptr, water);
+    for (int loopNum = 1; loopNum <= 3; ++loopNum) {
+        auto &plantLoop = state->dataPlnt->PlantLoop(loopNum);
+        plantLoop.glycol = water;
+        auto &loopSide = plantLoop.LoopSide(DataPlant::LoopSideLocation::Supply);
+        loopSide.Branch.allocate(1);
+        loopSide.Branch(1).Comp.allocate(1);
+    }
+
+    PlantCentralGSHP::WrapperSpecs wrapper;
+    wrapper.CWPlantLoc = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
+    wrapper.HWPlantLoc = PlantLocation(2, DataPlant::LoopSideLocation::Supply, 1, 1);
+    wrapper.GLHEPlantLoc = PlantLocation(3, DataPlant::LoopSideLocation::Supply, 1, 1);
+    PlantUtilities::SetPlantLocationLinks(*state, wrapper.CWPlantLoc);
+    PlantUtilities::SetPlantLocationLinks(*state, wrapper.HWPlantLoc);
+    PlantUtilities::SetPlantLocationLinks(*state, wrapper.GLHEPlantLoc);
+
+    wrapper.CHWInletNodeNum = 1;
+    wrapper.CHWOutletNodeNum = 2;
+    wrapper.HWInletNodeNum = 3;
+    wrapper.HWOutletNodeNum = 4;
+    wrapper.GLHEInletNodeNum = 5;
+    wrapper.GLHEOutletNodeNum = 6;
+    state->dataLoopNodes->Node(1).Temp = 12.0;
+    state->dataLoopNodes->Node(3).Temp = 40.0;
+    state->dataLoopNodes->Node(5).Temp = 15.0;
+    state->dataLoopNodes->Node(5).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(1).MassFlowRateRequest = 1.0;
+    state->dataLoopNodes->Node(5).MassFlowRateRequest = 2.0;
+
+    wrapper.setupOutputVarsFlag = false;
+    wrapper.MyWrapperFlag = false;
+    wrapper.MyWrapperEnvrnFlag = false;
+    wrapper.WrapperCoolingLoad = 1000.0;
+    wrapper.Report.CoolingRate = 1000.0;
+    wrapper.Report.GLHERate = 1200.0;
+    wrapper.Report.GLHEInletTemp = 15.0;
+    wrapper.Report.GLHEOutletTemp = 15.3;
+    wrapper.Report.GLHEmdot = 1.0;
+    wrapper.ChillerHeaterNums = 1;
+    wrapper.ChillerHeater.allocate(1);
+    wrapper.ChillerHeater(1).Result.currentMode = CurrentMode::CoolingOnly;
+    wrapper.ChillerHeater(1).Result.coolingDelivered = 1000.0;
+
+    Real64 sourceLoad = 0.0;
+    wrapper.simulate(*state, wrapper.GLHEPlantLoc, false, sourceLoad, false);
+    EXPECT_DOUBLE_EQ(1000.0, wrapper.WrapperCoolingLoad);
+    EXPECT_DOUBLE_EQ(1000.0, wrapper.Report.CoolingRate);
+    EXPECT_EQ(CurrentMode::CoolingOnly, wrapper.ChillerHeater(1).Result.currentMode);
+
+    Real64 heatingLoad = 0.0;
+    wrapper.simulate(*state, wrapper.HWPlantLoc, false, heatingLoad, false);
+    EXPECT_DOUBLE_EQ(0.0, heatingLoad);
+    EXPECT_DOUBLE_EQ(1000.0, wrapper.WrapperCoolingLoad);
+    EXPECT_DOUBLE_EQ(0.0, wrapper.WrapperHeatingLoad);
+    EXPECT_DOUBLE_EQ(1000.0, wrapper.Report.CoolingRate);
+    EXPECT_EQ(CurrentMode::CoolingOnly, wrapper.ChillerHeater(1).Result.currentMode);
+    EXPECT_DOUBLE_EQ(1.0, state->dataLoopNodes->Node(1).MassFlowRateRequest);
+    EXPECT_DOUBLE_EQ(2.0, state->dataLoopNodes->Node(5).MassFlowRateRequest);
+
+    Real64 coolingLoad = 0.0;
+    wrapper.simulate(*state, wrapper.CWPlantLoc, false, coolingLoad, false);
+    EXPECT_DOUBLE_EQ(0.0, coolingLoad);
+    EXPECT_DOUBLE_EQ(0.0, wrapper.WrapperCoolingLoad);
+    EXPECT_DOUBLE_EQ(0.0, wrapper.Report.CoolingRate);
+    EXPECT_EQ(CurrentMode::Off, wrapper.ChillerHeater(1).Result.currentMode);
+    EXPECT_DOUBLE_EQ(0.0, state->dataLoopNodes->Node(1).MassFlowRateRequest);
+    EXPECT_DOUBLE_EQ(0.0, state->dataLoopNodes->Node(5).MassFlowRateRequest);
+}
+
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_FailedPlantScanTerminatesInitialization)
 {
     state->init_state(*state);

@@ -410,16 +410,21 @@ void WrapperSpecs::simulate(
         this->initialize(state, CurLoad, calledFromLocation.loopNum, RunFlag);
         if (!RunFlag) {
             CurLoad = 0.0;
-            this->resetOffState(state);
+            if (calledFromLocation.loopNum == this->CWPlantLoc.loopNum) {
+                this->WrapperCoolingLoad = 0.0;
+            } else if (calledFromLocation.loopNum == this->HWPlantLoc.loopNum) {
+                this->WrapperHeatingLoad = 0.0;
+            }
+            if (this->WrapperCoolingLoad <= HVAC::SmallLoad && this->WrapperHeatingLoad <= HVAC::SmallLoad) {
+                this->resetOffState(state);
+            }
             return;
         }
         this->CalcWrapperModel(state, CurLoad, calledFromLocation.loopNum);
 
     } else if (calledFromLocation.loopNum == this->GLHEPlantLoc.loopNum) {
-        if (!RunFlag) {
-            CurLoad = 0.0;
-            this->resetOffState(state);
-        }
+        // Useful-load callbacks own the wrapper run state. The source callback only publishes the
+        // authoritative load-side result and must not erase an active cooling or heating request.
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             calledFromLocation.loopNum,
                                                             this->GLHEPlantLoc.loopSideNum,
@@ -2030,12 +2035,16 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
     Real64 mdotGLHE; // Condenser water mass flow rate
 
     if (!RunFlag) {
-        mdotCHW = 0.0;
-        mdotHW = 0.0;
-        mdotGLHE = 0.0;
-        PlantUtilities::SetComponentFlowRate(state, mdotCHW, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWPlantLoc);
-        PlantUtilities::SetComponentFlowRate(state, mdotHW, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWPlantLoc);
-        PlantUtilities::SetComponentFlowRate(state, mdotGLHE, this->GLHEInletNodeNum, this->GLHEOutletNodeNum, this->GLHEPlantLoc);
+        if (LoopNum == this->CWPlantLoc.loopNum) {
+            mdotCHW = 0.0;
+            PlantUtilities::SetComponentFlowRate(state, mdotCHW, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWPlantLoc);
+        } else if (LoopNum == this->HWPlantLoc.loopNum) {
+            mdotHW = 0.0;
+            PlantUtilities::SetComponentFlowRate(state, mdotHW, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWPlantLoc);
+        } else if (LoopNum == this->GLHEPlantLoc.loopNum) {
+            mdotGLHE = 0.0;
+            PlantUtilities::SetComponentFlowRate(state, mdotGLHE, this->GLHEInletNodeNum, this->GLHEOutletNodeNum, this->GLHEPlantLoc);
+        }
         return;
     }
 
