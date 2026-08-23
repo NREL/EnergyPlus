@@ -57,10 +57,12 @@
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 #include <algorithm>
 #include <array>
@@ -312,6 +314,72 @@ checkLoopHeatTransfer(Real64 const reportedHeat, Real64 const massFlow, Real64 c
         return ::testing::AssertionFailure() << "reported heat " << reportedHeat << " W does not match node heat " << nodeHeat << " W";
     }
     return ::testing::AssertionSuccess();
+}
+
+std::string makeChillerHeaterValidationInput(Real64 const capacityRatio = 0.75,
+                                             Real64 const coolingOptimumPLR = 0.5,
+                                             Real64 const heatingOptimumPLR = 0.5,
+                                             Real64 const maximumHeatingLeavingTemp = 55.0,
+                                             Real64 const coolingMinimumPLR = 0.2)
+{
+    std::vector<std::string> const lines{
+        "ChillerHeaterPerformance:Electric:EIR,",
+        "  Validation Module,",
+        "  10000,",
+        "  5.0,",
+        "  7.0,",
+        "  30.0,",
+        "  35.0,",
+        "  " + std::to_string(capacityRatio) + ",",
+        "  1.0,",
+        "  7.0,",
+        "  50.0,",
+        "  30.0,",
+        "  3.0,",
+        "  VariableFlow,",
+        "  0.001,",
+        "  0.001,",
+        "  0.001,",
+        "  0.8,",
+        "  LeavingCondenser,",
+        "  Cooling Reference Curve,",
+        "  Cooling Reference Curve,",
+        "  Cooling PLR Curve,",
+        "  " + std::to_string(coolingOptimumPLR) + ",",
+        "  LeavingCondenser,",
+        "  Heating Reference Curve,",
+        "  Heating Reference Curve,",
+        "  Heating PLR Curve,",
+        "  " + std::to_string(heatingOptimumPLR) + ",",
+        "  1.0,",
+        "  " + std::to_string(maximumHeatingLeavingTemp) + ";",
+
+        "Curve:Biquadratic,",
+        "  Cooling Reference Curve,",
+        "  0.0, 0.0, 0.0, 0.0285714285714286, 0.0, 0.0,",
+        "  -100.0, 100.0, -100.0, 100.0;",
+
+        "Curve:Biquadratic,",
+        "  Heating Reference Curve,",
+        "  0.0, 0.0, 0.0, 0.02, 0.0, 0.0,",
+        "  -100.0, 100.0, -100.0, 100.0;",
+
+        "Curve:Bicubic,",
+        "  Cooling PLR Curve,",
+        "  0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,",
+        "  -100.0, 100.0,",
+        "  " + std::to_string(coolingMinimumPLR) + ", 1.0;",
+
+        "Curve:Quadratic,",
+        "  Heating PLR Curve,",
+        "  1.0, 0.0, 0.0,",
+        "  0.3, 1.0;",
+    };
+    return std::accumulate(lines.begin(), lines.end(), std::string(), [](std::string result, std::string const &line) {
+        result += line;
+        result += '\n';
+        return result;
+    });
 }
 
 } // namespace
@@ -811,6 +879,10 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)
 
     // verify that under this scenario of not finding a schedule match, ScheduleAlwaysOn is the treated default
     EXPECT_EQ(state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).chSched, Sched::GetScheduleAlwaysOn(*state));
+    EXPECT_EQ(state->dataPlantCentralGSHP->Wrapper(1).ancillaryPowerSched, Sched::GetScheduleAlwaysOn(*state));
+    EXPECT_TRUE(state->dataPlantCentralGSHP->Wrapper(1).VariableFlowCH);
+    EXPECT_TRUE(state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).VariableFlow);
+    EXPECT_FALSE(state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).ConstantFlow);
     EXPECT_FALSE(state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).MaxHeatingLeavingCondTempWasBlank);
     EXPECT_DOUBLE_EQ(55.0, state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).MaxHeatingLeavingCondTemp);
 
@@ -840,6 +912,244 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)
     EXPECT_EQ(state->dataBranchNodeConnections->NodeConnections(6).NodeName, "CHW_LOOP HEATPUMP1 HHW OUTLET");
     EXPECT_ENUM_EQ(state->dataBranchNodeConnections->NodeConnections(6).ConnectionType, Node::ConnectionType::Outlet);
     EXPECT_ENUM_EQ(state->dataBranchNodeConnections->NodeConnections(6).FluidStream, Node::CompFluidStream::Tertiary);
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_FlowModeResolutionIsWrapperScopedAndMutuallyExclusive)
+{
+    state->init_state(*state);
+
+    PlantCentralGSHP::WrapperSpecs mixedWrapper;
+    mixedWrapper.Name = "MIXED WRAPPER";
+    mixedWrapper.ChillerHeater.allocate(2);
+    mixedWrapper.ChillerHeater(1).ConstantFlow = true;
+    mixedWrapper.ChillerHeater(2).VariableFlow = true;
+
+    mixedWrapper.resolveFlowMode(*state);
+
+    EXPECT_FALSE(mixedWrapper.VariableFlowCH);
+    for (auto const &chillerHeater : mixedWrapper.ChillerHeater) {
+        EXPECT_TRUE(chillerHeater.ConstantFlow);
+        EXPECT_FALSE(chillerHeater.VariableFlow);
+    }
+    EXPECT_TRUE(compare_err_stream_substring("MIXED WRAPPER contains both ConstantFlow and VariableFlow", true));
+
+    PlantCentralGSHP::WrapperSpecs variableWrapper;
+    variableWrapper.Name = "VARIABLE WRAPPER";
+    variableWrapper.ChillerHeater.allocate(2);
+    for (auto &chillerHeater : variableWrapper.ChillerHeater) {
+        chillerHeater.VariableFlow = true;
+    }
+
+    variableWrapper.resolveFlowMode(*state);
+
+    EXPECT_TRUE(variableWrapper.VariableFlowCH);
+    for (auto const &chillerHeater : variableWrapper.ChillerHeater) {
+        EXPECT_FALSE(chillerHeater.ConstantFlow);
+        EXPECT_TRUE(chillerHeater.VariableFlow);
+    }
+    EXPECT_FALSE(has_err_output());
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InputValidationUsesConfiguredReferenceTemperaturesAndBicubicPLRDomain)
+{
+    ASSERT_TRUE(process_idf(makeChillerHeaterValidationInput()));
+    state->init_state(*state);
+
+    EXPECT_NO_THROW(PlantCentralGSHP::GetChillerHeaterInput(*state));
+    EXPECT_FALSE(has_err_output());
+
+    ASSERT_TRUE(allocated(state->dataPlantCentralGSHP->ChillerHeater));
+    auto const &chillerHeater = state->dataPlantCentralGSHP->ChillerHeater(1);
+    EXPECT_DOUBLE_EQ(0.2, chillerHeater.MinPartLoadRatCooling);
+    EXPECT_DOUBLE_EQ(1.0, chillerHeater.MaxPartLoadRatCooling);
+    EXPECT_DOUBLE_EQ(0.3, chillerHeater.MinPartLoadRatClgHtg);
+    EXPECT_DOUBLE_EQ(1.0, chillerHeater.MaxPartLoadRatClgHtg);
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InputValidationRejectsOptimumPLROutsideCurveDomain)
+{
+    ASSERT_TRUE(process_idf(makeChillerHeaterValidationInput(0.75, 0.1)));
+    state->init_state(*state);
+
+    EXPECT_THROW(PlantCentralGSHP::GetChillerHeaterInput(*state), std::runtime_error);
+    EXPECT_TRUE(compare_err_stream_substring("Cooling Mode Cooling Capacity Optimum Part Load Ratio must be within", true));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InputValidationRejectsInvalidPartLoadCurveDomain)
+{
+    ASSERT_TRUE(process_idf(makeChillerHeaterValidationInput(0.75, 0.5, 0.5, 55.0, -0.1)));
+    state->init_state(*state);
+
+    EXPECT_THROW(PlantCentralGSHP::GetChillerHeaterInput(*state), std::runtime_error);
+    EXPECT_TRUE(compare_err_stream_substring("Part-load ratio limits [-0.100, 1.000] must include 1.0", true));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InputValidationRejectsInvalidMaximumHeatingLeavingTemperature)
+{
+    ASSERT_TRUE(process_idf(makeChillerHeaterValidationInput(0.75, 0.5, 0.5, 25.0)));
+    state->init_state(*state);
+
+    EXPECT_THROW(PlantCentralGSHP::GetChillerHeaterInput(*state), std::runtime_error);
+    EXPECT_TRUE(compare_err_stream_substring(
+        "Maximum Heating Mode Leaving Condenser Water Temperature must be greater than Reference Heating Mode Entering Condenser Fluid Temperature",
+        true));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SchemaRejectsNonpositiveHeatingCapacityRatio)
+{
+    EXPECT_FALSE(process_idf(makeChillerHeaterValidationInput(-0.75), false));
+    EXPECT_TRUE(compare_err_stream_substring("Expected number greater than 0.000000", true));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_RuntimeValidationRejectsInvalidStaticPerformanceInputs)
+{
+    ASSERT_TRUE(process_idf(makeChillerHeaterValidationInput()));
+    auto &performanceObject = state->dataInputProcessing->inputProcessor->epJSON["ChillerHeaterPerformance:Electric:EIR"]["Validation Module"];
+    performanceObject["reference_cooling_mode_evaporator_capacity"] = -10000.0;
+    performanceObject["reference_cooling_mode_cop"] = -5.0;
+    performanceObject["reference_heating_mode_cooling_capacity_ratio"] = -0.75;
+    performanceObject["reference_heating_mode_cooling_power_input_ratio"] = -1.0;
+    performanceObject["compressor_motor_efficiency"] = 1.1;
+    state->init_state(*state);
+
+    EXPECT_THROW(PlantCentralGSHP::GetChillerHeaterInput(*state), std::runtime_error);
+    EXPECT_TRUE(compare_err_stream_substring("Reference Cooling Mode Evaporator Capacity=-10000.00", false));
+    EXPECT_TRUE(compare_err_stream_substring("Reference Cooling Mode COP=-5.00", false));
+    EXPECT_TRUE(compare_err_stream_substring("Reference Heating Mode Cooling Capacity Ratio=-0.75", false));
+    EXPECT_TRUE(compare_err_stream_substring("Reference Heating Mode Cooling Power Input Ratio=-1.00", false));
+    EXPECT_TRUE(compare_err_stream_substring("Compressor Motor Efficiency = 1.100", true));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_AncillaryScheduleDefaultsAndScalesPowerAndEnergy)
+{
+    state->init_state(*state);
+    state->dataLoopNodes->Node.allocate(6);
+    state->dataHVACGlobal->TimeStepSysSec = 600.0;
+
+    PlantCentralGSHP::WrapperSpecs wrapper;
+    wrapper.CHWInletNodeNum = 1;
+    wrapper.CHWOutletNodeNum = 2;
+    wrapper.HWInletNodeNum = 3;
+    wrapper.HWOutletNodeNum = 4;
+    wrapper.GLHEInletNodeNum = 5;
+    wrapper.GLHEOutletNodeNum = 6;
+    wrapper.AncillaryPower = 100.0;
+    wrapper.ChillerHeaterNums = 1;
+    wrapper.ChillerHeater.allocate(1);
+
+    auto setCoolingResult = [&]() {
+        auto &result = wrapper.ChillerHeater(1).Result;
+        result = PlantCentralGSHP::ChillerHeaterResult();
+        result.currentMode = CurrentMode::CoolingOnly;
+        result.coolingPower = 50.0;
+        result.compressorPower = 50.0;
+        result.coolingDelivered = 1000.0;
+        result.sourceHeatTransfer = 1050.0;
+        result.chilledWaterMassFlowRate = 1.0;
+        result.chilledWaterOutletTemp = 7.0;
+        result.sourceMassFlowRate = 1.0;
+        result.sourceOutletTemp = 30.25;
+    };
+
+    setCoolingResult();
+    wrapper.ancillaryPowerSched = nullptr;
+    wrapper.updateWrapperReportingAndNodes(*state, 1.0, 0.0, 1.0, 12.0, 40.0, 30.0, false);
+    EXPECT_DOUBLE_EQ(150.0, wrapper.Report.TotElecCoolingPwr);
+    EXPECT_DOUBLE_EQ(90000.0, wrapper.Report.TotElecCooling);
+
+    setCoolingResult();
+    wrapper.ancillaryPowerSched = Sched::GetScheduleAlwaysOn(*state);
+    wrapper.updateWrapperReportingAndNodes(*state, 1.0, 0.0, 1.0, 12.0, 40.0, 30.0, false);
+    EXPECT_DOUBLE_EQ(150.0, wrapper.Report.TotElecCoolingPwr);
+    EXPECT_DOUBLE_EQ(90000.0, wrapper.Report.TotElecCooling);
+
+    Sched::ScheduleConstant fractionalSchedule;
+    fractionalSchedule.currentVal = 0.25;
+    setCoolingResult();
+    wrapper.ancillaryPowerSched = &fractionalSchedule;
+    wrapper.updateWrapperReportingAndNodes(*state, 1.0, 0.0, 1.0, 12.0, 40.0, 30.0, false);
+    EXPECT_DOUBLE_EQ(75.0, wrapper.Report.TotElecCoolingPwr);
+    EXPECT_DOUBLE_EQ(45000.0, wrapper.Report.TotElecCooling);
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_OffStateClearsCurrentAndSimultaneousState)
+{
+    state->init_state(*state);
+    state->dataLoopNodes->Node.allocate(6);
+
+    PlantCentralGSHP::WrapperSpecs wrapper;
+    wrapper.CHWInletNodeNum = 1;
+    wrapper.CHWOutletNodeNum = 2;
+    wrapper.HWInletNodeNum = 3;
+    wrapper.HWOutletNodeNum = 4;
+    wrapper.GLHEInletNodeNum = 5;
+    wrapper.GLHEOutletNodeNum = 6;
+    state->dataLoopNodes->Node(1).Temp = 12.0;
+    state->dataLoopNodes->Node(3).Temp = 40.0;
+    state->dataLoopNodes->Node(5).Temp = 15.0;
+    state->dataLoopNodes->Node(1).MassFlowRateRequest = 1.0;
+    state->dataLoopNodes->Node(3).MassFlowRateRequest = 2.0;
+    state->dataLoopNodes->Node(5).MassFlowRateRequest = 3.0;
+
+    wrapper.WrapperCoolingLoad = 1000.0;
+    wrapper.WrapperHeatingLoad = 1200.0;
+    wrapper.SimulClgDominant = true;
+    wrapper.Report.Power = 500.0;
+    wrapper.Report.CoolingRate = 1000.0;
+    wrapper.Report.HeatingRate = 1200.0;
+    wrapper.Report.GLHERate = 200.0;
+    wrapper.Report.TotElecCoolingSimul = 300000.0;
+    wrapper.ChillerHeaterNums = 1;
+    wrapper.ChillerHeater.allocate(1);
+    auto &chillerHeater = wrapper.ChillerHeater(1);
+    chillerHeater.Result.currentMode = CurrentMode::CoolingDominant;
+    chillerHeater.Result.coolingPower = 500.0;
+    chillerHeater.Result.coolingDelivered = 1000.0;
+    chillerHeater.SimulResult.currentMode = CurrentMode::CoolingOnly;
+    chillerHeater.SimulResult.coolingPower = 500.0;
+    chillerHeater.Report.CoolingPowerSimul = 500.0;
+
+    wrapper.resetOffState(*state, false);
+
+    EXPECT_DOUBLE_EQ(0.0, wrapper.WrapperCoolingLoad);
+    EXPECT_DOUBLE_EQ(0.0, wrapper.WrapperHeatingLoad);
+    EXPECT_FALSE(wrapper.SimulClgDominant);
+    EXPECT_FALSE(wrapper.SimulHtgDominant);
+    EXPECT_EQ(CurrentMode::Off, chillerHeater.Result.currentMode);
+    EXPECT_EQ(CurrentMode::Off, chillerHeater.SimulResult.currentMode);
+    EXPECT_DOUBLE_EQ(0.0, chillerHeater.Report.CoolingPower);
+    EXPECT_DOUBLE_EQ(0.0, chillerHeater.Report.CoolingPowerSimul);
+    EXPECT_DOUBLE_EQ(0.0, wrapper.Report.Power);
+    EXPECT_DOUBLE_EQ(0.0, wrapper.Report.CoolingRate);
+    EXPECT_DOUBLE_EQ(0.0, wrapper.Report.HeatingRate);
+    EXPECT_DOUBLE_EQ(0.0, wrapper.Report.GLHERate);
+    EXPECT_DOUBLE_EQ(0.0, wrapper.Report.TotElecCoolingSimul);
+    EXPECT_DOUBLE_EQ(12.0, state->dataLoopNodes->Node(2).Temp);
+    EXPECT_DOUBLE_EQ(40.0, state->dataLoopNodes->Node(4).Temp);
+    EXPECT_DOUBLE_EQ(15.0, state->dataLoopNodes->Node(6).Temp);
+    EXPECT_DOUBLE_EQ(0.0, state->dataLoopNodes->Node(1).MassFlowRateRequest);
+    EXPECT_DOUBLE_EQ(0.0, state->dataLoopNodes->Node(3).MassFlowRateRequest);
+    EXPECT_DOUBLE_EQ(0.0, state->dataLoopNodes->Node(5).MassFlowRateRequest);
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_FailedPlantScanTerminatesInitialization)
+{
+    state->init_state(*state);
+    state->dataLoopNodes->Node.allocate(6);
+
+    PlantCentralGSHP::WrapperSpecs wrapper;
+    wrapper.Name = "UNCONNECTED WRAPPER";
+    wrapper.setupOutputVarsFlag = false;
+    wrapper.MyWrapperEnvrnFlag = false;
+    wrapper.CHWInletNodeNum = 1;
+    wrapper.CHWOutletNodeNum = 2;
+    wrapper.HWInletNodeNum = 3;
+    wrapper.HWOutletNodeNum = 4;
+    wrapper.GLHEInletNodeNum = 5;
+    wrapper.GLHEOutletNodeNum = 6;
+
+    EXPECT_THROW(wrapper.initialize(*state, 0.0, 1, false), std::runtime_error);
+    EXPECT_TRUE(compare_err_stream_substring("could not be located on all three connected plant loops", true));
 }
 
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_adjustChillerHeaterCondFlowTemp)

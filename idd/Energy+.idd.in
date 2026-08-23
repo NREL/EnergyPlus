@@ -78791,6 +78791,7 @@ CentralHeatPumpSystem,
        \type object-list
        \object-list ScheduleNames
        \note This value from this schedule is multiplied times the Ancillary Power
+       \note If this field is blank, the ancillary power is available continuously.
   A9,  \field Chiller Heater Modules Performance Component Object Type 1
        \required-field
        \type choice
@@ -79094,6 +79095,7 @@ ChillerHeaterPerformance:Electric:EIR,
        \note (Evaporator capacity at simul clg-htg mode ref condition)/ (Evaporator capacity at cooling mode ref condition)
        \type real
        \default 0.75
+       \minimum> 0.0
   N7 , \field Reference Heating Mode Cooling Power Input Ratio
        \note During simultaneous cooling-heating mode, this ratio is relative to the Reference Cooling Mode COP
        \note (Power at simultaneous clg-htg mode reference condition)/ (Power at cooling mode reference condition)

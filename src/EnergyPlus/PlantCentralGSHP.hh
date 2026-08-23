@@ -340,6 +340,7 @@ namespace PlantCentralGSHP {
         void saveCurrentResultForSimultaneous();
         void updateResultEnergies(Real64 secondsInTimeStep, bool updateSimultaneousResult);
         void resetCurrentResult(Real64 evaporatorInletTemp, Real64 condenserInletTemp);
+        void resetAllResults(Real64 evaporatorInletTemp, Real64 condenserInletTemp);
     };
 
     struct WrapperReportVars
@@ -438,10 +439,14 @@ namespace PlantCentralGSHP {
 
         void initialize(EnergyPlusData &state,
                         Real64 MyLoad, // Demand Load
-                        int LoopNum    // Loop Number Index
-        );
+                        int LoopNum,   // Loop Number Index
+                        bool RunFlag = true);
 
         void initializeDesignFlowLimits(EnergyPlusData &state);
+
+        void resolveFlowMode(EnergyPlusData &state);
+
+        void resetOffState(EnergyPlusData &state, bool releasePlantFlows = true);
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,
