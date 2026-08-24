@@ -253,8 +253,6 @@ namespace PlantCentralGSHP {
         bool HeatSetPointSetToLoop = false;                                           // True if the setpoint is missing at the outlet node
         bool CoolSetPointErrDone = false;                                             // true if setpoint warning issued
         bool HeatSetPointErrDone = false;                                             // true if setpoint warning issued
-        bool PossibleSubcooling = false;                                              // flag to indicate chiller is doing less cooling that requested
-        int ChillerHeaterNum = 1;                                                     // Chiller heater number
         int ChillerCapFTCoolingIDX = 0;                                               // Cooling capacity function of temperature curve index
         int ChillerEIRFTCoolingIDX = 0;           // Elec Input to Cooling Output ratio function of temperature curve index
         int ChillerEIRFPLRCoolingIDX = 0;         // Elec Input to cooling output ratio function of PLR curve index
@@ -270,14 +268,6 @@ namespace PlantCentralGSHP {
         int CondOutletNodeNum = 0;                // Node number on the outlet side of the condenser
         int ChillerCapFTError = 0;                // Used for negative capacity as a function of temp warnings
         int ChillerCapFTErrorIndex = 0;           // Used for negative capacity as a function of temp warnings
-        int ChillerEIRFTError = 0;                // Used for negative EIR as a function of temp warnings
-        int ChillerEIRFTErrorIndex = 0;           // Used for negative EIR as a function of temp warnings
-        int ChillerEIRFPLRError = 0;              // Used for negative EIR as a function of PLR warnings
-        int ChillerEIRFPLRErrorIndex = 0;         // Used for negative EIR as a function of PLR warnings
-        int ChillerEIRRefTempErrorIndex = 0;      // Used for reference temperature problems
-        int DeltaTErrCount = 0;                   // Evaporator delta T equals 0 for variable flow chiller warning messages
-        int DeltaTErrCountIndex = 0;              // Index to evaporator delta T = 0 for variable flow chiller warning messages
-        int CondMassFlowIndex = 0;                // Index to condenser mass flow rate
         Real64 RefCapCooling = 0.0;               // Reference cooling-mode evaporator capacity [W]
         bool RefCapCoolingWasAutoSized = false;   // true if reference cooling capacity was autosize on input
         Real64 RefCOPCooling = 0.0;               // Reference cooling-mode COP
@@ -315,8 +305,6 @@ namespace PlantCentralGSHP {
         Real64 HotWaterMassFlowRateMax = 0.0;     // Condenser design mass flow on the hot-water connection [kg/s]
         Real64 SourceEvapMassFlowRateMax = 0.0;   // Evaporator design mass flow on the source connection [kg/s]
         Real64 SourceCondMassFlowRateMax = 0.0;   // Condenser design mass flow on the source connection [kg/s]
-        Real64 Evapmdot = 0.0;                    // Evaporator mass flow rate [kg/s]
-        Real64 Condmdot = 0.0;                    // Condenser mass flow rate [kg/s]
         Real64 DesignHotWaterVolFlowRate = 0.0;   // Design hot water volumetric flow rate through the condenser [m3/s]
         Real64 OpenMotorEff = 0.0;                // Open chiller motor efficiency [fraction, 0 to 1]
         Real64 SizFac = 0.0;                      // sizing factor
@@ -458,10 +446,6 @@ namespace PlantCentralGSHP {
 
         void CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int LoopNum);
 
-        void CalcChillerModel(EnergyPlusData &state);
-
-        void CalcChillerHeaterModel(EnergyPlusData &state);
-
         void CalcCoolingOnlyModel(
             EnergyPlusData &state, Real64 chilledWaterMassFlowRate, Real64 sourceMassFlowRate, Real64 chilledWaterInletTemp, Real64 sourceInletTemp);
 
@@ -512,42 +496,10 @@ namespace PlantCentralGSHP {
                                             Real64 sourceInletTemp,
                                             bool simultaneousOperation);
 
-        void adjustChillerHeaterCondFlowTemp(EnergyPlusData &state,
-                                             Real64 &QCondenser,
-                                             Real64 &CondMassFlowRate,
-                                             Real64 &CondOutletTemp,
-                                             Real64 const CondInletTemp,
-                                             Real64 const CondDeltaTemp);
-
-        void adjustChillerHeaterEvapFlowTemp(
-            EnergyPlusData &state, Real64 const qEvaporator, Real64 &evapMassFlowRate, Real64 &evapOutletTemp, Real64 const evapInletTemp);
-
         Real64
         setChillerHeaterCondTemp(EnergyPlusData &state, int const numChillerHeater, Real64 const condEnteringTemp, Real64 const condLeavingTemp);
 
         Real64 calcChillerCapFT(EnergyPlusData &state, int const numChillerHeater, Real64 const evapOutletTemp, Real64 const condTemp);
-
-        void checkEvapOutletTemp(EnergyPlusData &state,
-                                 int const numChillerHeater,
-                                 Real64 &evapOutletTemp,
-                                 Real64 const lowTempLimitEout,
-                                 Real64 evapInletTemp,
-                                 Real64 &qEvaporator,
-                                 Real64 const evapMassFlowRate,
-                                 Real64 const Cp,
-                                 CurrentMode const mode);
-
-        void calcPLRAndCyclingRatio(EnergyPlusData &state,
-                                    Real64 const availChillerCap,
-                                    Real64 &actualPartLoadRatio,
-                                    Real64 const minPartLoadRatio,
-                                    Real64 const maxPartLoadRatio,
-                                    Real64 const qEvaporator,
-                                    Real64 &frac);
-
-        void UpdateChillerHeaterRecords(EnergyPlusData &state);
-
-        void UpdateChillerRecords(EnergyPlusData &state);
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
@@ -565,15 +517,9 @@ namespace PlantCentralGSHP {
 struct PlantCentralGSHPData : BaseGlobalStruct
 {
 
-    bool getWrapperInputFlag = true;   // When TRUE, calls subroutine to read input file.
-    int numWrappers = 0;               // Number of Wrappers specified in input
-    int numChillerHeaters = 0;         // Number of Chiller/heaters specified in input
-    Real64 ChillerCapFT = 0.0;         // Chiller/heater capacity fraction (evaluated as a function of temperature)
-    Real64 ChillerEIRFT = 0.0;         // Chiller/heater electric input ratio (EIR = 1 / COP) as a function of temperature
-    Real64 ChillerEIRFPLR = 0.0;       // Chiller/heater EIR as a function of part-load ratio (PLR)
-    Real64 ChillerPartLoadRatio = 0.0; // Chiller/heater part-load ratio (PLR)
-    Real64 ChillerCyclingRatio = 0.0;  // Chiller/heater cycling ratio
-    Real64 ChillerFalseLoadRate = 0.0; // Chiller/heater false load over and above the water-side load [W]
+    bool getWrapperInputFlag = true; // When TRUE, calls subroutine to read input file.
+    int numWrappers = 0;             // Number of Wrappers specified in input
+    int numChillerHeaters = 0;       // Number of Chiller/heaters specified in input
     EPVector<PlantCentralGSHP::WrapperSpecs> Wrapper;
     EPVector<PlantCentralGSHP::ChillerHeaterSpecs> ChillerHeater;
 
