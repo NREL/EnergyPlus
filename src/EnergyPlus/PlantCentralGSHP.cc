@@ -53,9 +53,9 @@
 #include <limits>
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -431,7 +431,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
 
     // auto-size the chiller heater components
 
-    for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
+    for (int NumChillerHeater = 1; NumChillerHeater <= static_cast<int>(this->ChillerHeater.size()); ++NumChillerHeater) {
         bool ErrorsFound = false;
 
         // find the appropriate Plant Sizing objects
@@ -709,7 +709,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
     Real64 TotalEvapVolFlowRate = 0.0;
     Real64 TotalSourceVolFlowRate = 0.0;
     Real64 TotalHotWaterVolFlowRate = 0.0;
-    for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
+    for (int NumChillerHeater = 1; NumChillerHeater <= static_cast<int>(this->ChillerHeater.size()); ++NumChillerHeater) {
         auto const &chillerHeater = this->ChillerHeater(NumChillerHeater);
         auto const &performance = chillerHeater.performanceData();
         auto const &sizing = chillerHeater.sizing;
@@ -766,234 +766,225 @@ void GetWrapperInput(EnergyPlusData &state)
     //  This routine will get the input required by the Wrapper model.
 
     static constexpr std::string_view routineName = "GetWrapperInput";
+    static constexpr char objectType[] = "CentralHeatPumpSystem";
+    static constexpr char performanceObjectType[] = "ChillerHeaterPerformance:Electric:EIR";
 
-    bool ErrorsFound(false); // True when input errors are found
-    int NumAlphas;           // Number of elements in the alpha array
-    int NumNums;             // Number of elements in the numeric array
-    int IOStat;              // IO Status when calling get input subroutine
+    static constexpr char coolingInletNodeKey[] = "cooling_loop_inlet_node_name";
+    static constexpr char coolingOutletNodeKey[] = "cooling_loop_outlet_node_name";
+    static constexpr char sourceInletNodeKey[] = "source_loop_inlet_node_name";
+    static constexpr char sourceOutletNodeKey[] = "source_loop_outlet_node_name";
+    static constexpr char heatingInletNodeKey[] = "heating_loop_inlet_node_name";
+    static constexpr char heatingOutletNodeKey[] = "heating_loop_outlet_node_name";
+    static constexpr char ancillaryPowerKey[] = "ancillary_power";
+    static constexpr char ancillaryScheduleKey[] = "ancillary_operation_schedule_name";
 
-    state.dataIPShortCut->cCurrentModuleObject = "CentralHeatPumpSystem";
-    state.dataPlantCentralGSHP->numWrappers =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+    static constexpr char moduleGroupsKey[] = "module_groups";
+    static constexpr char performanceObjectTypeKey[] = "performance_object_type";
+    static constexpr char performanceNameKey[] = "performance_name";
+    static constexpr char controlScheduleNameKey[] = "control_schedule_name";
+    static constexpr char numberOfModulesKey[] = "number_of_modules";
+
+    struct ResolvedModuleGroup
+    {
+        int performanceIndex = 0;
+        int moduleCount = 0;
+        Sched::Schedule *availabilitySchedule = nullptr;
+    };
+
+    bool errorsFound = false;
+    auto &inputProcessor = state.dataInputProcessing->inputProcessor;
+    state.dataIPShortCut->cCurrentModuleObject = objectType;
+    state.dataPlantCentralGSHP->numWrappers = inputProcessor->getNumObjectsFound(state, objectType);
+    state.dataPlantCentralGSHP->numPerformanceReferences = 0;
 
     if (state.dataPlantCentralGSHP->numWrappers <= 0) {
-        ShowSevereError(state, std::format("No {} equipment specified in input file", state.dataIPShortCut->cCurrentModuleObject));
+        ShowSevereError(state, std::format("No {} equipment specified in input file", objectType));
+        return;
     }
 
+    if (allocated(state.dataPlantCentralGSHP->Wrapper)) {
+        state.dataPlantCentralGSHP->Wrapper.deallocate();
+    }
     state.dataPlantCentralGSHP->Wrapper.allocate(state.dataPlantCentralGSHP->numWrappers);
 
-    // Load arrays with electric EIR chiller data
-    for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 state.dataIPShortCut->cCurrentModuleObject,
-                                                                 WrapperNum,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 _,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+    // Performance definitions are independent named objects. Parse and retain them before resolving wrapper references.
+    GetChillerHeaterInput(state);
 
-        ErrorObjectHeader eoh{routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)};
+    auto const instances = inputProcessor->epJSON.find(objectType);
+    assert(instances != inputProcessor->epJSON.end());
+    auto const &objectSchemaProps = inputProcessor->getObjectSchemaProps(state, objectType);
+    auto const &instancesValue = instances.value();
+    assert(instancesValue.size() == static_cast<std::size_t>(state.dataPlantCentralGSHP->numWrappers));
 
-        auto &wrapper = state.dataPlantCentralGSHP->Wrapper(WrapperNum);
+    std::unordered_set<std::string> wrapperNames;
+    int wrapperNum = 0;
+    for (auto const &wrapperObject : instancesValue.items()) {
+        ++wrapperNum;
+        auto const &key = wrapperObject.key();
+        auto const &objectFields = wrapperObject.value();
+        inputProcessor->markObjectAsUsed(objectType, key);
 
-        wrapper.Name = state.dataIPShortCut->cAlphaArgs(1);
+        ErrorObjectHeader const eoh{routineName, objectType, key};
+        auto &wrapper = state.dataPlantCentralGSHP->Wrapper(wrapperNum);
+        wrapper.Name = Util::makeUPPER(key);
+        if (!wrapperNames.emplace(wrapper.Name).second) {
+            ShowSevereDuplicateName(state, eoh);
+            errorsFound = true;
+            continue;
+        }
+
+        std::string const coolingInletNodeName = inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, coolingInletNodeKey);
+        std::string const coolingOutletNodeName = inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, coolingOutletNodeKey);
+        std::string const sourceInletNodeName = inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, sourceInletNodeKey);
+        std::string const sourceOutletNodeName = inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, sourceOutletNodeKey);
+        std::string const heatingInletNodeName = inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, heatingInletNodeKey);
+        std::string const heatingOutletNodeName = inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, heatingOutletNodeKey);
 
         wrapper.CHWInletNodeNum = Node::GetOnlySingleNode(state,
-                                                          state.dataIPShortCut->cAlphaArgs(2),
-                                                          ErrorsFound,
+                                                          coolingInletNodeName,
+                                                          errorsFound,
                                                           Node::ConnectionObjectType::CentralHeatPumpSystem,
-                                                          state.dataIPShortCut->cAlphaArgs(1),
+                                                          wrapper.Name,
                                                           Node::FluidType::Water,
                                                           Node::ConnectionType::Inlet,
                                                           Node::CompFluidStream::Primary,
-                                                          Node::ObjectIsNotParent); // node name : connection should be careful!
+                                                          Node::ObjectIsNotParent);
         wrapper.CHWOutletNodeNum = Node::GetOnlySingleNode(state,
-                                                           state.dataIPShortCut->cAlphaArgs(3),
-                                                           ErrorsFound,
+                                                           coolingOutletNodeName,
+                                                           errorsFound,
                                                            Node::ConnectionObjectType::CentralHeatPumpSystem,
-                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                           wrapper.Name,
                                                            Node::FluidType::Water,
                                                            Node::ConnectionType::Outlet,
                                                            Node::CompFluidStream::Primary,
                                                            Node::ObjectIsNotParent);
         wrapper.CoolSetPointTempNode = wrapper.CHWOutletNodeNum;
-        Node::TestCompSet(state,
-                          state.dataIPShortCut->cCurrentModuleObject,
-                          state.dataIPShortCut->cAlphaArgs(1),
-                          state.dataIPShortCut->cAlphaArgs(2),
-                          state.dataIPShortCut->cAlphaArgs(3),
-                          "Chilled Water Nodes");
+        Node::TestCompSet(state, objectType, wrapper.Name, coolingInletNodeName, coolingOutletNodeName, "Chilled Water Nodes");
 
         wrapper.GLHEInletNodeNum = Node::GetOnlySingleNode(state,
-                                                           state.dataIPShortCut->cAlphaArgs(4),
-                                                           ErrorsFound,
+                                                           sourceInletNodeName,
+                                                           errorsFound,
                                                            Node::ConnectionObjectType::CentralHeatPumpSystem,
-                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                           wrapper.Name,
                                                            Node::FluidType::Water,
                                                            Node::ConnectionType::Inlet,
                                                            Node::CompFluidStream::Secondary,
-                                                           Node::ObjectIsNotParent); // node name : connection should be careful!
+                                                           Node::ObjectIsNotParent);
         wrapper.GLHEOutletNodeNum = Node::GetOnlySingleNode(state,
-                                                            state.dataIPShortCut->cAlphaArgs(5),
-                                                            ErrorsFound,
+                                                            sourceOutletNodeName,
+                                                            errorsFound,
                                                             Node::ConnectionObjectType::CentralHeatPumpSystem,
-                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                            wrapper.Name,
                                                             Node::FluidType::Water,
                                                             Node::ConnectionType::Outlet,
                                                             Node::CompFluidStream::Secondary,
                                                             Node::ObjectIsNotParent);
-        Node::TestCompSet(state,
-                          state.dataIPShortCut->cCurrentModuleObject,
-                          state.dataIPShortCut->cAlphaArgs(1),
-                          state.dataIPShortCut->cAlphaArgs(4),
-                          state.dataIPShortCut->cAlphaArgs(5),
-                          "GLHE Nodes");
+        Node::TestCompSet(state, objectType, wrapper.Name, sourceInletNodeName, sourceOutletNodeName, "GLHE Nodes");
 
         wrapper.HWInletNodeNum = Node::GetOnlySingleNode(state,
-                                                         state.dataIPShortCut->cAlphaArgs(6),
-                                                         ErrorsFound,
+                                                         heatingInletNodeName,
+                                                         errorsFound,
                                                          Node::ConnectionObjectType::CentralHeatPumpSystem,
-                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                         wrapper.Name,
                                                          Node::FluidType::Water,
                                                          Node::ConnectionType::Inlet,
                                                          Node::CompFluidStream::Tertiary,
-                                                         Node::ObjectIsNotParent); // node name : connection should be careful!
+                                                         Node::ObjectIsNotParent);
         wrapper.HWOutletNodeNum = Node::GetOnlySingleNode(state,
-                                                          state.dataIPShortCut->cAlphaArgs(7),
-                                                          ErrorsFound,
+                                                          heatingOutletNodeName,
+                                                          errorsFound,
                                                           Node::ConnectionObjectType::CentralHeatPumpSystem,
-                                                          state.dataIPShortCut->cAlphaArgs(1),
+                                                          wrapper.Name,
                                                           Node::FluidType::Water,
                                                           Node::ConnectionType::Outlet,
                                                           Node::CompFluidStream::Tertiary,
                                                           Node::ObjectIsNotParent);
         wrapper.HeatSetPointTempNode = wrapper.HWOutletNodeNum;
-        Node::TestCompSet(state,
-                          state.dataIPShortCut->cCurrentModuleObject,
-                          state.dataIPShortCut->cAlphaArgs(1),
-                          state.dataIPShortCut->cAlphaArgs(6),
-                          state.dataIPShortCut->cAlphaArgs(7),
-                          "Hot Water Nodes");
+        Node::TestCompSet(state, objectType, wrapper.Name, heatingInletNodeName, heatingOutletNodeName, "Hot Water Nodes");
 
-        wrapper.AncillaryPower = state.dataIPShortCut->rNumericArgs(1);
-        if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+        wrapper.AncillaryPower = inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, ancillaryPowerKey);
+        std::string const ancillaryScheduleName = inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, ancillaryScheduleKey);
+        if (ancillaryScheduleName.empty()) {
             wrapper.ancillaryPowerSched = Sched::GetScheduleAlwaysOn(state);
-        } else if ((wrapper.ancillaryPowerSched = Sched::GetSchedule(state, state.dataIPShortCut->cAlphaArgs(8))) == nullptr) {
-            ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8));
-            ErrorsFound = true;
+        } else if ((wrapper.ancillaryPowerSched = Sched::GetSchedule(state, ancillaryScheduleName)) == nullptr) {
+            ShowSevereItemNotFound(state, eoh, ancillaryScheduleKey, ancillaryScheduleName);
+            errorsFound = true;
         }
 
-        int NumberOfComp = (NumAlphas - 8) / 3;
-        wrapper.NumOfComp = NumberOfComp;
-        wrapper.WrapperComp.allocate(NumberOfComp);
+        auto const moduleGroups = objectFields.find(moduleGroupsKey);
+        if (moduleGroups == objectFields.end() || moduleGroups->empty()) {
+            ShowSevereError(state, std::format("{}: No module groups specified for {}={}", routineName, objectType, wrapper.Name));
+            errorsFound = true;
+            continue;
+        }
 
-        if (wrapper.NumOfComp == 0) {
-            ShowSevereError(state,
-                            std::format("GetWrapperInput: No component names on {}={}", state.dataIPShortCut->cCurrentModuleObject, wrapper.Name));
-            ErrorsFound = true;
-        } else {
-            int Comp = 0;
-            int NumChHtrPerWrapper = 0;
-            for (int loop = 9; loop <= NumAlphas; loop += 3) {
-                ++Comp;
-                wrapper.WrapperComp(Comp).WrapperPerformanceObjectType = state.dataIPShortCut->cAlphaArgs(loop);
-                wrapper.WrapperComp(Comp).WrapperComponentName = state.dataIPShortCut->cAlphaArgs(loop + 1);
-
-                if (state.dataIPShortCut->lAlphaFieldBlanks(loop + 2)) {
-                    wrapper.WrapperComp(Comp).chSched = Sched::GetScheduleAlwaysOn(state); // Not an availability schedule, but defaults to
-                                                                                           // constant-1.0
-                } else if ((wrapper.WrapperComp(Comp).chSched = Sched::GetSchedule(state, state.dataIPShortCut->cAlphaArgs(loop + 2))) == nullptr) {
-                    wrapper.WrapperComp(Comp).chSched = Sched::GetScheduleAlwaysOn(state); // Not an availability schedule, but defaults to
-                                                                                           // constant-1.0
-                    ShowWarningItemNotFound(state,
-                                            eoh,
-                                            state.dataIPShortCut->cAlphaFieldNames(loop + 2),
-                                            state.dataIPShortCut->cAlphaArgs(loop + 2),
-                                            "The Control Schedule is treated as AlwaysOn instead.");
-                }
-
-                wrapper.WrapperComp(Comp).WrapperIdenticalObjectNum = state.dataIPShortCut->rNumericArgs(1 + Comp);
-                if (wrapper.WrapperComp(Comp).WrapperPerformanceObjectType == "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR") {
-
-                    // count number of chiller heaters (including identical units) for
-                    // current wrapper
-                    if (wrapper.WrapperComp(Comp).WrapperIdenticalObjectNum > 1) {
-                        NumChHtrPerWrapper += wrapper.WrapperComp(Comp).WrapperIdenticalObjectNum;
-                    } else {
-                        ++NumChHtrPerWrapper;
-                    }
-
-                    // Count wrapper references independently from parsed performance
-                    // definitions
-                    ++state.dataPlantCentralGSHP->numPerformanceReferences;
-                }
+        auto const &moduleGroupSchemaProps = objectSchemaProps.at(moduleGroupsKey).at("items").at("properties");
+        std::vector<ResolvedModuleGroup> resolvedGroups;
+        resolvedGroups.reserve(moduleGroups->size());
+        int totalModuleCount = 0;
+        for (auto const &moduleGroup : *moduleGroups) {
+            std::string const enteredPerformanceObjectType =
+                inputProcessor->getAlphaFieldValue(moduleGroup, moduleGroupSchemaProps, performanceObjectTypeKey);
+            std::string const performanceName = inputProcessor->getAlphaFieldValue(moduleGroup, moduleGroupSchemaProps, performanceNameKey);
+            if (!Util::SameString(enteredPerformanceObjectType, performanceObjectType)) {
+                ShowSevereError(state,
+                                std::format("{}: {}={} is not a supported performance object type for {}={}",
+                                            routineName,
+                                            performanceObjectTypeKey,
+                                            enteredPerformanceObjectType,
+                                            objectType,
+                                            wrapper.Name));
+                errorsFound = true;
+                continue;
             }
 
-            wrapper.ChillerHeaterNums = NumChHtrPerWrapper;
+            int const performanceIndex = Util::FindItemInList(performanceName, state.dataPlantCentralGSHP->performanceDefinitions);
+            if (performanceIndex <= 0) {
+                ShowSevereItemNotFound(state, eoh, performanceNameKey, performanceName);
+                ShowContinueError(state, "Select the name of a ChillerHeaterPerformance:Electric:EIR object.");
+                errorsFound = true;
+                continue;
+            }
+
+            int const moduleCount = inputProcessor->getIntFieldValue(moduleGroup, moduleGroupSchemaProps, numberOfModulesKey);
+            if (moduleCount < 1) {
+                ShowSevereError(state, std::format("{}: {} must be at least 1 for {}={}", routineName, numberOfModulesKey, objectType, wrapper.Name));
+                errorsFound = true;
+                continue;
+            }
+
+            std::string const scheduleName = inputProcessor->getAlphaFieldValue(moduleGroup, moduleGroupSchemaProps, controlScheduleNameKey);
+            Sched::Schedule *availabilitySchedule = Sched::GetScheduleAlwaysOn(state);
+            if (!scheduleName.empty() && (availabilitySchedule = Sched::GetSchedule(state, scheduleName)) == nullptr) {
+                availabilitySchedule = Sched::GetScheduleAlwaysOn(state);
+                ShowWarningItemNotFound(state, eoh, controlScheduleNameKey, scheduleName, "the AlwaysOn schedule");
+            }
+
+            resolvedGroups.push_back({performanceIndex, moduleCount, availabilitySchedule});
+            totalModuleCount += moduleCount;
+            ++state.dataPlantCentralGSHP->numPerformanceReferences;
         }
 
-        if (ErrorsFound) {
-            ShowFatalError(state,
-                           std::format("GetWrapperInput: Invalid {} Input, preceding "
-                                       "condition(s) cause termination.",
-                                       state.dataIPShortCut->cCurrentModuleObject));
+        if (resolvedGroups.empty()) {
+            ShowSevereError(state, std::format("{}: No valid module groups specified for {}={}", routineName, objectType, wrapper.Name));
+            errorsFound = true;
+            continue;
         }
 
-        // ALLOCATE ARRAYS
-        if (state.dataPlantCentralGSHP->numPerformanceReferences == 0) {
-            ShowFatalError(state,
-                           std::format("{} : {} requires "
-                                       "ChillerHeaterPerformance:Electric:EIR object(s).",
-                                       state.dataIPShortCut->cCurrentModuleObject,
-                                       wrapper.Name));
-        }
-    }
-
-    if (state.dataPlantCentralGSHP->numPerformanceReferences > 0) {
-
-        for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
-            auto &wrapper = state.dataPlantCentralGSHP->Wrapper(WrapperNum);
-            wrapper.ChillerHeater.allocate(wrapper.ChillerHeaterNums);
-        }
-        GetChillerHeaterInput(state);
-    }
-
-    for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
-        auto &wrapper = state.dataPlantCentralGSHP->Wrapper(WrapperNum);
-        int ChillerHeaterNum = 0; // initialize nth chiller heater index (including
-                                  // identical units) for current wrapper
-        for (int Comp = 1; Comp <= wrapper.NumOfComp; ++Comp) {
-            if (wrapper.WrapperComp(Comp).WrapperPerformanceObjectType == "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR") {
-                std::string CompName = wrapper.WrapperComp(Comp).WrapperComponentName;
-                int CompIndex = Util::FindItemInList(CompName, state.dataPlantCentralGSHP->performanceDefinitions);
-                // User may enter invalid name rather than selecting one from the object
-                // list
-                if (CompIndex <= 0) {
-                    ShowSevereError(state,
-                                    std::format("GetWrapperInput: Invalid Chiller Heater "
-                                                "Modules Performance Component Name ={}",
-                                                CompName));
-                    ShowContinueError(state,
-                                      "Select the name of ChillerHeaterPerformance:Electric:EIR "
-                                      "object(s) from the object list.");
-                    ShowFatalError(state, "Program terminates due to preceding condition.");
-                }
-                wrapper.WrapperComp(Comp).WrapperPerformanceObjectIndex = CompIndex;
-                for (int i_CH = 1; i_CH <= wrapper.WrapperComp(Comp).WrapperIdenticalObjectNum; ++i_CH) {
-                    // increment nth chiller heater index (including identical units) for
-                    // current wrapper
-                    ++ChillerHeaterNum;
-                    wrapper.ChillerHeater(ChillerHeaterNum)
-                        .initialize(CompIndex, state.dataPlantCentralGSHP->performanceDefinitions(CompIndex), wrapper.WrapperComp(Comp).chSched);
-                }
+        wrapper.ChillerHeater.allocate(totalModuleCount);
+        int moduleNum = 0;
+        for (auto const &group : resolvedGroups) {
+            for (int identicalModuleNum = 1; identicalModuleNum <= group.moduleCount; ++identicalModuleNum) {
+                ++moduleNum;
+                wrapper.ChillerHeater(moduleNum).initialize(
+                    group.performanceIndex, state.dataPlantCentralGSHP->performanceDefinitions(group.performanceIndex), group.availabilitySchedule);
             }
         }
         wrapper.resolveFlowMode(state);
+    }
+
+    if (errorsFound) {
+        ShowFatalError(state, std::format("GetWrapperInput: Invalid {} Input, preceding condition(s) cause termination.", objectType));
     }
 }
 
@@ -1166,9 +1157,9 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::StoreType::Average,
                         this->Name);
 
-    if (this->ChillerHeaterNums > 0) {
+    if (static_cast<int>(this->ChillerHeater.size()) > 0) {
 
-        for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
+        for (int ChillerHeaterNum = 1; ChillerHeaterNum <= static_cast<int>(this->ChillerHeater.size()); ++ChillerHeaterNum) {
             auto &chillerHeater = this->ChillerHeater(ChillerHeaterNum);
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Operation Mode Unit {}", ChillerHeaterNum),
@@ -2898,7 +2889,7 @@ void WrapperSpecs::CalcCoolingOnlyModel(EnergyPlusData &state,
         return min(max(0.0, remainingFlow), max(0.0, designFlow));
     };
 
-    for (int chillerHeaterNum = 1; chillerHeaterNum <= this->ChillerHeaterNums; ++chillerHeaterNum) {
+    for (int chillerHeaterNum = 1; chillerHeaterNum <= static_cast<int>(this->ChillerHeater.size()); ++chillerHeaterNum) {
         auto &chillerHeater = this->ChillerHeater(chillerHeaterNum);
         auto const &sizing = chillerHeater.sizing;
         bool const moduleIsAvailable = chillerHeater.isAvailable();
@@ -2974,7 +2965,7 @@ void WrapperSpecs::CalcHeatingOnlyModel(EnergyPlusData &state,
         return min(max(0.0, remainingFlow), max(0.0, designFlow));
     };
 
-    for (int chillerHeaterNum = 1; chillerHeaterNum <= this->ChillerHeaterNums; ++chillerHeaterNum) {
+    for (int chillerHeaterNum = 1; chillerHeaterNum <= static_cast<int>(this->ChillerHeater.size()); ++chillerHeaterNum) {
         auto &chillerHeater = this->ChillerHeater(chillerHeaterNum);
         auto const &sizing = chillerHeater.sizing;
         bool const moduleIsAvailable = chillerHeater.isAvailable();
@@ -3049,7 +3040,7 @@ void WrapperSpecs::updateWrapperReportingAndNodes(EnergyPlusData &state,
     Real64 hotWaterOutletTemperatureSum = 0.0;
     Real64 sourceOutletTemperatureSum = 0.0;
 
-    for (int chillerHeaterNum = 1; chillerHeaterNum <= this->ChillerHeaterNums; ++chillerHeaterNum) {
+    for (int chillerHeaterNum = 1; chillerHeaterNum <= static_cast<int>(this->ChillerHeater.size()); ++chillerHeaterNum) {
         auto &chillerHeater = this->ChillerHeater(chillerHeaterNum);
         chillerHeater.updateResultEnergies(secondsInTimeStep);
         auto const &result = chillerHeater.Result;
@@ -3135,7 +3126,7 @@ void WrapperSpecs::CalcSimultaneousModel(EnergyPlusData &state,
     Real64 remainingHotWaterMassFlowRate = max(0.0, hotWaterMassFlowRate);
     Real64 remainingSourceMassFlowRate = max(0.0, sourceMassFlowRate);
 
-    for (int chillerHeaterNum = 1; chillerHeaterNum <= this->ChillerHeaterNums; ++chillerHeaterNum) {
+    for (int chillerHeaterNum = 1; chillerHeaterNum <= static_cast<int>(this->ChillerHeater.size()); ++chillerHeaterNum) {
         auto &chillerHeater = this->ChillerHeater(chillerHeaterNum);
         auto const &sizing = chillerHeater.sizing;
         bool const moduleIsAvailable = chillerHeater.isAvailable();

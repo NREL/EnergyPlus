@@ -53,7 +53,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -82,15 +81,6 @@ namespace PlantCentralGSHP {
         EnteringCondenser,
         LeavingCondenser,
         Num
-    };
-
-    struct WrapperComponentSpecs
-    {
-        std::string WrapperPerformanceObjectType; // Component type
-        std::string WrapperComponentName;         // Component name
-        int WrapperPerformanceObjectIndex = 0;    // Component index in the input array
-        int WrapperIdenticalObjectNum = 0;        // Number of identical objects
-        Sched::Schedule *chSched = nullptr;       // schedule
     };
 
     struct ChillerHeaterResult
@@ -321,7 +311,6 @@ namespace PlantCentralGSHP {
         std::string Name;                               // User identifier
         bool VariableFlowCH = false;                    // True if all chiller heaters are variable flow control
         Sched::Schedule *ancillaryPowerSched = nullptr; // Schedule value for ancillary power control
-        Sched::Schedule *chSched = nullptr;             // Schedule value for individual chiller heater control
         int CHWInletNodeNum = 0;                        // Node number on the inlet side of the plant (Chilled Water side)
         int CHWOutletNodeNum = 0;                       // Node number on the outlet side of the plant (Chilled Water side)
         int HWInletNodeNum = 0;                         // Node number on the inlet side of the plant (Hot Water side)
@@ -331,7 +320,6 @@ namespace PlantCentralGSHP {
         int CoolSetPointTempNode = 0;                   // Node number of the cooling setpoint temperature node
         int HeatSetPointTempNode = 0;                   // Node number of the heating setpoint temperature node
         bool EvapOutletMinTempCheck = true;             // True if minimum evaporator outlet temperature warning is enabled
-        int NumOfComp = 0;                              // Number of Components under the wrapper
         Real64 CHWMassFlowRate = 0.0;                   // Chilled water mass flow rate
         Real64 HWMassFlowRate = 0.0;                    // Hot water mass flow rate
         Real64 GLHEMassFlowRate = 0.0;                  // Condenser water mass flow rate
@@ -341,21 +329,19 @@ namespace PlantCentralGSHP {
         Real64 WrapperCoolingLoad = 0.0;                // Cooling demand for the central heat pump system
         Real64 WrapperHeatingLoad = 0.0;                // Heating demand for the central heat pump system
         Real64 AncillaryPower = 0.0;                    // Wrapper Ancillary Power
-        Array1D<WrapperComponentSpecs> WrapperComp;
-        Array1D<ChillerHeaterModule> ChillerHeater; // Dimension to number of machines
-        bool CoolSetPointErrDone = false;           // true if setpoint warning issued
-        bool HeatSetPointErrDone = false;           // true if setpoint warning issued
-        int ChillerHeaterNums = 0;                  // Total number of chiller heater units
-        PlantLocation CWPlantLoc = {};              // Chilled water plant loop component index
-        PlantLocation HWPlantLoc = {};              // Hot water plant loop component index
-        PlantLocation GLHEPlantLoc = {};            // Geo-field water plant loop component index
-        int CHWMassFlowIndex = 0;                   // Chilled water flow index
-        int HWMassFlowIndex = 0;                    // Hot water flow index
-        int GLHEMassFlowIndex = 0;                  // Condenser side flow index
-        Real64 SizingFactor = 1.0;                  // Sizing factor to adjust the capacity
-        Real64 CHWVolFlowRate = 0.0;                // Chilled water volume flow rate [kg/s]
-        Real64 HWVolFlowRate = 0.0;                 // Hot water volume flow rate [kg/s]
-        Real64 GLHEVolFlowRate = 0.0;               // Geo-field volume flow rate [kg/s]
+        Array1D<ChillerHeaterModule> ChillerHeater;     // Dimension to number of machines
+        bool CoolSetPointErrDone = false;               // true if setpoint warning issued
+        bool HeatSetPointErrDone = false;               // true if setpoint warning issued
+        PlantLocation CWPlantLoc = {};                  // Chilled water plant loop component index
+        PlantLocation HWPlantLoc = {};                  // Hot water plant loop component index
+        PlantLocation GLHEPlantLoc = {};                // Geo-field water plant loop component index
+        int CHWMassFlowIndex = 0;                       // Chilled water flow index
+        int HWMassFlowIndex = 0;                        // Hot water flow index
+        int GLHEMassFlowIndex = 0;                      // Condenser side flow index
+        Real64 SizingFactor = 1.0;                      // Sizing factor to adjust the capacity
+        Real64 CHWVolFlowRate = 0.0;                    // Chilled water volume flow rate [kg/s]
+        Real64 HWVolFlowRate = 0.0;                     // Hot water volume flow rate [kg/s]
+        Real64 GLHEVolFlowRate = 0.0;                   // Geo-field volume flow rate [kg/s]
         bool MyWrapperFlag = true;
         bool MyWrapperEnvrnFlag = true;
         bool SimulClgDominant = false;

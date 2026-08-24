@@ -448,6 +448,141 @@ nlohmann::json makeChillerHeaterNativeJSON(bool const includeOptionalFields = tr
     };
 }
 
+nlohmann::json makeNativeWrapperJSON(bool const useManyGroups)
+{
+    auto epJSON = makeChillerHeaterNativeJSON();
+    epJSON["ScheduleTypeLimits"]["Fraction"] = {
+        {"lower_limit_value", 0.0},
+        {"upper_limit_value", 1.0},
+        {"numeric_type", "Continuous"},
+        {"unit_type", "Dimensionless"},
+    };
+    epJSON["Schedule:Constant"] = {
+        {"Ancillary Schedule", {{"schedule_type_limits_name", "Fraction"}, {"hourly_value", 0.5}}},
+        {"Module Schedule", {{"schedule_type_limits_name", "Fraction"}, {"hourly_value", 1.0}}},
+        {"Module Schedule 1", {{"schedule_type_limits_name", "Fraction"}, {"hourly_value", 1.0}}},
+        {"Module Schedule 3", {{"schedule_type_limits_name", "Fraction"}, {"hourly_value", 1.0}}},
+        {"Module Schedule 4", {{"schedule_type_limits_name", "Fraction"}, {"hourly_value", 1.0}}},
+        {"Module Schedule 6", {{"schedule_type_limits_name", "Fraction"}, {"hourly_value", 1.0}}},
+    };
+
+    nlohmann::json wrapper = {
+        {"cooling_loop_inlet_node_name", useManyGroups ? "Cooling Inlet" : "Sparse Cooling Inlet"},
+        {"cooling_loop_outlet_node_name", useManyGroups ? "Cooling Outlet" : "Sparse Cooling Outlet"},
+        {"source_loop_inlet_node_name", useManyGroups ? "Source Inlet" : "Sparse Source Inlet"},
+        {"source_loop_outlet_node_name", useManyGroups ? "Source Outlet" : "Sparse Source Outlet"},
+        {"heating_loop_inlet_node_name", useManyGroups ? "Heating Inlet" : "Sparse Heating Inlet"},
+        {"heating_loop_outlet_node_name", useManyGroups ? "Heating Outlet" : "Sparse Heating Outlet"},
+        {"ancillary_power", 25.0},
+        {"ancillary_operation_schedule_name", "Ancillary Schedule"},
+        {"module_groups", nlohmann::json::array()},
+    };
+
+    auto addGroup = [&wrapper](int const count, std::string_view const scheduleName) {
+        nlohmann::json group = {
+            {"performance_object_type", "ChillerHeaterPerformance:Electric:EIR"},
+            {"performance_name", "Native Mixed Case Module"},
+            {"number_of_modules", count},
+        };
+        if (!scheduleName.empty()) {
+            group["control_schedule_name"] = scheduleName;
+        }
+        wrapper["module_groups"].push_back(std::move(group));
+    };
+
+    if (useManyGroups) {
+        for (int group = 1; group <= 21; ++group) {
+            addGroup(1, "Module Schedule");
+        }
+        epJSON["CentralHeatPumpSystem"]["Native Many Groups Wrapper"] = std::move(wrapper);
+    } else {
+        addGroup(1, "Module Schedule 1");
+        addGroup(2, "");
+        addGroup(1, "Module Schedule 3");
+        addGroup(1, "Module Schedule 4");
+        addGroup(1, "Missing Module Schedule");
+        addGroup(2, "Module Schedule 6");
+        epJSON["CentralHeatPumpSystem"]["Native Sparse Wrapper"] = std::move(wrapper);
+    }
+    return epJSON;
+}
+
+std::string makeAllModuleGroupsIDF()
+{
+    std::string idf = R"IDF(
+CentralHeatPumpSystem,
+  Native Many Groups Wrapper,
+  Cooling Inlet,
+  Cooling Outlet,
+  Source Inlet,
+  Source Outlet,
+  Heating Inlet,
+  Heating Outlet,
+  25.0,
+  Ancillary Schedule,
+)IDF";
+    for (int group = 1; group <= 21; ++group) {
+        idf += "  ChillerHeaterPerformance:Electric:EIR,\n";
+        idf += "  Native Mixed Case Module,\n";
+        idf += "  Module Schedule,\n";
+        idf += group == 21 ? "  1;\n" : "  1,\n";
+    }
+    idf += R"IDF(
+ScheduleTypeLimits,
+  Fraction,
+  0.0,
+  1.0,
+  Continuous,
+  Dimensionless;
+Schedule:Constant,
+  Ancillary Schedule,
+  Fraction,
+  0.5;
+Schedule:Constant,
+  Module Schedule,
+  Fraction,
+  1.0;
+ChillerHeaterPerformance:Electric:EIR,
+  Native Mixed Case Module,
+  10000,
+  5.0,
+  7.0,
+  30.0,
+  35.0,
+  0.75,
+  1.0,
+  7.0,
+  50.0,
+  30.0,
+  3.0,
+  VariableFlow,
+  0.001,
+  0.001,
+  0.001,
+  0.8,
+  LeavingCondenser,
+  Reference Temperature Curve,
+  Reference Temperature Curve,
+  Reference PLR Curve,
+  0.5,
+  EnteringCondenser,
+  Reference Temperature Curve,
+  Reference Temperature Curve,
+  Reference PLR Curve,
+  0.5,
+  1.2,
+  55.0;
+Curve:Biquadratic,
+  Reference Temperature Curve,
+  1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+  -100.0, 100.0, -100.0, 100.0;
+Curve:Quadratic,
+  Reference PLR Curve,
+  1.0, 0.0, 0.0,
+  0.0, 1.0;
+)IDF";
+    return idf;
+}
 } // namespace
 
 TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
@@ -459,14 +594,6 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataPlantCentralGSHP->numWrappers = NumWrappers;
     state->dataPlantCentralGSHP->Wrapper.allocate(NumWrappers);
 
-    int NumberOfComp = 1;
-    state->dataPlantCentralGSHP->Wrapper(1).NumOfComp = NumberOfComp;
-    state->dataPlantCentralGSHP->Wrapper(1).WrapperComp.allocate(NumberOfComp);
-
-    state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).WrapperPerformanceObjectType = "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR";
-    state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).WrapperIdenticalObjectNum = 2;
-    state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).chSched = Sched::GetScheduleAlwaysOn(*state);
-    state->dataPlantCentralGSHP->Wrapper(1).ChillerHeaterNums = 2;
     state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater.allocate(2);
 
     int NumChillerHeaters = 1;
@@ -495,7 +622,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
 
     // Both modules share one retained immutable performance definition.
     auto const &performance = state->dataPlantCentralGSHP->performanceDefinitions(1);
-    auto *availabilitySchedule = state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).chSched;
+    auto *availabilitySchedule = Sched::GetScheduleAlwaysOn(*state);
     state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).initialize(1, performance, availabilitySchedule);
     state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(2).initialize(1, performance, availabilitySchedule);
     auto &module1 = state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1);
@@ -608,7 +735,6 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_DesignCapacityReportingUses
     wrapper.CWPlantLoc.loopNum = 1;
     wrapper.HWPlantLoc.loopNum = 2;
     wrapper.GLHEPlantLoc.loopNum = 3;
-    wrapper.ChillerHeaterNums = 2;
     wrapper.ChillerHeater.allocate(2);
 
     PlantCentralGSHP::ChillerHeaterPerformanceData performance1;
@@ -708,7 +834,6 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SourceOnlySizingUsesSourceP
     wrapper.CHWInletNodeNum = 11;
     wrapper.HWInletNodeNum = 12;
     wrapper.GLHEInletNodeNum = 13;
-    wrapper.ChillerHeaterNums = 1;
     wrapper.ChillerHeater.allocate(1);
 
     PlantCentralGSHP::ChillerHeaterPerformanceData performance;
@@ -773,7 +898,6 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_HardSizedWarningsRetainCalc
     wrapper.CHWInletNodeNum = 21;
     wrapper.HWInletNodeNum = 22;
     wrapper.GLHEInletNodeNum = 23;
-    wrapper.ChillerHeaterNums = 1;
     wrapper.ChillerHeater.allocate(1);
 
     PlantCentralGSHP::ChillerHeaterPerformanceData performance;
@@ -965,12 +1089,11 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)
     PlantCentralGSHP::GetWrapperInput(*state);
 
     // verify that under this scenario of not finding a schedule match, ScheduleAlwaysOn is the treated default
-    EXPECT_EQ(state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).chSched, Sched::GetScheduleAlwaysOn(*state));
     EXPECT_EQ(state->dataPlantCentralGSHP->Wrapper(1).ancillaryPowerSched, Sched::GetScheduleAlwaysOn(*state));
     EXPECT_TRUE(state->dataPlantCentralGSHP->Wrapper(1).VariableFlowCH);
     auto const &module = state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1);
     EXPECT_TRUE(module.VariableFlow);
-    EXPECT_EQ(module.availabilitySchedule, state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).chSched);
+    EXPECT_EQ(module.availabilitySchedule, Sched::GetScheduleAlwaysOn(*state));
     EXPECT_FALSE(module.performanceData().ConstantFlow);
     EXPECT_FALSE(module.performanceData().MaxHeatingLeavingCondTempWasBlank);
     EXPECT_DOUBLE_EQ(55.0, module.performanceData().MaxHeatingLeavingCondTemp);
@@ -1241,6 +1364,158 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativePerformanceInpu
     EXPECT_DOUBLE_EQ(idfPerformance.MaxPartLoadRatClgHtg, nativePerformance.MaxPartLoadRatClgHtg);
 }
 
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativeWrapperInputsProduceEquivalentStateForExtensibleGroupsBeyondFormerLimit)
+{
+    ASSERT_TRUE(process_idf(makeAllModuleGroupsIDF()));
+    state->init_state(*state);
+    EXPECT_NO_THROW(PlantCentralGSHP::GetWrapperInput(*state));
+    EXPECT_TRUE(compare_err_stream("", true));
+
+    ASSERT_EQ(1, state->dataPlantCentralGSHP->numWrappers);
+    ASSERT_EQ(1, state->dataPlantCentralGSHP->numPerformanceDefinitions);
+    EXPECT_EQ(21, state->dataPlantCentralGSHP->numPerformanceReferences);
+    auto const &idfWrapper = state->dataPlantCentralGSHP->Wrapper(1);
+    ASSERT_EQ(21u, idfWrapper.ChillerHeater.size());
+    std::array<std::string, 6> const idfNodeNames = {
+        state->dataLoopNodes->NodeID(idfWrapper.CHWInletNodeNum),
+        state->dataLoopNodes->NodeID(idfWrapper.CHWOutletNodeNum),
+        state->dataLoopNodes->NodeID(idfWrapper.GLHEInletNodeNum),
+        state->dataLoopNodes->NodeID(idfWrapper.GLHEOutletNodeNum),
+        state->dataLoopNodes->NodeID(idfWrapper.HWInletNodeNum),
+        state->dataLoopNodes->NodeID(idfWrapper.HWOutletNodeNum),
+    };
+    std::vector<std::string> idfPerformanceNames;
+    std::vector<std::string> idfScheduleNames;
+    for (auto const &module : idfWrapper.ChillerHeater) {
+        idfPerformanceNames.push_back(module.name());
+        ASSERT_NE(nullptr, module.availabilitySchedule);
+        idfScheduleNames.push_back(module.availabilitySchedule->Name);
+    }
+    std::string const idfName = idfWrapper.Name;
+    std::string const idfAncillaryScheduleName = idfWrapper.ancillaryPowerSched->Name;
+    Real64 const idfAncillaryPower = idfWrapper.AncillaryPower;
+    bool const idfVariableFlow = idfWrapper.VariableFlowCH;
+
+    state->dataPlantCentralGSHP->clear_state();
+    state->dataCurveManager->clear_state();
+    state->dataInputProcessing->clear_state();
+    state->dataIPShortCut->clear_state();
+    EXPECT_TRUE(compare_err_stream("", true));
+
+    ASSERT_TRUE(process_json(makeNativeWrapperJSON(true)));
+    Curve::GetCurveInput(*state);
+    EXPECT_NO_THROW(PlantCentralGSHP::GetWrapperInput(*state));
+    EXPECT_TRUE(compare_err_stream("", true));
+
+    ASSERT_EQ(1, state->dataPlantCentralGSHP->numWrappers);
+    ASSERT_EQ(1, state->dataPlantCentralGSHP->numPerformanceDefinitions);
+    EXPECT_EQ(21, state->dataPlantCentralGSHP->numPerformanceReferences);
+    auto const &nativeWrapper = state->dataPlantCentralGSHP->Wrapper(1);
+    ASSERT_EQ(21u, nativeWrapper.ChillerHeater.size());
+    std::array<std::string, 6> const nativeNodeNames = {
+        state->dataLoopNodes->NodeID(nativeWrapper.CHWInletNodeNum),
+        state->dataLoopNodes->NodeID(nativeWrapper.CHWOutletNodeNum),
+        state->dataLoopNodes->NodeID(nativeWrapper.GLHEInletNodeNum),
+        state->dataLoopNodes->NodeID(nativeWrapper.GLHEOutletNodeNum),
+        state->dataLoopNodes->NodeID(nativeWrapper.HWInletNodeNum),
+        state->dataLoopNodes->NodeID(nativeWrapper.HWOutletNodeNum),
+    };
+    std::vector<std::string> nativePerformanceNames;
+    std::vector<std::string> nativeScheduleNames;
+    for (auto const &module : nativeWrapper.ChillerHeater) {
+        EXPECT_EQ(1, module.performanceIndex);
+        EXPECT_EQ(&state->dataPlantCentralGSHP->performanceDefinitions(1), module.performance);
+        nativePerformanceNames.push_back(module.name());
+        ASSERT_NE(nullptr, module.availabilitySchedule);
+        nativeScheduleNames.push_back(module.availabilitySchedule->Name);
+    }
+
+    EXPECT_EQ(idfName, nativeWrapper.Name);
+    EXPECT_EQ(idfNodeNames, nativeNodeNames);
+    EXPECT_EQ(idfPerformanceNames, nativePerformanceNames);
+    EXPECT_EQ(idfScheduleNames, nativeScheduleNames);
+    EXPECT_EQ(idfAncillaryScheduleName, nativeWrapper.ancillaryPowerSched->Name);
+    EXPECT_DOUBLE_EQ(idfAncillaryPower, nativeWrapper.AncillaryPower);
+    EXPECT_EQ(idfVariableFlow, nativeWrapper.VariableFlowCH);
+    EXPECT_EQ(6, state->dataBranchNodeConnections->NumOfNodeConnections);
+
+    state->dataGlobal->DisplayUnusedObjects = true;
+    state->dataGlobal->DisplayAllWarnings = true;
+    state->dataInputProcessing->inputProcessor->reportOrphanRecordObjects(*state);
+    EXPECT_FALSE(compare_err_stream_substring("Object=CentralHeatPumpSystem=Native Many Groups Wrapper", true, false));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativeWrapperInputReadsExtensibleGroupsAndSchedules)
+{
+    ASSERT_TRUE(process_json(makeNativeWrapperJSON(false)));
+    state->init_state(*state);
+    EXPECT_NO_THROW(PlantCentralGSHP::GetWrapperInput(*state));
+
+    ASSERT_EQ(1, state->dataPlantCentralGSHP->numWrappers);
+    ASSERT_EQ(1, state->dataPlantCentralGSHP->numPerformanceDefinitions);
+    EXPECT_EQ(6, state->dataPlantCentralGSHP->numPerformanceReferences);
+    auto const &wrapper = state->dataPlantCentralGSHP->Wrapper(1);
+    EXPECT_EQ("NATIVE SPARSE WRAPPER", wrapper.Name);
+    EXPECT_DOUBLE_EQ(25.0, wrapper.AncillaryPower);
+    ASSERT_NE(nullptr, wrapper.ancillaryPowerSched);
+    EXPECT_EQ("ANCILLARY SCHEDULE", wrapper.ancillaryPowerSched->Name);
+    ASSERT_EQ(8u, wrapper.ChillerHeater.size());
+
+    auto *alwaysOn = Sched::GetScheduleAlwaysOn(*state);
+    std::array<std::string, 8> const expectedScheduleNames = {
+        "MODULE SCHEDULE 1",
+        alwaysOn->Name,
+        alwaysOn->Name,
+        "MODULE SCHEDULE 3",
+        "MODULE SCHEDULE 4",
+        alwaysOn->Name,
+        "MODULE SCHEDULE 6",
+        "MODULE SCHEDULE 6",
+    };
+    for (int moduleNum = 1; moduleNum <= static_cast<int>(wrapper.ChillerHeater.size()); ++moduleNum) {
+        auto const &module = wrapper.ChillerHeater(moduleNum);
+        EXPECT_EQ(1, module.performanceIndex);
+        EXPECT_EQ(&state->dataPlantCentralGSHP->performanceDefinitions(1), module.performance);
+        ASSERT_NE(nullptr, module.availabilitySchedule);
+        EXPECT_EQ(expectedScheduleNames[moduleNum - 1], module.availabilitySchedule->Name);
+    }
+    EXPECT_EQ(6, state->dataBranchNodeConnections->NumOfNodeConnections);
+    EXPECT_TRUE(compare_err_stream_substring("MISSING MODULE SCHEDULE", false));
+    EXPECT_TRUE(compare_err_stream_substring("the AlwaysOn schedule will be used", true));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativeWrapperSchemaRequiresAtLeastOneModuleGroup)
+{
+    auto epJSON = makeNativeWrapperJSON(true);
+    epJSON["CentralHeatPumpSystem"]["Native Many Groups Wrapper"]["module_groups"] = nlohmann::json::array();
+
+    EXPECT_FALSE(process_json(epJSON, false));
+    EXPECT_TRUE(compare_err_stream_substring("Array should contain no fewer than 1 elements", true));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativeWrapperInputRejectsInvalidPerformanceReference)
+{
+    auto epJSON = makeNativeWrapperJSON(false);
+    epJSON["CentralHeatPumpSystem"]["Native Sparse Wrapper"]["module_groups"][1]["performance_name"] = "Missing Performance";
+    ASSERT_TRUE(process_json(epJSON));
+    state->init_state(*state);
+
+    EXPECT_THROW(PlantCentralGSHP::GetWrapperInput(*state), std::runtime_error);
+    EXPECT_TRUE(compare_err_stream_substring("performance_name = MISSING PERFORMANCE, item not found.", true));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativeWrapperInputRejectsCaseInsensitiveDuplicateNames)
+{
+    auto epJSON = makeNativeWrapperJSON(true);
+    auto &wrappers = epJSON["CentralHeatPumpSystem"];
+    wrappers["native many groups wrapper"] = wrappers["Native Many Groups Wrapper"];
+    ASSERT_TRUE(process_json(epJSON));
+    state->init_state(*state);
+
+    EXPECT_THROW(PlantCentralGSHP::GetWrapperInput(*state), std::runtime_error);
+    EXPECT_TRUE(compare_err_stream_substring("duplicate name.", true));
+}
+
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InputValidationUsesConfiguredReferenceTemperaturesAndBicubicPLRDomain)
 {
     ASSERT_TRUE(process_idf(makeChillerHeaterValidationInput()));
@@ -1325,7 +1600,6 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_AncillaryScheduleDefaultsAn
     wrapper.GLHEInletNodeNum = 5;
     wrapper.GLHEOutletNodeNum = 6;
     wrapper.AncillaryPower = 100.0;
-    wrapper.ChillerHeaterNums = 1;
     wrapper.ChillerHeater.allocate(1);
 
     auto setCoolingResult = [&]() {
@@ -1389,7 +1663,6 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_OffStateClearsAuthoritative
     wrapper.Report.CoolingRate = 1000.0;
     wrapper.Report.HeatingRate = 1200.0;
     wrapper.Report.GLHERate = 200.0;
-    wrapper.ChillerHeaterNums = 1;
     wrapper.ChillerHeater.allocate(1);
     PlantCentralGSHP::ChillerHeaterPerformanceData performance;
     wrapper.ChillerHeater(1).initialize(1, performance, nullptr);
@@ -1463,7 +1736,6 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InactiveConnectionPreserves
     wrapper.Report.GLHEInletTemp = 15.0;
     wrapper.Report.GLHEOutletTemp = 15.3;
     wrapper.Report.GLHEmdot = 1.0;
-    wrapper.ChillerHeaterNums = 1;
     wrapper.ChillerHeater.allocate(1);
     PlantCentralGSHP::ChillerHeaterPerformanceData performance;
     performance.OpenMotorEff = 0.80;
@@ -1813,7 +2085,6 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     wrapper.ChillerHeater(2).sizing.RefCOPClgHtg = 4.0;
     wrapper.ChillerHeater(2).sizing.EvapMassFlowRateMax = 1.0;
     wrapper.ChillerHeater(2).sizing.CondMassFlowRateMax = 1.0;
-    wrapper.ChillerHeaterNums = 2;
     wrapper.WrapperCoolingLoad = 18000.0;
     wrapper.WrapperHeatingLoad = 21600.0;
 
