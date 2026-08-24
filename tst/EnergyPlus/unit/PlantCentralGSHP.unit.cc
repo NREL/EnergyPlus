@@ -55,6 +55,7 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -380,6 +381,71 @@ std::string makeChillerHeaterValidationInput(Real64 const capacityRatio = 0.75,
         result += '\n';
         return result;
     });
+}
+
+nlohmann::json makeChillerHeaterNativeJSON(bool const includeOptionalFields = true, bool const autosize = false)
+{
+    nlohmann::json performance = {
+        {"reference_cooling_mode_evaporator_capacity", autosize ? nlohmann::json("Autosize") : nlohmann::json(10000.0)},
+        {"reference_cooling_mode_cop", 5.0},
+        {"cooling_mode_cooling_capacity_function_of_temperature_curve_name", "Reference Temperature Curve"},
+        {"cooling_mode_electric_input_to_cooling_output_ratio_function_of_temperature_curve_name", "Reference Temperature Curve"},
+        {"cooling_mode_electric_input_to_cooling_output_ratio_function_of_part_load_ratio_curve_name", "Reference PLR Curve"},
+        {"heating_mode_cooling_capacity_function_of_temperature_curve_name", "Reference Temperature Curve"},
+        {"heating_mode_electric_input_to_cooling_output_ratio_function_of_temperature_curve_name", "Reference Temperature Curve"},
+        {"heating_mode_electric_input_to_cooling_output_ratio_function_of_part_load_ratio_curve_name", "Reference PLR Curve"},
+    };
+
+    if (includeOptionalFields) {
+        performance.update({
+            {"reference_cooling_mode_leaving_chilled_water_temperature", 7.0},
+            {"reference_cooling_mode_entering_condenser_fluid_temperature", 30.0},
+            {"reference_cooling_mode_leaving_condenser_water_temperature", 35.0},
+            {"reference_heating_mode_cooling_capacity_ratio", 0.75},
+            {"reference_heating_mode_cooling_power_input_ratio", 1.0},
+            {"reference_heating_mode_leaving_chilled_water_temperature", 7.0},
+            {"reference_heating_mode_leaving_condenser_water_temperature", 50.0},
+            {"reference_heating_mode_entering_condenser_fluid_temperature", 30.0},
+            {"heating_mode_entering_chilled_water_temperature_low_limit", 3.0},
+            {"chilled_water_flow_mode_type", "VariableFlow"},
+            {"design_chilled_water_flow_rate", autosize ? nlohmann::json("Autosize") : nlohmann::json(0.001)},
+            {"design_condenser_water_flow_rate", autosize ? nlohmann::json("Autosize") : nlohmann::json(0.001)},
+            {"design_hot_water_flow_rate", 0.001},
+            {"compressor_motor_efficiency", 0.8},
+            {"cooling_mode_temperature_curve_condenser_water_independent_variable", "LeavingCondenser"},
+            {"cooling_mode_cooling_capacity_optimum_part_load_ratio", 0.5},
+            {"heating_mode_temperature_curve_condenser_water_independent_variable", "EnteringCondenser"},
+            {"heating_mode_cooling_capacity_optimum_part_load_ratio", 0.5},
+            {"sizing_factor", 1.2},
+            {"maximum_heating_mode_leaving_condenser_water_temperature", 55.0},
+        });
+    }
+
+    nlohmann::json const temperatureCurve = {
+        {"coefficient1_constant", 1.0},
+        {"coefficient2_x", 0.0},
+        {"coefficient3_x_2", 0.0},
+        {"coefficient4_y", 0.0},
+        {"coefficient5_y_2", 0.0},
+        {"coefficient6_x_y", 0.0},
+        {"minimum_value_of_x", -100.0},
+        {"maximum_value_of_x", 100.0},
+        {"minimum_value_of_y", -100.0},
+        {"maximum_value_of_y", 100.0},
+    };
+    nlohmann::json const partLoadCurve = {
+        {"coefficient1_constant", 1.0},
+        {"coefficient2_x", 0.0},
+        {"coefficient3_x_2", 0.0},
+        {"minimum_value_of_x", 0.0},
+        {"maximum_value_of_x", 1.0},
+    };
+
+    return {
+        {"ChillerHeaterPerformance:Electric:EIR", {{"Native Mixed Case Module", performance}}},
+        {"Curve:Biquadratic", {{"Reference Temperature Curve", temperatureCurve}}},
+        {"Curve:Quadratic", {{"Reference PLR Curve", partLoadCurve}}},
+    };
 }
 
 } // namespace
@@ -948,6 +1014,196 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_FlowModeResolutionIsWrapper
         EXPECT_TRUE(chillerHeater.VariableFlow);
     }
     EXPECT_FALSE(has_err_output());
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativePerformanceInputReadsCompleteObjectAndMarksItUsed)
+{
+    ASSERT_TRUE(process_json(makeChillerHeaterNativeJSON(true, true)));
+    state->init_state(*state);
+
+    EXPECT_NO_THROW(PlantCentralGSHP::GetChillerHeaterInput(*state));
+    EXPECT_FALSE(has_err_output());
+
+    ASSERT_TRUE(allocated(state->dataPlantCentralGSHP->ChillerHeater));
+    auto const &performance = state->dataPlantCentralGSHP->ChillerHeater(1);
+    EXPECT_EQ("NATIVE MIXED CASE MODULE", performance.Name);
+    EXPECT_EQ(PlantCentralGSHP::CondenserModeTemperature::LeavingCondenser, performance.CondModeCooling);
+    EXPECT_EQ(PlantCentralGSHP::CondenserModeTemperature::EnteringCondenser, performance.CondModeHeating);
+    EXPECT_FALSE(performance.ConstantFlow);
+    EXPECT_TRUE(performance.VariableFlow);
+    EXPECT_EQ(DataSizing::AutoSize, performance.RefCapCooling);
+    EXPECT_TRUE(performance.RefCapCoolingWasAutoSized);
+    EXPECT_EQ(DataSizing::AutoSize, performance.EvapVolFlowRate);
+    EXPECT_TRUE(performance.EvapVolFlowRateWasAutoSized);
+    EXPECT_EQ(DataSizing::AutoSize, performance.CondVolFlowRate);
+    EXPECT_TRUE(performance.CondVolFlowRateWasAutoSized);
+    EXPECT_DOUBLE_EQ(0.001, performance.DesignHotWaterVolFlowRate);
+    EXPECT_DOUBLE_EQ(0.8, performance.OpenMotorEff);
+    EXPECT_DOUBLE_EQ(0.5, performance.OptPartLoadRatCooling);
+    EXPECT_DOUBLE_EQ(0.5, performance.OptPartLoadRatClgHtg);
+    EXPECT_DOUBLE_EQ(1.2, performance.SizFac);
+    EXPECT_FALSE(performance.MaxHeatingLeavingCondTempWasBlank);
+    EXPECT_DOUBLE_EQ(55.0, performance.MaxHeatingLeavingCondTemp);
+    EXPECT_GT(performance.ChillerCapFTCoolingIDX, 0);
+    EXPECT_GT(performance.ChillerEIRFPLRHeatingIDX, 0);
+
+    state->dataGlobal->DisplayUnusedObjects = true;
+    state->dataGlobal->DisplayAllWarnings = true;
+    state->dataInputProcessing->inputProcessor->reportOrphanRecordObjects(*state);
+    EXPECT_FALSE(compare_err_stream_substring("Native Mixed Case Module", true, false));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativePerformanceInputAppliesSchemaDefaultsAndTracksOmittedLimit)
+{
+    ASSERT_TRUE(process_json(makeChillerHeaterNativeJSON(false)));
+    state->init_state(*state);
+
+    EXPECT_NO_THROW(PlantCentralGSHP::GetChillerHeaterInput(*state));
+    EXPECT_FALSE(has_err_output());
+
+    auto const &performance = state->dataPlantCentralGSHP->ChillerHeater(1);
+    EXPECT_TRUE(performance.ConstantFlow);
+    EXPECT_FALSE(performance.VariableFlow);
+    EXPECT_EQ(PlantCentralGSHP::CondenserModeTemperature::EnteringCondenser, performance.CondModeCooling);
+    EXPECT_EQ(PlantCentralGSHP::CondenserModeTemperature::LeavingCondenser, performance.CondModeHeating);
+    EXPECT_DOUBLE_EQ(6.67, performance.TempRefEvapOutCooling);
+    EXPECT_DOUBLE_EQ(29.44, performance.TempRefCondInCooling);
+    EXPECT_DOUBLE_EQ(35.0, performance.TempRefCondOutCooling);
+    EXPECT_DOUBLE_EQ(0.75, performance.ClgHtgToCoolingCapRatio);
+    EXPECT_DOUBLE_EQ(1.38, performance.ClgHtgtoCogPowerRatio);
+    EXPECT_DOUBLE_EQ(6.67, performance.TempRefEvapOutClgHtg);
+    EXPECT_DOUBLE_EQ(49.0, performance.TempRefCondOutClgHtg);
+    EXPECT_DOUBLE_EQ(29.44, performance.TempRefCondInClgHtg);
+    EXPECT_DOUBLE_EQ(12.22, performance.TempLowLimitEvapOut);
+    EXPECT_DOUBLE_EQ(0.0, performance.EvapVolFlowRate);
+    EXPECT_DOUBLE_EQ(0.0, performance.CondVolFlowRate);
+    EXPECT_DOUBLE_EQ(0.0, performance.DesignHotWaterVolFlowRate);
+    EXPECT_DOUBLE_EQ(1.0, performance.OpenMotorEff);
+    EXPECT_DOUBLE_EQ(1.0, performance.OptPartLoadRatCooling);
+    EXPECT_DOUBLE_EQ(1.0, performance.OptPartLoadRatClgHtg);
+    EXPECT_DOUBLE_EQ(1.0, performance.SizFac);
+    EXPECT_TRUE(performance.MaxHeatingLeavingCondTempWasBlank);
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativePerformanceInputReportsReferencedField)
+{
+    auto epJSON = makeChillerHeaterNativeJSON();
+    epJSON["ChillerHeaterPerformance:Electric:EIR"]["Native Mixed Case Module"]["cooling_mode_cooling_capacity_function_of_temperature_curve_name"] =
+        "Missing Temperature Curve";
+    ASSERT_TRUE(process_json(epJSON));
+    state->init_state(*state);
+
+    EXPECT_THROW(PlantCentralGSHP::GetChillerHeaterInput(*state), std::runtime_error);
+    EXPECT_TRUE(compare_err_stream_substring("Cooling Mode Cooling Capacity Function of Temperature Curve Name=MISSING TEMPERATURE CURVE", true));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativePerformanceInputRejectsCaseInsensitiveDuplicateNames)
+{
+    auto epJSON = makeChillerHeaterNativeJSON();
+    auto &objects = epJSON["ChillerHeaterPerformance:Electric:EIR"];
+    objects["native mixed case module"] = objects["Native Mixed Case Module"];
+    ASSERT_TRUE(process_json(epJSON));
+    state->init_state(*state);
+
+    EXPECT_THROW(PlantCentralGSHP::GetChillerHeaterInput(*state), std::runtime_error);
+    EXPECT_TRUE(compare_err_stream_substring("duplicate name.", true));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativePerformanceInputsProduceEquivalentState)
+{
+    std::string const idf = delimited_string({
+        "ChillerHeaterPerformance:Electric:EIR,",
+        "  Native Mixed Case Module,",
+        "  10000,",
+        "  5.0,",
+        "  7.0,",
+        "  30.0,",
+        "  35.0,",
+        "  0.75,",
+        "  1.0,",
+        "  7.0,",
+        "  50.0,",
+        "  30.0,",
+        "  3.0,",
+        "  VariableFlow,",
+        "  0.001,",
+        "  0.001,",
+        "  0.001,",
+        "  0.8,",
+        "  LeavingCondenser,",
+        "  Reference Temperature Curve,",
+        "  Reference Temperature Curve,",
+        "  Reference PLR Curve,",
+        "  0.5,",
+        "  EnteringCondenser,",
+        "  Reference Temperature Curve,",
+        "  Reference Temperature Curve,",
+        "  Reference PLR Curve,",
+        "  0.5,",
+        "  1.2,",
+        "  55.0;",
+
+        "Curve:Biquadratic,",
+        "  Reference Temperature Curve,",
+        "  1.0, 0.0, 0.0, 0.0, 0.0, 0.0,",
+        "  -100.0, 100.0, -100.0, 100.0;",
+
+        "Curve:Quadratic,",
+        "  Reference PLR Curve,",
+        "  1.0, 0.0, 0.0,",
+        "  0.0, 1.0;",
+    });
+
+    ASSERT_TRUE(process_idf(idf));
+    state->init_state(*state);
+    EXPECT_NO_THROW(PlantCentralGSHP::GetChillerHeaterInput(*state));
+    EXPECT_FALSE(has_err_output());
+    PlantCentralGSHP::ChillerHeaterSpecs const idfPerformance = state->dataPlantCentralGSHP->ChillerHeater(1);
+
+    state->dataPlantCentralGSHP->clear_state();
+    state->dataCurveManager->clear_state();
+    state->dataInputProcessing->clear_state();
+    state->dataIPShortCut->clear_state();
+    EXPECT_TRUE(compare_err_stream("", true));
+
+    ASSERT_TRUE(process_json(makeChillerHeaterNativeJSON()));
+    Curve::GetCurveInput(*state);
+    EXPECT_NO_THROW(PlantCentralGSHP::GetChillerHeaterInput(*state));
+    EXPECT_TRUE(compare_err_stream("", true));
+    auto const &nativePerformance = state->dataPlantCentralGSHP->ChillerHeater(1);
+
+    EXPECT_EQ(idfPerformance.Name, nativePerformance.Name);
+    EXPECT_EQ(idfPerformance.CondModeCooling, nativePerformance.CondModeCooling);
+    EXPECT_EQ(idfPerformance.CondModeHeating, nativePerformance.CondModeHeating);
+    EXPECT_EQ(idfPerformance.ConstantFlow, nativePerformance.ConstantFlow);
+    EXPECT_EQ(idfPerformance.VariableFlow, nativePerformance.VariableFlow);
+    EXPECT_EQ(idfPerformance.RefCapCoolingWasAutoSized, nativePerformance.RefCapCoolingWasAutoSized);
+    EXPECT_EQ(idfPerformance.EvapVolFlowRateWasAutoSized, nativePerformance.EvapVolFlowRateWasAutoSized);
+    EXPECT_EQ(idfPerformance.CondVolFlowRateWasAutoSized, nativePerformance.CondVolFlowRateWasAutoSized);
+    EXPECT_EQ(idfPerformance.MaxHeatingLeavingCondTempWasBlank, nativePerformance.MaxHeatingLeavingCondTempWasBlank);
+    EXPECT_DOUBLE_EQ(idfPerformance.RefCapCooling, nativePerformance.RefCapCooling);
+    EXPECT_DOUBLE_EQ(idfPerformance.RefCOPCooling, nativePerformance.RefCOPCooling);
+    EXPECT_DOUBLE_EQ(idfPerformance.TempRefEvapOutCooling, nativePerformance.TempRefEvapOutCooling);
+    EXPECT_DOUBLE_EQ(idfPerformance.TempRefCondInCooling, nativePerformance.TempRefCondInCooling);
+    EXPECT_DOUBLE_EQ(idfPerformance.TempRefCondOutCooling, nativePerformance.TempRefCondOutCooling);
+    EXPECT_DOUBLE_EQ(idfPerformance.ClgHtgToCoolingCapRatio, nativePerformance.ClgHtgToCoolingCapRatio);
+    EXPECT_DOUBLE_EQ(idfPerformance.ClgHtgtoCogPowerRatio, nativePerformance.ClgHtgtoCogPowerRatio);
+    EXPECT_DOUBLE_EQ(idfPerformance.TempRefEvapOutClgHtg, nativePerformance.TempRefEvapOutClgHtg);
+    EXPECT_DOUBLE_EQ(idfPerformance.TempRefCondOutClgHtg, nativePerformance.TempRefCondOutClgHtg);
+    EXPECT_DOUBLE_EQ(idfPerformance.TempRefCondInClgHtg, nativePerformance.TempRefCondInClgHtg);
+    EXPECT_DOUBLE_EQ(idfPerformance.TempLowLimitEvapOut, nativePerformance.TempLowLimitEvapOut);
+    EXPECT_DOUBLE_EQ(idfPerformance.EvapVolFlowRate, nativePerformance.EvapVolFlowRate);
+    EXPECT_DOUBLE_EQ(idfPerformance.CondVolFlowRate, nativePerformance.CondVolFlowRate);
+    EXPECT_DOUBLE_EQ(idfPerformance.DesignHotWaterVolFlowRate, nativePerformance.DesignHotWaterVolFlowRate);
+    EXPECT_DOUBLE_EQ(idfPerformance.OpenMotorEff, nativePerformance.OpenMotorEff);
+    EXPECT_DOUBLE_EQ(idfPerformance.OptPartLoadRatCooling, nativePerformance.OptPartLoadRatCooling);
+    EXPECT_DOUBLE_EQ(idfPerformance.OptPartLoadRatClgHtg, nativePerformance.OptPartLoadRatClgHtg);
+    EXPECT_DOUBLE_EQ(idfPerformance.SizFac, nativePerformance.SizFac);
+    EXPECT_DOUBLE_EQ(idfPerformance.MaxHeatingLeavingCondTemp, nativePerformance.MaxHeatingLeavingCondTemp);
+    EXPECT_DOUBLE_EQ(idfPerformance.MinPartLoadRatCooling, nativePerformance.MinPartLoadRatCooling);
+    EXPECT_DOUBLE_EQ(idfPerformance.MaxPartLoadRatCooling, nativePerformance.MaxPartLoadRatCooling);
+    EXPECT_DOUBLE_EQ(idfPerformance.MinPartLoadRatClgHtg, nativePerformance.MinPartLoadRatClgHtg);
+    EXPECT_DOUBLE_EQ(idfPerformance.MaxPartLoadRatClgHtg, nativePerformance.MaxPartLoadRatClgHtg);
 }
 
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InputValidationUsesConfiguredReferenceTemperaturesAndBicubicPLRDomain)

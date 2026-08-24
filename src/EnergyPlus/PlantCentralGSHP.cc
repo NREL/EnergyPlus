@@ -52,6 +52,7 @@
 #include <format>
 #include <limits>
 #include <string>
+#include <unordered_set>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -1357,425 +1358,429 @@ void GetChillerHeaterInput(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     //  This routine will get the input required by the ChillerHeaterPerformance:Electric:EIR model.
 
-    bool CHErrorsFound(false);         // True when input errors are found
-    int NumAlphas;                     // Number of elements in the alpha array
-    int NumNums;                       // Number of elements in the numeric array
-    int IOStat;                        // IO Status when calling get input subroutine
+    static constexpr std::string_view routineName = "GetChillerHeaterInput";
+    static constexpr char objectType[] = "ChillerHeaterPerformance:Electric:EIR";
+
+    static constexpr char referenceCoolingCapacityKey[] = "reference_cooling_mode_evaporator_capacity";
+    static constexpr char referenceCoolingCOPKey[] = "reference_cooling_mode_cop";
+    static constexpr char referenceCoolingLeavingChilledWaterTempKey[] = "reference_cooling_mode_leaving_chilled_water_temperature";
+    static constexpr char referenceCoolingEnteringCondenserTempKey[] = "reference_cooling_mode_entering_condenser_fluid_temperature";
+    static constexpr char referenceCoolingLeavingCondenserTempKey[] = "reference_cooling_mode_leaving_condenser_water_temperature";
+    static constexpr char referenceHeatingCapacityRatioKey[] = "reference_heating_mode_cooling_capacity_ratio";
+    static constexpr char referenceHeatingPowerRatioKey[] = "reference_heating_mode_cooling_power_input_ratio";
+    static constexpr char referenceHeatingLeavingChilledWaterTempKey[] = "reference_heating_mode_leaving_chilled_water_temperature";
+    static constexpr char referenceHeatingLeavingCondenserTempKey[] = "reference_heating_mode_leaving_condenser_water_temperature";
+    static constexpr char referenceHeatingEnteringCondenserTempKey[] = "reference_heating_mode_entering_condenser_fluid_temperature";
+    static constexpr char heatingEnteringChilledWaterLowLimitKey[] = "heating_mode_entering_chilled_water_temperature_low_limit";
+    static constexpr char chilledWaterFlowModeKey[] = "chilled_water_flow_mode_type";
+    static constexpr char designChilledWaterFlowRateKey[] = "design_chilled_water_flow_rate";
+    static constexpr char designCondenserWaterFlowRateKey[] = "design_condenser_water_flow_rate";
+    static constexpr char designHotWaterFlowRateKey[] = "design_hot_water_flow_rate";
+    static constexpr char compressorMotorEfficiencyKey[] = "compressor_motor_efficiency";
+    static constexpr char coolingCondenserVariableKey[] = "cooling_mode_temperature_curve_condenser_water_independent_variable";
+    static constexpr char coolingCapacityCurveKey[] = "cooling_mode_cooling_capacity_function_of_temperature_curve_name";
+    static constexpr char coolingEIRTemperatureCurveKey[] = "cooling_mode_electric_input_to_cooling_output_ratio_function_of_temperature_curve_name";
+    static constexpr char coolingEIRPartLoadCurveKey[] = "cooling_mode_electric_input_to_cooling_output_ratio_function_of_part_load_ratio_curve_name";
+    static constexpr char coolingOptimumPartLoadRatioKey[] = "cooling_mode_cooling_capacity_optimum_part_load_ratio";
+    static constexpr char heatingCondenserVariableKey[] = "heating_mode_temperature_curve_condenser_water_independent_variable";
+    static constexpr char heatingCapacityCurveKey[] = "heating_mode_cooling_capacity_function_of_temperature_curve_name";
+    static constexpr char heatingEIRTemperatureCurveKey[] = "heating_mode_electric_input_to_cooling_output_ratio_function_of_temperature_curve_name";
+    static constexpr char heatingEIRPartLoadCurveKey[] = "heating_mode_electric_input_to_cooling_output_ratio_function_of_part_load_ratio_curve_name";
+    static constexpr char heatingOptimumPartLoadRatioKey[] = "heating_mode_cooling_capacity_optimum_part_load_ratio";
+    static constexpr char sizingFactorKey[] = "sizing_factor";
+    static constexpr char maximumHeatingLeavingCondenserTempKey[] = "maximum_heating_mode_leaving_condenser_water_temperature";
+
+    static constexpr char referenceCoolingCapacityField[] = "Reference Cooling Mode Evaporator Capacity";
+    static constexpr char referenceCoolingCOPField[] = "Reference Cooling Mode COP";
+    static constexpr char referenceHeatingCapacityRatioField[] = "Reference Heating Mode Cooling Capacity Ratio";
+    static constexpr char referenceHeatingPowerRatioField[] = "Reference Heating Mode Cooling Power Input Ratio";
+    static constexpr char compressorMotorEfficiencyField[] = "Compressor Motor Efficiency";
+    static constexpr char coolingCapacityCurveField[] = "Cooling Mode Cooling Capacity Function of Temperature Curve Name";
+    static constexpr char coolingEIRTemperatureCurveField[] =
+        "Cooling Mode Electric Input to Cooling Output Ratio Function of Temperature Curve Name";
+    static constexpr char coolingEIRPartLoadCurveField[] =
+        "Cooling Mode Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name";
+    static constexpr char coolingOptimumPartLoadRatioField[] = "Cooling Mode Cooling Capacity Optimum Part Load Ratio";
+    static constexpr char heatingCapacityCurveField[] = "Heating Mode Cooling Capacity Function of Temperature Curve Name";
+    static constexpr char heatingEIRTemperatureCurveField[] =
+        "Heating Mode Electric Input to Cooling Output Ratio Function of Temperature Curve Name";
+    static constexpr char heatingEIRPartLoadCurveField[] =
+        "Heating Mode Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name";
+    static constexpr char heatingOptimumPartLoadRatioField[] = "Heating Mode Cooling Capacity Optimum Part Load Ratio";
+    static constexpr char referenceHeatingEnteringCondenserTempField[] = "Reference Heating Mode Entering Condenser Fluid Temperature";
+    static constexpr char maximumHeatingLeavingCondenserTempField[] = "Maximum Heating Mode Leaving Condenser Water Temperature";
+
+    bool CHErrorsFound = false;        // True when input errors are found
     Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
 
-    state.dataIPShortCut->cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
-    state.dataPlantCentralGSHP->numChillerHeaters =
-        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+    auto &inputProcessor = state.dataInputProcessing->inputProcessor;
+    state.dataIPShortCut->cCurrentModuleObject = objectType;
+    state.dataPlantCentralGSHP->numChillerHeaters = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
     if (state.dataPlantCentralGSHP->numChillerHeaters <= 0) {
-        ShowSevereError(state, std::format("No {} equipment specified in input file", state.dataIPShortCut->cCurrentModuleObject));
+        ShowSevereError(state, std::format("No {} equipment specified in input file", objectType));
         CHErrorsFound = true;
     }
 
-    // Allocate temporary ChillerHeater and ChillerHeaterReport arrays
+    // Allocate the temporary performance-object array.
     if (allocated(state.dataPlantCentralGSHP->ChillerHeater)) {
         state.dataPlantCentralGSHP->ChillerHeater.deallocate();
     }
     state.dataPlantCentralGSHP->ChillerHeater.allocate(state.dataPlantCentralGSHP->numChillerHeaters);
 
-    // Load arrays with electric EIR chiller data
-    for (int ChillerHeaterNum = 1; ChillerHeaterNum <= state.dataPlantCentralGSHP->numChillerHeaters; ++ChillerHeaterNum) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 state.dataIPShortCut->cCurrentModuleObject,
-                                                                 ChillerHeaterNum,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
+    auto const instances = inputProcessor->epJSON.find(objectType);
+    if (instances != inputProcessor->epJSON.end()) {
+        auto const &objectSchemaProps = inputProcessor->getObjectSchemaProps(state, objectType);
+        auto const &instancesValue = instances.value();
+        assert(instancesValue.size() == static_cast<std::size_t>(state.dataPlantCentralGSHP->numChillerHeaters));
 
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+        std::unordered_set<std::string> performanceNames;
+        int ChillerHeaterNum = 0;
+        for (auto const &performanceObject : instancesValue.items()) {
+            ++ChillerHeaterNum;
+            auto const &key = performanceObject.key();
+            auto const &objectFields = performanceObject.value();
 
-        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "LEAVINGCONDENSER")) {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeCooling = CondenserModeTemperature::LeavingCondenser;
-        } else { // only other option and default value is EnteringCondenser
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeCooling = CondenserModeTemperature::EnteringCondenser;
-        }
+            inputProcessor->markObjectAsUsed(objectType, key);
+            ErrorObjectHeader const eoh{routineName, objectType, key};
 
-        // Performance curves
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX =
-            Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX == 0) {
-            ShowSevereError(state, std::format("Invalid {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state, std::format("Entered in {}={}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
-            CHErrorsFound = true;
-        }
+            auto &chillerHeater = state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum);
+            chillerHeater.Name = Util::makeUPPER(key);
+            if (!performanceNames.emplace(chillerHeater.Name).second) {
+                ShowSevereDuplicateName(state, eoh);
+                CHErrorsFound = true;
+                continue;
+            }
 
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX =
-            Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5));
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX == 0) {
-            ShowSevereError(state, std::format("Invalid {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state, std::format("Entered in {}={}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
-            CHErrorsFound = true;
-        }
+            std::string const coolingCondenserVariable =
+                inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, coolingCondenserVariableKey);
+            chillerHeater.CondModeCooling = Util::SameString(coolingCondenserVariable, "LEAVINGCONDENSER")
+                                                ? CondenserModeTemperature::LeavingCondenser
+                                                : CondenserModeTemperature::EnteringCondenser;
 
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX =
-            Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX == 0) {
-            ShowSevereError(state, std::format("Invalid {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state, std::format("Entered in {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
-            CHErrorsFound = true;
-        }
-
-        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "LEAVINGCONDENSER")) {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeHeating = CondenserModeTemperature::LeavingCondenser;
-        } else { // only other option and default value is EnteringCondenser
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeHeating = CondenserModeTemperature::EnteringCondenser;
-        }
-
-        // Performance curves
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX =
-            Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(8));
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX == 0) {
-            ShowSevereError(state, std::format("Invalid {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state, std::format("Entered in {}={}", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8)));
-            CHErrorsFound = true;
-        }
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX =
-            Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(9));
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX == 0) {
-            ShowSevereError(state, std::format("Invalid {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state, std::format("Entered in {}={}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
-            CHErrorsFound = true;
-        }
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX =
-            Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(10));
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX == 0) {
-            ShowSevereError(state, std::format("Invalid {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state,
-                              std::format("Entered in {}={}", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10)));
-            CHErrorsFound = true;
-        }
-
-        if (state.dataIPShortCut->cAlphaArgs(2) == "CONSTANTFLOW") {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ConstantFlow = true;
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).VariableFlow = false;
-        } else if (state.dataIPShortCut->cAlphaArgs(2) == "VARIABLEFLOW") {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ConstantFlow = false;
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).VariableFlow = true;
-        }
-
-        // Chiller rated performance data
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCooling = state.dataIPShortCut->rNumericArgs(1);
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCooling == DataSizing::AutoSize) {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCoolingWasAutoSized = true;
-        }
-        if (state.dataIPShortCut->rNumericArgs(1) != DataSizing::AutoSize && state.dataIPShortCut->rNumericArgs(1) <= 0.0) {
-            ShowSevereError(state, std::format("Invalid {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(
-                state, std::format("Entered in {}={:.2f}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-            CHErrorsFound = true;
-        }
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCOPCooling = state.dataIPShortCut->rNumericArgs(2);
-        if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) {
-            ShowSevereError(state, std::format("Invalid {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(
-                state, std::format("Entered in {}={:.2f}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            CHErrorsFound = true;
-        }
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling = state.dataIPShortCut->rNumericArgs(3);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInCooling = state.dataIPShortCut->rNumericArgs(4);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondOutCooling = state.dataIPShortCut->rNumericArgs(5);
-
-        // Reference Heating Mode Ratios for Capacity and Power
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ClgHtgToCoolingCapRatio = state.dataIPShortCut->rNumericArgs(6);
-        if (state.dataIPShortCut->rNumericArgs(6) <= 0.0) {
-            ShowSevereError(state, std::format("Invalid {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(
-                state, std::format("Entered in {}={:.2f}", state.dataIPShortCut->cNumericFieldNames(6), state.dataIPShortCut->rNumericArgs(6)));
-            CHErrorsFound = true;
-        }
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ClgHtgtoCogPowerRatio = state.dataIPShortCut->rNumericArgs(7);
-        if (state.dataIPShortCut->rNumericArgs(7) <= 0.0) {
-            ShowSevereError(state, std::format("Invalid {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(
-                state, std::format("Entered in {}={:.2f}", state.dataIPShortCut->cNumericFieldNames(7), state.dataIPShortCut->rNumericArgs(7)));
-            CHErrorsFound = true;
-        }
-
-        if (!state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCoolingWasAutoSized &&
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCooling > 0.0 &&
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCOPCooling > 0.0 &&
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ClgHtgToCoolingCapRatio > 0.0 &&
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ClgHtgtoCogPowerRatio > 0.0) {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapClgHtg =
-                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ClgHtgToCoolingCapRatio *
-                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCooling;
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefPowerClgHtg =
-                (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapCooling /
-                 state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCOPCooling) *
-                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ClgHtgtoCogPowerRatio;
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCOPClgHtg =
-                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefCapClgHtg /
-                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).RefPowerClgHtg;
-        }
-
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg = state.dataIPShortCut->rNumericArgs(8);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondOutClgHtg = state.dataIPShortCut->rNumericArgs(9);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg = state.dataIPShortCut->rNumericArgs(10);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempLowLimitEvapOut = state.dataIPShortCut->rNumericArgs(11);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).EvapVolFlowRate = state.dataIPShortCut->rNumericArgs(12);
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).EvapVolFlowRate == DataSizing::AutoSize) {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).EvapVolFlowRateWasAutoSized = true;
-        }
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondVolFlowRate = state.dataIPShortCut->rNumericArgs(13);
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondVolFlowRate == DataSizing::AutoSize) {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondVolFlowRateWasAutoSized = true;
-        }
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).DesignHotWaterVolFlowRate = state.dataIPShortCut->rNumericArgs(14);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OpenMotorEff = state.dataIPShortCut->rNumericArgs(15);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OptPartLoadRatCooling = state.dataIPShortCut->rNumericArgs(16);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OptPartLoadRatClgHtg = state.dataIPShortCut->rNumericArgs(17);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).SizFac = state.dataIPShortCut->rNumericArgs(18);
-        state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MaxHeatingLeavingCondTempWasBlank = state.dataIPShortCut->lNumericFieldBlanks(19);
-        if (!state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MaxHeatingLeavingCondTempWasBlank) {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).MaxHeatingLeavingCondTemp = state.dataIPShortCut->rNumericArgs(19);
-            if (state.dataIPShortCut->rNumericArgs(19) <= state.dataIPShortCut->rNumericArgs(10)) {
-                ShowSevereError(state, std::format("Invalid {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(
-                    state, std::format("Entered in {}={:.2f}", state.dataIPShortCut->cNumericFieldNames(19), state.dataIPShortCut->rNumericArgs(19)));
-                ShowContinueError(state,
-                                  std::format("{} must be greater than {}={:.2f}",
-                                              state.dataIPShortCut->cNumericFieldNames(19),
-                                              state.dataIPShortCut->cNumericFieldNames(10),
-                                              state.dataIPShortCut->rNumericArgs(10)));
+            std::string const coolingCapacityCurveName = inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, coolingCapacityCurveKey);
+            chillerHeater.ChillerCapFTCoolingIDX = Curve::GetCurveIndex(state, coolingCapacityCurveName);
+            if (chillerHeater.ChillerCapFTCoolingIDX == 0) {
+                ShowSevereError(state, std::format("Invalid {}={}", objectType, chillerHeater.Name));
+                ShowContinueError(state, std::format("Entered in {}={}", coolingCapacityCurveField, coolingCapacityCurveName));
                 CHErrorsFound = true;
             }
-        }
 
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).SizFac <= 0.0) {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).SizFac = 1.0;
-        }
-
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OpenMotorEff < 0.0 ||
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).OpenMotorEff > 1.0) {
-            ShowSevereError(
-                state,
-                std::format("GetChillerHeaterInput: For {}: {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state,
-                              std::format("{} = {:.3f}", state.dataIPShortCut->cNumericFieldNames(15), state.dataIPShortCut->rNumericArgs(15)));
-            ShowContinueError(state, std::format("{} must be greater than or equal to zero", state.dataIPShortCut->cNumericFieldNames(15)));
-            ShowContinueError(state, std::format("{} must be less than or equal to one", state.dataIPShortCut->cNumericFieldNames(15)));
-            CHErrorsFound = true;
-        }
-
-        auto &chillerHeater = state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum);
-        Real64 const coolingReferenceCondenserTemp = chillerHeater.CondModeCooling == CondenserModeTemperature::LeavingCondenser
-                                                         ? chillerHeater.TempRefCondOutCooling
-                                                         : chillerHeater.TempRefCondInCooling;
-        Real64 const heatingReferenceCondenserTemp = chillerHeater.CondModeHeating == CondenserModeTemperature::LeavingCondenser
-                                                         ? chillerHeater.TempRefCondOutClgHtg
-                                                         : chillerHeater.TempRefCondInClgHtg;
-
-        // Check the CAP-FT, EIR-FT, and PLR curves and warn user if different from 1.0 by more than +-10%
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX > 0) {
-            Real64 CurveVal = Curve::CurveValue(state,
-                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX,
-                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling,
-                                                coolingReferenceCondenserTemp);
-            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(state, "Capacity ratio as a function of temperature curve output is not equal to 1.0");
-                ShowContinueError(state,
-                                  std::format("(+ or - 10%) at reference conditions for {}= {}",
-                                              state.dataIPShortCut->cCurrentModuleObject,
-                                              state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
+            std::string const coolingEIRTemperatureCurveName =
+                inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, coolingEIRTemperatureCurveKey);
+            chillerHeater.ChillerEIRFTCoolingIDX = Curve::GetCurveIndex(state, coolingEIRTemperatureCurveName);
+            if (chillerHeater.ChillerEIRFTCoolingIDX == 0) {
+                ShowSevereError(state, std::format("Invalid {}={}", objectType, chillerHeater.Name));
+                ShowContinueError(state, std::format("Entered in {}={}", coolingEIRTemperatureCurveField, coolingEIRTemperatureCurveName));
+                CHErrorsFound = true;
             }
-        }
 
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX > 0) {
-            Real64 CurveVal = Curve::CurveValue(state,
-                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX,
-                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling,
-                                                coolingReferenceCondenserTemp);
-            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(state, "Energy input ratio as a function of temperature curve output is not equal to 1.0");
-                ShowContinueError(state,
-                                  std::format("(+ or - 10%) at reference conditions for {}= {}",
-                                              state.dataIPShortCut->cCurrentModuleObject,
-                                              state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
+            std::string const coolingEIRPartLoadCurveName =
+                inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, coolingEIRPartLoadCurveKey);
+            chillerHeater.ChillerEIRFPLRCoolingIDX = Curve::GetCurveIndex(state, coolingEIRPartLoadCurveName);
+            if (chillerHeater.ChillerEIRFPLRCoolingIDX == 0) {
+                ShowSevereError(state, std::format("Invalid {}={}", objectType, chillerHeater.Name));
+                ShowContinueError(state, std::format("Entered in {}={}", coolingEIRPartLoadCurveField, coolingEIRPartLoadCurveName));
+                CHErrorsFound = true;
             }
-        }
 
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX > 0) {
-            Real64 CurveVal = evaluatePartLoadCurve(
-                state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX, coolingReferenceCondenserTemp, 1.0);
+            std::string const heatingCondenserVariable =
+                inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, heatingCondenserVariableKey);
+            chillerHeater.CondModeHeating = Util::SameString(heatingCondenserVariable, "LEAVINGCONDENSER")
+                                                ? CondenserModeTemperature::LeavingCondenser
+                                                : CondenserModeTemperature::EnteringCondenser;
 
-            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
-                ShowContinueError(state,
-                                  std::format("(+ or - 10%) at reference conditions for {}= {}",
-                                              state.dataIPShortCut->cCurrentModuleObject,
-                                              state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
+            std::string const heatingCapacityCurveName = inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, heatingCapacityCurveKey);
+            chillerHeater.ChillerCapFTHeatingIDX = Curve::GetCurveIndex(state, heatingCapacityCurveName);
+            if (chillerHeater.ChillerCapFTHeatingIDX == 0) {
+                ShowSevereError(state, std::format("Invalid {}={}", objectType, chillerHeater.Name));
+                ShowContinueError(state, std::format("Entered in {}={}", heatingCapacityCurveField, heatingCapacityCurveName));
+                CHErrorsFound = true;
             }
-        }
 
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX > 0) {
-            bool FoundNegValue = false;
-            for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
-                Real64 CurveValTmp = evaluatePartLoadCurve(state,
-                                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX,
-                                                           coolingReferenceCondenserTemp,
-                                                           double(CurveCheck / 10.0));
-                if (CurveValTmp < 0.0) {
-                    FoundNegValue = true;
+            std::string const heatingEIRTemperatureCurveName =
+                inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, heatingEIRTemperatureCurveKey);
+            chillerHeater.ChillerEIRFTHeatingIDX = Curve::GetCurveIndex(state, heatingEIRTemperatureCurveName);
+            if (chillerHeater.ChillerEIRFTHeatingIDX == 0) {
+                ShowSevereError(state, std::format("Invalid {}={}", objectType, chillerHeater.Name));
+                ShowContinueError(state, std::format("Entered in {}={}", heatingEIRTemperatureCurveField, heatingEIRTemperatureCurveName));
+                CHErrorsFound = true;
+            }
+
+            std::string const heatingEIRPartLoadCurveName =
+                inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, heatingEIRPartLoadCurveKey);
+            chillerHeater.ChillerEIRFPLRHeatingIDX = Curve::GetCurveIndex(state, heatingEIRPartLoadCurveName);
+            if (chillerHeater.ChillerEIRFPLRHeatingIDX == 0) {
+                ShowSevereError(state, std::format("Invalid {}={}", objectType, chillerHeater.Name));
+                ShowContinueError(state, std::format("Entered in {}={}", heatingEIRPartLoadCurveField, heatingEIRPartLoadCurveName));
+                CHErrorsFound = true;
+            }
+
+            std::string const chilledWaterFlowMode = inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, chilledWaterFlowModeKey);
+            chillerHeater.ConstantFlow = chilledWaterFlowMode == "CONSTANTFLOW";
+            chillerHeater.VariableFlow = chilledWaterFlowMode == "VARIABLEFLOW";
+
+            // Chiller rated performance data
+            chillerHeater.RefCapCooling = inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, referenceCoolingCapacityKey);
+            chillerHeater.RefCapCoolingWasAutoSized = chillerHeater.RefCapCooling == DataSizing::AutoSize;
+            if (!chillerHeater.RefCapCoolingWasAutoSized && chillerHeater.RefCapCooling <= 0.0) {
+                ShowSevereError(state, std::format("Invalid {}={}", objectType, chillerHeater.Name));
+                ShowContinueError(state, std::format("Entered in {}={:.2f}", referenceCoolingCapacityField, chillerHeater.RefCapCooling));
+                CHErrorsFound = true;
+            }
+
+            chillerHeater.RefCOPCooling = inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, referenceCoolingCOPKey);
+            if (chillerHeater.RefCOPCooling <= 0.0) {
+                ShowSevereError(state, std::format("Invalid {}={}", objectType, chillerHeater.Name));
+                ShowContinueError(state, std::format("Entered in {}={:.2f}", referenceCoolingCOPField, chillerHeater.RefCOPCooling));
+                CHErrorsFound = true;
+            }
+
+            chillerHeater.TempRefEvapOutCooling =
+                inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, referenceCoolingLeavingChilledWaterTempKey);
+            chillerHeater.TempRefCondInCooling =
+                inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, referenceCoolingEnteringCondenserTempKey);
+            chillerHeater.TempRefCondOutCooling =
+                inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, referenceCoolingLeavingCondenserTempKey);
+
+            chillerHeater.ClgHtgToCoolingCapRatio =
+                inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, referenceHeatingCapacityRatioKey);
+            if (chillerHeater.ClgHtgToCoolingCapRatio <= 0.0) {
+                ShowSevereError(state, std::format("Invalid {}={}", objectType, chillerHeater.Name));
+                ShowContinueError(state,
+                                  std::format("Entered in {}={:.2f}", referenceHeatingCapacityRatioField, chillerHeater.ClgHtgToCoolingCapRatio));
+                CHErrorsFound = true;
+            }
+
+            chillerHeater.ClgHtgtoCogPowerRatio = inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, referenceHeatingPowerRatioKey);
+            if (chillerHeater.ClgHtgtoCogPowerRatio <= 0.0) {
+                ShowSevereError(state, std::format("Invalid {}={}", objectType, chillerHeater.Name));
+                ShowContinueError(state, std::format("Entered in {}={:.2f}", referenceHeatingPowerRatioField, chillerHeater.ClgHtgtoCogPowerRatio));
+                CHErrorsFound = true;
+            }
+
+            if (!chillerHeater.RefCapCoolingWasAutoSized && chillerHeater.RefCapCooling > 0.0 && chillerHeater.RefCOPCooling > 0.0 &&
+                chillerHeater.ClgHtgToCoolingCapRatio > 0.0 && chillerHeater.ClgHtgtoCogPowerRatio > 0.0) {
+                chillerHeater.RefCapClgHtg = chillerHeater.ClgHtgToCoolingCapRatio * chillerHeater.RefCapCooling;
+                chillerHeater.RefPowerClgHtg = (chillerHeater.RefCapCooling / chillerHeater.RefCOPCooling) * chillerHeater.ClgHtgtoCogPowerRatio;
+                chillerHeater.RefCOPClgHtg = chillerHeater.RefCapClgHtg / chillerHeater.RefPowerClgHtg;
+            }
+
+            chillerHeater.TempRefEvapOutClgHtg =
+                inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, referenceHeatingLeavingChilledWaterTempKey);
+            chillerHeater.TempRefCondOutClgHtg =
+                inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, referenceHeatingLeavingCondenserTempKey);
+            chillerHeater.TempRefCondInClgHtg =
+                inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, referenceHeatingEnteringCondenserTempKey);
+            chillerHeater.TempLowLimitEvapOut =
+                inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, heatingEnteringChilledWaterLowLimitKey);
+
+            chillerHeater.EvapVolFlowRate = inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, designChilledWaterFlowRateKey);
+            chillerHeater.EvapVolFlowRateWasAutoSized = chillerHeater.EvapVolFlowRate == DataSizing::AutoSize;
+            chillerHeater.CondVolFlowRate = inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, designCondenserWaterFlowRateKey);
+            chillerHeater.CondVolFlowRateWasAutoSized = chillerHeater.CondVolFlowRate == DataSizing::AutoSize;
+            chillerHeater.DesignHotWaterVolFlowRate = inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, designHotWaterFlowRateKey);
+            chillerHeater.OpenMotorEff = inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, compressorMotorEfficiencyKey);
+            chillerHeater.OptPartLoadRatCooling = inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, coolingOptimumPartLoadRatioKey);
+            chillerHeater.OptPartLoadRatClgHtg = inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, heatingOptimumPartLoadRatioKey);
+            chillerHeater.SizFac = inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, sizingFactorKey);
+
+            chillerHeater.MaxHeatingLeavingCondTempWasBlank = objectFields.find(maximumHeatingLeavingCondenserTempKey) == objectFields.end();
+            if (!chillerHeater.MaxHeatingLeavingCondTempWasBlank) {
+                chillerHeater.MaxHeatingLeavingCondTemp =
+                    inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, maximumHeatingLeavingCondenserTempKey);
+                if (chillerHeater.MaxHeatingLeavingCondTemp <= chillerHeater.TempRefCondInClgHtg) {
+                    ShowSevereError(state, std::format("Invalid {}={}", objectType, chillerHeater.Name));
+                    ShowContinueError(
+                        state, std::format("Entered in {}={:.2f}", maximumHeatingLeavingCondenserTempField, chillerHeater.MaxHeatingLeavingCondTemp));
+                    ShowContinueError(state,
+                                      std::format("{} must be greater than {}={:.2f}",
+                                                  maximumHeatingLeavingCondenserTempField,
+                                                  referenceHeatingEnteringCondenserTempField,
+                                                  chillerHeater.TempRefCondInClgHtg));
+                    CHErrorsFound = true;
                 }
-                CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
             }
-            if (FoundNegValue) {
-                ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve shows negative values ");
-                ShowContinueError(state, std::format("for {}= {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(state, "EIR as a function of PLR curve output at various part-load ratios shown below:");
-                ShowContinueError(state, "PLR   =  0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
 
-                ShowContinueError(state, std::format("Curve Output = {:7.2F}", EnergyPlus::join(CurveValArray, ",")));
+            if (chillerHeater.SizFac <= 0.0) {
+                chillerHeater.SizFac = 1.0;
+            }
 
+            if (chillerHeater.OpenMotorEff < 0.0 || chillerHeater.OpenMotorEff > 1.0) {
+                ShowSevereError(state, std::format("GetChillerHeaterInput: For {}: {}", objectType, chillerHeater.Name));
+                ShowContinueError(state, std::format("{} = {:.3f}", compressorMotorEfficiencyField, chillerHeater.OpenMotorEff));
+                ShowContinueError(state, std::format("{} must be greater than or equal to zero", compressorMotorEfficiencyField));
+                ShowContinueError(state, std::format("{} must be less than or equal to one", compressorMotorEfficiencyField));
                 CHErrorsFound = true;
             }
-        }
 
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX > 0) {
-            Real64 CurveVal = Curve::CurveValue(state,
-                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX,
-                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg,
-                                                heatingReferenceCondenserTemp);
-            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(state, "Capacity ratio as a function of temperature curve output is not equal to 1.0");
-                ShowContinueError(state,
-                                  std::format("(+ or - 10%) at reference conditions for {}= {}",
-                                              state.dataIPShortCut->cCurrentModuleObject,
-                                              state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
-            }
-        }
+            Real64 const coolingReferenceCondenserTemp = chillerHeater.CondModeCooling == CondenserModeTemperature::LeavingCondenser
+                                                             ? chillerHeater.TempRefCondOutCooling
+                                                             : chillerHeater.TempRefCondInCooling;
+            Real64 const heatingReferenceCondenserTemp = chillerHeater.CondModeHeating == CondenserModeTemperature::LeavingCondenser
+                                                             ? chillerHeater.TempRefCondOutClgHtg
+                                                             : chillerHeater.TempRefCondInClgHtg;
 
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX > 0) {
-            Real64 CurveVal = Curve::CurveValue(state,
-                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX,
-                                                state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg,
-                                                heatingReferenceCondenserTemp);
-            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(state, "Energy input ratio as a function of temperature curve output is not equal to 1.0");
-                ShowContinueError(state,
-                                  std::format("(+ or - 10%) at reference conditions for {}= {}",
-                                              state.dataIPShortCut->cCurrentModuleObject,
-                                              state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
-            }
-        }
-
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX > 0) {
-            Real64 CurveVal = evaluatePartLoadCurve(
-                state, state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX, heatingReferenceCondenserTemp, 1.0);
-
-            if (CurveVal > 1.10 || CurveVal < 0.90) {
-                ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
-                ShowContinueError(state,
-                                  std::format("(+ or - 10%) at reference conditions for {}= {}",
-                                              state.dataIPShortCut->cCurrentModuleObject,
-                                              state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
-            }
-        }
-
-        if (state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX > 0) {
-            bool FoundNegValue = false;
-            for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
-                Real64 CurveValTmp = evaluatePartLoadCurve(state,
-                                                           state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX,
-                                                           heatingReferenceCondenserTemp,
-                                                           double(CurveCheck / 10.0));
-                if (CurveValTmp < 0.0) {
-                    FoundNegValue = true;
+            // Check the CAP-FT, EIR-FT, and PLR curves and warn user if different from 1.0 by more than +-10%
+            if (chillerHeater.ChillerCapFTCoolingIDX > 0) {
+                Real64 CurveVal = Curve::CurveValue(
+                    state, chillerHeater.ChillerCapFTCoolingIDX, chillerHeater.TempRefEvapOutCooling, coolingReferenceCondenserTemp);
+                if (CurveVal > 1.10 || CurveVal < 0.90) {
+                    ShowWarningError(state, "Capacity ratio as a function of temperature curve output is not equal to 1.0");
+                    ShowContinueError(state, std::format("(+ or - 10%) at reference conditions for {}= {}", objectType, chillerHeater.Name));
+                    ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
                 }
-                CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
             }
-            if (FoundNegValue) {
-                ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve shows negative values ");
-                ShowContinueError(state, std::format("for {}= {}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(state, "EIR as a function of PLR curve output at various part-load ratios shown below:");
-                ShowContinueError(state, "PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
 
-                ShowContinueError(state, std::format("Curve Output = {:7.2F}", EnergyPlus::join(CurveValArray, ",")));
-
-                CHErrorsFound = true;
+            if (chillerHeater.ChillerEIRFTCoolingIDX > 0) {
+                Real64 CurveVal = Curve::CurveValue(
+                    state, chillerHeater.ChillerEIRFTCoolingIDX, chillerHeater.TempRefEvapOutCooling, coolingReferenceCondenserTemp);
+                if (CurveVal > 1.10 || CurveVal < 0.90) {
+                    ShowWarningError(state, "Energy input ratio as a function of temperature curve output is not equal to 1.0");
+                    ShowContinueError(state, std::format("(+ or - 10%) at reference conditions for {}= {}", objectType, chillerHeater.Name));
+                    ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
+                }
             }
+
+            if (chillerHeater.ChillerEIRFPLRCoolingIDX > 0) {
+                Real64 CurveVal = evaluatePartLoadCurve(state, chillerHeater.ChillerEIRFPLRCoolingIDX, coolingReferenceCondenserTemp, 1.0);
+
+                if (CurveVal > 1.10 || CurveVal < 0.90) {
+                    ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
+                    ShowContinueError(state, std::format("(+ or - 10%) at reference conditions for {}= {}", objectType, chillerHeater.Name));
+                    ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
+                }
+            }
+
+            if (chillerHeater.ChillerEIRFPLRCoolingIDX > 0) {
+                bool FoundNegValue = false;
+                for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
+                    Real64 CurveValTmp = evaluatePartLoadCurve(
+                        state, chillerHeater.ChillerEIRFPLRCoolingIDX, coolingReferenceCondenserTemp, double(CurveCheck / 10.0));
+                    if (CurveValTmp < 0.0) {
+                        FoundNegValue = true;
+                    }
+                    CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
+                }
+                if (FoundNegValue) {
+                    ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve shows negative values ");
+                    ShowContinueError(state, std::format("for {}= {}", objectType, chillerHeater.Name));
+                    ShowContinueError(state, "EIR as a function of PLR curve output at various part-load ratios shown below:");
+                    ShowContinueError(state, "PLR   =  0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
+
+                    ShowContinueError(state, std::format("Curve Output = {:7.2f}", EnergyPlus::join(CurveValArray, ",")));
+
+                    CHErrorsFound = true;
+                }
+            }
+
+            if (chillerHeater.ChillerCapFTHeatingIDX > 0) {
+                Real64 CurveVal =
+                    Curve::CurveValue(state, chillerHeater.ChillerCapFTHeatingIDX, chillerHeater.TempRefEvapOutClgHtg, heatingReferenceCondenserTemp);
+                if (CurveVal > 1.10 || CurveVal < 0.90) {
+                    ShowWarningError(state, "Capacity ratio as a function of temperature curve output is not equal to 1.0");
+                    ShowContinueError(state, std::format("(+ or - 10%) at reference conditions for {}= {}", objectType, chillerHeater.Name));
+                    ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
+                }
+            }
+
+            if (chillerHeater.ChillerEIRFTHeatingIDX > 0) {
+                Real64 CurveVal =
+                    Curve::CurveValue(state, chillerHeater.ChillerEIRFTHeatingIDX, chillerHeater.TempRefEvapOutClgHtg, heatingReferenceCondenserTemp);
+                if (CurveVal > 1.10 || CurveVal < 0.90) {
+                    ShowWarningError(state, "Energy input ratio as a function of temperature curve output is not equal to 1.0");
+                    ShowContinueError(state, std::format("(+ or - 10%) at reference conditions for {}= {}", objectType, chillerHeater.Name));
+                    ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
+                }
+            }
+
+            if (chillerHeater.ChillerEIRFPLRHeatingIDX > 0) {
+                Real64 CurveVal = evaluatePartLoadCurve(state, chillerHeater.ChillerEIRFPLRHeatingIDX, heatingReferenceCondenserTemp, 1.0);
+
+                if (CurveVal > 1.10 || CurveVal < 0.90) {
+                    ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
+                    ShowContinueError(state, std::format("(+ or - 10%) at reference conditions for {}= {}", objectType, chillerHeater.Name));
+                    ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
+                }
+            }
+
+            if (chillerHeater.ChillerEIRFPLRHeatingIDX > 0) {
+                bool FoundNegValue = false;
+                for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
+                    Real64 CurveValTmp = evaluatePartLoadCurve(
+                        state, chillerHeater.ChillerEIRFPLRHeatingIDX, heatingReferenceCondenserTemp, double(CurveCheck / 10.0));
+                    if (CurveValTmp < 0.0) {
+                        FoundNegValue = true;
+                    }
+                    CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
+                }
+                if (FoundNegValue) {
+                    ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve shows negative values ");
+                    ShowContinueError(state, std::format("for {}= {}", objectType, chillerHeater.Name));
+                    ShowContinueError(state, "EIR as a function of PLR curve output at various part-load ratios shown below:");
+                    ShowContinueError(state, "PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
+
+                    ShowContinueError(state, std::format("Curve Output = {:7.2f}", EnergyPlus::join(CurveValArray, ",")));
+
+                    CHErrorsFound = true;
+                }
+            }
+
+            auto validatePartLoadDomain = [&](int const curveIndex,
+                                              Real64 const optimumPartLoadRatio,
+                                              Real64 &minimumPartLoadRatio,
+                                              Real64 &maximumPartLoadRatio,
+                                              std::string_view const optimumFieldName,
+                                              std::string_view const curveFieldName,
+                                              std::string const &curveName,
+                                              std::string_view const mode) {
+                if (curveIndex <= 0) {
+                    return;
+                }
+                getPartLoadCurveMinMax(state, curveIndex, minimumPartLoadRatio, maximumPartLoadRatio);
+                if (minimumPartLoadRatio < 0.0 || minimumPartLoadRatio > 1.0 || maximumPartLoadRatio < 1.0 ||
+                    maximumPartLoadRatio < minimumPartLoadRatio) {
+                    ShowSevereError(state, std::format("Invalid {} part-load curve domain for {}={}", mode, objectType, chillerHeater.Name));
+                    ShowContinueError(state, std::format("Entered in {}={}", curveFieldName, curveName));
+                    ShowContinueError(state,
+                                      std::format("Part-load ratio limits [{:.3f}, {:.3f}] must include 1.0 and have a minimum no less than zero.",
+                                                  minimumPartLoadRatio,
+                                                  maximumPartLoadRatio));
+                    CHErrorsFound = true;
+                }
+                if (optimumPartLoadRatio < minimumPartLoadRatio || optimumPartLoadRatio > maximumPartLoadRatio) {
+                    ShowSevereError(state, std::format("Invalid {}={}", objectType, chillerHeater.Name));
+                    ShowContinueError(state, std::format("Entered in {}={:.3f}", optimumFieldName, optimumPartLoadRatio));
+                    ShowContinueError(state,
+                                      std::format("{} must be within the associated part-load curve limits [{:.3f}, {:.3f}].",
+                                                  optimumFieldName,
+                                                  minimumPartLoadRatio,
+                                                  maximumPartLoadRatio));
+                    CHErrorsFound = true;
+                }
+            };
+
+            validatePartLoadDomain(chillerHeater.ChillerEIRFPLRCoolingIDX,
+                                   chillerHeater.OptPartLoadRatCooling,
+                                   chillerHeater.MinPartLoadRatCooling,
+                                   chillerHeater.MaxPartLoadRatCooling,
+                                   coolingOptimumPartLoadRatioField,
+                                   coolingEIRPartLoadCurveField,
+                                   coolingEIRPartLoadCurveName,
+                                   "cooling");
+            validatePartLoadDomain(chillerHeater.ChillerEIRFPLRHeatingIDX,
+                                   chillerHeater.OptPartLoadRatClgHtg,
+                                   chillerHeater.MinPartLoadRatClgHtg,
+                                   chillerHeater.MaxPartLoadRatClgHtg,
+                                   heatingOptimumPartLoadRatioField,
+                                   heatingEIRPartLoadCurveField,
+                                   heatingEIRPartLoadCurveName,
+                                   "heating");
         }
-
-        auto validatePartLoadDomain = [&](int const curveIndex,
-                                          Real64 const optimumPartLoadRatio,
-                                          Real64 &minimumPartLoadRatio,
-                                          Real64 &maximumPartLoadRatio,
-                                          int const optimumFieldIndex,
-                                          int const curveFieldIndex,
-                                          std::string_view const mode) {
-            if (curveIndex <= 0) {
-                return;
-            }
-            getPartLoadCurveMinMax(state, curveIndex, minimumPartLoadRatio, maximumPartLoadRatio);
-            if (minimumPartLoadRatio < 0.0 || minimumPartLoadRatio > 1.0 || maximumPartLoadRatio < 1.0 ||
-                maximumPartLoadRatio < minimumPartLoadRatio) {
-                ShowSevereError(state,
-                                std::format("Invalid {} part-load curve domain for {}={}",
-                                            mode,
-                                            state.dataIPShortCut->cCurrentModuleObject,
-                                            state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(state,
-                                  std::format("Entered in {}={}",
-                                              state.dataIPShortCut->cAlphaFieldNames(curveFieldIndex),
-                                              state.dataIPShortCut->cAlphaArgs(curveFieldIndex)));
-                ShowContinueError(state,
-                                  std::format("Part-load ratio limits [{:.3f}, {:.3f}] must include 1.0 and have a minimum no less than zero.",
-                                              minimumPartLoadRatio,
-                                              maximumPartLoadRatio));
-                CHErrorsFound = true;
-            }
-            if (optimumPartLoadRatio < minimumPartLoadRatio || optimumPartLoadRatio > maximumPartLoadRatio) {
-                ShowSevereError(state, std::format("Invalid {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(
-                    state, std::format("Entered in {}={:.3f}", state.dataIPShortCut->cNumericFieldNames(optimumFieldIndex), optimumPartLoadRatio));
-                ShowContinueError(state,
-                                  std::format("{} must be within the associated part-load curve limits [{:.3f}, {:.3f}].",
-                                              state.dataIPShortCut->cNumericFieldNames(optimumFieldIndex),
-                                              minimumPartLoadRatio,
-                                              maximumPartLoadRatio));
-                CHErrorsFound = true;
-            }
-        };
-
-        validatePartLoadDomain(chillerHeater.ChillerEIRFPLRCoolingIDX,
-                               chillerHeater.OptPartLoadRatCooling,
-                               chillerHeater.MinPartLoadRatCooling,
-                               chillerHeater.MaxPartLoadRatCooling,
-                               16,
-                               6,
-                               "cooling");
-        validatePartLoadDomain(chillerHeater.ChillerEIRFPLRHeatingIDX,
-                               chillerHeater.OptPartLoadRatClgHtg,
-                               chillerHeater.MinPartLoadRatClgHtg,
-                               chillerHeater.MaxPartLoadRatClgHtg,
-                               17,
-                               10,
-                               "heating");
     }
 
     if (CHErrorsFound) {
-        ShowFatalError(state, std::format("Errors found in processing input for {}", state.dataIPShortCut->cCurrentModuleObject));
+        ShowFatalError(state, std::format("Errors found in processing input for {}", objectType));
     }
 }
 
