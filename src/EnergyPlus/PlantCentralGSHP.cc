@@ -47,7 +47,7 @@
 
 // C++ Headers
 #include <algorithm>
-#include <array>
+#include <cassert>
 #include <cmath>
 #include <format>
 #include <limits>
@@ -93,14 +93,16 @@ namespace EnergyPlus::PlantCentralGSHP {
 // PURPOSE OF THIS MODULE:
 // This module simulates the performance of the Central Plant GSHP systems
 // It currently includes one object: ChillerHeaterPerformance:Electric:EIR.
-// The other object available for this central CGSHP system such as HeatPumpPerformance:WaterToWater:EIR
+// The other object available for this central CGSHP system such as
+// HeatPumpPerformance:WaterToWater:EIR
 //      will be implemented later.
 
 // METHODOLOGY EMPLOYED:
 //  Once the PlantLoopManager determines that the Central Plant GSHP
 //  is available to meet a loop cooling and heating demands, it calls simulate
-//  which in turn calls the electric PlantCentralGSHP model. The PlantCentralGSHP model is based on
-//  polynomial fits of chiller/heater or heat pump performance data.
+//  which in turn calls the electric PlantCentralGSHP model. The
+//  PlantCentralGSHP model is based on polynomial fits of chiller/heater or heat
+//  pump performance data.
 
 namespace {
 
@@ -123,9 +125,95 @@ namespace {
                                    : Curve::CurveValue(state, curveIndex, condenserTemp, partLoadRatio);
     }
 
+    struct PartLoadOperatingPoint
+    {
+        Real64 evaporatorLoad = 0.0;
+        Real64 condenserLoad = 0.0;
+        Real64 compressorPower = 0.0;
+        Real64 falseLoadRate = 0.0;
+        Real64 partLoadRatio = 0.0;
+        Real64 cyclingRatio = 0.0;
+        Real64 eirPartLoadModifier = 0.0;
+    };
+
 } // namespace
 
-void ChillerHeaterSpecs::mapResultToPlantConnections()
+void ChillerHeaterModule::initialize(int const performanceIndex,
+                                     ChillerHeaterPerformanceData const &performance,
+                                     Sched::Schedule *const availabilitySchedule)
+{
+    this->performanceIndex = performanceIndex;
+    this->performance = &performance;
+    this->availabilitySchedule = availabilitySchedule;
+    this->VariableFlow = performance.VariableFlow;
+    this->sizing = ChillerHeaterSizingData();
+    this->sizing.RefCapCooling = performance.RefCapCooling;
+    this->sizing.RefCapClgHtg = performance.RefCapClgHtg;
+    this->sizing.RefCOPClgHtg = performance.RefCOPClgHtg;
+    this->sizing.RefPowerClgHtg = performance.RefPowerClgHtg;
+    this->sizing.EvapVolFlowRate = performance.EvapVolFlowRate;
+    this->sizing.CondVolFlowRate = performance.CondVolFlowRate;
+    this->minimumEvaporatorOutletTemp = 0.0;
+    this->capacityCurveErrorCount = 0;
+    this->capacityCurveErrorIndex = 0;
+    this->Result = ChillerHeaterResult();
+}
+
+ChillerHeaterPerformanceData const &ChillerHeaterModule::performanceData() const
+{
+    assert(this->performance != nullptr);
+    return *this->performance;
+}
+
+std::string const &ChillerHeaterModule::name() const
+{
+    return this->performanceData().Name;
+}
+
+bool ChillerHeaterModule::isAvailable() const
+{
+    return this->availabilitySchedule == nullptr || this->availabilitySchedule->getCurrentVal() > 0.0;
+}
+
+ModePerformanceData ChillerHeaterModule::coolingModePerformance() const
+{
+    auto const &performance = this->performanceData();
+    ModePerformanceData mode;
+    mode.condenserMode = performance.CondModeCooling;
+    mode.capacityTemperatureCurveIndex = performance.ChillerCapFTCoolingIDX;
+    mode.eirTemperatureCurveIndex = performance.ChillerEIRFTCoolingIDX;
+    mode.eirPartLoadCurveIndex = performance.ChillerEIRFPLRCoolingIDX;
+    mode.referenceEvaporatorCapacity = this->sizing.RefCapCooling;
+    mode.referenceCOP = performance.RefCOPCooling;
+    mode.referenceEvaporatorLeavingTemp = performance.TempRefEvapOutCooling;
+    mode.referenceCondenserEnteringTemp = performance.TempRefCondInCooling;
+    mode.referenceCondenserLeavingTemp = performance.TempRefCondOutCooling;
+    mode.minimumPartLoadRatio = performance.MinPartLoadRatCooling;
+    mode.maximumPartLoadRatio = performance.MaxPartLoadRatCooling;
+    mode.optimumPartLoadRatio = performance.OptPartLoadRatCooling;
+    return mode;
+}
+
+ModePerformanceData ChillerHeaterModule::heatingModePerformance() const
+{
+    auto const &performance = this->performanceData();
+    ModePerformanceData mode;
+    mode.condenserMode = performance.CondModeHeating;
+    mode.capacityTemperatureCurveIndex = performance.ChillerCapFTHeatingIDX;
+    mode.eirTemperatureCurveIndex = performance.ChillerEIRFTHeatingIDX;
+    mode.eirPartLoadCurveIndex = performance.ChillerEIRFPLRHeatingIDX;
+    mode.referenceEvaporatorCapacity = this->sizing.RefCapClgHtg;
+    mode.referenceCOP = this->sizing.RefCOPClgHtg;
+    mode.referenceEvaporatorLeavingTemp = performance.TempRefEvapOutClgHtg;
+    mode.referenceCondenserEnteringTemp = performance.TempRefCondInClgHtg;
+    mode.referenceCondenserLeavingTemp = performance.TempRefCondOutClgHtg;
+    mode.minimumPartLoadRatio = performance.MinPartLoadRatClgHtg;
+    mode.maximumPartLoadRatio = performance.MaxPartLoadRatClgHtg;
+    mode.optimumPartLoadRatio = performance.OptPartLoadRatClgHtg;
+    return mode;
+}
+
+void ChillerHeaterModule::mapResultToPlantConnections()
 {
     auto &result = this->Result;
 
@@ -183,110 +271,15 @@ void ChillerHeaterSpecs::mapResultToPlantConnections()
         break;
     }
 
-    result.updatePowerAccounting(this->OpenMotorEff);
+    result.updatePowerAccounting(this->performanceData().OpenMotorEff);
 }
 
-void ChillerHeaterSpecs::applySimultaneousCoolingConnection()
+void ChillerHeaterModule::updateResultEnergies(Real64 const secondsInTimeStep)
 {
-    auto &result = this->Result;
-    auto const &coolingResult = this->SimulResult;
-
-    result.requestedCoolingLoad = coolingResult.requestedCoolingLoad;
-    result.unmetCoolingLoad = coolingResult.unmetCoolingLoad;
-    result.chilledWaterInletTemp = coolingResult.chilledWaterInletTemp;
-    result.chilledWaterOutletTemp = coolingResult.chilledWaterOutletTemp;
-    result.chilledWaterMassFlowRate = coolingResult.chilledWaterMassFlowRate;
-    result.coolingDelivered = coolingResult.coolingDelivered;
-
-    if (result.currentMode == CurrentMode::HeatingDominant) {
-        result.sourceHeatTransfer = -(result.qEvaporator - result.coolingDelivered);
-    }
+    this->Result.updateEnergies(secondsInTimeStep);
 }
 
-void ChillerHeaterSpecs::syncLegacyReportAndNodes()
-{
-    auto const &result = this->Result;
-
-    this->EvapInletNode.Temp = result.evaporatorInletTemp;
-    this->EvapOutletNode.Temp = result.evaporatorOutletTemp;
-    this->EvapOutletNode.MassFlowRate = result.evaporatorMassFlowRate;
-    this->CondInletNode.Temp = result.condenserInletTemp;
-    this->CondOutletNode.Temp = result.condenserOutletTemp;
-    this->CondOutletNode.MassFlowRate = result.condenserMassFlowRate;
-
-    this->Report.currentMode = result.currentMode;
-    this->Report.ChillerPartLoadRatio = result.partLoadRatio;
-    this->Report.ChillerCyclingRatio = result.cyclingRatio;
-    this->Report.ChillerFalseLoadRate = result.falseLoadRate;
-    this->Report.ChillerFalseLoad = result.falseLoadEnergy;
-    this->Report.ChillerCapFT = result.capacityTemperatureModifier;
-    this->Report.ChillerEIRFT = result.eirTemperatureModifier;
-    this->Report.ChillerEIRFPLR = result.eirPartLoadModifier;
-    this->Report.CoolingPower = result.coolingPower;
-    this->Report.HeatingPower = result.heatingPower;
-    this->Report.CoolingEnergy = result.coolingEnergy;
-    this->Report.HeatingEnergy = result.heatingEnergy;
-    this->Report.QEvap = result.qEvaporator;
-    this->Report.QCond = result.qCondenser;
-    this->Report.EvapEnergy = result.evaporatorEnergy;
-    this->Report.CondEnergy = result.condenserEnergy;
-    this->Report.EvapOutletTemp = result.evaporatorOutletTemp;
-    this->Report.EvapInletTemp = result.evaporatorInletTemp;
-    this->Report.CondOutletTemp = result.condenserOutletTemp;
-    this->Report.CondInletTemp = result.condenserInletTemp;
-    this->Report.Evapmdot = result.evaporatorMassFlowRate;
-    this->Report.Condmdot = result.condenserMassFlowRate;
-    this->Report.ActualCOP = result.actualCOP;
-}
-
-void ChillerHeaterSpecs::saveCurrentResultForSimultaneous()
-{
-    this->SimulResult = this->Result;
-    auto const &result = this->SimulResult;
-
-    this->Report.ChillerPartLoadRatioSimul = result.partLoadRatio;
-    this->Report.ChillerCyclingRatioSimul = result.cyclingRatio;
-    this->Report.ChillerFalseLoadRateSimul = result.falseLoadRate;
-    this->Report.ChillerFalseLoadSimul = result.falseLoadEnergy;
-    this->Report.ChillerCapFTSimul = result.capacityTemperatureModifier;
-    this->Report.ChillerEIRFTSimul = result.eirTemperatureModifier;
-    this->Report.ChillerEIRFPLRSimul = result.eirPartLoadModifier;
-    this->Report.CoolingPowerSimul = result.coolingPower;
-    this->Report.CoolingEnergySimul = result.coolingEnergy;
-    this->Report.QEvapSimul = result.qEvaporator;
-    this->Report.QCondSimul = result.qCondenser;
-    this->Report.EvapEnergySimul = result.evaporatorEnergy;
-    this->Report.CondEnergySimul = result.condenserEnergy;
-    this->Report.EvapOutletTempSimul = result.evaporatorOutletTemp;
-    this->Report.EvapInletTempSimul = result.evaporatorInletTemp;
-    this->Report.EvapmdotSimul = result.evaporatorMassFlowRate;
-    this->Report.CondOutletTempSimul = result.condenserOutletTemp;
-    this->Report.CondInletTempSimul = result.condenserInletTemp;
-    this->Report.CondmdotSimul = result.condenserMassFlowRate;
-}
-
-void ChillerHeaterSpecs::updateResultEnergies(Real64 const secondsInTimeStep, bool const updateSimultaneousResult)
-{
-    auto update = [secondsInTimeStep](ChillerHeaterResult &result) {
-        result.falseLoadEnergy = result.falseLoadRate * secondsInTimeStep;
-        result.coolingEnergy = result.coolingPower * secondsInTimeStep;
-        result.heatingEnergy = result.heatingPower * secondsInTimeStep;
-        result.evaporatorEnergy = result.qEvaporator * secondsInTimeStep;
-        result.condenserEnergy = result.qCondenser * secondsInTimeStep;
-    };
-
-    update(this->Result);
-    this->syncLegacyReportAndNodes();
-    if (updateSimultaneousResult) {
-        update(this->SimulResult);
-        this->Report.ChillerFalseLoadSimul = this->SimulResult.falseLoadEnergy;
-        this->Report.CoolingEnergySimul = this->SimulResult.coolingEnergy;
-        this->Report.EvapEnergySimul = this->SimulResult.evaporatorEnergy;
-        this->Report.CondEnergySimul = this->SimulResult.condenserEnergy;
-    }
-}
-
-void ChillerHeaterSpecs::resetCurrentResult(Real64 const evaporatorInletTemp, Real64 const condenserInletTemp)
+void ChillerHeaterModule::resetResult(Real64 const evaporatorInletTemp, Real64 const condenserInletTemp)
 {
     this->Result = ChillerHeaterResult();
     this->Result.evaporatorInletTemp = evaporatorInletTemp;
@@ -294,14 +287,6 @@ void ChillerHeaterSpecs::resetCurrentResult(Real64 const evaporatorInletTemp, Re
     this->Result.condenserInletTemp = condenserInletTemp;
     this->Result.condenserOutletTemp = condenserInletTemp;
     this->mapResultToPlantConnections();
-    this->syncLegacyReportAndNodes();
-}
-
-void ChillerHeaterSpecs::resetAllResults(Real64 const evaporatorInletTemp, Real64 const condenserInletTemp)
-{
-    this->Report = CHReportVars();
-    this->resetCurrentResult(evaporatorInletTemp, condenserInletTemp);
-    this->saveCurrentResultForSimultaneous();
 }
 
 PlantComponent *WrapperSpecs::factory(EnergyPlusData &state, std::string const &objectName)
@@ -319,7 +304,10 @@ PlantComponent *WrapperSpecs::factory(EnergyPlusData &state, std::string const &
         }
     }
     // If we didn't find it, fatal
-    ShowFatalError(state, std::format("LocalPlantCentralGSHPFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
+    ShowFatalError(state,
+                   std::format("LocalPlantCentralGSHPFactory: Error "
+                               "getting inputs for object named: {}",
+                               objectName)); // LCOV_EXCL_LINE
 }
 
 void WrapperSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
@@ -335,59 +323,37 @@ void WrapperSpecs::getDesignCapacities(
     MaxLoad = 0.0;
     OptLoad = 0.0;
     Real64 minimumStageLoad = std::numeric_limits<Real64>::max();
-    auto accumulateCapacity = [&minimumStageLoad](Real64 const referenceCapacity,
-                                                  Real64 const minimumPartLoadRatio,
-                                                  Real64 const maximumPartLoadRatio,
-                                                  Real64 const optimumPartLoadRatio,
-                                                  Real64 &maximumLoad,
-                                                  Real64 &optimumLoad) {
-        if (referenceCapacity <= 0.0) {
+    auto accumulateCapacity = [&minimumStageLoad](ModePerformanceData const &mode, Real64 &maximumLoad, Real64 &optimumLoad) {
+        if (mode.referenceEvaporatorCapacity <= 0.0) {
             return;
         }
-        maximumLoad += referenceCapacity * max(0.0, maximumPartLoadRatio);
-        optimumLoad += referenceCapacity * max(0.0, optimumPartLoadRatio);
-        minimumStageLoad = min(minimumStageLoad, referenceCapacity * max(0.0, minimumPartLoadRatio));
+        maximumLoad += mode.referenceEvaporatorCapacity * max(0.0, mode.maximumPartLoadRatio);
+        optimumLoad += mode.referenceEvaporatorCapacity * max(0.0, mode.optimumPartLoadRatio);
+        minimumStageLoad = min(minimumStageLoad, mode.referenceEvaporatorCapacity * max(0.0, mode.minimumPartLoadRatio));
     };
 
-    if (calledFromLocation.loopNum == this->CWPlantLoc.loopNum) { // Chilled-water useful cooling
-        for (auto const &chillerHeater : this->ChillerHeater) {
-            accumulateCapacity(chillerHeater.RefCapCooling,
-                               chillerHeater.MinPartLoadRatCooling,
-                               chillerHeater.MaxPartLoadRatCooling,
-                               chillerHeater.OptPartLoadRatCooling,
-                               MaxLoad,
-                               OptLoad);
+    if (calledFromLocation.loopNum == this->CWPlantLoc.loopNum) {
+        for (auto const &module : this->ChillerHeater) {
+            accumulateCapacity(module.coolingModePerformance(), MaxLoad, OptLoad);
         }
-    } else if (calledFromLocation.loopNum == this->HWPlantLoc.loopNum) { // Hot-water useful heating
-        for (auto const &chillerHeater : this->ChillerHeater) {
-            Real64 const referenceHeatingCapacity = chillerHeater.RefCapClgHtg + max(0.0, chillerHeater.RefPowerClgHtg) * chillerHeater.OpenMotorEff;
-            accumulateCapacity(referenceHeatingCapacity,
-                               chillerHeater.MinPartLoadRatClgHtg,
-                               chillerHeater.MaxPartLoadRatClgHtg,
-                               chillerHeater.OptPartLoadRatClgHtg,
-                               MaxLoad,
-                               OptLoad);
+    } else if (calledFromLocation.loopNum == this->HWPlantLoc.loopNum) {
+        for (auto const &module : this->ChillerHeater) {
+            auto heatingMode = module.heatingModePerformance();
+            heatingMode.referenceEvaporatorCapacity += max(0.0, module.sizing.RefPowerClgHtg) * module.performanceData().OpenMotorEff;
+            accumulateCapacity(heatingMode, MaxLoad, OptLoad);
         }
-    } else if (calledFromLocation.loopNum == this->GLHEPlantLoc.loopNum) { // Absolute source rejection/extraction envelope
+    } else if (calledFromLocation.loopNum == this->GLHEPlantLoc.loopNum) {
         Real64 maximumSourceRejection = 0.0;
         Real64 optimumSourceRejection = 0.0;
         Real64 maximumSourceExtraction = 0.0;
         Real64 optimumSourceExtraction = 0.0;
-        for (auto const &chillerHeater : this->ChillerHeater) {
-            Real64 const referenceCoolingPower = chillerHeater.RefCOPCooling > 0.0 ? chillerHeater.RefCapCooling / chillerHeater.RefCOPCooling : 0.0;
-            Real64 const referenceSourceRejection = chillerHeater.RefCapCooling + referenceCoolingPower * chillerHeater.OpenMotorEff;
-            accumulateCapacity(referenceSourceRejection,
-                               chillerHeater.MinPartLoadRatCooling,
-                               chillerHeater.MaxPartLoadRatCooling,
-                               chillerHeater.OptPartLoadRatCooling,
-                               maximumSourceRejection,
-                               optimumSourceRejection);
-            accumulateCapacity(chillerHeater.RefCapClgHtg,
-                               chillerHeater.MinPartLoadRatClgHtg,
-                               chillerHeater.MaxPartLoadRatClgHtg,
-                               chillerHeater.OptPartLoadRatClgHtg,
-                               maximumSourceExtraction,
-                               optimumSourceExtraction);
+        for (auto const &module : this->ChillerHeater) {
+            auto coolingMode = module.coolingModePerformance();
+            Real64 const referenceCoolingPower =
+                coolingMode.referenceCOP > 0.0 ? coolingMode.referenceEvaporatorCapacity / coolingMode.referenceCOP : 0.0;
+            coolingMode.referenceEvaporatorCapacity += referenceCoolingPower * module.performanceData().OpenMotorEff;
+            accumulateCapacity(coolingMode, maximumSourceRejection, optimumSourceRejection);
+            accumulateCapacity(module.heatingModePerformance(), maximumSourceExtraction, optimumSourceExtraction);
         }
         MaxLoad = max(maximumSourceRejection, maximumSourceExtraction);
         OptLoad = max(optimumSourceRejection, optimumSourceExtraction);
@@ -424,8 +390,9 @@ void WrapperSpecs::simulate(
         this->CalcWrapperModel(state, CurLoad, calledFromLocation.loopNum);
 
     } else if (calledFromLocation.loopNum == this->GLHEPlantLoc.loopNum) {
-        // Useful-load callbacks own the wrapper run state. The source callback only publishes the
-        // authoritative load-side result and must not erase an active cooling or heating request.
+        // Useful-load callbacks own the wrapper run state. The source callback only
+        // publishes the authoritative load-side result and must not erase an active
+        // cooling or heating request.
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             calledFromLocation.loopNum,
                                                             this->GLHEPlantLoc.loopSideNum,
@@ -445,17 +412,19 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Yunzhi Huang, PNNL
     //       DATE WRITTEN   Feb 2013
-    //       MODIFIED       November 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
+    //       MODIFIED       November 2013 Daeho Kang, add component sizing table
+    //       entries RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    //  This subroutine is for sizing all the components under each 'CentralHeatPumpSystem' object,
-    //  for which capacities and flow rates have not been specified in the input.
+    //  This subroutine is for sizing all the components under each
+    //  'CentralHeatPumpSystem' object, for which capacities and flow rates have
+    //  not been specified in the input.
 
     // METHODOLOGY EMPLOYED:
-    //  Obtains evaporator flow rate from the plant sizing array. Calculates reference capacity from
-    //  the evaporator (or load side) flow rate and the chilled water loop design delta T. The condenser
-    //  flow (or source side) rate is calculated from the reference capacity, the COP, and the condenser
+    //  Obtains evaporator flow rate from the plant sizing array. Calculates
+    //  reference capacity from the evaporator (or load side) flow rate and the
+    //  chilled water loop design delta T. The condenser flow (or source side)
+    //  rate is calculated from the reference capacity, the COP, and the condenser
     //  loop design delta T.
 
     static constexpr std::string_view RoutineName("SizeCGSHPChillerHeater");
@@ -470,80 +439,92 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
         int PltSizCondNum = this->GLHEPlantLoc.loop->PlantSizNum;
 
         auto &chillerHeater = this->ChillerHeater(NumChillerHeater);
+        auto const &performance = chillerHeater.performanceData();
+        auto &sizing = chillerHeater.sizing;
 
-        Real64 sizingNomCap = chillerHeater.RefCapCooling;
-        Real64 sizingEvapVolFlowRate = chillerHeater.EvapVolFlowRate;
-        Real64 sizingCondVolFlowRate = chillerHeater.CondVolFlowRate;
+        Real64 sizingNomCap = sizing.RefCapCooling;
+        Real64 sizingEvapVolFlowRate = sizing.EvapVolFlowRate;
+        Real64 sizingCondVolFlowRate = sizing.CondVolFlowRate;
 
         // auto-size the Evaporator Flow Rate
         if (PltSizNum > 0) {
             Real64 designEvapVolFlowRate = 0.0;
             if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
-                designEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * chillerHeater.SizFac;
+                designEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * performance.SizFac;
             }
-            sizingEvapVolFlowRate = chillerHeater.EvapVolFlowRateWasAutoSized ? designEvapVolFlowRate : chillerHeater.EvapVolFlowRate;
+            sizingEvapVolFlowRate = performance.EvapVolFlowRateWasAutoSized ? designEvapVolFlowRate : sizing.EvapVolFlowRate;
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                if (chillerHeater.EvapVolFlowRateWasAutoSized) {
-                    chillerHeater.EvapVolFlowRate = designEvapVolFlowRate;
+                if (performance.EvapVolFlowRateWasAutoSized) {
+                    sizing.EvapVolFlowRate = designEvapVolFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
                         BaseSizer::reportSizerOutput(state,
                                                      "ChillerHeaterPerformance:Electric:EIR",
-                                                     chillerHeater.Name,
+                                                     chillerHeater.name(),
                                                      "Design Size Reference Chilled Water Flow Rate [m3/s]",
                                                      designEvapVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      "ChillerHeaterPerformance:Electric:EIR",
-                                                     chillerHeater.Name,
+                                                     chillerHeater.name(),
                                                      "Initial Design Size Reference Chilled Water Flow Rate [m3/s]",
                                                      designEvapVolFlowRate);
                     }
-                } else if (chillerHeater.EvapVolFlowRate > 0.0 && designEvapVolFlowRate > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport &&
+                } else if (sizing.EvapVolFlowRate > 0.0 && designEvapVolFlowRate > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport &&
                            !this->mySizesReported) {
-                    Real64 const evapVolFlowRateUser = chillerHeater.EvapVolFlowRate;
+                    Real64 const evapVolFlowRateUser = sizing.EvapVolFlowRate;
                     BaseSizer::reportSizerOutput(state,
                                                  "ChillerHeaterPerformance:Electric:EIR",
-                                                 chillerHeater.Name,
+                                                 chillerHeater.name(),
                                                  "Design Size Reference Chilled Water Flow Rate [m3/s]",
                                                  designEvapVolFlowRate,
                                                  "User-Specified Reference Chilled Water Flow Rate [m3/s]",
                                                  evapVolFlowRateUser);
                     if (state.dataGlobal->DisplayExtraWarnings &&
                         (std::abs(designEvapVolFlowRate - evapVolFlowRateUser) / evapVolFlowRateUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                        ShowMessage(
-                            state,
-                            std::format("SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for {}", chillerHeater.Name));
+                        ShowMessage(state,
+                                    std::format("SizeChillerHeaterPerformanceElectricEIR: "
+                                                "Potential issue with equipment sizing for {}",
+                                                chillerHeater.name()));
                         ShowContinueError(state,
-                                          std::format("User-Specified Reference Chilled Water Flow Rate of {:.5f} [m3/s]", evapVolFlowRateUser));
-                        ShowContinueError(
-                            state, std::format("differs from Design Size Reference Chilled Water Flow Rate of {:.5f} [m3/s]", designEvapVolFlowRate));
+                                          std::format("User-Specified Reference Chilled "
+                                                      "Water Flow Rate of {:.5f} [m3/s]",
+                                                      evapVolFlowRateUser));
+                        ShowContinueError(state,
+                                          std::format("differs from Design Size Reference Chilled "
+                                                      "Water Flow Rate of {:.5f} [m3/s]",
+                                                      designEvapVolFlowRate));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
-                        ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
+                        ShowContinueError(state,
+                                          "Verify that the value entered is intended and "
+                                          "is consistent with other components.");
                     }
                 }
             }
         } else {
-            if (chillerHeater.EvapVolFlowRateWasAutoSized) {
+            if (performance.EvapVolFlowRateWasAutoSized) {
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                    ShowSevereError(state, "Autosizing of CGSHP Chiller Heater evap flow rate requires a loop Sizing:Plant object");
-                    ShowContinueError(state, std::format("Occurs in CGSHP Chiller Heater Performance object={}", chillerHeater.Name));
+                    ShowSevereError(state,
+                                    "Autosizing of CGSHP Chiller Heater evap flow "
+                                    "rate requires a loop Sizing:Plant object");
+                    ShowContinueError(state, std::format("Occurs in CGSHP Chiller Heater Performance object={}", chillerHeater.name()));
                     ErrorsFound = true;
                 }
             } else {
-                if (chillerHeater.EvapVolFlowRate > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
+                if (sizing.EvapVolFlowRate > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
                     BaseSizer::reportSizerOutput(state,
                                                  "ChillerHeaterPerformance:Electric:EIR",
-                                                 chillerHeater.Name,
+                                                 chillerHeater.name(),
                                                  "User-Specified Reference Chilled Water Flow Rate [m3/s]",
-                                                 chillerHeater.EvapVolFlowRate);
+                                                 sizing.EvapVolFlowRate);
                 }
             }
         }
-        chillerHeater.tmpEvapVolFlowRate = max(0.0, sizingEvapVolFlowRate);
+        sizing.tmpEvapVolFlowRate = max(0.0, sizingEvapVolFlowRate);
 
         // auto-size the Reference Cooling Capacity
-        // each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
+        // each individual chiller heater module is sized to be capable of
+        // supporting the total load on the wrapper
         if (PltSizNum > 0) {
             Real64 designNomCap = 0.0;
             if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow && sizingEvapVolFlowRate > 0.0) {
@@ -551,153 +532,172 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
                 Real64 const rho = this->CWPlantLoc.loop->glycol->getDensity(state, Constant::CWInitConvTemp, RoutineName);
                 designNomCap = cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * sizingEvapVolFlowRate;
             }
-            sizingNomCap = chillerHeater.RefCapCoolingWasAutoSized ? designNomCap : chillerHeater.RefCapCooling;
+            sizingNomCap = performance.RefCapCoolingWasAutoSized ? designNomCap : sizing.RefCapCooling;
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                if (chillerHeater.RefCapCoolingWasAutoSized) {
-                    chillerHeater.RefCapCooling = designNomCap;
+                if (performance.RefCapCoolingWasAutoSized) {
+                    sizing.RefCapCooling = designNomCap;
 
-                    // Now that we have the Reference Cooling Capacity, we need to also initialize the Heating side
-                    // given the ratios
-                    chillerHeater.RefCapClgHtg = chillerHeater.RefCapCooling * chillerHeater.ClgHtgToCoolingCapRatio;
+                    // Now that we have the Reference Cooling Capacity, we need to also
+                    // initialize the Heating side given the ratios
+                    sizing.RefCapClgHtg = sizing.RefCapCooling * performance.ClgHtgToCoolingCapRatio;
 
-                    chillerHeater.RefPowerClgHtg = (chillerHeater.RefCapCooling / chillerHeater.RefCOPCooling) * chillerHeater.ClgHtgtoCogPowerRatio;
+                    sizing.RefPowerClgHtg = (sizing.RefCapCooling / performance.RefCOPCooling) * performance.ClgHtgtoCogPowerRatio;
 
-                    chillerHeater.RefCOPClgHtg = chillerHeater.RefCapClgHtg / chillerHeater.RefPowerClgHtg;
+                    sizing.RefCOPClgHtg = sizing.RefCapClgHtg / sizing.RefPowerClgHtg;
 
                     if (state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
                         BaseSizer::reportSizerOutput(
-                            state, "ChillerHeaterPerformance:Electric:EIR", chillerHeater.Name, "Design Size Reference Capacity [W]", designNomCap);
+                            state, "ChillerHeaterPerformance:Electric:EIR", chillerHeater.name(), "Design Size Reference Capacity [W]", designNomCap);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      "ChillerHeaterPerformance:Electric:EIR",
-                                                     chillerHeater.Name,
+                                                     chillerHeater.name(),
                                                      "Initial Design Size Reference Capacity [W]",
                                                      designNomCap);
                     }
-                } else if (chillerHeater.RefCapCooling > 0.0 && designNomCap > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport &&
+                } else if (sizing.RefCapCooling > 0.0 && designNomCap > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport &&
                            !this->mySizesReported) {
-                    Real64 const nomCapUser = chillerHeater.RefCapCooling;
+                    Real64 const nomCapUser = sizing.RefCapCooling;
                     BaseSizer::reportSizerOutput(state,
                                                  "ChillerHeaterPerformance:Electric:EIR",
-                                                 chillerHeater.Name,
+                                                 chillerHeater.name(),
                                                  "Design Size Reference Capacity [W]",
                                                  designNomCap,
                                                  "User-Specified Reference Capacity [W]",
                                                  nomCapUser);
                     if (state.dataGlobal->DisplayExtraWarnings &&
                         (std::abs(designNomCap - nomCapUser) / nomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                        ShowMessage(
-                            state,
-                            std::format("SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for {}", chillerHeater.Name));
+                        ShowMessage(state,
+                                    std::format("SizeChillerHeaterPerformanceElectricEIR: "
+                                                "Potential issue with equipment sizing for {}",
+                                                chillerHeater.name()));
                         ShowContinueError(state, std::format("User-Specified Reference Capacity of {:.2f} [W]", nomCapUser));
                         ShowContinueError(state, std::format("differs from Design Size Reference Capacity of {:.2f} [W]", designNomCap));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
-                        ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
+                        ShowContinueError(state,
+                                          "Verify that the value entered is intended and "
+                                          "is consistent with other components.");
                     }
                 }
             }
         } else {
-            if (chillerHeater.RefCapCoolingWasAutoSized) {
+            if (performance.RefCapCoolingWasAutoSized) {
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                    ShowSevereError(state, std::format("Size ChillerHeaterPerformance:Electric:EIR=\"{}\", autosize error.", chillerHeater.Name));
+                    ShowSevereError(state,
+                                    std::format("Size ChillerHeaterPerformance:Electric:EIR=\"{}\", "
+                                                "autosize error.",
+                                                chillerHeater.name()));
                     ShowContinueError(state, "Autosizing of CGSHP Chiller Heater reference capacity requires");
                     ShowContinueError(state, "a cooling loop Sizing:Plant object.");
                     ErrorsFound = true;
                 }
             } else {
-                if (chillerHeater.RefCapCooling > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
+                if (sizing.RefCapCooling > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
                     BaseSizer::reportSizerOutput(state,
                                                  "ChillerHeaterPerformance:Electric:EIR",
-                                                 chillerHeater.Name,
+                                                 chillerHeater.name(),
                                                  "User-Specified Reference Capacity [W]",
-                                                 chillerHeater.RefCapCooling);
+                                                 sizing.RefCapCooling);
                 }
             }
         }
 
         // auto-size the condenser volume flow rate
-        // each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
+        // each individual chiller heater module is sized to be capable of
+        // supporting the total load on the wrapper
         if (PltSizCondNum > 0) {
             auto const &sourceSizing = state.dataSize->PlantSizData(PltSizCondNum);
             Real64 designCondVolFlowRate = 0.0;
             if (sourceSizing.DesVolFlowRate >= HVAC::SmallWaterVolFlow && sizingNomCap > 0.0 && sourceSizing.DeltaT > 0.0 &&
-                chillerHeater.RefCOPCooling > 0.0) {
-                Real64 const rho = this->GLHEPlantLoc.loop->glycol->getDensity(state, chillerHeater.TempRefCondInCooling, RoutineName);
-                Real64 const cp = this->GLHEPlantLoc.loop->glycol->getSpecificHeat(state, chillerHeater.TempRefCondInCooling, RoutineName);
+                performance.RefCOPCooling > 0.0) {
+                Real64 const rho = this->GLHEPlantLoc.loop->glycol->getDensity(state, performance.TempRefCondInCooling, RoutineName);
+                Real64 const cp = this->GLHEPlantLoc.loop->glycol->getSpecificHeat(state, performance.TempRefCondInCooling, RoutineName);
                 designCondVolFlowRate =
-                    sizingNomCap * (1.0 + chillerHeater.OpenMotorEff / chillerHeater.RefCOPCooling) / (sourceSizing.DeltaT * cp * rho);
+                    sizingNomCap * (1.0 + performance.OpenMotorEff / performance.RefCOPCooling) / (sourceSizing.DeltaT * cp * rho);
             }
-            sizingCondVolFlowRate = chillerHeater.CondVolFlowRateWasAutoSized ? designCondVolFlowRate : chillerHeater.CondVolFlowRate;
+            sizingCondVolFlowRate = performance.CondVolFlowRateWasAutoSized ? designCondVolFlowRate : sizing.CondVolFlowRate;
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                if (chillerHeater.CondVolFlowRateWasAutoSized) {
-                    chillerHeater.CondVolFlowRate = designCondVolFlowRate;
+                if (performance.CondVolFlowRateWasAutoSized) {
+                    sizing.CondVolFlowRate = designCondVolFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
                         BaseSizer::reportSizerOutput(state,
                                                      "ChillerHeaterPerformance:Electric:EIR",
-                                                     chillerHeater.Name,
+                                                     chillerHeater.name(),
                                                      "Design Size Reference Condenser Water Flow Rate [m3/s]",
                                                      designCondVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      "ChillerHeaterPerformance:Electric:EIR",
-                                                     chillerHeater.Name,
-                                                     "Initial Design Size Reference Condenser Water Flow Rate [m3/s]",
+                                                     chillerHeater.name(),
+                                                     "Initial Design Size Reference Condenser Water Flow Rate "
+                                                     "[m3/s]",
                                                      designCondVolFlowRate);
                     }
-                } else if (chillerHeater.CondVolFlowRate > 0.0 && designCondVolFlowRate > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport &&
+                } else if (sizing.CondVolFlowRate > 0.0 && designCondVolFlowRate > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport &&
                            !this->mySizesReported) {
-                    Real64 const condVolFlowRateUser = chillerHeater.CondVolFlowRate;
+                    Real64 const condVolFlowRateUser = sizing.CondVolFlowRate;
                     BaseSizer::reportSizerOutput(state,
                                                  "ChillerHeaterPerformance:Electric:EIR",
-                                                 chillerHeater.Name,
+                                                 chillerHeater.name(),
                                                  "Design Size Reference Condenser Water Flow Rate [m3/s]",
                                                  designCondVolFlowRate,
                                                  "User-Specified Reference Condenser Water Flow Rate [m3/s]",
                                                  condVolFlowRateUser);
                     if (state.dataGlobal->DisplayExtraWarnings &&
                         (std::abs(designCondVolFlowRate - condVolFlowRateUser) / condVolFlowRateUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                        ShowMessage(
-                            state,
-                            std::format("SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for {}", chillerHeater.Name));
+                        ShowMessage(state,
+                                    std::format("SizeChillerHeaterPerformanceElectricEIR: "
+                                                "Potential issue with equipment sizing for {}",
+                                                chillerHeater.name()));
                         ShowContinueError(state,
-                                          std::format("User-Specified Reference Condenser Water Flow Rate of {:.5f} [m3/s]", condVolFlowRateUser));
-                        ShowContinueError(
-                            state,
-                            std::format("differs from Design Size Reference Condenser Water Flow Rate of {:.5f} [m3/s]", designCondVolFlowRate));
+                                          std::format("User-Specified Reference Condenser "
+                                                      "Water Flow Rate of {:.5f} [m3/s]",
+                                                      condVolFlowRateUser));
+                        ShowContinueError(state,
+                                          std::format("differs from Design Size Reference "
+                                                      "Condenser Water Flow Rate of {:.5f} [m3/s]",
+                                                      designCondVolFlowRate));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
-                        ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
+                        ShowContinueError(state,
+                                          "Verify that the value entered is intended and "
+                                          "is consistent with other components.");
                     }
                 }
             }
         } else {
-            if (chillerHeater.CondVolFlowRateWasAutoSized) {
+            if (performance.CondVolFlowRateWasAutoSized) {
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                    ShowSevereError(state, std::format("Size ChillerHeaterPerformance:Electric:EIR=\"{}\", autosize error.", chillerHeater.Name));
-                    ShowContinueError(state, "Autosizing of CGSHP Chiller Heater condenser flow rate requires");
+                    ShowSevereError(state,
+                                    std::format("Size ChillerHeaterPerformance:Electric:EIR=\"{}\", "
+                                                "autosize error.",
+                                                chillerHeater.name()));
+                    ShowContinueError(state,
+                                      "Autosizing of CGSHP Chiller Heater "
+                                      "condenser flow rate requires");
                     ShowContinueError(state, "a condenser loop Sizing:Plant object.");
                     ErrorsFound = true;
                 }
             } else {
-                if (chillerHeater.CondVolFlowRate > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
+                if (sizing.CondVolFlowRate > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
                     BaseSizer::reportSizerOutput(state,
                                                  "ChillerHeaterPerformance:Electric:EIR",
-                                                 chillerHeater.Name,
+                                                 chillerHeater.name(),
                                                  "User-Specified Reference Condenser Water Flow Rate [m3/s]",
-                                                 chillerHeater.CondVolFlowRate);
+                                                 sizing.CondVolFlowRate);
                 }
             }
         }
-        chillerHeater.tmpCondVolFlowRate = max(0.0, sizingCondVolFlowRate);
+        sizing.tmpCondVolFlowRate = max(0.0, sizingCondVolFlowRate);
 
         if (state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
             // create predefined report
-            std::string equipName = chillerHeater.Name;
+            std::string equipName = chillerHeater.name();
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchMechType, equipName, "ChillerHeaterPerformance:Electric:EIR");
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, equipName, chillerHeater.RefCOPCooling);
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, equipName, chillerHeater.RefCapCooling);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, equipName, performance.RefCOPCooling);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, equipName, sizing.RefCapCooling);
         }
 
         if (ErrorsFound) {
@@ -711,14 +711,17 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
     Real64 TotalHotWaterVolFlowRate = 0.0;
     for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
         auto const &chillerHeater = this->ChillerHeater(NumChillerHeater);
-        TotalEvapVolFlowRate += chillerHeater.tmpEvapVolFlowRate;
-        TotalSourceVolFlowRate += max(chillerHeater.tmpEvapVolFlowRate, chillerHeater.tmpCondVolFlowRate);
-        TotalHotWaterVolFlowRate += chillerHeater.DesignHotWaterVolFlowRate;
+        auto const &performance = chillerHeater.performanceData();
+        auto const &sizing = chillerHeater.sizing;
+        TotalEvapVolFlowRate += sizing.tmpEvapVolFlowRate;
+        TotalSourceVolFlowRate += max(sizing.tmpEvapVolFlowRate, sizing.tmpCondVolFlowRate);
+        TotalHotWaterVolFlowRate += performance.DesignHotWaterVolFlowRate;
     }
 
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->CHWInletNodeNum, TotalEvapVolFlowRate);
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->HWInletNodeNum, TotalHotWaterVolFlowRate);
-    // Source extraction uses evaporator flow and source rejection uses condenser flow; only one direction is active per module.
+    // Source extraction uses evaporator flow and source rejection uses condenser
+    // flow; only one direction is active per module.
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->GLHEInletNodeNum, TotalSourceVolFlowRate);
 
     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
@@ -733,25 +736,23 @@ void WrapperSpecs::resolveFlowMode(EnergyPlusData &state)
     bool hasConstantFlow = false;
     bool hasVariableFlow = false;
     for (auto const &chillerHeater : this->ChillerHeater) {
-        hasConstantFlow = hasConstantFlow || chillerHeater.ConstantFlow || !chillerHeater.VariableFlow;
-        hasVariableFlow = hasVariableFlow || chillerHeater.VariableFlow;
+        auto const &performance = chillerHeater.performanceData();
+        hasConstantFlow = hasConstantFlow || performance.ConstantFlow || !performance.VariableFlow;
+        hasVariableFlow = hasVariableFlow || performance.VariableFlow;
     }
 
     bool const mixedFlowModes = hasConstantFlow && hasVariableFlow;
     this->VariableFlowCH = hasVariableFlow && !hasConstantFlow;
     if (mixedFlowModes) {
-        ShowWarningError(state, std::format("CentralHeatPumpSystem={} contains both ConstantFlow and VariableFlow performance objects.", this->Name));
+        ShowWarningError(state,
+                         std::format("CentralHeatPumpSystem={} contains both "
+                                     "ConstantFlow and VariableFlow performance objects.",
+                                     this->Name));
         ShowContinueError(state, "All modules in this CentralHeatPumpSystem will use ConstantFlow.");
     }
 
     for (auto &chillerHeater : this->ChillerHeater) {
-        if (mixedFlowModes || !this->VariableFlowCH) {
-            chillerHeater.ConstantFlow = true;
-            chillerHeater.VariableFlow = false;
-        } else {
-            chillerHeater.ConstantFlow = false;
-            chillerHeater.VariableFlow = true;
-        }
+        chillerHeater.VariableFlow = !mixedFlowModes && this->VariableFlowCH;
     }
 }
 
@@ -904,11 +905,11 @@ void GetWrapperInput(EnergyPlusData &state)
                 wrapper.WrapperComp(Comp).WrapperComponentName = state.dataIPShortCut->cAlphaArgs(loop + 1);
 
                 if (state.dataIPShortCut->lAlphaFieldBlanks(loop + 2)) {
-                    wrapper.WrapperComp(Comp).chSched =
-                        Sched::GetScheduleAlwaysOn(state); // Not an availability schedule, but defaults to constant-1.0
+                    wrapper.WrapperComp(Comp).chSched = Sched::GetScheduleAlwaysOn(state); // Not an availability schedule, but defaults to
+                                                                                           // constant-1.0
                 } else if ((wrapper.WrapperComp(Comp).chSched = Sched::GetSchedule(state, state.dataIPShortCut->cAlphaArgs(loop + 2))) == nullptr) {
-                    wrapper.WrapperComp(Comp).chSched =
-                        Sched::GetScheduleAlwaysOn(state); // Not an availability schedule, but defaults to constant-1.0
+                    wrapper.WrapperComp(Comp).chSched = Sched::GetScheduleAlwaysOn(state); // Not an availability schedule, but defaults to
+                                                                                           // constant-1.0
                     ShowWarningItemNotFound(state,
                                             eoh,
                                             state.dataIPShortCut->cAlphaFieldNames(loop + 2),
@@ -919,15 +920,17 @@ void GetWrapperInput(EnergyPlusData &state)
                 wrapper.WrapperComp(Comp).WrapperIdenticalObjectNum = state.dataIPShortCut->rNumericArgs(1 + Comp);
                 if (wrapper.WrapperComp(Comp).WrapperPerformanceObjectType == "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR") {
 
-                    // count number of chiller heaters (including identical units) for current wrapper
+                    // count number of chiller heaters (including identical units) for
+                    // current wrapper
                     if (wrapper.WrapperComp(Comp).WrapperIdenticalObjectNum > 1) {
                         NumChHtrPerWrapper += wrapper.WrapperComp(Comp).WrapperIdenticalObjectNum;
                     } else {
                         ++NumChHtrPerWrapper;
                     }
 
-                    // count total number of chiller heaters (not including identical units) for ALL wrappers
-                    ++state.dataPlantCentralGSHP->numChillerHeaters;
+                    // Count wrapper references independently from parsed performance
+                    // definitions
+                    ++state.dataPlantCentralGSHP->numPerformanceReferences;
                 }
             }
 
@@ -936,20 +939,22 @@ void GetWrapperInput(EnergyPlusData &state)
 
         if (ErrorsFound) {
             ShowFatalError(state,
-                           std::format("GetWrapperInput: Invalid {} Input, preceding condition(s) cause termination.",
+                           std::format("GetWrapperInput: Invalid {} Input, preceding "
+                                       "condition(s) cause termination.",
                                        state.dataIPShortCut->cCurrentModuleObject));
         }
 
         // ALLOCATE ARRAYS
-        if (state.dataPlantCentralGSHP->numChillerHeaters == 0) {
+        if (state.dataPlantCentralGSHP->numPerformanceReferences == 0) {
             ShowFatalError(state,
-                           std::format("{} : {} requires ChillerHeaterPerformance:Electric:EIR object(s).",
+                           std::format("{} : {} requires "
+                                       "ChillerHeaterPerformance:Electric:EIR object(s).",
                                        state.dataIPShortCut->cCurrentModuleObject,
                                        wrapper.Name));
         }
     }
 
-    if (state.dataPlantCentralGSHP->numChillerHeaters > 0) {
+    if (state.dataPlantCentralGSHP->numPerformanceReferences > 0) {
 
         for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
             auto &wrapper = state.dataPlantCentralGSHP->Wrapper(WrapperNum);
@@ -960,31 +965,35 @@ void GetWrapperInput(EnergyPlusData &state)
 
     for (int WrapperNum = 1; WrapperNum <= state.dataPlantCentralGSHP->numWrappers; ++WrapperNum) {
         auto &wrapper = state.dataPlantCentralGSHP->Wrapper(WrapperNum);
-        int ChillerHeaterNum = 0; // initialize nth chiller heater index (including identical units) for current wrapper
+        int ChillerHeaterNum = 0; // initialize nth chiller heater index (including
+                                  // identical units) for current wrapper
         for (int Comp = 1; Comp <= wrapper.NumOfComp; ++Comp) {
             if (wrapper.WrapperComp(Comp).WrapperPerformanceObjectType == "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR") {
                 std::string CompName = wrapper.WrapperComp(Comp).WrapperComponentName;
-                int CompIndex = Util::FindItemInList(CompName, state.dataPlantCentralGSHP->ChillerHeater);
-                // User may enter invalid name rather than selecting one from the object list
+                int CompIndex = Util::FindItemInList(CompName, state.dataPlantCentralGSHP->performanceDefinitions);
+                // User may enter invalid name rather than selecting one from the object
+                // list
                 if (CompIndex <= 0) {
-                    ShowSevereError(state, std::format("GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name ={}", CompName));
-                    ShowContinueError(state, "Select the name of ChillerHeaterPerformance:Electric:EIR object(s) from the object list.");
+                    ShowSevereError(state,
+                                    std::format("GetWrapperInput: Invalid Chiller Heater "
+                                                "Modules Performance Component Name ={}",
+                                                CompName));
+                    ShowContinueError(state,
+                                      "Select the name of ChillerHeaterPerformance:Electric:EIR "
+                                      "object(s) from the object list.");
                     ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
                 wrapper.WrapperComp(Comp).WrapperPerformanceObjectIndex = CompIndex;
                 for (int i_CH = 1; i_CH <= wrapper.WrapperComp(Comp).WrapperIdenticalObjectNum; ++i_CH) {
-                    // increment nth chiller heater index (including identical units) for current wrapper
+                    // increment nth chiller heater index (including identical units) for
+                    // current wrapper
                     ++ChillerHeaterNum;
-                    wrapper.ChillerHeater(ChillerHeaterNum) = state.dataPlantCentralGSHP->ChillerHeater(CompIndex);
+                    wrapper.ChillerHeater(ChillerHeaterNum)
+                        .initialize(CompIndex, state.dataPlantCentralGSHP->performanceDefinitions(CompIndex), wrapper.WrapperComp(Comp).chSched);
                 }
             }
         }
         wrapper.resolveFlowMode(state);
-    }
-
-    // Release memory from temporary arrays; values now copied into their associated Wrapper in above loop
-    if (allocated(state.dataPlantCentralGSHP->ChillerHeater)) {
-        state.dataPlantCentralGSHP->ChillerHeater.deallocate();
     }
 }
 
@@ -1164,186 +1173,186 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Operation Mode Unit {}", ChillerHeaterNum),
                                 Constant::Units::None,
-                                chillerHeater.Report.currentMode,
+                                chillerHeater.Result.currentMode,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Part Load Ratio Unit {}", ChillerHeaterNum),
                                 Constant::Units::None,
-                                chillerHeater.Report.ChillerPartLoadRatio,
+                                chillerHeater.Result.partLoadRatio,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Cycling Ratio Unit {}", ChillerHeaterNum),
                                 Constant::Units::None,
-                                chillerHeater.Report.ChillerCyclingRatio,
+                                chillerHeater.Result.cyclingRatio,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Cooling Electricity Rate Unit {}", ChillerHeaterNum),
                                 Constant::Units::W,
-                                chillerHeater.Report.CoolingPower,
+                                chillerHeater.Result.coolingPower,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Heating Electricity Rate Unit {}", ChillerHeaterNum),
                                 Constant::Units::W,
-                                chillerHeater.Report.HeatingPower,
+                                chillerHeater.Result.heatingPower,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Cooling Electricity Energy Unit {}", ChillerHeaterNum),
                                 Constant::Units::J,
-                                chillerHeater.Report.CoolingEnergy,
+                                chillerHeater.Result.coolingEnergy,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Sum,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Heating Electricity Energy Unit {}", ChillerHeaterNum),
                                 Constant::Units::J,
-                                chillerHeater.Report.HeatingEnergy,
+                                chillerHeater.Result.heatingEnergy,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Sum,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Cooling Rate Unit {}", ChillerHeaterNum),
                                 Constant::Units::W,
-                                chillerHeater.Report.QEvap,
+                                chillerHeater.Result.qEvaporator,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Cooling Energy Unit {}", ChillerHeaterNum),
                                 Constant::Units::J,
-                                chillerHeater.Report.EvapEnergy,
+                                chillerHeater.Result.evaporatorEnergy,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Sum,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater False Load Heat Transfer Rate Unit {}", ChillerHeaterNum),
                                 Constant::Units::W,
-                                chillerHeater.Report.ChillerFalseLoadRate,
+                                chillerHeater.Result.falseLoadRate,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater False Load Heat Transfer Energy Unit {}", ChillerHeaterNum),
                                 Constant::Units::J,
-                                chillerHeater.Report.ChillerFalseLoad,
+                                chillerHeater.Result.falseLoadEnergy,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Sum,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Evaporator Inlet Temperature Unit {}", ChillerHeaterNum),
                                 Constant::Units::C,
-                                chillerHeater.Report.EvapInletTemp,
+                                chillerHeater.Result.evaporatorInletTemp,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Evaporator Outlet Temperature Unit {}", ChillerHeaterNum),
                                 Constant::Units::C,
-                                chillerHeater.Report.EvapOutletTemp,
+                                chillerHeater.Result.evaporatorOutletTemp,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Evaporator Mass Flow Rate Unit {}", ChillerHeaterNum),
                                 Constant::Units::kg_s,
-                                chillerHeater.Report.Evapmdot,
+                                chillerHeater.Result.evaporatorMassFlowRate,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Condenser Heat Transfer Rate Unit {}", ChillerHeaterNum),
                                 Constant::Units::W,
-                                chillerHeater.Report.QCond,
+                                chillerHeater.Result.qCondenser,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Condenser Heat Transfer Energy Unit {}", ChillerHeaterNum),
                                 Constant::Units::J,
-                                chillerHeater.Report.CondEnergy,
+                                chillerHeater.Result.condenserEnergy,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Sum,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater COP Unit {}", ChillerHeaterNum),
                                 Constant::Units::W_W,
-                                chillerHeater.Report.ActualCOP,
+                                chillerHeater.Result.actualCOP,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Capacity Temperature Modifier Multiplier Unit {}", ChillerHeaterNum),
                                 Constant::Units::None,
-                                chillerHeater.Report.ChillerCapFT,
+                                chillerHeater.Result.capacityTemperatureModifier,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater EIR Temperature Modifier Multiplier Unit {}", ChillerHeaterNum),
                                 Constant::Units::None,
-                                chillerHeater.Report.ChillerEIRFT,
+                                chillerHeater.Result.eirTemperatureModifier,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater EIR Part Load Modifier Multiplier Unit {}", ChillerHeaterNum),
                                 Constant::Units::None,
-                                chillerHeater.Report.ChillerEIRFPLR,
+                                chillerHeater.Result.eirPartLoadModifier,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Condenser Inlet Temperature Unit {}", ChillerHeaterNum),
                                 Constant::Units::C,
-                                chillerHeater.Report.CondInletTemp,
+                                chillerHeater.Result.condenserInletTemp,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Condenser Outlet Temperature Unit {}", ChillerHeaterNum),
                                 Constant::Units::C,
-                                chillerHeater.Report.CondOutletTemp,
+                                chillerHeater.Result.condenserOutletTemp,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
 
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Condenser Mass Flow Rate Unit {}", ChillerHeaterNum),
                                 Constant::Units::kg_s,
-                                chillerHeater.Report.Condmdot,
+                                chillerHeater.Result.condenserMassFlowRate,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
-                                chillerHeater.Name);
+                                chillerHeater.name());
         } // End of individual chiller heater count for current wrapper
 
     } // End of individual chiller heater output
@@ -1356,7 +1365,8 @@ void GetChillerHeaterInput(EnergyPlusData &state)
     //       DATE WRITTEN:    Feb 2013
 
     // PURPOSE OF THIS SUBROUTINE:
-    //  This routine will get the input required by the ChillerHeaterPerformance:Electric:EIR model.
+    //  This routine will get the input required by the
+    //  ChillerHeaterPerformance:Electric:EIR model.
 
     static constexpr std::string_view routineName = "GetChillerHeaterInput";
     static constexpr char objectType[] = "ChillerHeaterPerformance:Electric:EIR";
@@ -1379,13 +1389,17 @@ void GetChillerHeaterInput(EnergyPlusData &state)
     static constexpr char compressorMotorEfficiencyKey[] = "compressor_motor_efficiency";
     static constexpr char coolingCondenserVariableKey[] = "cooling_mode_temperature_curve_condenser_water_independent_variable";
     static constexpr char coolingCapacityCurveKey[] = "cooling_mode_cooling_capacity_function_of_temperature_curve_name";
-    static constexpr char coolingEIRTemperatureCurveKey[] = "cooling_mode_electric_input_to_cooling_output_ratio_function_of_temperature_curve_name";
-    static constexpr char coolingEIRPartLoadCurveKey[] = "cooling_mode_electric_input_to_cooling_output_ratio_function_of_part_load_ratio_curve_name";
+    static constexpr char coolingEIRTemperatureCurveKey[] = "cooling_mode_electric_input_to_cooling_output_ratio_function_of_"
+                                                            "temperature_curve_name";
+    static constexpr char coolingEIRPartLoadCurveKey[] = "cooling_mode_electric_input_to_cooling_output_ratio_function_of_part_"
+                                                         "load_ratio_curve_name";
     static constexpr char coolingOptimumPartLoadRatioKey[] = "cooling_mode_cooling_capacity_optimum_part_load_ratio";
     static constexpr char heatingCondenserVariableKey[] = "heating_mode_temperature_curve_condenser_water_independent_variable";
     static constexpr char heatingCapacityCurveKey[] = "heating_mode_cooling_capacity_function_of_temperature_curve_name";
-    static constexpr char heatingEIRTemperatureCurveKey[] = "heating_mode_electric_input_to_cooling_output_ratio_function_of_temperature_curve_name";
-    static constexpr char heatingEIRPartLoadCurveKey[] = "heating_mode_electric_input_to_cooling_output_ratio_function_of_part_load_ratio_curve_name";
+    static constexpr char heatingEIRTemperatureCurveKey[] = "heating_mode_electric_input_to_cooling_output_ratio_function_of_"
+                                                            "temperature_curve_name";
+    static constexpr char heatingEIRPartLoadCurveKey[] = "heating_mode_electric_input_to_cooling_output_ratio_function_of_part_"
+                                                         "load_ratio_curve_name";
     static constexpr char heatingOptimumPartLoadRatioKey[] = "heating_mode_cooling_capacity_optimum_part_load_ratio";
     static constexpr char sizingFactorKey[] = "sizing_factor";
     static constexpr char maximumHeatingLeavingCondenserTempKey[] = "maximum_heating_mode_leaving_condenser_water_temperature";
@@ -1396,16 +1410,16 @@ void GetChillerHeaterInput(EnergyPlusData &state)
     static constexpr char referenceHeatingPowerRatioField[] = "Reference Heating Mode Cooling Power Input Ratio";
     static constexpr char compressorMotorEfficiencyField[] = "Compressor Motor Efficiency";
     static constexpr char coolingCapacityCurveField[] = "Cooling Mode Cooling Capacity Function of Temperature Curve Name";
-    static constexpr char coolingEIRTemperatureCurveField[] =
-        "Cooling Mode Electric Input to Cooling Output Ratio Function of Temperature Curve Name";
-    static constexpr char coolingEIRPartLoadCurveField[] =
-        "Cooling Mode Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name";
+    static constexpr char coolingEIRTemperatureCurveField[] = "Cooling Mode Electric Input to Cooling Output Ratio Function of "
+                                                              "Temperature Curve Name";
+    static constexpr char coolingEIRPartLoadCurveField[] = "Cooling Mode Electric Input to Cooling Output Ratio Function of Part "
+                                                           "Load Ratio Curve Name";
     static constexpr char coolingOptimumPartLoadRatioField[] = "Cooling Mode Cooling Capacity Optimum Part Load Ratio";
     static constexpr char heatingCapacityCurveField[] = "Heating Mode Cooling Capacity Function of Temperature Curve Name";
-    static constexpr char heatingEIRTemperatureCurveField[] =
-        "Heating Mode Electric Input to Cooling Output Ratio Function of Temperature Curve Name";
-    static constexpr char heatingEIRPartLoadCurveField[] =
-        "Heating Mode Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name";
+    static constexpr char heatingEIRTemperatureCurveField[] = "Heating Mode Electric Input to Cooling Output Ratio Function of "
+                                                              "Temperature Curve Name";
+    static constexpr char heatingEIRPartLoadCurveField[] = "Heating Mode Electric Input to Cooling Output Ratio Function of Part "
+                                                           "Load Ratio Curve Name";
     static constexpr char heatingOptimumPartLoadRatioField[] = "Heating Mode Cooling Capacity Optimum Part Load Ratio";
     static constexpr char referenceHeatingEnteringCondenserTempField[] = "Reference Heating Mode Entering Condenser Fluid Temperature";
     static constexpr char maximumHeatingLeavingCondenserTempField[] = "Maximum Heating Mode Leaving Condenser Water Temperature";
@@ -1415,24 +1429,24 @@ void GetChillerHeaterInput(EnergyPlusData &state)
 
     auto &inputProcessor = state.dataInputProcessing->inputProcessor;
     state.dataIPShortCut->cCurrentModuleObject = objectType;
-    state.dataPlantCentralGSHP->numChillerHeaters = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+    state.dataPlantCentralGSHP->numPerformanceDefinitions = inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
-    if (state.dataPlantCentralGSHP->numChillerHeaters <= 0) {
+    if (state.dataPlantCentralGSHP->numPerformanceDefinitions <= 0) {
         ShowSevereError(state, std::format("No {} equipment specified in input file", objectType));
         CHErrorsFound = true;
     }
 
     // Allocate the temporary performance-object array.
-    if (allocated(state.dataPlantCentralGSHP->ChillerHeater)) {
-        state.dataPlantCentralGSHP->ChillerHeater.deallocate();
+    if (allocated(state.dataPlantCentralGSHP->performanceDefinitions)) {
+        state.dataPlantCentralGSHP->performanceDefinitions.deallocate();
     }
-    state.dataPlantCentralGSHP->ChillerHeater.allocate(state.dataPlantCentralGSHP->numChillerHeaters);
+    state.dataPlantCentralGSHP->performanceDefinitions.allocate(state.dataPlantCentralGSHP->numPerformanceDefinitions);
 
     auto const instances = inputProcessor->epJSON.find(objectType);
     if (instances != inputProcessor->epJSON.end()) {
         auto const &objectSchemaProps = inputProcessor->getObjectSchemaProps(state, objectType);
         auto const &instancesValue = instances.value();
-        assert(instancesValue.size() == static_cast<std::size_t>(state.dataPlantCentralGSHP->numChillerHeaters));
+        assert(instancesValue.size() == static_cast<std::size_t>(state.dataPlantCentralGSHP->numPerformanceDefinitions));
 
         std::unordered_set<std::string> performanceNames;
         int ChillerHeaterNum = 0;
@@ -1444,7 +1458,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
             inputProcessor->markObjectAsUsed(objectType, key);
             ErrorObjectHeader const eoh{routineName, objectType, key};
 
-            auto &chillerHeater = state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum);
+            auto &chillerHeater = state.dataPlantCentralGSHP->performanceDefinitions(ChillerHeaterNum);
             chillerHeater.Name = Util::makeUPPER(key);
             if (!performanceNames.emplace(chillerHeater.Name).second) {
                 ShowSevereDuplicateName(state, eoh);
@@ -1621,12 +1635,15 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                                                              ? chillerHeater.TempRefCondOutClgHtg
                                                              : chillerHeater.TempRefCondInClgHtg;
 
-            // Check the CAP-FT, EIR-FT, and PLR curves and warn user if different from 1.0 by more than +-10%
+            // Check the CAP-FT, EIR-FT, and PLR curves and warn user if different
+            // from 1.0 by more than +-10%
             if (chillerHeater.ChillerCapFTCoolingIDX > 0) {
                 Real64 CurveVal = Curve::CurveValue(
                     state, chillerHeater.ChillerCapFTCoolingIDX, chillerHeater.TempRefEvapOutCooling, coolingReferenceCondenserTemp);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
-                    ShowWarningError(state, "Capacity ratio as a function of temperature curve output is not equal to 1.0");
+                    ShowWarningError(state,
+                                     "Capacity ratio as a function of temperature "
+                                     "curve output is not equal to 1.0");
                     ShowContinueError(state, std::format("(+ or - 10%) at reference conditions for {}= {}", objectType, chillerHeater.Name));
                     ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
                 }
@@ -1636,7 +1653,9 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                 Real64 CurveVal = Curve::CurveValue(
                     state, chillerHeater.ChillerEIRFTCoolingIDX, chillerHeater.TempRefEvapOutCooling, coolingReferenceCondenserTemp);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
-                    ShowWarningError(state, "Energy input ratio as a function of temperature curve output is not equal to 1.0");
+                    ShowWarningError(state,
+                                     "Energy input ratio as a function of temperature "
+                                     "curve output is not equal to 1.0");
                     ShowContinueError(state, std::format("(+ or - 10%) at reference conditions for {}= {}", objectType, chillerHeater.Name));
                     ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
                 }
@@ -1646,7 +1665,9 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                 Real64 CurveVal = evaluatePartLoadCurve(state, chillerHeater.ChillerEIRFPLRCoolingIDX, coolingReferenceCondenserTemp, 1.0);
 
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
-                    ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
+                    ShowWarningError(state,
+                                     "Energy input ratio as a function of part-load "
+                                     "ratio curve output is not equal to 1.0");
                     ShowContinueError(state, std::format("(+ or - 10%) at reference conditions for {}= {}", objectType, chillerHeater.Name));
                     ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
                 }
@@ -1663,10 +1684,16 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                     CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
                 }
                 if (FoundNegValue) {
-                    ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve shows negative values ");
+                    ShowWarningError(state,
+                                     "Energy input ratio as a function of part-load "
+                                     "ratio curve shows negative values ");
                     ShowContinueError(state, std::format("for {}= {}", objectType, chillerHeater.Name));
-                    ShowContinueError(state, "EIR as a function of PLR curve output at various part-load ratios shown below:");
-                    ShowContinueError(state, "PLR   =  0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
+                    ShowContinueError(state,
+                                      "EIR as a function of PLR curve output at "
+                                      "various part-load ratios shown below:");
+                    ShowContinueError(state,
+                                      "PLR   =  0.00   0.10   0.20   0.30   0.40  "
+                                      " 0.50   0.60   0.70   0.80   0.90   1.00");
 
                     ShowContinueError(state, std::format("Curve Output = {:7.2f}", EnergyPlus::join(CurveValArray, ",")));
 
@@ -1678,7 +1705,9 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                 Real64 CurveVal =
                     Curve::CurveValue(state, chillerHeater.ChillerCapFTHeatingIDX, chillerHeater.TempRefEvapOutClgHtg, heatingReferenceCondenserTemp);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
-                    ShowWarningError(state, "Capacity ratio as a function of temperature curve output is not equal to 1.0");
+                    ShowWarningError(state,
+                                     "Capacity ratio as a function of temperature "
+                                     "curve output is not equal to 1.0");
                     ShowContinueError(state, std::format("(+ or - 10%) at reference conditions for {}= {}", objectType, chillerHeater.Name));
                     ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
                 }
@@ -1688,7 +1717,9 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                 Real64 CurveVal =
                     Curve::CurveValue(state, chillerHeater.ChillerEIRFTHeatingIDX, chillerHeater.TempRefEvapOutClgHtg, heatingReferenceCondenserTemp);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
-                    ShowWarningError(state, "Energy input ratio as a function of temperature curve output is not equal to 1.0");
+                    ShowWarningError(state,
+                                     "Energy input ratio as a function of temperature "
+                                     "curve output is not equal to 1.0");
                     ShowContinueError(state, std::format("(+ or - 10%) at reference conditions for {}= {}", objectType, chillerHeater.Name));
                     ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
                 }
@@ -1698,7 +1729,9 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                 Real64 CurveVal = evaluatePartLoadCurve(state, chillerHeater.ChillerEIRFPLRHeatingIDX, heatingReferenceCondenserTemp, 1.0);
 
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
-                    ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
+                    ShowWarningError(state,
+                                     "Energy input ratio as a function of part-load "
+                                     "ratio curve output is not equal to 1.0");
                     ShowContinueError(state, std::format("(+ or - 10%) at reference conditions for {}= {}", objectType, chillerHeater.Name));
                     ShowContinueError(state, std::format("Curve output at reference conditions = {:.3f}", CurveVal));
                 }
@@ -1715,10 +1748,16 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                     CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
                 }
                 if (FoundNegValue) {
-                    ShowWarningError(state, "Energy input ratio as a function of part-load ratio curve shows negative values ");
+                    ShowWarningError(state,
+                                     "Energy input ratio as a function of part-load "
+                                     "ratio curve shows negative values ");
                     ShowContinueError(state, std::format("for {}= {}", objectType, chillerHeater.Name));
-                    ShowContinueError(state, "EIR as a function of PLR curve output at various part-load ratios shown below:");
-                    ShowContinueError(state, "PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
+                    ShowContinueError(state,
+                                      "EIR as a function of PLR curve output at "
+                                      "various part-load ratios shown below:");
+                    ShowContinueError(state,
+                                      "PLR          =    0.00   0.10   0.20   0.30   "
+                                      "0.40   0.50   0.60   0.70   0.80   0.90   1.00");
 
                     ShowContinueError(state, std::format("Curve Output = {:7.2f}", EnergyPlus::join(CurveValArray, ",")));
 
@@ -1743,7 +1782,8 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                     ShowSevereError(state, std::format("Invalid {} part-load curve domain for {}={}", mode, objectType, chillerHeater.Name));
                     ShowContinueError(state, std::format("Entered in {}={}", curveFieldName, curveName));
                     ShowContinueError(state,
-                                      std::format("Part-load ratio limits [{:.3f}, {:.3f}] must include 1.0 and have a minimum no less than zero.",
+                                      std::format("Part-load ratio limits [{:.3f}, {:.3f}] must "
+                                                  "include 1.0 and have a minimum no less than zero.",
                                                   minimumPartLoadRatio,
                                                   maximumPartLoadRatio));
                     CHErrorsFound = true;
@@ -1752,7 +1792,8 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                     ShowSevereError(state, std::format("Invalid {}={}", objectType, chillerHeater.Name));
                     ShowContinueError(state, std::format("Entered in {}={:.3f}", optimumFieldName, optimumPartLoadRatio));
                     ShowContinueError(state,
-                                      std::format("{} must be within the associated part-load curve limits [{:.3f}, {:.3f}].",
+                                      std::format("{} must be within the associated part-load "
+                                                  "curve limits [{:.3f}, {:.3f}].",
                                                   optimumFieldName,
                                                   minimumPartLoadRatio,
                                                   maximumPartLoadRatio));
@@ -1792,11 +1833,12 @@ void WrapperSpecs::initializeDesignFlowLimits(EnergyPlusData &state)
     this->HWVolFlowRate = 0.0;
     this->GLHEVolFlowRate = 0.0;
 
-    for (int chillerHeaterNum = 1; chillerHeaterNum <= this->ChillerHeaterNums; ++chillerHeaterNum) {
-        auto const &chillerHeater = this->ChillerHeater(chillerHeaterNum);
-        this->CHWVolFlowRate += chillerHeater.EvapVolFlowRate;
-        this->HWVolFlowRate += chillerHeater.DesignHotWaterVolFlowRate;
-        this->GLHEVolFlowRate += max(chillerHeater.EvapVolFlowRate, chillerHeater.CondVolFlowRate);
+    for (auto const &module : this->ChillerHeater) {
+        auto const &performance = module.performanceData();
+        auto const &sizing = module.sizing;
+        this->CHWVolFlowRate += sizing.EvapVolFlowRate;
+        this->HWVolFlowRate += performance.DesignHotWaterVolFlowRate;
+        this->GLHEVolFlowRate += max(sizing.EvapVolFlowRate, sizing.CondVolFlowRate);
     }
 
     Real64 const chilledWaterDensity = this->CWPlantLoc.loop->glycol->getDensity(state, Constant::CWInitConvTemp, routineName);
@@ -1811,25 +1853,15 @@ void WrapperSpecs::initializeDesignFlowLimits(EnergyPlusData &state)
     PlantUtilities::InitComponentNodes(state, 0.0, this->HWMassFlowRateMax, this->HWInletNodeNum, this->HWOutletNodeNum);
     PlantUtilities::InitComponentNodes(state, 0.0, this->GLHEMassFlowRateMax, this->GLHEInletNodeNum, this->GLHEOutletNodeNum);
 
-    for (int chillerHeaterNum = 1; chillerHeaterNum <= this->ChillerHeaterNums; ++chillerHeaterNum) {
-        auto &chillerHeater = this->ChillerHeater(chillerHeaterNum);
-        chillerHeater.ChilledWaterMassFlowRateMax = chilledWaterDensity * chillerHeater.EvapVolFlowRate;
-        chillerHeater.HotWaterMassFlowRateMax = hotWaterDensity * chillerHeater.DesignHotWaterVolFlowRate;
-        chillerHeater.SourceEvapMassFlowRateMax = sourceDensity * chillerHeater.EvapVolFlowRate;
-        chillerHeater.SourceCondMassFlowRateMax = sourceDensity * chillerHeater.CondVolFlowRate;
-        chillerHeater.EvapMassFlowRateMax = max(chillerHeater.ChilledWaterMassFlowRateMax, chillerHeater.SourceEvapMassFlowRateMax);
-        chillerHeater.CondMassFlowRateMax = max(chillerHeater.HotWaterMassFlowRateMax, chillerHeater.SourceCondMassFlowRateMax);
-        chillerHeater.EvapInletNode.MassFlowRateMin = 0.0;
-        chillerHeater.EvapInletNode.MassFlowRateMinAvail = 0.0;
-        chillerHeater.EvapInletNode.MassFlowRateMax = chillerHeater.EvapMassFlowRateMax;
-        chillerHeater.EvapInletNode.MassFlowRateMaxAvail = chillerHeater.EvapMassFlowRateMax;
-        chillerHeater.EvapInletNode.MassFlowRate = 0.0;
-        chillerHeater.CondInletNode.MassFlowRateMin = 0.0;
-        chillerHeater.CondInletNode.MassFlowRateMinAvail = 0.0;
-        chillerHeater.CondInletNode.MassFlowRateMax = chillerHeater.CondMassFlowRateMax;
-        chillerHeater.CondInletNode.MassFlowRateMaxAvail = chillerHeater.CondMassFlowRateMax;
-        chillerHeater.CondInletNode.MassFlowRate = 0.0;
-        chillerHeater.CondInletNode.MassFlowRateRequest = 0.0;
+    for (auto &module : this->ChillerHeater) {
+        auto const &performance = module.performanceData();
+        auto &sizing = module.sizing;
+        sizing.ChilledWaterMassFlowRateMax = chilledWaterDensity * sizing.EvapVolFlowRate;
+        sizing.HotWaterMassFlowRateMax = hotWaterDensity * performance.DesignHotWaterVolFlowRate;
+        sizing.SourceEvapMassFlowRateMax = sourceDensity * sizing.EvapVolFlowRate;
+        sizing.SourceCondMassFlowRateMax = sourceDensity * sizing.CondVolFlowRate;
+        sizing.EvapMassFlowRateMax = max(sizing.ChilledWaterMassFlowRateMax, sizing.SourceEvapMassFlowRateMax);
+        sizing.CondMassFlowRateMax = max(sizing.HotWaterMassFlowRateMax, sizing.SourceCondMassFlowRateMax);
     }
 }
 
@@ -1845,7 +1877,7 @@ void WrapperSpecs::resetOffState(EnergyPlusData &state, bool const releasePlantF
     this->SimulHtgDominant = false;
 
     for (auto &chillerHeater : this->ChillerHeater) {
-        chillerHeater.resetAllResults(chilledWaterInletTemp, sourceInletTemp);
+        chillerHeater.resetResult(chilledWaterInletTemp, sourceInletTemp);
     }
 
     this->Report = WrapperReportVars();
@@ -1855,10 +1887,6 @@ void WrapperSpecs::resetOffState(EnergyPlusData &state, bool const releasePlantF
     this->Report.HWOutletTemp = hotWaterInletTemp;
     this->Report.GLHEInletTemp = sourceInletTemp;
     this->Report.GLHEOutletTemp = sourceInletTemp;
-    this->Report.CHWInletTempSimul = chilledWaterInletTemp;
-    this->Report.CHWOutletTempSimul = chilledWaterInletTemp;
-    this->Report.GLHEInletTempSimul = sourceInletTemp;
-    this->Report.GLHEOutletTempSimul = sourceInletTemp;
 
     state.dataLoopNodes->Node(this->CHWOutletNodeNum).Temp = chilledWaterInletTemp;
     state.dataLoopNodes->Node(this->HWOutletNodeNum).Temp = hotWaterInletTemp;
@@ -1888,7 +1916,8 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    //  This subroutine is for initializations of the CentralHeatPumpSystem variables
+    //  This subroutine is for initializations of the CentralHeatPumpSystem
+    //  variables
 
     // METHODOLOGY EMPLOYED:
     //  Uses the status flags to trigger initializations.
@@ -1935,9 +1964,10 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                 _);
 
         if (errFlag) {
-            ShowFatalError(
-                state,
-                std::format("InitCGSHPHeatPump: CentralHeatPumpSystem={} could not be located on all three connected plant loops.", this->Name));
+            ShowFatalError(state,
+                           std::format("InitCGSHPHeatPump: CentralHeatPumpSystem={} could not "
+                                       "be located on all three connected plant loops.",
+                                       this->Name));
         }
 
         PlantUtilities::InterConnectTwoPlantLoopSides(
@@ -1949,7 +1979,8 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
         PlantUtilities::InterConnectTwoPlantLoopSides(
             state, this->CWPlantLoc, this->HWPlantLoc, DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump, true);
 
-        if (this->VariableFlowCH) { // why do this only for VS chiller heaters? constant flow also uses set points.
+        if (this->VariableFlowCH) { // why do this only for VS chiller heaters?
+                                    // constant flow also uses set points.
             // Reset flow priority
             if (LoopNum == this->CWPlantLoc.loopNum) {
                 DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc).FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
@@ -1963,10 +1994,15 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 if (!this->CoolSetPointErrDone) {
                     ShowWarningError(state,
-                                     std::format("Missing temperature setpoint on cooling side for CentralHeatPumpSystem named {}", this->Name));
+                                     std::format("Missing temperature setpoint on cooling side "
+                                                 "for CentralHeatPumpSystem named {}",
+                                                 this->Name));
                     ShowContinueError(state,
-                                      "  A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem, use a SetpointManager");
-                    ShowContinueError(state, "  The overall loop setpoint will be assumed for CentralHeatPumpSystem. The simulation continues ... ");
+                                      "  A temperature setpoint is needed at the outlet node of "
+                                      "a CentralHeatPumpSystem, use a SetpointManager");
+                    ShowContinueError(state,
+                                      "  The overall loop setpoint will be assumed for "
+                                      "CentralHeatPumpSystem. The simulation continues ... ");
                     this->CoolSetPointErrDone = true;
                 }
             } else {
@@ -1977,11 +2013,21 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                 if (FatalError) {
                     if (!this->CoolSetPointErrDone) {
                         ShowWarningError(state,
-                                         std::format("Missing temperature setpoint on cooling side for CentralHeatPumpSystem named {}", this->Name));
-                        ShowContinueError(state, "A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem ");
-                        ShowContinueError(state, "use a Setpoint Manager to establish a setpoint at the chiller side outlet node ");
-                        ShowContinueError(state, "or use an EMS actuator to establish a setpoint at the outlet node ");
-                        ShowContinueError(state, "The overall loop setpoint will be assumed for chiller side. The simulation continues ... ");
+                                         std::format("Missing temperature setpoint on cooling "
+                                                     "side for CentralHeatPumpSystem named {}",
+                                                     this->Name));
+                        ShowContinueError(state,
+                                          "A temperature setpoint is needed at the "
+                                          "outlet node of a CentralHeatPumpSystem ");
+                        ShowContinueError(state,
+                                          "use a Setpoint Manager to establish a setpoint "
+                                          "at the chiller side outlet node ");
+                        ShowContinueError(state,
+                                          "or use an EMS actuator to establish a "
+                                          "setpoint at the outlet node ");
+                        ShowContinueError(state,
+                                          "The overall loop setpoint will be assumed for "
+                                          "chiller side. The simulation continues ... ");
                         this->CoolSetPointErrDone = true;
                     }
                 }
@@ -1993,10 +2039,15 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 if (!this->HeatSetPointErrDone) {
                     ShowWarningError(state,
-                                     std::format("Missing temperature setpoint on heating side for CentralHeatPumpSystem named {}", this->Name));
+                                     std::format("Missing temperature setpoint on heating side "
+                                                 "for CentralHeatPumpSystem named {}",
+                                                 this->Name));
                     ShowContinueError(state,
-                                      "  A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem, use a SetpointManager");
-                    ShowContinueError(state, "  The overall loop setpoint will be assumed for CentralHeatPumpSystem. The simulation continues ... ");
+                                      "  A temperature setpoint is needed at the outlet node of "
+                                      "a CentralHeatPumpSystem, use a SetpointManager");
+                    ShowContinueError(state,
+                                      "  The overall loop setpoint will be assumed for "
+                                      "CentralHeatPumpSystem. The simulation continues ... ");
                     this->HeatSetPointErrDone = true;
                 }
             } else {
@@ -2007,11 +2058,21 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                 if (FatalError) {
                     if (!this->HeatSetPointErrDone) {
                         ShowWarningError(state,
-                                         std::format("Missing temperature setpoint on heating side for CentralHeatPumpSystem named {}", this->Name));
-                        ShowContinueError(state, "A temperature setpoint is needed at the outlet node of a CentralHeatPumpSystem ");
-                        ShowContinueError(state, "use a Setpoint Manager to establish a setpoint at the chiller side outlet node ");
-                        ShowContinueError(state, "or use an EMS actuator to establish a setpoint at the outlet node ");
-                        ShowContinueError(state, "The overall loop setpoint will be assumed for chiller side. The simulation continues ... ");
+                                         std::format("Missing temperature setpoint on heating "
+                                                     "side for CentralHeatPumpSystem named {}",
+                                                     this->Name));
+                        ShowContinueError(state,
+                                          "A temperature setpoint is needed at the "
+                                          "outlet node of a CentralHeatPumpSystem ");
+                        ShowContinueError(state,
+                                          "use a Setpoint Manager to establish a setpoint "
+                                          "at the chiller side outlet node ");
+                        ShowContinueError(state,
+                                          "or use an EMS actuator to establish a "
+                                          "setpoint at the outlet node ");
+                        ShowContinueError(state,
+                                          "The overall loop setpoint will be assumed for "
+                                          "chiller side. The simulation continues ... ");
                         this->HeatSetPointErrDone = true;
                     }
                 }
@@ -2049,7 +2110,8 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
         return;
     }
 
-    // Switch over the mass flow rate to the condenser loop, i.e., ground heat exchanger
+    // Switch over the mass flow rate to the condenser loop, i.e., ground heat
+    // exchanger
     if (LoopNum == this->CWPlantLoc.loopNum) { // called for on cooling loop
         if (MyLoad < -1.0) {                   // calling for cooling
             mdotCHW = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRateMax;
@@ -2122,6 +2184,8 @@ ChillerHeaterResult WrapperSpecs::solveCoolingOnly(EnergyPlusData &state,
     constexpr Real64 convergenceTolerance = 1.0e-8;
 
     auto &chillerHeater = this->ChillerHeater(chillerHeaterNum);
+    auto const &performance = chillerHeater.performanceData();
+    ModePerformanceData const modePerformance = chillerHeater.coolingModePerformance();
     ChillerHeaterResult result;
     result.requestedCoolingLoad = max(0.0, requestedCoolingLoad);
     result.evaporatorInletTemp = evaporatorInletTemp;
@@ -2131,29 +2195,27 @@ ChillerHeaterResult WrapperSpecs::solveCoolingOnly(EnergyPlusData &state,
     result.unmetCoolingLoad = result.requestedCoolingLoad;
 
     if (result.requestedCoolingLoad <= HVAC::SmallLoad || evaporatorMassFlowRateMax <= DataBranchAirLoopPlant::MassFlowTolerance ||
-        condenserMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || chillerHeater.RefCap <= 0.0 || chillerHeater.RefCOP <= 0.0) {
-        result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+        condenserMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || modePerformance.referenceEvaporatorCapacity <= 0.0 ||
+        modePerformance.referenceCOP <= 0.0) {
+        result.updatePowerAccounting(performance.OpenMotorEff);
         return result;
     }
 
-    Real64 minPartLoadRatio = 0.0;
-    Real64 maxPartLoadRatio = 1.0;
-    getPartLoadCurveMinMax(state, chillerHeater.ChillerEIRFPLRIDX, minPartLoadRatio, maxPartLoadRatio);
-    minPartLoadRatio = max(0.0, minPartLoadRatio);
-    maxPartLoadRatio = max(minPartLoadRatio, maxPartLoadRatio);
+    Real64 const minPartLoadRatio = modePerformance.minimumPartLoadRatio;
+    Real64 const maxPartLoadRatio = modePerformance.maximumPartLoadRatio;
 
     Real64 const evaporatorCp = this->CWPlantLoc.loop->glycol->getSpecificHeat(state, evaporatorInletTemp, routineName);
     Real64 const condenserCp = this->GLHEPlantLoc.loop->glycol->getSpecificHeat(state, condenserInletTemp, routineName);
     Real64 evaporatorOutletTarget = state.dataLoopNodes->Node(this->CoolSetPointTempNode).TempSetPoint;
     if (evaporatorOutletTarget == Node::SensedNodeFlagValue) {
-        evaporatorOutletTarget = chillerHeater.EvapOutletNode.TempMin;
+        evaporatorOutletTarget = chillerHeater.minimumEvaporatorOutletTemp;
     }
-    evaporatorOutletTarget = max(evaporatorOutletTarget, chillerHeater.EvapOutletNode.TempMin);
+    evaporatorOutletTarget = max(evaporatorOutletTarget, chillerHeater.minimumEvaporatorOutletTemp);
     Real64 const evaporatorDeltaTempTarget = max(0.0, evaporatorInletTemp - evaporatorOutletTarget);
     Real64 const flowLimitedCooling = evaporatorMassFlowRateMax * evaporatorCp * evaporatorDeltaTempTarget;
 
     if (flowLimitedCooling <= HVAC::SmallLoad) {
-        result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+        result.updatePowerAccounting(performance.OpenMotorEff);
         return result;
     }
 
@@ -2175,9 +2237,9 @@ ChillerHeaterResult WrapperSpecs::solveCoolingOnly(EnergyPlusData &state,
     Real64 condenserCurveTemp = condenserInletTemp;
 
     for (int iteration = 0; iteration < maxIterations; ++iteration) {
-        condenserCurveTemp = this->setChillerHeaterCondTemp(state, chillerHeaterNum, condenserInletTemp, condenserOutletGuess);
-        capacityModifier = this->calcChillerCapFT(state, chillerHeaterNum, evaporatorOutletGuess, condenserCurveTemp);
-        availableEvaporatorCapacity = chillerHeater.RefCap * capacityModifier;
+        condenserCurveTemp = setChillerHeaterCondTemp(modePerformance, condenserInletTemp, condenserOutletGuess);
+        capacityModifier = this->calcChillerCapFT(state, chillerHeater, modePerformance, evaporatorOutletGuess, condenserCurveTemp);
+        availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
         qEvaporator = std::min({result.requestedCoolingLoad, availableEvaporatorCapacity * maxPartLoadRatio, flowLimitedCooling});
 
         if (qEvaporator <= HVAC::SmallLoad || availableEvaporatorCapacity <= 0.0) {
@@ -2197,10 +2259,11 @@ ChillerHeaterResult WrapperSpecs::solveCoolingOnly(EnergyPlusData &state,
         cyclingRatio = minPartLoadRatio > 0.0 ? min(1.0, requestedPartLoadRatio / minPartLoadRatio) : 1.0;
         falseLoadRate = max(0.0, availableEvaporatorCapacity * partLoadRatio * cyclingRatio - qEvaporator);
 
-        eirTemperatureModifier = max(0.0, Curve::CurveValue(state, chillerHeater.ChillerEIRFTIDX, evaporatorOutletTemp, condenserCurveTemp));
-        eirPartLoadModifier = max(0.0, evaluatePartLoadCurve(state, chillerHeater.ChillerEIRFPLRIDX, condenserCurveTemp, partLoadRatio));
-        compressorPower = (availableEvaporatorCapacity / chillerHeater.RefCOP) * eirTemperatureModifier * eirPartLoadModifier * cyclingRatio;
-        qCondenser = qEvaporator + falseLoadRate + compressorPower * chillerHeater.OpenMotorEff;
+        eirTemperatureModifier =
+            max(0.0, Curve::CurveValue(state, modePerformance.eirTemperatureCurveIndex, evaporatorOutletTemp, condenserCurveTemp));
+        eirPartLoadModifier = max(0.0, evaluatePartLoadCurve(state, modePerformance.eirPartLoadCurveIndex, condenserCurveTemp, partLoadRatio));
+        compressorPower = (availableEvaporatorCapacity / modePerformance.referenceCOP) * eirTemperatureModifier * eirPartLoadModifier * cyclingRatio;
+        qCondenser = qEvaporator + falseLoadRate + compressorPower * performance.OpenMotorEff;
         condenserOutletTemp = condenserInletTemp + qCondenser / (condenserMassFlowRate * condenserCp);
 
         Real64 const residual = max(std::abs(evaporatorOutletTemp - evaporatorOutletGuess), std::abs(condenserOutletTemp - condenserOutletGuess));
@@ -2212,27 +2275,28 @@ ChillerHeaterResult WrapperSpecs::solveCoolingOnly(EnergyPlusData &state,
     }
 
     if (qEvaporator <= HVAC::SmallLoad) {
-        result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+        result.updatePowerAccounting(performance.OpenMotorEff);
         return result;
     }
 
-    condenserCurveTemp = this->setChillerHeaterCondTemp(state, chillerHeaterNum, condenserInletTemp, condenserOutletTemp);
-    capacityModifier = this->calcChillerCapFT(state, chillerHeaterNum, evaporatorOutletTemp, condenserCurveTemp);
-    availableEvaporatorCapacity = chillerHeater.RefCap * capacityModifier;
-    eirTemperatureModifier = max(0.0, Curve::CurveValue(state, chillerHeater.ChillerEIRFTIDX, evaporatorOutletTemp, condenserCurveTemp));
-    eirPartLoadModifier = max(0.0, evaluatePartLoadCurve(state, chillerHeater.ChillerEIRFPLRIDX, condenserCurveTemp, partLoadRatio));
-    compressorPower = (availableEvaporatorCapacity / chillerHeater.RefCOP) * eirTemperatureModifier * eirPartLoadModifier * cyclingRatio;
+    condenserCurveTemp = setChillerHeaterCondTemp(modePerformance, condenserInletTemp, condenserOutletTemp);
+    capacityModifier = this->calcChillerCapFT(state, chillerHeater, modePerformance, evaporatorOutletTemp, condenserCurveTemp);
+    availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
+    eirTemperatureModifier = max(0.0, Curve::CurveValue(state, modePerformance.eirTemperatureCurveIndex, evaporatorOutletTemp, condenserCurveTemp));
+    eirPartLoadModifier = max(0.0, evaluatePartLoadCurve(state, modePerformance.eirPartLoadCurveIndex, condenserCurveTemp, partLoadRatio));
+    compressorPower = (availableEvaporatorCapacity / modePerformance.referenceCOP) * eirTemperatureModifier * eirPartLoadModifier * cyclingRatio;
     falseLoadRate = max(0.0, availableEvaporatorCapacity * partLoadRatio * cyclingRatio - qEvaporator);
-    qCondenser = qEvaporator + falseLoadRate + compressorPower * chillerHeater.OpenMotorEff;
+    qCondenser = qEvaporator + falseLoadRate + compressorPower * performance.OpenMotorEff;
     condenserOutletTemp = condenserInletTemp + qCondenser / (condenserMassFlowRate * condenserCp);
 
     Real64 const availableEIRPartLoadModifier =
-        max(0.0, evaluatePartLoadCurve(state, chillerHeater.ChillerEIRFPLRIDX, condenserCurveTemp, maxPartLoadRatio));
-    Real64 const availablePower = (availableEvaporatorCapacity / chillerHeater.RefCOP) * eirTemperatureModifier * availableEIRPartLoadModifier;
+        max(0.0, evaluatePartLoadCurve(state, modePerformance.eirPartLoadCurveIndex, condenserCurveTemp, maxPartLoadRatio));
+    Real64 const availablePower =
+        (availableEvaporatorCapacity / modePerformance.referenceCOP) * eirTemperatureModifier * availableEIRPartLoadModifier;
 
     result.currentMode = CurrentMode::CoolingOnly;
     result.availableEvaporatorCapacity = availableEvaporatorCapacity;
-    result.availableCondenserCapacity = availableEvaporatorCapacity * maxPartLoadRatio + availablePower * chillerHeater.OpenMotorEff;
+    result.availableCondenserCapacity = availableEvaporatorCapacity * maxPartLoadRatio + availablePower * performance.OpenMotorEff;
     result.qEvaporator = qEvaporator;
     result.qCondenser = qCondenser;
     result.coolingPower = compressorPower;
@@ -2255,7 +2319,7 @@ ChillerHeaterResult WrapperSpecs::solveCoolingOnly(EnergyPlusData &state,
     result.condenserOutletTemp = condenserOutletTemp;
     result.condenserMassFlowRate = condenserMassFlowRate;
     result.unmetCoolingLoad = max(0.0, result.requestedCoolingLoad - qEvaporator);
-    result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+    result.updatePowerAccounting(performance.OpenMotorEff);
     return result;
 }
 
@@ -2273,6 +2337,8 @@ ChillerHeaterResult WrapperSpecs::solveHeatingOnly(EnergyPlusData &state,
     constexpr Real64 convergenceTolerance = 1.0e-8;
 
     auto &chillerHeater = this->ChillerHeater(chillerHeaterNum);
+    auto const &performance = chillerHeater.performanceData();
+    ModePerformanceData const modePerformance = chillerHeater.heatingModePerformance();
     ChillerHeaterResult result;
     result.requestedHeatingLoad = max(0.0, requestedHeatingLoad);
     result.evaporatorInletTemp = evaporatorInletTemp;
@@ -2282,20 +2348,18 @@ ChillerHeaterResult WrapperSpecs::solveHeatingOnly(EnergyPlusData &state,
     result.unmetHeatingLoad = result.requestedHeatingLoad;
 
     if (result.requestedHeatingLoad <= HVAC::SmallLoad || evaporatorMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance ||
-        condenserMassFlowRateMax <= DataBranchAirLoopPlant::MassFlowTolerance || chillerHeater.RefCap <= 0.0 || chillerHeater.RefCOP <= 0.0) {
-        result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+        condenserMassFlowRateMax <= DataBranchAirLoopPlant::MassFlowTolerance || modePerformance.referenceEvaporatorCapacity <= 0.0 ||
+        modePerformance.referenceCOP <= 0.0) {
+        result.updatePowerAccounting(performance.OpenMotorEff);
         return result;
     }
 
-    Real64 minPartLoadRatio = 0.0;
-    Real64 maxPartLoadRatio = 1.0;
-    getPartLoadCurveMinMax(state, chillerHeater.ChillerEIRFPLRIDX, minPartLoadRatio, maxPartLoadRatio);
-    minPartLoadRatio = max(0.0, minPartLoadRatio);
-    maxPartLoadRatio = max(minPartLoadRatio, maxPartLoadRatio);
+    Real64 const minPartLoadRatio = modePerformance.minimumPartLoadRatio;
+    Real64 const maxPartLoadRatio = modePerformance.maximumPartLoadRatio;
 
     Real64 const evaporatorCp = this->GLHEPlantLoc.loop->glycol->getSpecificHeat(state, evaporatorInletTemp, routineName);
     Real64 const condenserCp = this->HWPlantLoc.loop->glycol->getSpecificHeat(state, condenserInletTemp, routineName);
-    Real64 const evaporatorOutletLowLimit = max(chillerHeater.TempLowLimitEvapOut, chillerHeater.EvapOutletNode.TempMin);
+    Real64 const evaporatorOutletLowLimit = max(performance.TempLowLimitEvapOut, chillerHeater.minimumEvaporatorOutletTemp);
     Real64 const sourceLimitedEvaporatorHeat = max(0.0, evaporatorMassFlowRate * evaporatorCp * (evaporatorInletTemp - evaporatorOutletLowLimit));
 
     bool hasCondenserOutletLimit = false;
@@ -2305,9 +2369,9 @@ ChillerHeaterResult WrapperSpecs::solveHeatingOnly(EnergyPlusData &state,
         condenserOutletLimit = plantHeatingSetPoint;
         hasCondenserOutletLimit = true;
     }
-    if (!chillerHeater.MaxHeatingLeavingCondTempWasBlank) {
+    if (!performance.MaxHeatingLeavingCondTempWasBlank) {
         condenserOutletLimit =
-            hasCondenserOutletLimit ? min(condenserOutletLimit, chillerHeater.MaxHeatingLeavingCondTemp) : chillerHeater.MaxHeatingLeavingCondTemp;
+            hasCondenserOutletLimit ? min(condenserOutletLimit, performance.MaxHeatingLeavingCondTemp) : performance.MaxHeatingLeavingCondTemp;
         hasCondenserOutletLimit = true;
     }
     Real64 const hotWaterLimitedCondenserHeat = hasCondenserOutletLimit
@@ -2315,7 +2379,7 @@ ChillerHeaterResult WrapperSpecs::solveHeatingOnly(EnergyPlusData &state,
                                                     : std::numeric_limits<Real64>::max();
 
     if (sourceLimitedEvaporatorHeat <= HVAC::SmallLoad || hotWaterLimitedCondenserHeat <= HVAC::SmallLoad) {
-        result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+        result.updatePowerAccounting(performance.OpenMotorEff);
         return result;
     }
 
@@ -2341,20 +2405,24 @@ ChillerHeaterResult WrapperSpecs::solveHeatingOnly(EnergyPlusData &state,
     Real64 condenserCurveTemp = condenserInletTemp;
 
     for (int iteration = 0; iteration < maxIterations; ++iteration) {
-        condenserCurveTemp = this->setChillerHeaterCondTemp(state, chillerHeaterNum, condenserInletTemp, condenserOutletGuess);
-        capacityModifier = this->calcChillerCapFT(state, chillerHeaterNum, evaporatorOutletGuess, condenserCurveTemp);
-        availableEvaporatorCapacity = chillerHeater.RefCap * capacityModifier;
-        eirTemperatureModifier = max(0.0, Curve::CurveValue(state, chillerHeater.ChillerEIRFTIDX, evaporatorOutletGuess, condenserCurveTemp));
+        condenserCurveTemp = setChillerHeaterCondTemp(modePerformance, condenserInletTemp, condenserOutletGuess);
+        capacityModifier = this->calcChillerCapFT(state, chillerHeater, modePerformance, evaporatorOutletGuess, condenserCurveTemp);
+        availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
+        eirTemperatureModifier =
+            max(0.0, Curve::CurveValue(state, modePerformance.eirTemperatureCurveIndex, evaporatorOutletGuess, condenserCurveTemp));
 
         if (availableEvaporatorCapacity <= 0.0) {
             break;
         }
 
         auto operatingPointAtPLR = [&](Real64 const plr) {
-            Real64 const eirPLR = max(0.0, evaluatePartLoadCurve(state, chillerHeater.ChillerEIRFPLRIDX, condenserCurveTemp, plr));
-            Real64 const power = (availableEvaporatorCapacity / chillerHeater.RefCOP) * eirTemperatureModifier * eirPLR;
-            Real64 const condenserHeat = availableEvaporatorCapacity * plr + power * chillerHeater.OpenMotorEff;
-            return std::array<Real64, 3>{condenserHeat, power, eirPLR};
+            PartLoadOperatingPoint point;
+            point.partLoadRatio = plr;
+            point.eirPartLoadModifier = max(0.0, evaluatePartLoadCurve(state, modePerformance.eirPartLoadCurveIndex, condenserCurveTemp, plr));
+            point.evaporatorLoad = availableEvaporatorCapacity * plr;
+            point.compressorPower = (availableEvaporatorCapacity / modePerformance.referenceCOP) * eirTemperatureModifier * point.eirPartLoadModifier;
+            point.condenserLoad = point.evaporatorLoad + point.compressorPower * performance.OpenMotorEff;
+            return point;
         };
 
         Real64 maximumAllowedPLR = min(maxPartLoadRatio, sourceLimitedEvaporatorHeat / availableEvaporatorCapacity);
@@ -2364,7 +2432,7 @@ ChillerHeaterResult WrapperSpecs::solveHeatingOnly(EnergyPlusData &state,
             maximumAllowedPLR = minPartLoadRatio;
         }
         auto const maximumPoint = operatingPointAtPLR(maximumAllowedPLR);
-        availableCondenserCapacity = maximumPoint[0] * maximumCyclingRatio;
+        availableCondenserCapacity = maximumPoint.condenserLoad * maximumCyclingRatio;
         availableCondenserCapacity = min(availableCondenserCapacity, hotWaterLimitedCondenserHeat);
         Real64 const targetCondenserHeat = min(result.requestedHeatingLoad, availableCondenserCapacity);
         if (targetCondenserHeat <= HVAC::SmallLoad) {
@@ -2372,16 +2440,16 @@ ChillerHeaterResult WrapperSpecs::solveHeatingOnly(EnergyPlusData &state,
         }
 
         auto const minimumPoint = operatingPointAtPLR(minPartLoadRatio);
-        if (targetCondenserHeat < minimumPoint[0]) {
+        if (targetCondenserHeat < minimumPoint.condenserLoad) {
             partLoadRatio = minPartLoadRatio;
-            cyclingRatio = min(maximumCyclingRatio, targetCondenserHeat / minimumPoint[0]);
+            cyclingRatio = min(maximumCyclingRatio, targetCondenserHeat / minimumPoint.condenserLoad);
         } else {
             cyclingRatio = 1.0;
             Real64 lowerPLR = minPartLoadRatio;
             Real64 upperPLR = maximumAllowedPLR;
             for (int plrIteration = 0; plrIteration < maxPartLoadIterations; ++plrIteration) {
                 Real64 const candidatePLR = 0.5 * (lowerPLR + upperPLR);
-                if (operatingPointAtPLR(candidatePLR)[0] < targetCondenserHeat) {
+                if (operatingPointAtPLR(candidatePLR).condenserLoad < targetCondenserHeat) {
                     lowerPLR = candidatePLR;
                 } else {
                     upperPLR = candidatePLR;
@@ -2392,9 +2460,9 @@ ChillerHeaterResult WrapperSpecs::solveHeatingOnly(EnergyPlusData &state,
 
         auto const operatingPoint = operatingPointAtPLR(partLoadRatio);
         qEvaporator = availableEvaporatorCapacity * partLoadRatio * cyclingRatio;
-        compressorPower = operatingPoint[1] * cyclingRatio;
-        eirPartLoadModifier = operatingPoint[2];
-        qCondenser = qEvaporator + compressorPower * chillerHeater.OpenMotorEff;
+        compressorPower = operatingPoint.compressorPower * cyclingRatio;
+        eirPartLoadModifier = operatingPoint.eirPartLoadModifier;
+        qCondenser = qEvaporator + compressorPower * performance.OpenMotorEff;
 
         if (this->VariableFlowCH && hasCondenserOutletLimit && condenserOutletLimit > condenserInletTemp) {
             condenserMassFlowRate = min(condenserMassFlowRateMax, qCondenser / (condenserCp * (condenserOutletLimit - condenserInletTemp)));
@@ -2413,18 +2481,18 @@ ChillerHeaterResult WrapperSpecs::solveHeatingOnly(EnergyPlusData &state,
     }
 
     if (qCondenser <= HVAC::SmallLoad) {
-        result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+        result.updatePowerAccounting(performance.OpenMotorEff);
         return result;
     }
 
-    condenserCurveTemp = this->setChillerHeaterCondTemp(state, chillerHeaterNum, condenserInletTemp, condenserOutletTemp);
-    capacityModifier = this->calcChillerCapFT(state, chillerHeaterNum, evaporatorOutletTemp, condenserCurveTemp);
-    availableEvaporatorCapacity = chillerHeater.RefCap * capacityModifier;
-    eirTemperatureModifier = max(0.0, Curve::CurveValue(state, chillerHeater.ChillerEIRFTIDX, evaporatorOutletTemp, condenserCurveTemp));
-    eirPartLoadModifier = max(0.0, evaluatePartLoadCurve(state, chillerHeater.ChillerEIRFPLRIDX, condenserCurveTemp, partLoadRatio));
-    compressorPower = (availableEvaporatorCapacity / chillerHeater.RefCOP) * eirTemperatureModifier * eirPartLoadModifier * cyclingRatio;
+    condenserCurveTemp = setChillerHeaterCondTemp(modePerformance, condenserInletTemp, condenserOutletTemp);
+    capacityModifier = this->calcChillerCapFT(state, chillerHeater, modePerformance, evaporatorOutletTemp, condenserCurveTemp);
+    availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
+    eirTemperatureModifier = max(0.0, Curve::CurveValue(state, modePerformance.eirTemperatureCurveIndex, evaporatorOutletTemp, condenserCurveTemp));
+    eirPartLoadModifier = max(0.0, evaluatePartLoadCurve(state, modePerformance.eirPartLoadCurveIndex, condenserCurveTemp, partLoadRatio));
+    compressorPower = (availableEvaporatorCapacity / modePerformance.referenceCOP) * eirTemperatureModifier * eirPartLoadModifier * cyclingRatio;
     qEvaporator = availableEvaporatorCapacity * partLoadRatio * cyclingRatio;
-    qCondenser = qEvaporator + compressorPower * chillerHeater.OpenMotorEff;
+    qCondenser = qEvaporator + compressorPower * performance.OpenMotorEff;
     evaporatorOutletTemp = evaporatorInletTemp - qEvaporator / (evaporatorMassFlowRate * evaporatorCp);
     condenserOutletTemp = condenserInletTemp + qCondenser / (condenserMassFlowRate * condenserCp);
 
@@ -2452,7 +2520,7 @@ ChillerHeaterResult WrapperSpecs::solveHeatingOnly(EnergyPlusData &state,
     result.condenserOutletTemp = condenserOutletTemp;
     result.condenserMassFlowRate = condenserMassFlowRate;
     result.unmetHeatingLoad = max(0.0, result.requestedHeatingLoad - qCondenser);
-    result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+    result.updatePowerAccounting(performance.OpenMotorEff);
     return result;
 }
 
@@ -2473,6 +2541,9 @@ ChillerHeaterResult WrapperSpecs::solveSimultaneous(EnergyPlusData &state,
     constexpr Real64 convergenceTolerance = 1.0e-8;
 
     auto &chillerHeater = this->ChillerHeater(chillerHeaterNum);
+    auto const &performance = chillerHeater.performanceData();
+    auto const &sizing = chillerHeater.sizing;
+    ModePerformanceData const modePerformance = chillerHeater.heatingModePerformance();
     ChillerHeaterResult result;
     result.requestedCoolingLoad = max(0.0, requestedCoolingLoad);
     result.requestedHeatingLoad = max(0.0, requestedHeatingLoad);
@@ -2487,16 +2558,14 @@ ChillerHeaterResult WrapperSpecs::solveSimultaneous(EnergyPlusData &state,
 
     if (result.requestedCoolingLoad <= HVAC::SmallLoad || result.requestedHeatingLoad <= HVAC::SmallLoad ||
         chilledWaterMassFlowRateMax <= DataBranchAirLoopPlant::MassFlowTolerance ||
-        hotWaterMassFlowRateMax <= DataBranchAirLoopPlant::MassFlowTolerance || chillerHeater.RefCap <= 0.0 || chillerHeater.RefCOP <= 0.0) {
-        result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+        hotWaterMassFlowRateMax <= DataBranchAirLoopPlant::MassFlowTolerance || modePerformance.referenceEvaporatorCapacity <= 0.0 ||
+        modePerformance.referenceCOP <= 0.0) {
+        result.updatePowerAccounting(performance.OpenMotorEff);
         return result;
     }
 
-    Real64 minPartLoadRatio = 0.0;
-    Real64 maxPartLoadRatio = 1.0;
-    getPartLoadCurveMinMax(state, chillerHeater.ChillerEIRFPLRIDX, minPartLoadRatio, maxPartLoadRatio);
-    minPartLoadRatio = max(0.0, minPartLoadRatio);
-    maxPartLoadRatio = max(minPartLoadRatio, maxPartLoadRatio);
+    Real64 const minPartLoadRatio = modePerformance.minimumPartLoadRatio;
+    Real64 const maxPartLoadRatio = modePerformance.maximumPartLoadRatio;
 
     Real64 const chilledWaterCp = this->CWPlantLoc.loop->glycol->getSpecificHeat(state, chilledWaterInletTemp, routineName);
     Real64 const hotWaterCp = this->HWPlantLoc.loop->glycol->getSpecificHeat(state, hotWaterInletTemp, routineName);
@@ -2504,9 +2573,9 @@ ChillerHeaterResult WrapperSpecs::solveSimultaneous(EnergyPlusData &state,
 
     Real64 chilledWaterOutletTarget = state.dataLoopNodes->Node(this->CoolSetPointTempNode).TempSetPoint;
     if (chilledWaterOutletTarget == Node::SensedNodeFlagValue) {
-        chilledWaterOutletTarget = chillerHeater.EvapOutletNode.TempMin;
+        chilledWaterOutletTarget = chillerHeater.minimumEvaporatorOutletTemp;
     }
-    chilledWaterOutletTarget = max(chilledWaterOutletTarget, chillerHeater.EvapOutletNode.TempMin);
+    chilledWaterOutletTarget = max(chilledWaterOutletTarget, chillerHeater.minimumEvaporatorOutletTemp);
     Real64 const chilledWaterDeltaTempTarget = max(0.0, chilledWaterInletTemp - chilledWaterOutletTarget);
     Real64 const coolingTarget = min(result.requestedCoolingLoad, chilledWaterMassFlowRateMax * chilledWaterCp * chilledWaterDeltaTempTarget);
 
@@ -2517,9 +2586,9 @@ ChillerHeaterResult WrapperSpecs::solveSimultaneous(EnergyPlusData &state,
         hotWaterOutletLimit = plantHeatingSetPoint;
         hasHotWaterOutletLimit = true;
     }
-    if (!chillerHeater.MaxHeatingLeavingCondTempWasBlank) {
+    if (!performance.MaxHeatingLeavingCondTempWasBlank) {
         hotWaterOutletLimit =
-            hasHotWaterOutletLimit ? min(hotWaterOutletLimit, chillerHeater.MaxHeatingLeavingCondTemp) : chillerHeater.MaxHeatingLeavingCondTemp;
+            hasHotWaterOutletLimit ? min(hotWaterOutletLimit, performance.MaxHeatingLeavingCondTemp) : performance.MaxHeatingLeavingCondTemp;
         hasHotWaterOutletLimit = true;
     }
     Real64 const hotWaterDeltaTempTarget = hasHotWaterOutletLimit ? max(0.0, hotWaterOutletLimit - hotWaterInletTemp) : 0.0;
@@ -2537,16 +2606,16 @@ ChillerHeaterResult WrapperSpecs::solveSimultaneous(EnergyPlusData &state,
         }
         return min(sourceMassFlowRateMax, max(0.0, flowLimit));
     };
-    Real64 const sourceEvaporatorMassFlowRateMax = sourceFlowLimit(chillerHeater.SourceEvapMassFlowRateMax, chillerHeater.EvapMassFlowRateMax);
-    Real64 const sourceCondenserMassFlowRateMax = sourceFlowLimit(chillerHeater.SourceCondMassFlowRateMax, chillerHeater.CondMassFlowRateMax);
-    Real64 const sourceOutletLowLimit = max(chillerHeater.TempLowLimitEvapOut, chillerHeater.EvapOutletNode.TempMin);
+    Real64 const sourceEvaporatorMassFlowRateMax = sourceFlowLimit(sizing.SourceEvapMassFlowRateMax, sizing.EvapMassFlowRateMax);
+    Real64 const sourceCondenserMassFlowRateMax = sourceFlowLimit(sizing.SourceCondMassFlowRateMax, sizing.CondMassFlowRateMax);
+    Real64 const sourceOutletLowLimit = max(performance.TempLowLimitEvapOut, chillerHeater.minimumEvaporatorOutletTemp);
     Real64 const sourceExtractionCapacity = sourceEvaporatorMassFlowRateMax > DataBranchAirLoopPlant::MassFlowTolerance
                                                 ? max(0.0, sourceEvaporatorMassFlowRateMax * sourceCp * (sourceInletTemp - sourceOutletLowLimit))
                                                 : 0.0;
     bool const canRejectToSource = sourceCondenserMassFlowRateMax > DataBranchAirLoopPlant::MassFlowTolerance;
 
     if (coolingTarget <= HVAC::SmallLoad || heatingTarget <= HVAC::SmallLoad) {
-        result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+        result.updatePowerAccounting(performance.OpenMotorEff);
         return result;
     }
 
@@ -2587,47 +2656,49 @@ ChillerHeaterResult WrapperSpecs::solveSimultaneous(EnergyPlusData &state,
     Real64 condenserMassFlowRate = 0.0;
 
     for (int iteration = 0; iteration < maxIterations; ++iteration) {
-        condenserCurveTemp = this->setChillerHeaterCondTemp(state, chillerHeaterNum, condenserEnteringTempGuess, condenserLeavingTempGuess);
-        capacityModifier = this->calcChillerCapFT(state, chillerHeaterNum, evaporatorCurveTempGuess, condenserCurveTemp);
-        availableEvaporatorCapacity = chillerHeater.RefCap * capacityModifier;
-        eirTemperatureModifier = max(0.0, Curve::CurveValue(state, chillerHeater.ChillerEIRFTIDX, evaporatorCurveTempGuess, condenserCurveTemp));
+        condenserCurveTemp = setChillerHeaterCondTemp(modePerformance, condenserEnteringTempGuess, condenserLeavingTempGuess);
+        capacityModifier = this->calcChillerCapFT(state, chillerHeater, modePerformance, evaporatorCurveTempGuess, condenserCurveTemp);
+        availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
+        eirTemperatureModifier =
+            max(0.0, Curve::CurveValue(state, modePerformance.eirTemperatureCurveIndex, evaporatorCurveTempGuess, condenserCurveTemp));
         if (availableEvaporatorCapacity <= 0.0) {
             break;
         }
 
         auto operatingPointAtEvaporatorLoad = [&](Real64 const evaporatorLoad) {
-            std::array<Real64, 6> point{};
+            PartLoadOperatingPoint point;
             if (evaporatorLoad <= HVAC::SmallLoad) {
                 return point;
             }
             Real64 const requestedPartLoadRatio = evaporatorLoad / availableEvaporatorCapacity;
-            Real64 const operatingPartLoadRatio = min(maxPartLoadRatio, max(requestedPartLoadRatio, minPartLoadRatio));
-            Real64 const operatingCyclingRatio =
+            point.partLoadRatio = min(maxPartLoadRatio, max(requestedPartLoadRatio, minPartLoadRatio));
+            point.cyclingRatio =
                 requestedPartLoadRatio < minPartLoadRatio && minPartLoadRatio > 0.0 ? requestedPartLoadRatio / minPartLoadRatio : 1.0;
-            Real64 const partLoadModifier =
-                max(0.0, evaluatePartLoadCurve(state, chillerHeater.ChillerEIRFPLRIDX, condenserCurveTemp, operatingPartLoadRatio));
-            Real64 const power =
-                (availableEvaporatorCapacity / chillerHeater.RefCOP) * eirTemperatureModifier * partLoadModifier * operatingCyclingRatio;
-            Real64 const falseLoad = max(0.0, availableEvaporatorCapacity * operatingPartLoadRatio * operatingCyclingRatio - evaporatorLoad);
-            Real64 const condenserLoad = evaporatorLoad + falseLoad + power * chillerHeater.OpenMotorEff;
-            return std::array<Real64, 6>{evaporatorLoad, condenserLoad, power, falseLoad, operatingPartLoadRatio, operatingCyclingRatio};
+            point.eirPartLoadModifier =
+                max(0.0, evaluatePartLoadCurve(state, modePerformance.eirPartLoadCurveIndex, condenserCurveTemp, point.partLoadRatio));
+            point.evaporatorLoad = evaporatorLoad;
+            point.compressorPower = (availableEvaporatorCapacity / modePerformance.referenceCOP) * eirTemperatureModifier *
+                                    point.eirPartLoadModifier * point.cyclingRatio;
+            point.falseLoadRate = max(0.0, availableEvaporatorCapacity * point.partLoadRatio * point.cyclingRatio - point.evaporatorLoad);
+            point.condenserLoad = point.evaporatorLoad + point.falseLoadRate + point.compressorPower * performance.OpenMotorEff;
+            return point;
         };
 
         Real64 const maximumEvaporatorLoad = min(availableEvaporatorCapacity * maxPartLoadRatio, coolingTarget + sourceExtractionCapacity);
         auto coolingPoint = operatingPointAtEvaporatorLoad(min(coolingTarget, maximumEvaporatorLoad));
         auto maximumPoint = operatingPointAtEvaporatorLoad(maximumEvaporatorLoad);
-        availableCondenserCapacity = maximumPoint[1];
+        availableCondenserCapacity = maximumPoint.condenserLoad;
         auto selectedPoint = coolingPoint;
 
-        bool const heatingDrivesCycle = coolingPoint[1] + HVAC::SmallLoad < heatingTarget;
-        bool const excessHeatCannotBeRejected = !canRejectToSource && coolingPoint[1] > heatingTarget + HVAC::SmallLoad;
+        bool const heatingDrivesCycle = coolingPoint.condenserLoad + HVAC::SmallLoad < heatingTarget;
+        bool const excessHeatCannotBeRejected = !canRejectToSource && coolingPoint.condenserLoad > heatingTarget + HVAC::SmallLoad;
         if (heatingDrivesCycle || excessHeatCannotBeRejected) {
-            Real64 lowerEvaporatorLoad = heatingDrivesCycle ? coolingPoint[0] : 0.0;
-            Real64 upperEvaporatorLoad = heatingDrivesCycle ? maximumEvaporatorLoad : coolingPoint[0];
-            Real64 const boundedHeatingTarget = min(heatingTarget, operatingPointAtEvaporatorLoad(upperEvaporatorLoad)[1]);
+            Real64 lowerEvaporatorLoad = heatingDrivesCycle ? coolingPoint.evaporatorLoad : 0.0;
+            Real64 upperEvaporatorLoad = heatingDrivesCycle ? maximumEvaporatorLoad : coolingPoint.evaporatorLoad;
+            Real64 const boundedHeatingTarget = min(heatingTarget, operatingPointAtEvaporatorLoad(upperEvaporatorLoad).condenserLoad);
             for (int partLoadIteration = 0; partLoadIteration < maxPartLoadIterations; ++partLoadIteration) {
                 Real64 const candidateEvaporatorLoad = 0.5 * (lowerEvaporatorLoad + upperEvaporatorLoad);
-                if (operatingPointAtEvaporatorLoad(candidateEvaporatorLoad)[1] < boundedHeatingTarget) {
+                if (operatingPointAtEvaporatorLoad(candidateEvaporatorLoad).condenserLoad < boundedHeatingTarget) {
                     lowerEvaporatorLoad = candidateEvaporatorLoad;
                 } else {
                     upperEvaporatorLoad = candidateEvaporatorLoad;
@@ -2636,13 +2707,13 @@ ChillerHeaterResult WrapperSpecs::solveSimultaneous(EnergyPlusData &state,
             selectedPoint = operatingPointAtEvaporatorLoad(0.5 * (lowerEvaporatorLoad + upperEvaporatorLoad));
         }
 
-        qEvaporator = selectedPoint[0];
-        qCondenser = selectedPoint[1];
-        compressorPower = selectedPoint[2];
-        falseLoadRate = selectedPoint[3];
-        partLoadRatio = selectedPoint[4];
-        cyclingRatio = selectedPoint[5];
-        eirPartLoadModifier = max(0.0, evaluatePartLoadCurve(state, chillerHeater.ChillerEIRFPLRIDX, condenserCurveTemp, partLoadRatio));
+        qEvaporator = selectedPoint.evaporatorLoad;
+        qCondenser = selectedPoint.condenserLoad;
+        compressorPower = selectedPoint.compressorPower;
+        falseLoadRate = selectedPoint.falseLoadRate;
+        partLoadRatio = selectedPoint.partLoadRatio;
+        cyclingRatio = selectedPoint.cyclingRatio;
+        eirPartLoadModifier = selectedPoint.eirPartLoadModifier;
 
         coolingDelivered = min(coolingTarget, qEvaporator);
         sourceExtraction = max(0.0, qEvaporator - coolingDelivered);
@@ -2707,7 +2778,7 @@ ChillerHeaterResult WrapperSpecs::solveSimultaneous(EnergyPlusData &state,
     }
 
     if (qEvaporator <= HVAC::SmallLoad || qCondenser <= HVAC::SmallLoad) {
-        result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+        result.updatePowerAccounting(performance.OpenMotorEff);
         return result;
     }
 
@@ -2736,7 +2807,7 @@ ChillerHeaterResult WrapperSpecs::solveSimultaneous(EnergyPlusData &state,
     result.eirTemperatureModifier = eirTemperatureModifier;
     result.eirPartLoadModifier = eirPartLoadModifier;
     result.capacityCurveEvaporatorTemp = evaporatorOutletTemp;
-    result.capacityCurveCondenserTemp = this->setChillerHeaterCondTemp(state, chillerHeaterNum, condenserInletTemp, condenserOutletTemp);
+    result.capacityCurveCondenserTemp = setChillerHeaterCondTemp(modePerformance, condenserInletTemp, condenserOutletTemp);
     result.eirCurveEvaporatorTemp = evaporatorOutletTemp;
     result.eirCurveCondenserTemp = result.capacityCurveCondenserTemp;
     result.eirPartLoadCurvePLR = partLoadRatio;
@@ -2760,50 +2831,46 @@ ChillerHeaterResult WrapperSpecs::solveSimultaneous(EnergyPlusData &state,
     result.sourceHeatTransfer = sourceHeatTransfer;
     result.unmetCoolingLoad = max(0.0, result.requestedCoolingLoad - coolingDelivered);
     result.unmetHeatingLoad = max(0.0, result.requestedHeatingLoad - heatingDelivered);
-    result.updatePowerAccounting(chillerHeater.OpenMotorEff);
+    result.updatePowerAccounting(performance.OpenMotorEff);
     return result;
 }
 
-Real64 WrapperSpecs::setChillerHeaterCondTemp([[maybe_unused]] EnergyPlusData &state,
-                                              int const numChillerHeater,
-                                              Real64 const condEnteringTemp,
-                                              Real64 const condLeavingTemp)
+Real64 WrapperSpecs::setChillerHeaterCondTemp(ModePerformanceData const &modePerformance, Real64 const condEnteringTemp, Real64 const condLeavingTemp)
 {
-    Real64 setChillerHeaterCondTemp;
-    if (this->ChillerHeater(numChillerHeater).CondMode == CondenserModeTemperature::EnteringCondenser) {
-        setChillerHeaterCondTemp = condEnteringTemp;
-    } else { // by default, if not EnteringCondenser, then this can only be LeavingCondenser
-        setChillerHeaterCondTemp = condLeavingTemp;
-    }
-    return setChillerHeaterCondTemp;
+    return modePerformance.condenserMode == CondenserModeTemperature::EnteringCondenser ? condEnteringTemp : condLeavingTemp;
 }
 
-Real64 WrapperSpecs::calcChillerCapFT(EnergyPlusData &state, int const numChillerHeater, Real64 const evapOutletTemp, Real64 const condTemp)
+Real64 WrapperSpecs::calcChillerCapFT(EnergyPlusData &state,
+                                      ChillerHeaterModule &module,
+                                      ModePerformanceData const &modePerformance,
+                                      Real64 const evapOutletTemp,
+                                      Real64 const condTemp)
 {
-    // Calculate the chiller capacity as a function of temperature
-    Real64 chillCapFT = Curve::CurveValue(state, this->ChillerHeater(numChillerHeater).ChillerCapFTIDX, evapOutletTemp, condTemp);
+    Real64 chillCapFT = Curve::CurveValue(state, modePerformance.capacityTemperatureCurveIndex, evapOutletTemp, condTemp);
 
-    // Tracks errors for when the capacity is calculated as less than zero
-    if (chillCapFT < 0) {
-        if (this->ChillerHeater(numChillerHeater).ChillerCapFTError < 1 && !state.dataGlobal->WarmupFlag) {
-            ++this->ChillerHeater(numChillerHeater).ChillerCapFTError;
-            ShowWarningError(state, std::format("ChillerHeaterPerformance:Electric:EIR \"{}\":", this->ChillerHeater(numChillerHeater).Name));
+    if (chillCapFT < 0.0) {
+        if (module.capacityCurveErrorCount < 1 && !state.dataGlobal->WarmupFlag) {
+            ++module.capacityCurveErrorCount;
+            ShowWarningError(state, std::format("ChillerHeaterPerformance:Electric:EIR \"{}\":", module.name()));
             ShowContinueError(state,
-                              std::format(" ChillerHeater Capacity as a Function of Temperature curve output is negative ({:.3f}).", chillCapFT));
+                              std::format(" ChillerHeater Capacity as a Function of "
+                                          "Temperature curve output is negative ({:.3f}).",
+                                          chillCapFT));
             ShowContinueError(state,
-                              std::format(" Negative value occurs using an Evaporator Outlet Temp of {:.1f} and a Condenser Inlet Temp of {:.1f}.",
+                              std::format(" Negative value occurs using an Evaporator Outlet Temp "
+                                          "of {:.1f} and a Condenser Inlet Temp of {:.1f}.",
                                           evapOutletTemp,
                                           condTemp));
             ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
         } else if (!state.dataGlobal->WarmupFlag) {
-            ++this->ChillerHeater(numChillerHeater).ChillerCapFTError;
-            ShowRecurringWarningErrorAtEnd(
-                state,
-                "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(numChillerHeater).Name +
-                    "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...",
-                this->ChillerHeater(numChillerHeater).ChillerCapFTErrorIndex,
-                chillCapFT,
-                chillCapFT);
+            ++module.capacityCurveErrorCount;
+            ShowRecurringWarningErrorAtEnd(state,
+                                           "ChillerHeaterPerformance:Electric:EIR \"" + module.name() +
+                                               "\": ChillerHeater Capacity as a Function of Temperature curve "
+                                               "output is negative warning continues...",
+                                           module.capacityCurveErrorIndex,
+                                           chillCapFT,
+                                           chillCapFT);
         }
         chillCapFT = 0.0;
     }
@@ -2819,8 +2886,6 @@ void WrapperSpecs::CalcCoolingOnlyModel(EnergyPlusData &state,
     Real64 remainingCoolingLoad = this->WrapperCoolingLoad;
     Real64 remainingChilledWaterMassFlowRate = max(0.0, chilledWaterMassFlowRate);
     Real64 remainingSourceMassFlowRate = max(0.0, sourceMassFlowRate);
-    int componentNum = 1;
-    int unitsUsedInComponent = 0;
 
     auto allocateConnectionFlow = [](Real64 const remainingFlow, Real64 const connectionDesignFlow, Real64 const legacyDesignFlow) {
         Real64 designFlow = connectionDesignFlow;
@@ -2835,36 +2900,13 @@ void WrapperSpecs::CalcCoolingOnlyModel(EnergyPlusData &state,
 
     for (int chillerHeaterNum = 1; chillerHeaterNum <= this->ChillerHeaterNums; ++chillerHeaterNum) {
         auto &chillerHeater = this->ChillerHeater(chillerHeaterNum);
-        bool moduleIsAvailable = true;
-        if (this->NumOfComp > 0 && allocated(this->WrapperComp)) {
-            while (componentNum <= this->NumOfComp && unitsUsedInComponent >= this->WrapperComp(componentNum).WrapperIdenticalObjectNum) {
-                ++componentNum;
-                unitsUsedInComponent = 0;
-            }
-            if (componentNum <= this->NumOfComp) {
-                moduleIsAvailable =
-                    this->WrapperComp(componentNum).chSched == nullptr || this->WrapperComp(componentNum).chSched->getCurrentVal() > 0.0;
-                ++unitsUsedInComponent;
-            } else {
-                moduleIsAvailable = false;
-            }
-        }
-
-        chillerHeater.RefCap = chillerHeater.RefCapCooling;
-        chillerHeater.RefCOP = chillerHeater.RefCOPCooling;
-        chillerHeater.TempRefEvapOut = chillerHeater.TempRefEvapOutCooling;
-        chillerHeater.TempRefCondIn = chillerHeater.TempRefCondInCooling;
-        chillerHeater.TempRefCondOut = chillerHeater.TempRefCondOutCooling;
-        chillerHeater.OptPartLoadRat = chillerHeater.OptPartLoadRatCooling;
-        chillerHeater.CondMode = chillerHeater.CondModeCooling;
-        chillerHeater.ChillerCapFTIDX = chillerHeater.ChillerCapFTCoolingIDX;
-        chillerHeater.ChillerEIRFTIDX = chillerHeater.ChillerEIRFTCoolingIDX;
-        chillerHeater.ChillerEIRFPLRIDX = chillerHeater.ChillerEIRFPLRCoolingIDX;
+        auto const &sizing = chillerHeater.sizing;
+        bool const moduleIsAvailable = chillerHeater.isAvailable();
 
         Real64 const moduleChilledWaterMassFlowRate =
-            allocateConnectionFlow(remainingChilledWaterMassFlowRate, chillerHeater.ChilledWaterMassFlowRateMax, chillerHeater.EvapMassFlowRateMax);
+            allocateConnectionFlow(remainingChilledWaterMassFlowRate, sizing.ChilledWaterMassFlowRateMax, sizing.EvapMassFlowRateMax);
         Real64 const moduleSourceMassFlowRate =
-            allocateConnectionFlow(remainingSourceMassFlowRate, chillerHeater.SourceCondMassFlowRateMax, chillerHeater.CondMassFlowRateMax);
+            allocateConnectionFlow(remainingSourceMassFlowRate, sizing.SourceCondMassFlowRateMax, sizing.CondMassFlowRateMax);
         ChillerHeaterResult result;
         if (moduleIsAvailable && remainingCoolingLoad > HVAC::SmallLoad &&
             moduleChilledWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance &&
@@ -2908,8 +2950,7 @@ void WrapperSpecs::CalcCoolingOnlyModel(EnergyPlusData &state,
                                          sourceMassFlowRate,
                                          chilledWaterInletTemp,
                                          state.dataLoopNodes->Node(this->HWInletNodeNum).Temp,
-                                         sourceInletTemp,
-                                         false);
+                                         sourceInletTemp);
 }
 
 void WrapperSpecs::CalcHeatingOnlyModel(EnergyPlusData &state,
@@ -2921,8 +2962,6 @@ void WrapperSpecs::CalcHeatingOnlyModel(EnergyPlusData &state,
     Real64 remainingHeatingLoad = this->WrapperHeatingLoad;
     Real64 remainingHotWaterMassFlowRate = max(0.0, hotWaterMassFlowRate);
     Real64 remainingSourceMassFlowRate = max(0.0, sourceMassFlowRate);
-    int componentNum = 1;
-    int unitsUsedInComponent = 0;
 
     auto allocateConnectionFlow = [](Real64 const remainingFlow, Real64 const connectionDesignFlow, Real64 const legacyDesignFlow) {
         Real64 designFlow = connectionDesignFlow;
@@ -2937,36 +2976,13 @@ void WrapperSpecs::CalcHeatingOnlyModel(EnergyPlusData &state,
 
     for (int chillerHeaterNum = 1; chillerHeaterNum <= this->ChillerHeaterNums; ++chillerHeaterNum) {
         auto &chillerHeater = this->ChillerHeater(chillerHeaterNum);
-        bool moduleIsAvailable = true;
-        if (this->NumOfComp > 0 && allocated(this->WrapperComp)) {
-            while (componentNum <= this->NumOfComp && unitsUsedInComponent >= this->WrapperComp(componentNum).WrapperIdenticalObjectNum) {
-                ++componentNum;
-                unitsUsedInComponent = 0;
-            }
-            if (componentNum <= this->NumOfComp) {
-                moduleIsAvailable =
-                    this->WrapperComp(componentNum).chSched == nullptr || this->WrapperComp(componentNum).chSched->getCurrentVal() > 0.0;
-                ++unitsUsedInComponent;
-            } else {
-                moduleIsAvailable = false;
-            }
-        }
-
-        chillerHeater.RefCap = chillerHeater.RefCapClgHtg;
-        chillerHeater.RefCOP = chillerHeater.RefCOPClgHtg;
-        chillerHeater.TempRefEvapOut = chillerHeater.TempRefEvapOutClgHtg;
-        chillerHeater.TempRefCondIn = chillerHeater.TempRefCondInClgHtg;
-        chillerHeater.TempRefCondOut = chillerHeater.TempRefCondOutClgHtg;
-        chillerHeater.OptPartLoadRat = chillerHeater.OptPartLoadRatClgHtg;
-        chillerHeater.CondMode = chillerHeater.CondModeHeating;
-        chillerHeater.ChillerCapFTIDX = chillerHeater.ChillerCapFTHeatingIDX;
-        chillerHeater.ChillerEIRFTIDX = chillerHeater.ChillerEIRFTHeatingIDX;
-        chillerHeater.ChillerEIRFPLRIDX = chillerHeater.ChillerEIRFPLRHeatingIDX;
+        auto const &sizing = chillerHeater.sizing;
+        bool const moduleIsAvailable = chillerHeater.isAvailable();
 
         Real64 const moduleHotWaterMassFlowRate =
-            allocateConnectionFlow(remainingHotWaterMassFlowRate, chillerHeater.HotWaterMassFlowRateMax, chillerHeater.CondMassFlowRateMax);
+            allocateConnectionFlow(remainingHotWaterMassFlowRate, sizing.HotWaterMassFlowRateMax, sizing.CondMassFlowRateMax);
         Real64 const moduleSourceMassFlowRate =
-            allocateConnectionFlow(remainingSourceMassFlowRate, chillerHeater.SourceEvapMassFlowRateMax, chillerHeater.EvapMassFlowRateMax);
+            allocateConnectionFlow(remainingSourceMassFlowRate, sizing.SourceEvapMassFlowRateMax, sizing.EvapMassFlowRateMax);
         ChillerHeaterResult result;
         if (moduleIsAvailable && remainingHeatingLoad > HVAC::SmallLoad && moduleHotWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance &&
             moduleSourceMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -3009,8 +3025,7 @@ void WrapperSpecs::CalcHeatingOnlyModel(EnergyPlusData &state,
                                          sourceMassFlowRate,
                                          state.dataLoopNodes->Node(this->CHWInletNodeNum).Temp,
                                          hotWaterInletTemp,
-                                         sourceInletTemp,
-                                         false);
+                                         sourceInletTemp);
 }
 
 void WrapperSpecs::updateWrapperReportingAndNodes(EnergyPlusData &state,
@@ -3019,8 +3034,7 @@ void WrapperSpecs::updateWrapperReportingAndNodes(EnergyPlusData &state,
                                                   Real64 const sourceMassFlowRate,
                                                   Real64 const chilledWaterInletTemp,
                                                   Real64 const hotWaterInletTemp,
-                                                  Real64 const sourceInletTemp,
-                                                  bool const simultaneousOperation)
+                                                  Real64 const sourceInletTemp)
 {
     Real64 const secondsInTimeStep = state.dataHVACGlobal->TimeStepSysSec;
     Real64 totalCoolingRate = 0.0;
@@ -3037,10 +3051,7 @@ void WrapperSpecs::updateWrapperReportingAndNodes(EnergyPlusData &state,
 
     for (int chillerHeaterNum = 1; chillerHeaterNum <= this->ChillerHeaterNums; ++chillerHeaterNum) {
         auto &chillerHeater = this->ChillerHeater(chillerHeaterNum);
-        chillerHeater.updateResultEnergies(secondsInTimeStep, false);
-        if (simultaneousOperation) {
-            chillerHeater.saveCurrentResultForSimultaneous();
-        }
+        chillerHeater.updateResultEnergies(secondsInTimeStep);
         auto const &result = chillerHeater.Result;
         totalCoolingRate += result.coolingDelivered;
         totalHeatingRate += result.heatingDelivered;
@@ -3105,19 +3116,6 @@ void WrapperSpecs::updateWrapperReportingAndNodes(EnergyPlusData &state,
     this->Report.HeatingEnergy = totalHeatingRate * secondsInTimeStep;
     this->Report.GLHEEnergy = totalSourceHeatTransfer * secondsInTimeStep;
 
-    if (simultaneousOperation) {
-        this->Report.CHWInletTempSimul = chilledWaterInletTemp;
-        this->Report.CHWOutletTempSimul = chilledWaterOutletTemp;
-        this->Report.CHWmdotSimul = chilledWaterMassFlowRate;
-        this->Report.GLHEInletTempSimul = sourceInletTemp;
-        this->Report.GLHEOutletTempSimul = sourceOutletTemp;
-        this->Report.GLHEmdotSimul = sourceMassFlowRate;
-        this->Report.TotElecCoolingPwrSimul = totalCoolingPower;
-        this->Report.TotElecCoolingSimul = totalCoolingPower * secondsInTimeStep;
-        this->Report.CoolingRateSimul = totalCoolingRate;
-        this->Report.CoolingEnergySimul = totalCoolingRate * secondsInTimeStep;
-    }
-
     state.dataLoopNodes->Node(this->CHWOutletNodeNum).Temp = chilledWaterOutletTemp;
     state.dataLoopNodes->Node(this->HWOutletNodeNum).Temp = hotWaterOutletTemp;
     state.dataLoopNodes->Node(this->GLHEOutletNodeNum).Temp = sourceOutletTemp;
@@ -3137,35 +3135,10 @@ void WrapperSpecs::CalcSimultaneousModel(EnergyPlusData &state,
     Real64 remainingHotWaterMassFlowRate = max(0.0, hotWaterMassFlowRate);
     Real64 remainingSourceMassFlowRate = max(0.0, sourceMassFlowRate);
 
-    int componentNum = 1;
-    int unitsUsedInComponent = 0;
     for (int chillerHeaterNum = 1; chillerHeaterNum <= this->ChillerHeaterNums; ++chillerHeaterNum) {
         auto &chillerHeater = this->ChillerHeater(chillerHeaterNum);
-        bool moduleIsAvailable = true;
-        if (this->NumOfComp > 0 && allocated(this->WrapperComp)) {
-            while (componentNum <= this->NumOfComp && unitsUsedInComponent >= this->WrapperComp(componentNum).WrapperIdenticalObjectNum) {
-                ++componentNum;
-                unitsUsedInComponent = 0;
-            }
-            if (componentNum <= this->NumOfComp) {
-                moduleIsAvailable =
-                    this->WrapperComp(componentNum).chSched == nullptr || this->WrapperComp(componentNum).chSched->getCurrentVal() > 0.0;
-                ++unitsUsedInComponent;
-            } else {
-                moduleIsAvailable = false;
-            }
-        }
-
-        chillerHeater.RefCap = chillerHeater.RefCapClgHtg;
-        chillerHeater.RefCOP = chillerHeater.RefCOPClgHtg;
-        chillerHeater.TempRefEvapOut = chillerHeater.TempRefEvapOutClgHtg;
-        chillerHeater.TempRefCondIn = chillerHeater.TempRefCondInClgHtg;
-        chillerHeater.TempRefCondOut = chillerHeater.TempRefCondOutClgHtg;
-        chillerHeater.OptPartLoadRat = chillerHeater.OptPartLoadRatClgHtg;
-        chillerHeater.CondMode = chillerHeater.CondModeHeating;
-        chillerHeater.ChillerCapFTIDX = chillerHeater.ChillerCapFTHeatingIDX;
-        chillerHeater.ChillerEIRFTIDX = chillerHeater.ChillerEIRFTHeatingIDX;
-        chillerHeater.ChillerEIRFPLRIDX = chillerHeater.ChillerEIRFPLRHeatingIDX;
+        auto const &sizing = chillerHeater.sizing;
+        bool const moduleIsAvailable = chillerHeater.isAvailable();
 
         auto moduleFlowLimit = [](Real64 const remainingFlow, Real64 const connectionDesignFlow, Real64 const legacyDesignFlow) {
             Real64 flowLimit = connectionDesignFlow;
@@ -3179,9 +3152,9 @@ void WrapperSpecs::CalcSimultaneousModel(EnergyPlusData &state,
         };
 
         Real64 const moduleChilledWaterMassFlowRate =
-            moduleFlowLimit(remainingChilledWaterMassFlowRate, chillerHeater.ChilledWaterMassFlowRateMax, chillerHeater.EvapMassFlowRateMax);
+            moduleFlowLimit(remainingChilledWaterMassFlowRate, sizing.ChilledWaterMassFlowRateMax, sizing.EvapMassFlowRateMax);
         Real64 const moduleHotWaterMassFlowRate =
-            moduleFlowLimit(remainingHotWaterMassFlowRate, chillerHeater.HotWaterMassFlowRateMax, chillerHeater.CondMassFlowRateMax);
+            moduleFlowLimit(remainingHotWaterMassFlowRate, sizing.HotWaterMassFlowRateMax, sizing.CondMassFlowRateMax);
         Real64 moduleSourceMassFlowRate = 0.0;
         ChillerHeaterResult result;
 
@@ -3189,8 +3162,8 @@ void WrapperSpecs::CalcSimultaneousModel(EnergyPlusData &state,
             moduleChilledWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance &&
             moduleHotWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
             moduleSourceMassFlowRate = moduleFlowLimit(remainingSourceMassFlowRate,
-                                                       max(chillerHeater.SourceEvapMassFlowRateMax, chillerHeater.SourceCondMassFlowRateMax),
-                                                       max(chillerHeater.EvapMassFlowRateMax, chillerHeater.CondMassFlowRateMax));
+                                                       max(sizing.SourceEvapMassFlowRateMax, sizing.SourceCondMassFlowRateMax),
+                                                       max(sizing.EvapMassFlowRateMax, sizing.CondMassFlowRateMax));
             result = this->solveSimultaneous(state,
                                              chillerHeaterNum,
                                              remainingCoolingLoad,
@@ -3203,8 +3176,7 @@ void WrapperSpecs::CalcSimultaneousModel(EnergyPlusData &state,
                                              sourceInletTemp);
         } else if (moduleIsAvailable && remainingCoolingLoad > HVAC::SmallLoad &&
                    moduleChilledWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-            moduleSourceMassFlowRate =
-                moduleFlowLimit(remainingSourceMassFlowRate, chillerHeater.SourceCondMassFlowRateMax, chillerHeater.CondMassFlowRateMax);
+            moduleSourceMassFlowRate = moduleFlowLimit(remainingSourceMassFlowRate, sizing.SourceCondMassFlowRateMax, sizing.CondMassFlowRateMax);
             result = this->solveCoolingOnly(state,
                                             chillerHeaterNum,
                                             remainingCoolingLoad,
@@ -3222,8 +3194,7 @@ void WrapperSpecs::CalcSimultaneousModel(EnergyPlusData &state,
             result.unmetHeatingLoad = remainingHeatingLoad;
         } else if (moduleIsAvailable && remainingHeatingLoad > HVAC::SmallLoad &&
                    moduleHotWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-            moduleSourceMassFlowRate =
-                moduleFlowLimit(remainingSourceMassFlowRate, chillerHeater.SourceEvapMassFlowRateMax, chillerHeater.EvapMassFlowRateMax);
+            moduleSourceMassFlowRate = moduleFlowLimit(remainingSourceMassFlowRate, sizing.SourceEvapMassFlowRateMax, sizing.EvapMassFlowRateMax);
             result = this->solveHeatingOnly(state,
                                             chillerHeaterNum,
                                             remainingHeatingLoad,
@@ -3276,7 +3247,7 @@ void WrapperSpecs::CalcSimultaneousModel(EnergyPlusData &state,
     this->SimulClgDominant = totalSourceHeatTransfer > sourceModeTolerance;
     this->SimulHtgDominant = totalSourceHeatTransfer < -sourceModeTolerance;
     this->updateWrapperReportingAndNodes(
-        state, chilledWaterMassFlowRate, hotWaterMassFlowRate, sourceMassFlowRate, chilledWaterInletTemp, hotWaterInletTemp, sourceInletTemp, true);
+        state, chilledWaterMassFlowRate, hotWaterMassFlowRate, sourceMassFlowRate, chilledWaterInletTemp, hotWaterInletTemp, sourceInletTemp);
 }
 
 void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int const LoopNum)
