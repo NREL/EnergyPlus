@@ -136,6 +136,144 @@ namespace {
         Real64 eirPartLoadModifier = 0.0;
     };
 
+    // A unit-width PLR bracket reaches the 1.0e-12 tolerance in 40 subdivisions; 50 leaves conservative headroom.
+    constexpr int maxOuterSolverIterations = 100;
+    constexpr int maxPartLoadSolverIterations = 50;
+    constexpr Real64 temperatureConvergenceTolerance = 1.0e-8;
+    constexpr Real64 partLoadAbsoluteTolerance = 1.0e-12;
+    constexpr Real64 loadAbsoluteTolerance = 1.0e-7;
+    constexpr Real64 loadRelativeTolerance = 1.0e-12;
+
+    struct BisectionResult
+    {
+        Real64 value = 0.0;
+        Real64 bracketWidth = 0.0;
+        Real64 loadResidual = 0.0;
+        int iterations = 0;
+        SolverConvergenceStatus status = SolverConvergenceStatus::NotRequired;
+    };
+
+    template <typename LoadAtValue>
+    BisectionResult solveBisection(
+        Real64 lowerValue, Real64 upperValue, Real64 const targetLoad, Real64 const valueTolerance, Real64 const loadScale, LoadAtValue loadAtValue)
+    {
+        BisectionResult result;
+        Real64 previousValue = std::numeric_limits<Real64>::quiet_NaN();
+        Real64 const loadTolerance = max(loadAbsoluteTolerance, loadRelativeTolerance * loadScale);
+
+        for (int iteration = 0; iteration < maxPartLoadSolverIterations; ++iteration) {
+            Real64 const candidateValue = 0.5 * (lowerValue + upperValue);
+            Real64 const candidateLoad = loadAtValue(candidateValue);
+            result.value = candidateValue;
+            result.loadResidual = std::abs(candidateLoad - targetLoad);
+            result.iterations = iteration + 1;
+
+            if (!std::isfinite(candidateValue) || !std::isfinite(candidateLoad) || !std::isfinite(result.loadResidual)) {
+                result.status = SolverConvergenceStatus::Invalid;
+                break;
+            }
+
+            bool const stagnated = candidateValue == lowerValue || candidateValue == upperValue || candidateValue == previousValue;
+            if (candidateLoad < targetLoad) {
+                lowerValue = candidateValue;
+            } else {
+                upperValue = candidateValue;
+            }
+            result.bracketWidth = upperValue - lowerValue;
+
+            if (result.bracketWidth <= valueTolerance && result.loadResidual <= loadTolerance) {
+                result.status = SolverConvergenceStatus::Converged;
+                break;
+            }
+            if (stagnated) {
+                result.status = SolverConvergenceStatus::Stagnated;
+                break;
+            }
+            previousValue = candidateValue;
+        }
+
+        if (result.status == SolverConvergenceStatus::NotRequired) {
+            result.status = SolverConvergenceStatus::IterationLimit;
+        }
+        return result;
+    }
+
+    std::string_view solverStatusName(SolverConvergenceStatus const status)
+    {
+        switch (status) {
+        case SolverConvergenceStatus::NotRequired:
+            return "not required";
+        case SolverConvergenceStatus::Converged:
+            return "converged";
+        case SolverConvergenceStatus::Stagnated:
+            return "floating-point stagnation";
+        case SolverConvergenceStatus::IterationLimit:
+            return "iteration limit";
+        case SolverConvergenceStatus::Invalid:
+            return "invalid numerical value";
+        default:
+            assert(false);
+            return "unknown";
+        }
+    }
+
+    bool solverFailed(SolverConvergenceStatus const status)
+    {
+        return status != SolverConvergenceStatus::NotRequired && status != SolverConvergenceStatus::Converged;
+    }
+
+    void reportSolverFailure(EnergyPlusData &state,
+                             std::string const &systemName,
+                             std::string const &moduleName,
+                             int const moduleNum,
+                             std::string_view const operatingMode,
+                             std::string_view const iterationType,
+                             SolverConvergenceStatus const status,
+                             std::string const &requestedLoads,
+                             int const iterations,
+                             Real64 const bracketOrTemperatureResidual,
+                             Real64 const loadResidual,
+                             Real64 const finalOperatingPoint,
+                             std::string_view const finalOperatingPointUnits,
+                             SolverWarningData &warning)
+    {
+        ++warning.count;
+        if (warning.count == 1) {
+            ShowWarningError(state,
+                             std::format("CentralHeatPumpSystem \"{}\" module {} (\"{}\") {} {} failed to converge ({}).",
+                                         systemName,
+                                         moduleNum,
+                                         moduleName,
+                                         operatingMode,
+                                         iterationType,
+                                         solverStatusName(status)));
+            ShowContinueError(state,
+                              std::format("Requested {}; iterations={}; bracket/temperature residual={:.6g}; load residual={:.6g} W; "
+                                          "final operating point={:.6g} {}.",
+                                          requestedLoads,
+                                          iterations,
+                                          bracketOrTemperatureResidual,
+                                          loadResidual,
+                                          finalOperatingPoint,
+                                          finalOperatingPointUnits));
+            return;
+        }
+
+        ShowRecurringWarningErrorAtEnd(state,
+                                       std::format("CentralHeatPumpSystem \"{}\" module {} (\"{}\") {} {} convergence failure continues.",
+                                                   systemName,
+                                                   moduleNum,
+                                                   moduleName,
+                                                   operatingMode,
+                                                   iterationType),
+                                       warning.recurringIndex,
+                                       bracketOrTemperatureResidual,
+                                       bracketOrTemperatureResidual,
+                                       _,
+                                       std::string(finalOperatingPointUnits),
+                                       std::string(finalOperatingPointUnits));
+    }
+
 } // namespace
 
 void Module::initialize(int const performanceIndex, PerformanceData const &performance, Sched::Schedule *const availabilitySchedule)
@@ -154,6 +292,11 @@ void Module::initialize(int const performanceIndex, PerformanceData const &perfo
     this->minimumEvaporatorOutletTemp = 0.0;
     this->capacityCurveErrorCount = 0;
     this->capacityCurveErrorIndex = 0;
+    this->coolingSolverWarning = SolverWarningData();
+    this->heatingSolverWarning = SolverWarningData();
+    this->heatingPartLoadSolverWarning = SolverWarningData();
+    this->simultaneousSolverWarning = SolverWarningData();
+    this->simultaneousPartLoadSolverWarning = SolverWarningData();
     this->result = ModuleResult();
 }
 
@@ -2216,8 +2359,6 @@ ModuleResult CentralHeatPumpSystem::solveCoolingOnly(EnergyPlusData &state,
                                                      Real64 const condenserInletTemp)
 {
     static constexpr std::string_view routineName("CentralHeatPumpSystem cooling-only solver");
-    constexpr int maxIterations = 100;
-    constexpr Real64 convergenceTolerance = 1.0e-8;
 
     auto &module = this->modules(moduleNum);
     auto const &performance = module.performanceData();
@@ -2272,8 +2413,10 @@ ModuleResult CentralHeatPumpSystem::solveCoolingOnly(EnergyPlusData &state,
     Real64 eirPartLoadModifier = 0.0;
     Real64 condenserCurveTemp = condenserInletTemp;
 
-    for (int iteration = 0; iteration < maxIterations; ++iteration) {
+    for (int iteration = 0; iteration < maxOuterSolverIterations; ++iteration) {
+        result.solver.outerIterations = iteration + 1;
         condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletGuess);
+        ++result.solver.curveEvaluations;
         capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletGuess, condenserCurveTemp);
         availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
         qEvaporator = std::min({result.requestedCoolingLoad, availableEvaporatorCapacity * maxPartLoadRatio, flowLimitedCooling});
@@ -2295,19 +2438,53 @@ ModuleResult CentralHeatPumpSystem::solveCoolingOnly(EnergyPlusData &state,
         cyclingRatio = minPartLoadRatio > 0.0 ? min(1.0, requestedPartLoadRatio / minPartLoadRatio) : 1.0;
         falseLoadRate = max(0.0, availableEvaporatorCapacity * partLoadRatio * cyclingRatio - qEvaporator);
 
+        ++result.solver.curveEvaluations;
         eirTemperatureModifier =
             max(0.0, Curve::CurveValue(state, modePerformance.eirTemperatureCurveIndex, evaporatorOutletTemp, condenserCurveTemp));
+        ++result.solver.curveEvaluations;
         eirPartLoadModifier = max(0.0, evaluatePartLoadCurve(state, modePerformance.eirPartLoadCurveIndex, condenserCurveTemp, partLoadRatio));
         compressorPower = (availableEvaporatorCapacity / modePerformance.referenceCOP) * eirTemperatureModifier * eirPartLoadModifier * cyclingRatio;
         qCondenser = qEvaporator + falseLoadRate + compressorPower * performance.compressorMotorEfficiency;
         condenserOutletTemp = condenserInletTemp + qCondenser / (condenserMassFlowRate * condenserCp);
 
         Real64 const residual = max(std::abs(evaporatorOutletTemp - evaporatorOutletGuess), std::abs(condenserOutletTemp - condenserOutletGuess));
-        if (residual <= convergenceTolerance) {
+        result.solver.temperatureResidual = residual;
+        if (!std::isfinite(residual)) {
+            result.solver.outerStatus = SolverConvergenceStatus::Invalid;
             break;
         }
-        evaporatorOutletGuess = 0.5 * (evaporatorOutletGuess + evaporatorOutletTemp);
-        condenserOutletGuess = 0.5 * (condenserOutletGuess + condenserOutletTemp);
+        if (residual <= temperatureConvergenceTolerance) {
+            result.solver.outerStatus = SolverConvergenceStatus::Converged;
+            break;
+        }
+        Real64 const nextEvaporatorOutletGuess = 0.5 * (evaporatorOutletGuess + evaporatorOutletTemp);
+        Real64 const nextCondenserOutletGuess = 0.5 * (condenserOutletGuess + condenserOutletTemp);
+        if (nextEvaporatorOutletGuess == evaporatorOutletGuess && nextCondenserOutletGuess == condenserOutletGuess) {
+            result.solver.outerStatus = SolverConvergenceStatus::Stagnated;
+            break;
+        }
+        evaporatorOutletGuess = nextEvaporatorOutletGuess;
+        condenserOutletGuess = nextCondenserOutletGuess;
+    }
+
+    if (result.solver.outerStatus == SolverConvergenceStatus::NotRequired && result.solver.outerIterations == maxOuterSolverIterations) {
+        result.solver.outerStatus = SolverConvergenceStatus::IterationLimit;
+    }
+    if (!state.dataGlobal->WarmupFlag && solverFailed(result.solver.outerStatus)) {
+        reportSolverFailure(state,
+                            this->Name,
+                            module.name(),
+                            moduleNum,
+                            "cooling-only",
+                            "temperature iteration",
+                            result.solver.outerStatus,
+                            std::format("cooling load={:.6g} W", result.requestedCoolingLoad),
+                            result.solver.outerIterations,
+                            result.solver.temperatureResidual,
+                            0.0,
+                            condenserOutletTemp,
+                            "C",
+                            module.coolingSolverWarning);
     }
 
     if (qEvaporator <= HVAC::SmallLoad) {
@@ -2316,15 +2493,19 @@ ModuleResult CentralHeatPumpSystem::solveCoolingOnly(EnergyPlusData &state,
     }
 
     condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletTemp);
+    ++result.solver.curveEvaluations;
     capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletTemp, condenserCurveTemp);
     availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
+    ++result.solver.curveEvaluations;
     eirTemperatureModifier = max(0.0, Curve::CurveValue(state, modePerformance.eirTemperatureCurveIndex, evaporatorOutletTemp, condenserCurveTemp));
+    ++result.solver.curveEvaluations;
     eirPartLoadModifier = max(0.0, evaluatePartLoadCurve(state, modePerformance.eirPartLoadCurveIndex, condenserCurveTemp, partLoadRatio));
     compressorPower = (availableEvaporatorCapacity / modePerformance.referenceCOP) * eirTemperatureModifier * eirPartLoadModifier * cyclingRatio;
     falseLoadRate = max(0.0, availableEvaporatorCapacity * partLoadRatio * cyclingRatio - qEvaporator);
     qCondenser = qEvaporator + falseLoadRate + compressorPower * performance.compressorMotorEfficiency;
     condenserOutletTemp = condenserInletTemp + qCondenser / (condenserMassFlowRate * condenserCp);
 
+    ++result.solver.curveEvaluations;
     Real64 const availableEIRPartLoadModifier =
         max(0.0, evaluatePartLoadCurve(state, modePerformance.eirPartLoadCurveIndex, condenserCurveTemp, maxPartLoadRatio));
     Real64 const availablePower =
@@ -2368,9 +2549,6 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
                                                      Real64 const condenserInletTemp)
 {
     static constexpr std::string_view routineName("CentralHeatPumpSystem heating-only solver");
-    constexpr int maxIterations = 100;
-    constexpr int maxPartLoadIterations = 80;
-    constexpr Real64 convergenceTolerance = 1.0e-8;
 
     auto &module = this->modules(moduleNum);
     auto const &performance = module.performanceData();
@@ -2440,10 +2618,16 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
     Real64 eirPartLoadModifier = 0.0;
     Real64 condenserCurveTemp = condenserInletTemp;
 
-    for (int iteration = 0; iteration < maxIterations; ++iteration) {
+    for (int iteration = 0; iteration < maxOuterSolverIterations; ++iteration) {
+        result.solver.outerIterations = iteration + 1;
+        result.solver.partLoadStatus = SolverConvergenceStatus::NotRequired;
+        result.solver.partLoadBracketWidth = 0.0;
+        result.solver.loadResidual = 0.0;
         condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletGuess);
+        ++result.solver.curveEvaluations;
         capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletGuess, condenserCurveTemp);
         availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
+        ++result.solver.curveEvaluations;
         eirTemperatureModifier =
             max(0.0, Curve::CurveValue(state, modePerformance.eirTemperatureCurveIndex, evaporatorOutletGuess, condenserCurveTemp));
 
@@ -2454,6 +2638,7 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
         auto operatingPointAtPLR = [&](Real64 const plr) {
             PartLoadOperatingPoint point;
             point.partLoadRatio = plr;
+            ++result.solver.curveEvaluations;
             point.eirPartLoadModifier = max(0.0, evaluatePartLoadCurve(state, modePerformance.eirPartLoadCurveIndex, condenserCurveTemp, plr));
             point.evaporatorLoad = availableEvaporatorCapacity * plr;
             point.compressorPower = (availableEvaporatorCapacity / modePerformance.referenceCOP) * eirTemperatureModifier * point.eirPartLoadModifier;
@@ -2481,17 +2666,16 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
             cyclingRatio = min(maximumCyclingRatio, targetCondenserHeat / minimumPoint.condenserLoad);
         } else {
             cyclingRatio = 1.0;
-            Real64 lowerPLR = minPartLoadRatio;
-            Real64 upperPLR = maximumAllowedPLR;
-            for (int plrIteration = 0; plrIteration < maxPartLoadIterations; ++plrIteration) {
-                Real64 const candidatePLR = 0.5 * (lowerPLR + upperPLR);
-                if (operatingPointAtPLR(candidatePLR).condenserLoad < targetCondenserHeat) {
-                    lowerPLR = candidatePLR;
-                } else {
-                    upperPLR = candidatePLR;
-                }
-            }
-            partLoadRatio = 0.5 * (lowerPLR + upperPLR);
+            Real64 const loadScale = max({targetCondenserHeat, availableCondenserCapacity, 1.0});
+            auto const bisection =
+                solveBisection(minPartLoadRatio, maximumAllowedPLR, targetCondenserHeat, partLoadAbsoluteTolerance, loadScale, [&](Real64 const plr) {
+                    return operatingPointAtPLR(plr).condenserLoad;
+                });
+            result.solver.partLoadIterations += bisection.iterations;
+            result.solver.partLoadStatus = bisection.status;
+            result.solver.partLoadBracketWidth = bisection.bracketWidth;
+            result.solver.loadResidual = bisection.loadResidual;
+            partLoadRatio = bisection.value;
         }
 
         auto const operatingPoint = operatingPointAtPLR(partLoadRatio);
@@ -2509,11 +2693,59 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
         condenserOutletTemp = condenserInletTemp + qCondenser / (condenserMassFlowRate * condenserCp);
 
         Real64 const residual = max(std::abs(evaporatorOutletTemp - evaporatorOutletGuess), std::abs(condenserOutletTemp - condenserOutletGuess));
-        if (residual <= convergenceTolerance) {
+        result.solver.temperatureResidual = residual;
+        if (!std::isfinite(residual)) {
+            result.solver.outerStatus = SolverConvergenceStatus::Invalid;
             break;
         }
-        evaporatorOutletGuess = 0.5 * (evaporatorOutletGuess + evaporatorOutletTemp);
-        condenserOutletGuess = 0.5 * (condenserOutletGuess + condenserOutletTemp);
+        if (residual <= temperatureConvergenceTolerance) {
+            result.solver.outerStatus = SolverConvergenceStatus::Converged;
+            break;
+        }
+        Real64 const nextEvaporatorOutletGuess = 0.5 * (evaporatorOutletGuess + evaporatorOutletTemp);
+        Real64 const nextCondenserOutletGuess = 0.5 * (condenserOutletGuess + condenserOutletTemp);
+        if (nextEvaporatorOutletGuess == evaporatorOutletGuess && nextCondenserOutletGuess == condenserOutletGuess) {
+            result.solver.outerStatus = SolverConvergenceStatus::Stagnated;
+            break;
+        }
+        evaporatorOutletGuess = nextEvaporatorOutletGuess;
+        condenserOutletGuess = nextCondenserOutletGuess;
+    }
+
+    if (result.solver.outerStatus == SolverConvergenceStatus::NotRequired && result.solver.outerIterations == maxOuterSolverIterations) {
+        result.solver.outerStatus = SolverConvergenceStatus::IterationLimit;
+    }
+    if (!state.dataGlobal->WarmupFlag && solverFailed(result.solver.partLoadStatus)) {
+        reportSolverFailure(state,
+                            this->Name,
+                            module.name(),
+                            moduleNum,
+                            "heating-only",
+                            "part-load iteration",
+                            result.solver.partLoadStatus,
+                            std::format("heating load={:.6g} W", result.requestedHeatingLoad),
+                            result.solver.partLoadIterations,
+                            result.solver.partLoadBracketWidth,
+                            result.solver.loadResidual,
+                            partLoadRatio,
+                            "PLR",
+                            module.heatingPartLoadSolverWarning);
+    }
+    if (!state.dataGlobal->WarmupFlag && solverFailed(result.solver.outerStatus)) {
+        reportSolverFailure(state,
+                            this->Name,
+                            module.name(),
+                            moduleNum,
+                            "heating-only",
+                            "temperature iteration",
+                            result.solver.outerStatus,
+                            std::format("heating load={:.6g} W", result.requestedHeatingLoad),
+                            result.solver.outerIterations,
+                            result.solver.temperatureResidual,
+                            result.solver.loadResidual,
+                            condenserOutletTemp,
+                            "C",
+                            module.heatingSolverWarning);
     }
 
     if (qCondenser <= HVAC::SmallLoad) {
@@ -2522,9 +2754,12 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
     }
 
     condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletTemp);
+    ++result.solver.curveEvaluations;
     capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletTemp, condenserCurveTemp);
     availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
+    ++result.solver.curveEvaluations;
     eirTemperatureModifier = max(0.0, Curve::CurveValue(state, modePerformance.eirTemperatureCurveIndex, evaporatorOutletTemp, condenserCurveTemp));
+    ++result.solver.curveEvaluations;
     eirPartLoadModifier = max(0.0, evaluatePartLoadCurve(state, modePerformance.eirPartLoadCurveIndex, condenserCurveTemp, partLoadRatio));
     compressorPower = (availableEvaporatorCapacity / modePerformance.referenceCOP) * eirTemperatureModifier * eirPartLoadModifier * cyclingRatio;
     qEvaporator = availableEvaporatorCapacity * partLoadRatio * cyclingRatio;
@@ -2572,9 +2807,6 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
                                                       Real64 const sourceInletTemp)
 {
     static constexpr std::string_view routineName("CentralHeatPumpSystem simultaneous solver");
-    constexpr int maxIterations = 100;
-    constexpr int maxPartLoadIterations = 80;
-    constexpr Real64 convergenceTolerance = 1.0e-8;
 
     auto &module = this->modules(moduleNum);
     auto const &performance = module.performanceData();
@@ -2690,10 +2922,16 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
     Real64 condenserOutletTemp = heatingInletTemp;
     Real64 condenserMassFlowRate = 0.0;
 
-    for (int iteration = 0; iteration < maxIterations; ++iteration) {
+    for (int iteration = 0; iteration < maxOuterSolverIterations; ++iteration) {
+        result.solver.outerIterations = iteration + 1;
+        result.solver.partLoadStatus = SolverConvergenceStatus::NotRequired;
+        result.solver.partLoadBracketWidth = 0.0;
+        result.solver.loadResidual = 0.0;
         condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserEnteringTempGuess, condenserLeavingTempGuess);
+        ++result.solver.curveEvaluations;
         capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorCurveTempGuess, condenserCurveTemp);
         availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
+        ++result.solver.curveEvaluations;
         eirTemperatureModifier =
             max(0.0, Curve::CurveValue(state, modePerformance.eirTemperatureCurveIndex, evaporatorCurveTempGuess, condenserCurveTemp));
         if (availableEvaporatorCapacity <= 0.0) {
@@ -2709,6 +2947,7 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
             point.partLoadRatio = min(maxPartLoadRatio, max(requestedPartLoadRatio, minPartLoadRatio));
             point.cyclingRatio =
                 requestedPartLoadRatio < minPartLoadRatio && minPartLoadRatio > 0.0 ? requestedPartLoadRatio / minPartLoadRatio : 1.0;
+            ++result.solver.curveEvaluations;
             point.eirPartLoadModifier =
                 max(0.0, evaluatePartLoadCurve(state, modePerformance.eirPartLoadCurveIndex, condenserCurveTemp, point.partLoadRatio));
             point.evaporatorLoad = evaporatorLoad;
@@ -2728,18 +2967,23 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
         bool const heatingDrivesCycle = coolingPoint.condenserLoad + HVAC::SmallLoad < heatingTarget;
         bool const excessHeatCannotBeRejected = !canRejectToSource && coolingPoint.condenserLoad > heatingTarget + HVAC::SmallLoad;
         if (heatingDrivesCycle || excessHeatCannotBeRejected) {
-            Real64 lowerEvaporatorLoad = heatingDrivesCycle ? coolingPoint.evaporatorLoad : 0.0;
-            Real64 upperEvaporatorLoad = heatingDrivesCycle ? maximumEvaporatorLoad : coolingPoint.evaporatorLoad;
+            Real64 const lowerEvaporatorLoad = heatingDrivesCycle ? coolingPoint.evaporatorLoad : 0.0;
+            Real64 const upperEvaporatorLoad = heatingDrivesCycle ? maximumEvaporatorLoad : coolingPoint.evaporatorLoad;
             Real64 const boundedHeatingTarget = min(heatingTarget, operatingPointAtEvaporatorLoad(upperEvaporatorLoad).condenserLoad);
-            for (int partLoadIteration = 0; partLoadIteration < maxPartLoadIterations; ++partLoadIteration) {
-                Real64 const candidateEvaporatorLoad = 0.5 * (lowerEvaporatorLoad + upperEvaporatorLoad);
-                if (operatingPointAtEvaporatorLoad(candidateEvaporatorLoad).condenserLoad < boundedHeatingTarget) {
-                    lowerEvaporatorLoad = candidateEvaporatorLoad;
-                } else {
-                    upperEvaporatorLoad = candidateEvaporatorLoad;
-                }
-            }
-            selectedPoint = operatingPointAtEvaporatorLoad(0.5 * (lowerEvaporatorLoad + upperEvaporatorLoad));
+            Real64 const evaporatorCapacityScale = max(availableEvaporatorCapacity, 1.0);
+            Real64 const loadScale = max({boundedHeatingTarget, availableCondenserCapacity, 1.0});
+            auto const bisection =
+                solveBisection(lowerEvaporatorLoad,
+                               upperEvaporatorLoad,
+                               boundedHeatingTarget,
+                               partLoadAbsoluteTolerance * evaporatorCapacityScale,
+                               loadScale,
+                               [&](Real64 const evaporatorLoad) { return operatingPointAtEvaporatorLoad(evaporatorLoad).condenserLoad; });
+            result.solver.partLoadIterations += bisection.iterations;
+            result.solver.partLoadStatus = bisection.status;
+            result.solver.partLoadBracketWidth = bisection.bracketWidth / evaporatorCapacityScale;
+            result.solver.loadResidual = bisection.loadResidual;
+            selectedPoint = operatingPointAtEvaporatorLoad(bisection.value);
         }
 
         qEvaporator = selectedPoint.evaporatorLoad;
@@ -2802,12 +3046,62 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
         Real64 const temperatureResidual = max({std::abs(evaporatorOutletTemp - evaporatorCurveTempGuess),
                                                 std::abs(condenserInletTemp - condenserEnteringTempGuess),
                                                 std::abs(condenserOutletTemp - condenserLeavingTempGuess)});
-        if (temperatureResidual <= convergenceTolerance) {
+        result.solver.temperatureResidual = temperatureResidual;
+        if (!std::isfinite(temperatureResidual)) {
+            result.solver.outerStatus = SolverConvergenceStatus::Invalid;
             break;
         }
-        evaporatorCurveTempGuess = 0.5 * (evaporatorCurveTempGuess + evaporatorOutletTemp);
-        condenserEnteringTempGuess = 0.5 * (condenserEnteringTempGuess + condenserInletTemp);
-        condenserLeavingTempGuess = 0.5 * (condenserLeavingTempGuess + condenserOutletTemp);
+        if (temperatureResidual <= temperatureConvergenceTolerance) {
+            result.solver.outerStatus = SolverConvergenceStatus::Converged;
+            break;
+        }
+        Real64 const nextEvaporatorCurveTempGuess = 0.5 * (evaporatorCurveTempGuess + evaporatorOutletTemp);
+        Real64 const nextCondenserEnteringTempGuess = 0.5 * (condenserEnteringTempGuess + condenserInletTemp);
+        Real64 const nextCondenserLeavingTempGuess = 0.5 * (condenserLeavingTempGuess + condenserOutletTemp);
+        if (nextEvaporatorCurveTempGuess == evaporatorCurveTempGuess && nextCondenserEnteringTempGuess == condenserEnteringTempGuess &&
+            nextCondenserLeavingTempGuess == condenserLeavingTempGuess) {
+            result.solver.outerStatus = SolverConvergenceStatus::Stagnated;
+            break;
+        }
+        evaporatorCurveTempGuess = nextEvaporatorCurveTempGuess;
+        condenserEnteringTempGuess = nextCondenserEnteringTempGuess;
+        condenserLeavingTempGuess = nextCondenserLeavingTempGuess;
+    }
+
+    if (result.solver.outerStatus == SolverConvergenceStatus::NotRequired && result.solver.outerIterations == maxOuterSolverIterations) {
+        result.solver.outerStatus = SolverConvergenceStatus::IterationLimit;
+    }
+    if (!state.dataGlobal->WarmupFlag && solverFailed(result.solver.partLoadStatus)) {
+        reportSolverFailure(state,
+                            this->Name,
+                            module.name(),
+                            moduleNum,
+                            "simultaneous",
+                            "part-load iteration",
+                            result.solver.partLoadStatus,
+                            std::format("cooling/heating loads={:.6g}/{:.6g} W", result.requestedCoolingLoad, result.requestedHeatingLoad),
+                            result.solver.partLoadIterations,
+                            result.solver.partLoadBracketWidth,
+                            result.solver.loadResidual,
+                            partLoadRatio,
+                            "PLR",
+                            module.simultaneousPartLoadSolverWarning);
+    }
+    if (!state.dataGlobal->WarmupFlag && solverFailed(result.solver.outerStatus)) {
+        reportSolverFailure(state,
+                            this->Name,
+                            module.name(),
+                            moduleNum,
+                            "simultaneous",
+                            "temperature iteration",
+                            result.solver.outerStatus,
+                            std::format("cooling/heating loads={:.6g}/{:.6g} W", result.requestedCoolingLoad, result.requestedHeatingLoad),
+                            result.solver.outerIterations,
+                            result.solver.temperatureResidual,
+                            result.solver.loadResidual,
+                            condenserOutletTemp,
+                            "C",
+                            module.simultaneousSolverWarning);
     }
 
     if (qEvaporator <= HVAC::SmallLoad || qCondenser <= HVAC::SmallLoad) {

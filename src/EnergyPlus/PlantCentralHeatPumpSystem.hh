@@ -83,6 +83,34 @@ namespace PlantCentralHeatPumpSystem {
         Num
     };
 
+    enum class SolverConvergenceStatus
+    {
+        Invalid = -1,
+        NotRequired,
+        Converged,
+        Stagnated,
+        IterationLimit,
+        Num
+    };
+
+    struct SolverStatistics
+    {
+        SolverConvergenceStatus outerStatus = SolverConvergenceStatus::NotRequired;
+        SolverConvergenceStatus partLoadStatus = SolverConvergenceStatus::NotRequired;
+        int outerIterations = 0;
+        int partLoadIterations = 0;
+        int curveEvaluations = 0;
+        Real64 temperatureResidual = 0.0;
+        Real64 partLoadBracketWidth = 0.0;
+        Real64 loadResidual = 0.0;
+    };
+
+    struct SolverWarningData
+    {
+        int count = 0;
+        int recurringIndex = 0;
+    };
+
     struct ModuleResult
     {
         CurrentMode currentMode = CurrentMode::Off;
@@ -140,6 +168,8 @@ namespace PlantCentralHeatPumpSystem {
         Real64 sourceHeatTransfer = 0.0; // Positive rejects to source; negative extracts from source [W]
         Real64 unmetCoolingLoad = 0.0;   // Remaining system cooling load after this module [W]
         Real64 unmetHeatingLoad = 0.0;   // Remaining system heating load after this module [W]
+
+        SolverStatistics solver;
 
         Real64 falseLoadEnergy = 0.0;
         Real64 coolingEnergy = 0.0;
@@ -266,6 +296,11 @@ namespace PlantCentralHeatPumpSystem {
         Real64 minimumEvaporatorOutletTemp = 0.0;
         int capacityCurveErrorCount = 0;
         int capacityCurveErrorIndex = 0;
+        SolverWarningData coolingSolverWarning;
+        SolverWarningData heatingSolverWarning;
+        SolverWarningData heatingPartLoadSolverWarning;
+        SolverWarningData simultaneousSolverWarning;
+        SolverWarningData simultaneousPartLoadSolverWarning;
         ModuleResult result;
 
         void initialize(int performanceIndex, PerformanceData const &performance, Sched::Schedule *availabilitySchedule);

@@ -1991,6 +1991,11 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     EXPECT_NEAR(30.0, coolingResult.capacityCurveCondenserTemp, 1.0e-12);
     EXPECT_NE(7.0, coolingResult.evaporatorOutletTemp);
     EXPECT_NEAR(0.0, coolingResult.moduleEnergyBalanceResidual(), 1.0e-9);
+    EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::Converged, coolingResult.solver.outerStatus);
+    EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::NotRequired, coolingResult.solver.partLoadStatus);
+    EXPECT_GT(coolingResult.solver.outerIterations, 0);
+    EXPECT_EQ(0, coolingResult.solver.partLoadIterations);
+    EXPECT_EQ(3 * coolingResult.solver.outerIterations + 4, coolingResult.solver.curveEvaluations);
     chillerHeater.result = coolingResult;
     chillerHeater.mapResultToPlantConnections();
     EXPECT_NEAR(0.0, chillerHeater.result.routingEnergyBalanceResidual(), 1.0e-9);
@@ -2003,6 +2008,13 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     EXPECT_NEAR(1000.0 / (coolingCp * 5.0), coolingResult.evaporatorMassFlowRate, 1.0e-9);
     EXPECT_NEAR(coolingResult.condenserOutletTemp, coolingResult.capacityCurveCondenserTemp, 1.0e-12);
     EXPECT_NEAR(0.0, coolingResult.moduleEnergyBalanceResidual(), 1.0e-9);
+
+    auto const tinyHeatingResult = system.solveHeatingOnly(*state, 1, 0.5 * HVAC::SmallLoad, 1.0, 1.0, 15.0, 40.0);
+    EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::NotRequired, tinyHeatingResult.solver.outerStatus);
+    EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::NotRequired, tinyHeatingResult.solver.partLoadStatus);
+    EXPECT_EQ(0, tinyHeatingResult.solver.outerIterations);
+    EXPECT_EQ(0, tinyHeatingResult.solver.partLoadIterations);
+    EXPECT_EQ(0, tinyHeatingResult.solver.curveEvaluations);
 
     auto heatingResult = system.solveHeatingOnly(*state, 1, 1200.0, 1.0, 1.0, 15.0, 40.0);
     EXPECT_EQ(CurrentMode::HeatingOnly, heatingResult.currentMode);
@@ -2017,6 +2029,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     EXPECT_NEAR(40.0, heatingResult.capacityCurveCondenserTemp, 1.0e-12);
     EXPECT_NEAR(45.0, heatingResult.condenserOutletTemp, 1.0e-9);
     EXPECT_NEAR(0.0, heatingResult.moduleEnergyBalanceResidual(), 1.0e-9);
+    EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::NotRequired, heatingResult.solver.partLoadStatus);
     chillerHeater.result = heatingResult;
     chillerHeater.mapResultToPlantConnections();
     EXPECT_NEAR(0.0, chillerHeater.result.routingEnergyBalanceResidual(), 1.0e-9);
@@ -2066,6 +2079,14 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     EXPECT_LT(simultaneousResult.capacityCurveEvaporatorTemp, 15.0);
     EXPECT_NEAR(0.0, simultaneousResult.moduleEnergyBalanceResidual(), 1.0e-9);
     EXPECT_NEAR(0.0, simultaneousResult.routingEnergyBalanceResidual(), 1.0e-9);
+    EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::Converged, simultaneousResult.solver.outerStatus);
+    EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::Converged, simultaneousResult.solver.partLoadStatus);
+    EXPECT_GT(simultaneousResult.solver.partLoadIterations, 0);
+    EXPECT_LE(simultaneousResult.solver.partLoadIterations, 50 * simultaneousResult.solver.outerIterations);
+    EXPECT_LT(simultaneousResult.solver.partLoadIterations, 80 * simultaneousResult.solver.outerIterations);
+    EXPECT_LE(simultaneousResult.solver.partLoadBracketWidth, 1.0e-12);
+    EXPECT_LE(simultaneousResult.solver.loadResidual, 1.0e-7);
+    EXPECT_GT(simultaneousResult.solver.curveEvaluations, 0);
 
     system.allModulesVariableFlow = false;
     performance1.heatingCondenserTemperatureMode = PlantCentralHeatPumpSystem::CondenserTemperatureMode::LeavingCondenser;
@@ -2076,6 +2097,14 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     EXPECT_NEAR(heatingResult.condenserOutletTemp, heatingResult.eirPartLoadCurveCondenserTemp, 1.0e-12);
     EXPECT_NEAR(0.0, heatingResult.unmetHeatingLoad, 1.0e-6);
     EXPECT_NEAR(0.0, heatingResult.moduleEnergyBalanceResidual(), 1.0e-9);
+    EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::Converged, heatingResult.solver.outerStatus);
+    EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::Converged, heatingResult.solver.partLoadStatus);
+    EXPECT_GT(heatingResult.solver.partLoadIterations, 0);
+    EXPECT_LE(heatingResult.solver.partLoadIterations, 50 * heatingResult.solver.outerIterations);
+    EXPECT_LT(heatingResult.solver.partLoadIterations, 80 * heatingResult.solver.outerIterations);
+    EXPECT_LE(heatingResult.solver.partLoadBracketWidth, 1.0e-12);
+    EXPECT_LE(heatingResult.solver.loadResidual, 1.0e-7);
+    EXPECT_GT(heatingResult.solver.curveEvaluations, 0);
 
     performance1.maximumHeatingCondenserOutletTempWasOmitted = false;
     performance1.maximumHeatingCondenserOutletTemp = 40.1;
@@ -2234,6 +2263,23 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     EXPECT_NEAR(system.coolingMassFlowRateMax, state->dataLoopNodes->Node(system.coolingInletNodeNum).MassFlowRateMax, 1.0e-9);
     EXPECT_NEAR(system.heatingMassFlowRateMax, state->dataLoopNodes->Node(system.heatingInletNodeNum).MassFlowRateMax, 1.0e-9);
     EXPECT_NEAR(system.sourceMassFlowRateMax, state->dataLoopNodes->Node(system.sourceInletNodeNum).MassFlowRateMax, 1.0e-9);
+
+    auto *adversarialPartLoadCurve = state->dataCurveManager->curves(performance1.heatingEIRPartLoadCurveIndex);
+    adversarialPartLoadCurve->coeff.fill(0.0);
+    constexpr Real64 steepPartLoadSlope = 1.0e10;
+    adversarialPartLoadCurve->coeff[0] = -performance1.heatingMinimumPartLoadRatio * steepPartLoadSlope;
+    adversarialPartLoadCurve->coeff[3] = steepPartLoadSlope;
+    auto const exhaustedResult = system.solveHeatingOnly(*state, 1, 5000.0, 1.0, 1.0, 15.0, 40.0);
+    EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::IterationLimit, exhaustedResult.solver.partLoadStatus);
+    EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::Converged, exhaustedResult.solver.outerStatus);
+    EXPECT_EQ(50 * exhaustedResult.solver.outerIterations, exhaustedResult.solver.partLoadIterations);
+    EXPECT_GT(exhaustedResult.solver.loadResidual, 1.0e-7);
+    auto const repeatedExhaustedResult = system.solveHeatingOnly(*state, 1, 5000.0, 1.0, 1.0, 15.0, 40.0);
+    EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::IterationLimit, repeatedExhaustedResult.solver.partLoadStatus);
+    EXPECT_EQ(2, system.modules(1).heatingPartLoadSolverWarning.count);
+    EXPECT_GT(system.modules(1).heatingPartLoadSolverWarning.recurringIndex, 0);
+    EXPECT_EQ(0, system.modules(1).heatingSolverWarning.count);
+    EXPECT_NEAR(0.0, exhaustedResult.moduleEnergyBalanceResidual(), 1.0e-9);
 }
 
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SequentialFlowAllocationContracts)
