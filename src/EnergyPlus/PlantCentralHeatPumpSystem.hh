@@ -48,8 +48,8 @@
 #ifndef PlantCentralHeatPumpSystem_hh_INCLUDED
 #define PlantCentralHeatPumpSystem_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
+// C++ Headers
+#include <vector>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -288,7 +288,6 @@ namespace PlantCentralHeatPumpSystem {
 
     struct Module
     {
-        int performanceIndex = 0;
         PerformanceData const *performance = nullptr;
         Sched::Schedule *availabilitySchedule = nullptr;
         bool variableFlow = false;
@@ -303,7 +302,7 @@ namespace PlantCentralHeatPumpSystem {
         SolverWarningData simultaneousPartLoadSolverWarning;
         ModuleResult result;
 
-        void initialize(int performanceIndex, PerformanceData const &performance, Sched::Schedule *availabilitySchedule);
+        void initialize(PerformanceData const &performance, Sched::Schedule *availabilitySchedule);
         PerformanceData const &performanceData() const;
         std::string const &name() const;
         bool isAvailable() const;
@@ -357,7 +356,7 @@ namespace PlantCentralHeatPumpSystem {
         Real64 requestedCoolingLoad = 0.0;              // Cooling demand for the central heat pump system
         Real64 requestedHeatingLoad = 0.0;              // Heating demand for the central heat pump system
         Real64 ancillaryPower = 0.0;                    // System ancillary power
-        Array1D<Module> modules;                        // Expanded runtime modules
+        std::vector<Module> modules;                    // Expanded runtime modules
         bool coolingSetpointErrorIssued = false;        // true if setpoint warning issued
         bool heatingSetpointErrorIssued = false;        // true if setpoint warning issued
         PlantLocation coolingPlantLoc = {};             // Chilled water plant loop component index
@@ -411,7 +410,7 @@ namespace PlantCentralHeatPumpSystem {
             EnergyPlusData &state, Real64 heatingMassFlowRate, Real64 sourceMassFlowRate, Real64 heatingInletTemp, Real64 sourceInletTemp);
 
         ModuleResult solveCoolingOnly(EnergyPlusData &state,
-                                      int moduleNum,
+                                      std::size_t moduleIndex,
                                       Real64 requestedCoolingLoad,
                                       Real64 evaporatorMassFlowRateMax,
                                       Real64 condenserMassFlowRate,
@@ -419,7 +418,7 @@ namespace PlantCentralHeatPumpSystem {
                                       Real64 condenserInletTemp);
 
         ModuleResult solveHeatingOnly(EnergyPlusData &state,
-                                      int moduleNum,
+                                      std::size_t moduleIndex,
                                       Real64 requestedHeatingLoad,
                                       Real64 evaporatorMassFlowRate,
                                       Real64 condenserMassFlowRateMax,
@@ -427,7 +426,7 @@ namespace PlantCentralHeatPumpSystem {
                                       Real64 condenserInletTemp);
 
         ModuleResult solveSimultaneous(EnergyPlusData &state,
-                                       int moduleNum,
+                                       std::size_t moduleIndex,
                                        Real64 requestedCoolingLoad,
                                        Real64 requestedHeatingLoad,
                                        Real64 coolingMassFlowRateMax,
@@ -473,12 +472,10 @@ namespace PlantCentralHeatPumpSystem {
 struct PlantCentralHeatPumpSystemData : BaseGlobalStruct
 {
 
-    bool getSystemInputFlag = true;    // When TRUE, calls subroutine to read input file.
-    int numSystems = 0;                // Number of systems specified in input
-    int numPerformanceDefinitions = 0; // Number of performance definitions specified in input
-    int numPerformanceReferences = 0;  // Number of system performance references
-    EPVector<PlantCentralHeatPumpSystem::CentralHeatPumpSystem> systems;
-    EPVector<PlantCentralHeatPumpSystem::PerformanceData> performanceDefinitions;
+    bool getSystemInputFlag = true;   // When TRUE, calls subroutine to read input file.
+    int numPerformanceReferences = 0; // Number of system performance references
+    std::vector<PlantCentralHeatPumpSystem::CentralHeatPumpSystem> systems;
+    std::vector<PlantCentralHeatPumpSystem::PerformanceData> performanceDefinitions;
 
     void init_constant_state([[maybe_unused]] EnergyPlusData &state) override
     {

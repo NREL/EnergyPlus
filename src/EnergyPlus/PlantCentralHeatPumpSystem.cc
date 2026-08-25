@@ -276,9 +276,8 @@ namespace {
 
 } // namespace
 
-void Module::initialize(int const performanceIndex, PerformanceData const &performance, Sched::Schedule *const availabilitySchedule)
+void Module::initialize(PerformanceData const &performance, Sched::Schedule *const availabilitySchedule)
 {
-    this->performanceIndex = performanceIndex;
     this->performance = &performance;
     this->availabilitySchedule = availabilitySchedule;
     this->variableFlow = performance.variableFlow;
@@ -573,14 +572,13 @@ void CentralHeatPumpSystem::size(EnergyPlusData &state)
 
     // auto-size the chiller heater components
 
-    for (int moduleIndex = 1; moduleIndex <= static_cast<int>(this->modules.size()); ++moduleIndex) {
+    for (auto &module : this->modules) {
         bool errorsFound = false;
 
         // find the appropriate Plant Sizing objects
         int coolingPlantSizingIndex = this->coolingPlantLoc.loop->PlantSizNum;
         int sourcePlantSizingIndex = this->sourcePlantLoc.loop->PlantSizNum;
 
-        auto &module = this->modules(moduleIndex);
         auto const &performance = module.performanceData();
         auto &sizing = module.sizing;
 
@@ -861,8 +859,7 @@ void CentralHeatPumpSystem::size(EnergyPlusData &state)
     Real64 totalEvaporatorVolFlowRate = 0.0;
     Real64 totalSourceVolFlowRate = 0.0;
     Real64 totalHeatingVolFlowRate = 0.0;
-    for (int moduleIndex = 1; moduleIndex <= static_cast<int>(this->modules.size()); ++moduleIndex) {
-        auto const &module = this->modules(moduleIndex);
+    for (auto const &module : this->modules) {
         auto const &performance = module.performanceData();
         auto const &sizing = module.sizing;
         totalEvaporatorVolFlowRate += sizing.temporaryEvaporatorVolFlowRate;
@@ -938,46 +935,42 @@ void getCentralHeatPumpSystemInput(EnergyPlusData &state)
 
     struct ResolvedModuleGroup
     {
-        int performanceIndex = 0;
+        std::size_t performanceIndex = 0;
         int moduleCount = 0;
         Sched::Schedule *availabilitySchedule = nullptr;
     };
 
     bool errorsFound = false;
     auto &inputProcessor = state.dataInputProcessing->inputProcessor;
+    auto &systems = state.dataPlantCentralHeatPumpSystem->systems;
     state.dataIPShortCut->cCurrentModuleObject = objectType;
-    state.dataPlantCentralHeatPumpSystem->numSystems = inputProcessor->getNumObjectsFound(state, objectType);
     state.dataPlantCentralHeatPumpSystem->numPerformanceReferences = 0;
 
-    if (state.dataPlantCentralHeatPumpSystem->numSystems <= 0) {
+    auto const instances = inputProcessor->epJSON.find(objectType);
+    if (instances == inputProcessor->epJSON.end() || instances->empty()) {
         ShowSevereError(state, std::format("No {} equipment specified in input file", objectType));
         return;
     }
 
-    if (allocated(state.dataPlantCentralHeatPumpSystem->systems)) {
-        state.dataPlantCentralHeatPumpSystem->systems.deallocate();
-    }
-    state.dataPlantCentralHeatPumpSystem->systems.allocate(state.dataPlantCentralHeatPumpSystem->numSystems);
+    auto const &instancesValue = instances.value();
+    systems.clear();
+    systems.resize(instancesValue.size());
 
     // Performance definitions are independent named objects. Parse and retain them before resolving system references.
     getPerformanceInput(state);
 
-    auto const instances = inputProcessor->epJSON.find(objectType);
-    assert(instances != inputProcessor->epJSON.end());
     auto const &objectSchemaProps = inputProcessor->getObjectSchemaProps(state, objectType);
-    auto const &instancesValue = instances.value();
-    assert(instancesValue.size() == static_cast<std::size_t>(state.dataPlantCentralHeatPumpSystem->numSystems));
+    assert(instancesValue.size() == systems.size());
 
     std::unordered_set<std::string> systemNames;
-    int systemNum = 0;
+    std::size_t systemIndex = 0;
     for (auto const &systemObject : instancesValue.items()) {
-        ++systemNum;
         auto const &key = systemObject.key();
         auto const &objectFields = systemObject.value();
         inputProcessor->markObjectAsUsed(objectType, key);
 
         ErrorObjectHeader const eoh{routineName, objectType, key};
-        auto &system = state.dataPlantCentralHeatPumpSystem->systems(systemNum);
+        auto &system = systems.at(systemIndex++);
         system.Name = Util::makeUPPER(key);
         if (!systemNames.emplace(system.Name).second) {
             ShowSevereDuplicateName(state, eoh);
@@ -1073,7 +1066,7 @@ void getCentralHeatPumpSystemInput(EnergyPlusData &state)
         auto const &moduleGroupSchemaProps = objectSchemaProps.at(moduleGroupsKey).at("items").at("properties");
         std::vector<ResolvedModuleGroup> resolvedGroups;
         resolvedGroups.reserve(moduleGroups->size());
-        int totalModuleCount = 0;
+        std::size_t totalModuleCount = 0;
         for (auto const &moduleGroup : *moduleGroups) {
             std::string const enteredPerformanceObjectType =
                 inputProcessor->getAlphaFieldValue(moduleGroup, moduleGroupSchemaProps, performanceObjectTypeKey);
@@ -1090,13 +1083,16 @@ void getCentralHeatPumpSystemInput(EnergyPlusData &state)
                 continue;
             }
 
-            int const performanceIndex = Util::FindItemInList(performanceName, state.dataPlantCentralHeatPumpSystem->performanceDefinitions);
-            if (performanceIndex <= 0) {
+            auto const &performanceDefinitions = state.dataPlantCentralHeatPumpSystem->performanceDefinitions;
+            auto const performance = std::ranges::find_if(
+                performanceDefinitions, [&performanceName](auto const &candidate) { return Util::SameString(performanceName, candidate.Name); });
+            if (performance == performanceDefinitions.end()) {
                 ShowSevereItemNotFound(state, eoh, performanceNameKey, performanceName);
                 ShowContinueError(state, "Select the name of a ChillerHeaterPerformance:Electric:EIR object.");
                 errorsFound = true;
                 continue;
             }
+            auto const performanceIndex = static_cast<std::size_t>(std::distance(performanceDefinitions.begin(), performance));
 
             int const moduleCount = inputProcessor->getIntFieldValue(moduleGroup, moduleGroupSchemaProps, numberOfModulesKey);
             if (moduleCount < 1) {
@@ -1113,7 +1109,7 @@ void getCentralHeatPumpSystemInput(EnergyPlusData &state)
             }
 
             resolvedGroups.push_back({performanceIndex, moduleCount, availabilitySchedule});
-            totalModuleCount += moduleCount;
+            totalModuleCount += static_cast<std::size_t>(moduleCount);
             ++state.dataPlantCentralHeatPumpSystem->numPerformanceReferences;
         }
 
@@ -1123,16 +1119,15 @@ void getCentralHeatPumpSystemInput(EnergyPlusData &state)
             continue;
         }
 
-        system.modules.allocate(totalModuleCount);
-        int moduleNum = 0;
+        system.modules.resize(totalModuleCount);
+        std::size_t moduleIndex = 0;
         for (auto const &group : resolvedGroups) {
             for (int identicalModuleNum = 1; identicalModuleNum <= group.moduleCount; ++identicalModuleNum) {
-                ++moduleNum;
-                system.modules(moduleNum).initialize(group.performanceIndex,
-                                                     state.dataPlantCentralHeatPumpSystem->performanceDefinitions(group.performanceIndex),
-                                                     group.availabilitySchedule);
+                system.modules.at(moduleIndex++)
+                    .initialize(state.dataPlantCentralHeatPumpSystem->performanceDefinitions.at(group.performanceIndex), group.availabilitySchedule);
             }
         }
+        assert(moduleIndex == system.modules.size());
         system.resolveFlowMode(state);
     }
 
@@ -1310,10 +1305,10 @@ void CentralHeatPumpSystem::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::StoreType::Average,
                         this->Name);
 
-    if (static_cast<int>(this->modules.size()) > 0) {
-
-        for (int moduleNum = 1; moduleNum <= static_cast<int>(this->modules.size()); ++moduleNum) {
-            auto &module = this->modules(moduleNum);
+    if (!this->modules.empty()) {
+        for (std::size_t moduleIndex = 0; moduleIndex < this->modules.size(); ++moduleIndex) {
+            int const moduleNum = static_cast<int>(moduleIndex) + 1;
+            auto &module = this->modules[moduleIndex];
             SetupOutputVariable(state,
                                 std::format("Chiller Heater Operation Mode Unit {}", moduleNum),
                                 Constant::Units::None,
@@ -1568,42 +1563,37 @@ void getPerformanceInput(EnergyPlusData &state)
     static constexpr char referenceHeatingEnteringCondenserTempField[] = "Reference Heating Mode Entering Condenser Fluid Temperature";
     static constexpr char maximumHeatingLeavingCondenserTempField[] = "Maximum Heating Mode Leaving Condenser Water Temperature";
 
-    bool errorsFound = false;        // True when input errors are found
-    Array1D<Real64> curveValues(11); // Used to evaluate PLFFPLR curve objects
+    bool errorsFound = false;                 // True when input errors are found
+    std::vector<Real64> curveValues(11, 0.0); // Used to evaluate PLFFPLR curve objects
 
     auto &inputProcessor = state.dataInputProcessing->inputProcessor;
+    auto &performanceDefinitions = state.dataPlantCentralHeatPumpSystem->performanceDefinitions;
     state.dataIPShortCut->cCurrentModuleObject = objectType;
-    state.dataPlantCentralHeatPumpSystem->numPerformanceDefinitions =
-        inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+    auto const instances = inputProcessor->epJSON.find(objectType);
 
-    if (state.dataPlantCentralHeatPumpSystem->numPerformanceDefinitions <= 0) {
+    performanceDefinitions.clear();
+    if (instances == inputProcessor->epJSON.end() || instances->empty()) {
         ShowSevereError(state, std::format("No {} equipment specified in input file", objectType));
         errorsFound = true;
+    } else {
+        performanceDefinitions.resize(instances->size());
     }
 
-    // Allocate the retained performance-definition array.
-    if (allocated(state.dataPlantCentralHeatPumpSystem->performanceDefinitions)) {
-        state.dataPlantCentralHeatPumpSystem->performanceDefinitions.deallocate();
-    }
-    state.dataPlantCentralHeatPumpSystem->performanceDefinitions.allocate(state.dataPlantCentralHeatPumpSystem->numPerformanceDefinitions);
-
-    auto const instances = inputProcessor->epJSON.find(objectType);
     if (instances != inputProcessor->epJSON.end()) {
         auto const &objectSchemaProps = inputProcessor->getObjectSchemaProps(state, objectType);
         auto const &instancesValue = instances.value();
-        assert(instancesValue.size() == static_cast<std::size_t>(state.dataPlantCentralHeatPumpSystem->numPerformanceDefinitions));
+        assert(instancesValue.size() == performanceDefinitions.size());
 
         std::unordered_set<std::string> performanceNames;
-        int performanceIndex = 0;
+        std::size_t performanceIndex = 0;
         for (auto const &performanceObject : instancesValue.items()) {
-            ++performanceIndex;
             auto const &key = performanceObject.key();
             auto const &objectFields = performanceObject.value();
 
             inputProcessor->markObjectAsUsed(objectType, key);
             ErrorObjectHeader const eoh{routineName, objectType, key};
 
-            auto &performanceDefinition = state.dataPlantCentralHeatPumpSystem->performanceDefinitions(performanceIndex);
+            auto &performanceDefinition = performanceDefinitions.at(performanceIndex++);
             performanceDefinition.Name = Util::makeUPPER(key);
             if (!performanceNames.emplace(performanceDefinition.Name).second) {
                 ShowSevereDuplicateName(state, eoh);
@@ -1852,7 +1842,7 @@ void getPerformanceInput(EnergyPlusData &state)
                     if (curveValue < 0.0) {
                         foundNegativeValue = true;
                     }
-                    curveValues(curvePointIndex + 1) = int(curveValue * 100.0) / 100.0;
+                    curveValues[static_cast<std::size_t>(curvePointIndex)] = int(curveValue * 100.0) / 100.0;
                 }
                 if (foundNegativeValue) {
                     ShowWarningError(state,
@@ -1921,7 +1911,7 @@ void getPerformanceInput(EnergyPlusData &state)
                     if (curveValue < 0.0) {
                         foundNegativeValue = true;
                     }
-                    curveValues(curvePointIndex + 1) = int(curveValue * 100.0) / 100.0;
+                    curveValues[static_cast<std::size_t>(curvePointIndex)] = int(curveValue * 100.0) / 100.0;
                 }
                 if (foundNegativeValue) {
                     ShowWarningError(state,
@@ -1994,6 +1984,7 @@ void getPerformanceInput(EnergyPlusData &state)
                                    heatingEIRPartLoadCurveName,
                                    "heating");
         }
+        assert(performanceIndex == performanceDefinitions.size());
     }
 
     if (errorsFound) {
@@ -2351,7 +2342,7 @@ void CentralHeatPumpSystem::initialize(EnergyPlusData &state,
 }
 
 ModuleResult CentralHeatPumpSystem::solveCoolingOnly(EnergyPlusData &state,
-                                                     int const moduleNum,
+                                                     std::size_t const moduleIndex,
                                                      Real64 const requestedCoolingLoad,
                                                      Real64 const evaporatorMassFlowRateMax,
                                                      Real64 const condenserMassFlowRate,
@@ -2360,7 +2351,8 @@ ModuleResult CentralHeatPumpSystem::solveCoolingOnly(EnergyPlusData &state,
 {
     static constexpr std::string_view routineName("CentralHeatPumpSystem cooling-only solver");
 
-    auto &module = this->modules(moduleNum);
+    auto &module = this->modules[moduleIndex];
+    int const moduleNum = static_cast<int>(moduleIndex) + 1;
     auto const &performance = module.performanceData();
     ModePerformanceData const modePerformance = module.coolingModePerformance();
     ModuleResult result;
@@ -2541,7 +2533,7 @@ ModuleResult CentralHeatPumpSystem::solveCoolingOnly(EnergyPlusData &state,
 }
 
 ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
-                                                     int const moduleNum,
+                                                     std::size_t const moduleIndex,
                                                      Real64 const requestedHeatingLoad,
                                                      Real64 const evaporatorMassFlowRate,
                                                      Real64 const condenserMassFlowRateMax,
@@ -2550,7 +2542,8 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
 {
     static constexpr std::string_view routineName("CentralHeatPumpSystem heating-only solver");
 
-    auto &module = this->modules(moduleNum);
+    auto &module = this->modules[moduleIndex];
+    int const moduleNum = static_cast<int>(moduleIndex) + 1;
     auto const &performance = module.performanceData();
     ModePerformanceData const modePerformance = module.heatingModePerformance();
     ModuleResult result;
@@ -2796,7 +2789,7 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
 }
 
 ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
-                                                      int const moduleNum,
+                                                      std::size_t const moduleIndex,
                                                       Real64 const requestedCoolingLoad,
                                                       Real64 const requestedHeatingLoad,
                                                       Real64 const coolingMassFlowRateMax,
@@ -2808,7 +2801,8 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
 {
     static constexpr std::string_view routineName("CentralHeatPumpSystem simultaneous solver");
 
-    auto &module = this->modules(moduleNum);
+    auto &module = this->modules[moduleIndex];
+    int const moduleNum = static_cast<int>(moduleIndex) + 1;
     auto const &performance = module.performanceData();
     auto const &sizing = module.sizing;
     ModePerformanceData const modePerformance = module.heatingModePerformance();
@@ -3224,8 +3218,8 @@ void CentralHeatPumpSystem::calculateCoolingOnly(EnergyPlusData &state,
         return min(max(0.0, remainingFlow), max(0.0, designFlow));
     };
 
-    for (int moduleNum = 1; moduleNum <= static_cast<int>(this->modules.size()); ++moduleNum) {
-        auto &module = this->modules(moduleNum);
+    for (std::size_t moduleIndex = 0; moduleIndex < this->modules.size(); ++moduleIndex) {
+        auto &module = this->modules[moduleIndex];
         auto const &sizing = module.sizing;
         bool const moduleIsAvailable = module.isAvailable();
 
@@ -3237,7 +3231,7 @@ void CentralHeatPumpSystem::calculateCoolingOnly(EnergyPlusData &state,
         if (moduleIsAvailable && remainingCoolingLoad > HVAC::SmallLoad && moduleCoolingMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance &&
             moduleSourceMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
             result = this->solveCoolingOnly(
-                state, moduleNum, remainingCoolingLoad, moduleCoolingMassFlowRate, moduleSourceMassFlowRate, coolingInletTemp, sourceInletTemp);
+                state, moduleIndex, remainingCoolingLoad, moduleCoolingMassFlowRate, moduleSourceMassFlowRate, coolingInletTemp, sourceInletTemp);
             module.result = result;
             module.mapResultToPlantConnections();
             result = module.result;
@@ -3294,8 +3288,8 @@ void CentralHeatPumpSystem::calculateHeatingOnly(EnergyPlusData &state,
         return min(max(0.0, remainingFlow), max(0.0, designFlow));
     };
 
-    for (int moduleNum = 1; moduleNum <= static_cast<int>(this->modules.size()); ++moduleNum) {
-        auto &module = this->modules(moduleNum);
+    for (std::size_t moduleIndex = 0; moduleIndex < this->modules.size(); ++moduleIndex) {
+        auto &module = this->modules[moduleIndex];
         auto const &sizing = module.sizing;
         bool const moduleIsAvailable = module.isAvailable();
 
@@ -3307,7 +3301,7 @@ void CentralHeatPumpSystem::calculateHeatingOnly(EnergyPlusData &state,
         if (moduleIsAvailable && remainingHeatingLoad > HVAC::SmallLoad && moduleHeatingMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance &&
             moduleSourceMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
             result = this->solveHeatingOnly(
-                state, moduleNum, remainingHeatingLoad, moduleSourceMassFlowRate, moduleHeatingMassFlowRate, sourceInletTemp, heatingInletTemp);
+                state, moduleIndex, remainingHeatingLoad, moduleSourceMassFlowRate, moduleHeatingMassFlowRate, sourceInletTemp, heatingInletTemp);
             module.result = result;
             module.mapResultToPlantConnections();
             result = module.result;
@@ -3364,8 +3358,7 @@ void CentralHeatPumpSystem::updateReportingAndNodes(EnergyPlusData &state,
     Real64 heatingOutletTemperatureSum = 0.0;
     Real64 sourceOutletTemperatureSum = 0.0;
 
-    for (int moduleNum = 1; moduleNum <= static_cast<int>(this->modules.size()); ++moduleNum) {
-        auto &module = this->modules(moduleNum);
+    for (auto &module : this->modules) {
         module.updateResultEnergies(secondsInTimeStep);
         auto const &result = module.result;
         totalCoolingHeatTransferRate += result.coolingDelivered;
@@ -3448,8 +3441,8 @@ void CentralHeatPumpSystem::calculateSimultaneous(EnergyPlusData &state,
     Real64 remainingHeatingMassFlowRate = max(0.0, heatingMassFlowRate);
     Real64 remainingSourceMassFlowRate = max(0.0, sourceMassFlowRate);
 
-    for (int moduleNum = 1; moduleNum <= static_cast<int>(this->modules.size()); ++moduleNum) {
-        auto &module = this->modules(moduleNum);
+    for (std::size_t moduleIndex = 0; moduleIndex < this->modules.size(); ++moduleIndex) {
+        auto &module = this->modules[moduleIndex];
         auto const &sizing = module.sizing;
         bool const moduleIsAvailable = module.isAvailable();
 
@@ -3478,7 +3471,7 @@ void CentralHeatPumpSystem::calculateSimultaneous(EnergyPlusData &state,
                                                        max(sizing.maximumSourceEvaporatorMassFlowRate, sizing.maximumSourceCondenserMassFlowRate),
                                                        max(sizing.maximumEvaporatorMassFlowRate, sizing.maximumCondenserMassFlowRate));
             result = this->solveSimultaneous(state,
-                                             moduleNum,
+                                             moduleIndex,
                                              remainingCoolingLoad,
                                              remainingHeatingLoad,
                                              moduleCoolingMassFlowRate,
@@ -3492,7 +3485,7 @@ void CentralHeatPumpSystem::calculateSimultaneous(EnergyPlusData &state,
             moduleSourceMassFlowRate =
                 moduleFlowLimit(remainingSourceMassFlowRate, sizing.maximumSourceCondenserMassFlowRate, sizing.maximumCondenserMassFlowRate);
             result = this->solveCoolingOnly(
-                state, moduleNum, remainingCoolingLoad, moduleCoolingMassFlowRate, moduleSourceMassFlowRate, coolingInletTemp, sourceInletTemp);
+                state, moduleIndex, remainingCoolingLoad, moduleCoolingMassFlowRate, moduleSourceMassFlowRate, coolingInletTemp, sourceInletTemp);
             module.result = result;
             module.mapResultToPlantConnections();
             result = module.result;
@@ -3506,7 +3499,7 @@ void CentralHeatPumpSystem::calculateSimultaneous(EnergyPlusData &state,
             moduleSourceMassFlowRate =
                 moduleFlowLimit(remainingSourceMassFlowRate, sizing.maximumSourceEvaporatorMassFlowRate, sizing.maximumEvaporatorMassFlowRate);
             result = this->solveHeatingOnly(
-                state, moduleNum, remainingHeatingLoad, moduleSourceMassFlowRate, moduleHeatingMassFlowRate, sourceInletTemp, heatingInletTemp);
+                state, moduleIndex, remainingHeatingLoad, moduleSourceMassFlowRate, moduleHeatingMassFlowRate, sourceInletTemp, heatingInletTemp);
             module.result = result;
             module.mapResultToPlantConnections();
             result = module.result;

@@ -590,47 +590,41 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->init_state(*state);
     // Allocate one system with One module (=distinct ChillerHeaterPerformance:Electric:EIR)
     // but with a number of identical number module of 2 in CentralHeatPumpSystem
-    int numSystems = 1;
-    state->dataPlantCentralHeatPumpSystem->numSystems = numSystems;
-    state->dataPlantCentralHeatPumpSystem->systems.allocate(numSystems);
+    state->dataPlantCentralHeatPumpSystem->systems.resize(1);
 
-    state->dataPlantCentralHeatPumpSystem->systems(1).modules.allocate(2);
+    state->dataPlantCentralHeatPumpSystem->systems[0].modules.resize(2);
 
-    int numModules = 1;
-    state->dataPlantCentralHeatPumpSystem->numPerformanceDefinitions = numModules;
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions.allocate(numModules);
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1).constantFlow = false;
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1).variableFlow = true;
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions.resize(1);
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0].constantFlow = false;
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0].variableFlow = true;
 
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1).sizingFactor = 1.2;
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0].sizingFactor = 1.2;
 
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1).referenceCoolingCapacity = DataSizing::AutoSize;
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1).referenceCoolingCapacityWasAutoSized = true;
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0].referenceCoolingCapacity = DataSizing::AutoSize;
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0].referenceCoolingCapacityWasAutoSized = true;
 
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1).designEvaporatorVolFlowRate = DataSizing::AutoSize;
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1).designEvaporatorVolFlowRateWasAutoSized = true;
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0].designEvaporatorVolFlowRate = DataSizing::AutoSize;
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0].designEvaporatorVolFlowRateWasAutoSized = true;
 
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1).designCondenserVolFlowRate = DataSizing::AutoSize;
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1).designCondenserVolFlowRateWasAutoSized = true;
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0].designCondenserVolFlowRate = DataSizing::AutoSize;
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0].designCondenserVolFlowRateWasAutoSized = true;
 
     // Needed for calcs
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1).referenceCoolingCOP = 1.5;
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1).compressorMotorEfficiency = 0.98;
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1).coolingReferenceCondenserInletTemp = 29.4;
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1).heatingToCoolingCapacityRatio = 0.74;
-    state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1).heatingToCoolingPowerRatio = 1.38;
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0].referenceCoolingCOP = 1.5;
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0].compressorMotorEfficiency = 0.98;
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0].coolingReferenceCondenserInletTemp = 29.4;
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0].heatingToCoolingCapacityRatio = 0.74;
+    state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0].heatingToCoolingPowerRatio = 1.38;
 
     // Both modules share one retained immutable performance definition.
-    auto const &performance = state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1);
+    auto const &performance = state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0];
     auto *availabilitySchedule = Sched::GetScheduleAlwaysOn(*state);
-    state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).initialize(1, performance, availabilitySchedule);
-    state->dataPlantCentralHeatPumpSystem->systems(1).modules(2).initialize(1, performance, availabilitySchedule);
-    auto &module1 = state->dataPlantCentralHeatPumpSystem->systems(1).modules(1);
-    auto &module2 = state->dataPlantCentralHeatPumpSystem->systems(1).modules(2);
+    state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].initialize(performance, availabilitySchedule);
+    state->dataPlantCentralHeatPumpSystem->systems[0].modules[1].initialize(performance, availabilitySchedule);
+    auto &module1 = state->dataPlantCentralHeatPumpSystem->systems[0].modules[0];
+    auto &module2 = state->dataPlantCentralHeatPumpSystem->systems[0].modules[1];
     EXPECT_EQ(&performance, module1.performance);
     EXPECT_EQ(&performance, module2.performance);
-    EXPECT_EQ(1, module1.performanceIndex);
-    EXPECT_EQ(1, module2.performanceIndex);
     EXPECT_EQ(availabilitySchedule, module1.availabilitySchedule);
     EXPECT_EQ(availabilitySchedule, module2.availabilitySchedule);
     module1.result.qEvaporator = 100.0;
@@ -648,8 +642,8 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataSize->PlantSizData(PltSizNum).DeltaT = 10.0;
     state->dataSize->PlantSizData(PltSizNum).LoopType = DataSizing::TypeOfPlantLoop::Cooling;
     // Assign to the system
-    state->dataPlantCentralHeatPumpSystem->systems(1).coolingPlantLoc.loopNum = PltSizNum;
-    PlantUtilities::SetPlantLocationLinks(*state, state->dataPlantCentralHeatPumpSystem->systems(1).coolingPlantLoc);
+    state->dataPlantCentralHeatPumpSystem->systems[0].coolingPlantLoc.loopNum = PltSizNum;
+    PlantUtilities::SetPlantLocationLinks(*state, state->dataPlantCentralHeatPumpSystem->systems[0].coolingPlantLoc);
 
     // Condenser Loop
     int PltSizCondNum = 2;
@@ -660,11 +654,11 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataSize->PlantSizData(PltSizCondNum).DesVolFlowRate = 1.0;
     state->dataSize->PlantSizData(PltSizCondNum).LoopType = DataSizing::TypeOfPlantLoop::Condenser;
     // Assign to the system
-    state->dataPlantCentralHeatPumpSystem->systems(1).sourcePlantLoc.loopNum = PltSizCondNum;
-    PlantUtilities::SetPlantLocationLinks(*state, state->dataPlantCentralHeatPumpSystem->systems(1).sourcePlantLoc);
-    state->dataPlantCentralHeatPumpSystem->systems(1).coolingInletNodeNum = 1;
-    state->dataPlantCentralHeatPumpSystem->systems(1).heatingInletNodeNum = 2;
-    state->dataPlantCentralHeatPumpSystem->systems(1).sourceInletNodeNum = 3;
+    state->dataPlantCentralHeatPumpSystem->systems[0].sourcePlantLoc.loopNum = PltSizCondNum;
+    PlantUtilities::SetPlantLocationLinks(*state, state->dataPlantCentralHeatPumpSystem->systems[0].sourcePlantLoc);
+    state->dataPlantCentralHeatPumpSystem->systems[0].coolingInletNodeNum = 1;
+    state->dataPlantCentralHeatPumpSystem->systems[0].heatingInletNodeNum = 2;
+    state->dataPlantCentralHeatPumpSystem->systems[0].sourceInletNodeNum = 3;
 
     // Calculate expected values
     Real64 rho_evap = state->dataPlnt->PlantLoop(PltSizNum).glycol->getDensity(*state, Constant::CWInitConvTemp, "ChillerHeater_Autosize_TEST");
@@ -674,56 +668,56 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     Real64 rho_cond =
         state->dataPlnt->PlantLoop(PltSizCondNum)
             .glycol->getDensity(*state,
-                                state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).performanceData().coolingReferenceCondenserInletTemp,
+                                state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].performanceData().coolingReferenceCondenserInletTemp,
                                 "ChillerHeater_Autosize_TEST");
 
     Real64 Cp_cond = state->dataPlnt->PlantLoop(PltSizCondNum)
                          .glycol->getSpecificHeat(
                              *state,
-                             state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).performanceData().coolingReferenceCondenserInletTemp,
+                             state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].performanceData().coolingReferenceCondenserInletTemp,
                              "ChillerHeater_Autosize_TEST");
 
     // Note: Each individual chiller heater module is sized to be capable of supporting the total load on the system
 
     // Flow is multiplied by the sizingFactor
     Real64 expectedEvaporatorVolFlowRate = state->dataSize->PlantSizData(PltSizNum).DesVolFlowRate *
-                                           state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).performanceData().sizingFactor;
+                                           state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].performanceData().sizingFactor;
 
     Real64 expectedReferenceCoolingCapacity = rho_evap * Cp_evap * expectedEvaporatorVolFlowRate * state->dataSize->PlantSizData(PltSizNum).DeltaT;
 
     Real64 expectedCondenserVolFlowRate =
         expectedReferenceCoolingCapacity *
-        (1.0 + (1.0 / state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).performanceData().referenceCoolingCOP) *
-                   state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).performanceData().compressorMotorEfficiency) /
+        (1.0 + (1.0 / state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].performanceData().referenceCoolingCOP) *
+                   state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].performanceData().compressorMotorEfficiency) /
         (rho_cond * Cp_cond * state->dataSize->PlantSizData(PltSizCondNum).DeltaT);
 
     // now call sizing routine
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
-    state->dataPlantCentralHeatPumpSystem->systems(1).size(*state);
+    state->dataPlantCentralHeatPumpSystem->systems[0].size(*state);
 
     // Autosized values are system-specific module sizing state; the shared definition remains unchanged.
-    EXPECT_DOUBLE_EQ(expectedEvaporatorVolFlowRate, state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).sizing.designEvaporatorVolFlowRate);
-    EXPECT_DOUBLE_EQ(expectedReferenceCoolingCapacity, state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).sizing.referenceCoolingCapacity);
+    EXPECT_DOUBLE_EQ(expectedEvaporatorVolFlowRate, state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].sizing.designEvaporatorVolFlowRate);
+    EXPECT_DOUBLE_EQ(expectedReferenceCoolingCapacity, state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].sizing.referenceCoolingCapacity);
 
-    EXPECT_DOUBLE_EQ(expectedCondenserVolFlowRate, state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).sizing.designCondenserVolFlowRate);
-    EXPECT_DOUBLE_EQ(expectedCondenserVolFlowRate, state->dataPlantCentralHeatPumpSystem->systems(1).modules(2).sizing.designCondenserVolFlowRate);
+    EXPECT_DOUBLE_EQ(expectedCondenserVolFlowRate, state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].sizing.designCondenserVolFlowRate);
+    EXPECT_DOUBLE_EQ(expectedCondenserVolFlowRate, state->dataPlantCentralHeatPumpSystem->systems[0].modules[1].sizing.designCondenserVolFlowRate);
 
     // Ensure that stuff that other quantities that depends on referenceCoolingCapacity are also initialized properly
     // Heating Cap
     Real64 expectedReferenceHeatingCapacity =
         expectedReferenceCoolingCapacity *
-        state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).performanceData().heatingToCoolingCapacityRatio;
-    EXPECT_DOUBLE_EQ(expectedReferenceHeatingCapacity, state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).sizing.referenceHeatingCapacity);
+        state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].performanceData().heatingToCoolingCapacityRatio;
+    EXPECT_DOUBLE_EQ(expectedReferenceHeatingCapacity, state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].sizing.referenceHeatingCapacity);
 
     // Heating Power: Calc cooling Power = Cap / COP, and multiply by ratio
     Real64 expectedReferenceHeatingPower =
-        (expectedReferenceCoolingCapacity / state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).performanceData().referenceCoolingCOP) *
-        state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).performanceData().heatingToCoolingPowerRatio;
-    EXPECT_DOUBLE_EQ(expectedReferenceHeatingPower, state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).sizing.referenceHeatingPower);
+        (expectedReferenceCoolingCapacity / state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].performanceData().referenceCoolingCOP) *
+        state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].performanceData().heatingToCoolingPowerRatio;
+    EXPECT_DOUBLE_EQ(expectedReferenceHeatingPower, state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].sizing.referenceHeatingPower);
 
     // Heating COP = Heating Cap / Heating Power
     Real64 expectedReferenceHeatingCOP = expectedReferenceHeatingCapacity / expectedReferenceHeatingPower;
-    EXPECT_DOUBLE_EQ(expectedReferenceHeatingCOP, state->dataPlantCentralHeatPumpSystem->systems(1).modules(1).sizing.referenceHeatingCOP);
+    EXPECT_DOUBLE_EQ(expectedReferenceHeatingCOP, state->dataPlantCentralHeatPumpSystem->systems[0].modules[0].sizing.referenceHeatingCOP);
 
     ASSERT_EQ(3u, state->dataSize->CompDesWaterFlow.size());
     EXPECT_DOUBLE_EQ(2.0 * expectedEvaporatorVolFlowRate, state->dataSize->CompDesWaterFlow(1).DesVolFlowRate);
@@ -740,14 +734,14 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_DesignCapacityReportingUses
     system.coolingPlantLoc.loopNum = 1;
     system.heatingPlantLoc.loopNum = 2;
     system.sourcePlantLoc.loopNum = 3;
-    system.modules.allocate(2);
+    system.modules.resize(2);
 
     PlantCentralHeatPumpSystem::PerformanceData performance1;
     PlantCentralHeatPumpSystem::PerformanceData performance2;
-    system.modules(1).initialize(1, performance1, nullptr);
-    system.modules(2).initialize(2, performance2, nullptr);
+    system.modules[0].initialize(performance1, nullptr);
+    system.modules[1].initialize(performance2, nullptr);
 
-    auto &module1 = system.modules(1);
+    auto &module1 = system.modules[0];
     module1.sizing.referenceCoolingCapacity = 10000.0;
     performance1.referenceCoolingCOP = 5.0;
     performance1.coolingMinimumPartLoadRatio = 0.20;
@@ -760,7 +754,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_DesignCapacityReportingUses
     performance1.heatingOptimumPartLoadRatio = 0.75;
     performance1.compressorMotorEfficiency = 0.80;
 
-    auto &module2 = system.modules(2);
+    auto &module2 = system.modules[1];
     module2.sizing.referenceCoolingCapacity = 6000.0;
     performance2.referenceCoolingCOP = 3.0;
     performance2.coolingMinimumPartLoadRatio = 0.10;
@@ -839,11 +833,11 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SourceOnlySizingUsesSourceP
     system.coolingInletNodeNum = 11;
     system.heatingInletNodeNum = 12;
     system.sourceInletNodeNum = 13;
-    system.modules.allocate(1);
+    system.modules.resize(1);
 
     PlantCentralHeatPumpSystem::PerformanceData performance;
-    system.modules(1).initialize(1, performance, nullptr);
-    auto &module = system.modules(1);
+    system.modules[0].initialize(performance, nullptr);
+    auto &module = system.modules[0];
     performance.Name = "SOURCE SIZING ONLY";
     performance.sizingFactor = 1.0;
     module.sizing.designEvaporatorVolFlowRate = 0.001;
@@ -908,11 +902,11 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_HardSizedWarningsRetainCalc
     system.coolingInletNodeNum = 21;
     system.heatingInletNodeNum = 22;
     system.sourceInletNodeNum = 23;
-    system.modules.allocate(1);
+    system.modules.resize(1);
 
     PlantCentralHeatPumpSystem::PerformanceData performance;
-    system.modules(1).initialize(1, performance, nullptr);
-    auto &module = system.modules(1);
+    system.modules[0].initialize(performance, nullptr);
+    auto &module = system.modules[0];
     performance.Name = "HARD SIZED MODULE";
     performance.sizingFactor = 1.0;
     module.sizing.designEvaporatorVolFlowRate = 0.001;
@@ -1099,19 +1093,18 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)
     PlantCentralHeatPumpSystem::getCentralHeatPumpSystemInput(*state);
 
     // verify that under this scenario of not finding a schedule match, ScheduleAlwaysOn is the treated default
-    EXPECT_EQ(state->dataPlantCentralHeatPumpSystem->systems(1).ancillaryPowerSched, Sched::GetScheduleAlwaysOn(*state));
-    EXPECT_TRUE(state->dataPlantCentralHeatPumpSystem->systems(1).allModulesVariableFlow);
-    auto const &module = state->dataPlantCentralHeatPumpSystem->systems(1).modules(1);
+    EXPECT_EQ(state->dataPlantCentralHeatPumpSystem->systems[0].ancillaryPowerSched, Sched::GetScheduleAlwaysOn(*state));
+    EXPECT_TRUE(state->dataPlantCentralHeatPumpSystem->systems[0].allModulesVariableFlow);
+    auto const &module = state->dataPlantCentralHeatPumpSystem->systems[0].modules[0];
     EXPECT_TRUE(module.variableFlow);
     EXPECT_EQ(module.availabilitySchedule, Sched::GetScheduleAlwaysOn(*state));
     EXPECT_FALSE(module.performanceData().constantFlow);
     EXPECT_FALSE(module.performanceData().maximumHeatingCondenserOutletTempWasOmitted);
     EXPECT_DOUBLE_EQ(55.0, module.performanceData().maximumHeatingCondenserOutletTemp);
-    ASSERT_TRUE(allocated(state->dataPlantCentralHeatPumpSystem->performanceDefinitions));
-    EXPECT_EQ(1, state->dataPlantCentralHeatPumpSystem->numPerformanceDefinitions);
+    ASSERT_FALSE(state->dataPlantCentralHeatPumpSystem->performanceDefinitions.empty());
+    EXPECT_EQ(1u, state->dataPlantCentralHeatPumpSystem->performanceDefinitions.size());
     EXPECT_EQ(1, state->dataPlantCentralHeatPumpSystem->numPerformanceReferences);
-    EXPECT_EQ(&state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1), module.performance);
-    EXPECT_EQ(1, module.performanceIndex);
+    EXPECT_EQ(&state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0], module.performance);
 
     // verify that node names were processed correctly
     EXPECT_EQ(state->dataBranchNodeConnections->NumOfNodeConnections, 6);
@@ -1147,13 +1140,13 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_FlowModeResolutionIsSystemS
 
     PlantCentralHeatPumpSystem::CentralHeatPumpSystem mixedSystem;
     mixedSystem.Name = "MIXED WRAPPER";
-    mixedSystem.modules.allocate(2);
+    mixedSystem.modules.resize(2);
     PlantCentralHeatPumpSystem::PerformanceData constantPerformance;
     PlantCentralHeatPumpSystem::PerformanceData variablePerformance;
     constantPerformance.constantFlow = true;
     variablePerformance.variableFlow = true;
-    mixedSystem.modules(1).initialize(1, constantPerformance, nullptr);
-    mixedSystem.modules(2).initialize(2, variablePerformance, nullptr);
+    mixedSystem.modules[0].initialize(constantPerformance, nullptr);
+    mixedSystem.modules[1].initialize(variablePerformance, nullptr);
 
     mixedSystem.resolveFlowMode(*state);
 
@@ -1167,13 +1160,13 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_FlowModeResolutionIsSystemS
 
     PlantCentralHeatPumpSystem::CentralHeatPumpSystem variableSystem;
     variableSystem.Name = "VARIABLE WRAPPER";
-    variableSystem.modules.allocate(2);
+    variableSystem.modules.resize(2);
     PlantCentralHeatPumpSystem::PerformanceData variablePerformance1;
     PlantCentralHeatPumpSystem::PerformanceData variablePerformance2;
     variablePerformance1.variableFlow = true;
     variablePerformance2.variableFlow = true;
-    variableSystem.modules(1).initialize(1, variablePerformance1, nullptr);
-    variableSystem.modules(2).initialize(2, variablePerformance2, nullptr);
+    variableSystem.modules[0].initialize(variablePerformance1, nullptr);
+    variableSystem.modules[1].initialize(variablePerformance2, nullptr);
 
     variableSystem.resolveFlowMode(*state);
 
@@ -1184,6 +1177,25 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_FlowModeResolutionIsSystemS
     EXPECT_FALSE(has_err_output());
 }
 
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_StandardContainersResetToEmpty)
+{
+    auto &data = *state->dataPlantCentralHeatPumpSystem;
+
+    EXPECT_TRUE(data.systems.empty());
+    EXPECT_TRUE(data.performanceDefinitions.empty());
+
+    data.systems.resize(1);
+    data.systems.front().modules.resize(2);
+    data.performanceDefinitions.resize(2);
+    data.numPerformanceReferences = 2;
+
+    data.clear_state();
+
+    EXPECT_TRUE(data.systems.empty());
+    EXPECT_TRUE(data.performanceDefinitions.empty());
+    EXPECT_EQ(0, data.numPerformanceReferences);
+}
+
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativePerformanceInputReadsCompleteObjectAndMarksItUsed)
 {
     ASSERT_TRUE(process_json(makeChillerHeaterNativeJSON(true, true)));
@@ -1192,8 +1204,8 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativePerformanceInputReads
     EXPECT_NO_THROW(PlantCentralHeatPumpSystem::getPerformanceInput(*state));
     EXPECT_FALSE(has_err_output());
 
-    ASSERT_TRUE(allocated(state->dataPlantCentralHeatPumpSystem->performanceDefinitions));
-    auto const &performance = state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1);
+    ASSERT_FALSE(state->dataPlantCentralHeatPumpSystem->performanceDefinitions.empty());
+    auto const &performance = state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0];
     EXPECT_EQ("NATIVE MIXED CASE MODULE", performance.Name);
     EXPECT_EQ(PlantCentralHeatPumpSystem::CondenserTemperatureMode::LeavingCondenser, performance.coolingCondenserTemperatureMode);
     EXPECT_EQ(PlantCentralHeatPumpSystem::CondenserTemperatureMode::EnteringCondenser, performance.heatingCondenserTemperatureMode);
@@ -1229,7 +1241,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativePerformanceInputAppli
     EXPECT_NO_THROW(PlantCentralHeatPumpSystem::getPerformanceInput(*state));
     EXPECT_FALSE(has_err_output());
 
-    auto const &performance = state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1);
+    auto const &performance = state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0];
     EXPECT_TRUE(performance.constantFlow);
     EXPECT_FALSE(performance.variableFlow);
     EXPECT_EQ(PlantCentralHeatPumpSystem::CondenserTemperatureMode::EnteringCondenser, performance.coolingCondenserTemperatureMode);
@@ -1326,7 +1338,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativePerformanceInpu
     state->init_state(*state);
     EXPECT_NO_THROW(PlantCentralHeatPumpSystem::getPerformanceInput(*state));
     EXPECT_FALSE(has_err_output());
-    PlantCentralHeatPumpSystem::PerformanceData const idfPerformance = state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1);
+    PlantCentralHeatPumpSystem::PerformanceData const idfPerformance = state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0];
 
     state->dataPlantCentralHeatPumpSystem->clear_state();
     state->dataCurveManager->clear_state();
@@ -1338,7 +1350,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativePerformanceInpu
     Curve::GetCurveInput(*state);
     EXPECT_NO_THROW(PlantCentralHeatPumpSystem::getPerformanceInput(*state));
     EXPECT_TRUE(compare_err_stream("", true));
-    auto const &nativePerformance = state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1);
+    auto const &nativePerformance = state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0];
 
     EXPECT_EQ(idfPerformance.Name, nativePerformance.Name);
     EXPECT_EQ(idfPerformance.coolingCondenserTemperatureMode, nativePerformance.coolingCondenserTemperatureMode);
@@ -1381,10 +1393,10 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativeSystemInputsPro
     EXPECT_NO_THROW(PlantCentralHeatPumpSystem::getCentralHeatPumpSystemInput(*state));
     EXPECT_TRUE(compare_err_stream("", true));
 
-    ASSERT_EQ(1, state->dataPlantCentralHeatPumpSystem->numSystems);
-    ASSERT_EQ(1, state->dataPlantCentralHeatPumpSystem->numPerformanceDefinitions);
+    ASSERT_EQ(1u, state->dataPlantCentralHeatPumpSystem->systems.size());
+    ASSERT_EQ(1u, state->dataPlantCentralHeatPumpSystem->performanceDefinitions.size());
     EXPECT_EQ(21, state->dataPlantCentralHeatPumpSystem->numPerformanceReferences);
-    auto const &idfSystem = state->dataPlantCentralHeatPumpSystem->systems(1);
+    auto const &idfSystem = state->dataPlantCentralHeatPumpSystem->systems[0];
     ASSERT_EQ(21u, idfSystem.modules.size());
     std::array<std::string, 6> const idfNodeNames = {
         state->dataLoopNodes->NodeID(idfSystem.coolingInletNodeNum),
@@ -1417,10 +1429,10 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativeSystemInputsPro
     EXPECT_NO_THROW(PlantCentralHeatPumpSystem::getCentralHeatPumpSystemInput(*state));
     EXPECT_TRUE(compare_err_stream("", true));
 
-    ASSERT_EQ(1, state->dataPlantCentralHeatPumpSystem->numSystems);
-    ASSERT_EQ(1, state->dataPlantCentralHeatPumpSystem->numPerformanceDefinitions);
+    ASSERT_EQ(1u, state->dataPlantCentralHeatPumpSystem->systems.size());
+    ASSERT_EQ(1u, state->dataPlantCentralHeatPumpSystem->performanceDefinitions.size());
     EXPECT_EQ(21, state->dataPlantCentralHeatPumpSystem->numPerformanceReferences);
-    auto const &nativeSystem = state->dataPlantCentralHeatPumpSystem->systems(1);
+    auto const &nativeSystem = state->dataPlantCentralHeatPumpSystem->systems[0];
     ASSERT_EQ(21u, nativeSystem.modules.size());
     std::array<std::string, 6> const nativeNodeNames = {
         state->dataLoopNodes->NodeID(nativeSystem.coolingInletNodeNum),
@@ -1433,8 +1445,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativeSystemInputsPro
     std::vector<std::string> nativePerformanceNames;
     std::vector<std::string> nativeScheduleNames;
     for (auto const &module : nativeSystem.modules) {
-        EXPECT_EQ(1, module.performanceIndex);
-        EXPECT_EQ(&state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1), module.performance);
+        EXPECT_EQ(&state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0], module.performance);
         nativePerformanceNames.push_back(module.name());
         ASSERT_NE(nullptr, module.availabilitySchedule);
         nativeScheduleNames.push_back(module.availabilitySchedule->Name);
@@ -1461,10 +1472,10 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativeSystemInputReadsExten
     state->init_state(*state);
     EXPECT_NO_THROW(PlantCentralHeatPumpSystem::getCentralHeatPumpSystemInput(*state));
 
-    ASSERT_EQ(1, state->dataPlantCentralHeatPumpSystem->numSystems);
-    ASSERT_EQ(1, state->dataPlantCentralHeatPumpSystem->numPerformanceDefinitions);
+    ASSERT_EQ(1u, state->dataPlantCentralHeatPumpSystem->systems.size());
+    ASSERT_EQ(1u, state->dataPlantCentralHeatPumpSystem->performanceDefinitions.size());
     EXPECT_EQ(6, state->dataPlantCentralHeatPumpSystem->numPerformanceReferences);
-    auto const &system = state->dataPlantCentralHeatPumpSystem->systems(1);
+    auto const &system = state->dataPlantCentralHeatPumpSystem->systems[0];
     EXPECT_EQ("NATIVE SPARSE WRAPPER", system.Name);
     EXPECT_DOUBLE_EQ(25.0, system.ancillaryPower);
     ASSERT_NE(nullptr, system.ancillaryPowerSched);
@@ -1482,16 +1493,48 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativeSystemInputReadsExten
         "MODULE SCHEDULE 6",
         "MODULE SCHEDULE 6",
     };
-    for (int moduleNum = 1; moduleNum <= static_cast<int>(system.modules.size()); ++moduleNum) {
-        auto const &module = system.modules(moduleNum);
-        EXPECT_EQ(1, module.performanceIndex);
-        EXPECT_EQ(&state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1), module.performance);
+    for (std::size_t moduleIndex = 0; moduleIndex < system.modules.size(); ++moduleIndex) {
+        auto const &module = system.modules[moduleIndex];
+        EXPECT_EQ(&state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0], module.performance);
         ASSERT_NE(nullptr, module.availabilitySchedule);
-        EXPECT_EQ(expectedScheduleNames[moduleNum - 1], module.availabilitySchedule->Name);
+        EXPECT_EQ(expectedScheduleNames[moduleIndex], module.availabilitySchedule->Name);
     }
     EXPECT_EQ(6, state->dataBranchNodeConnections->NumOfNodeConnections);
     EXPECT_TRUE(compare_err_stream_substring("MISSING MODULE SCHEDULE", false));
     EXPECT_TRUE(compare_err_stream_substring("the AlwaysOn schedule will be used", true));
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_PerformanceReferencesRemainStableAcrossVectorBinding)
+{
+    auto epJSON = makeNativeSystemJSON(false);
+    auto &performanceObjects = epJSON["ChillerHeaterPerformance:Electric:EIR"];
+    performanceObjects["Second Native Module"] = performanceObjects.at("Native Mixed Case Module");
+    auto &moduleGroups = epJSON["CentralHeatPumpSystem"]["Native Sparse Wrapper"]["module_groups"];
+    moduleGroups.back()["performance_name"] = "Second Native Module";
+
+    ASSERT_TRUE(process_json(epJSON));
+    state->init_state(*state);
+    EXPECT_NO_THROW(PlantCentralHeatPumpSystem::getCentralHeatPumpSystemInput(*state));
+
+    auto const &data = *state->dataPlantCentralHeatPumpSystem;
+    ASSERT_EQ(2u, data.performanceDefinitions.size());
+    auto const firstPerformance = std::find_if(data.performanceDefinitions.begin(), data.performanceDefinitions.end(), [](auto const &performance) {
+        return performance.Name == "NATIVE MIXED CASE MODULE";
+    });
+    auto const secondPerformance = std::find_if(data.performanceDefinitions.begin(), data.performanceDefinitions.end(), [](auto const &performance) {
+        return performance.Name == "SECOND NATIVE MODULE";
+    });
+    ASSERT_NE(data.performanceDefinitions.end(), firstPerformance);
+    ASSERT_NE(data.performanceDefinitions.end(), secondPerformance);
+    ASSERT_NE(&*firstPerformance, &*secondPerformance);
+
+    ASSERT_EQ(1u, data.systems.size());
+    auto const &modules = data.systems.front().modules;
+    ASSERT_EQ(8u, modules.size());
+    EXPECT_EQ(&*firstPerformance, modules.front().performance);
+    EXPECT_EQ(&*firstPerformance, modules[5].performance);
+    EXPECT_EQ(&*secondPerformance, modules[6].performance);
+    EXPECT_EQ(&*secondPerformance, modules.back().performance);
 }
 
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativeSystemSchemaRequiresAtLeastOneModuleGroup)
@@ -1534,8 +1577,8 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InputValidationUsesConfigur
     EXPECT_NO_THROW(PlantCentralHeatPumpSystem::getPerformanceInput(*state));
     EXPECT_FALSE(has_err_output());
 
-    ASSERT_TRUE(allocated(state->dataPlantCentralHeatPumpSystem->performanceDefinitions));
-    auto const &chillerHeater = state->dataPlantCentralHeatPumpSystem->performanceDefinitions(1);
+    ASSERT_FALSE(state->dataPlantCentralHeatPumpSystem->performanceDefinitions.empty());
+    auto const &chillerHeater = state->dataPlantCentralHeatPumpSystem->performanceDefinitions[0];
     EXPECT_DOUBLE_EQ(0.2, chillerHeater.coolingMinimumPartLoadRatio);
     EXPECT_DOUBLE_EQ(1.0, chillerHeater.coolingMaximumPartLoadRatio);
     EXPECT_DOUBLE_EQ(0.3, chillerHeater.heatingMinimumPartLoadRatio);
@@ -1610,10 +1653,10 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_AncillaryScheduleDefaultsAn
     system.sourceInletNodeNum = 5;
     system.sourceOutletNodeNum = 6;
     system.ancillaryPower = 100.0;
-    system.modules.allocate(1);
+    system.modules.resize(1);
 
     auto setCoolingResult = [&]() {
-        auto &result = system.modules(1).result;
+        auto &result = system.modules[0].result;
         result = PlantCentralHeatPumpSystem::ModuleResult();
         result.currentMode = CurrentMode::CoolingOnly;
         result.coolingPower = 50.0;
@@ -1672,10 +1715,10 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_OffStateClearsAuthoritative
     system.report.coolingHeatTransferRate = 1000.0;
     system.report.heatingHeatTransferRate = 1200.0;
     system.report.sourceHeatTransferRate = 200.0;
-    system.modules.allocate(1);
+    system.modules.resize(1);
     PlantCentralHeatPumpSystem::PerformanceData performance;
-    system.modules(1).initialize(1, performance, nullptr);
-    auto &chillerHeater = system.modules(1);
+    system.modules[0].initialize(performance, nullptr);
+    auto &chillerHeater = system.modules[0];
     chillerHeater.result.currentMode = CurrentMode::CoolingDominant;
     chillerHeater.result.coolingPower = 500.0;
     chillerHeater.result.coolingDelivered = 1000.0;
@@ -1744,18 +1787,18 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InactiveConnectionPreserves
     system.report.sourceInletTemp = 15.0;
     system.report.sourceOutletTemp = 15.3;
     system.report.sourceMassFlowRate = 1.0;
-    system.modules.allocate(1);
+    system.modules.resize(1);
     PlantCentralHeatPumpSystem::PerformanceData performance;
     performance.compressorMotorEfficiency = 0.80;
-    system.modules(1).initialize(1, performance, nullptr);
-    system.modules(1).result.currentMode = CurrentMode::CoolingOnly;
-    system.modules(1).result.coolingDelivered = 1000.0;
+    system.modules[0].initialize(performance, nullptr);
+    system.modules[0].result.currentMode = CurrentMode::CoolingOnly;
+    system.modules[0].result.coolingDelivered = 1000.0;
 
     Real64 sourceLoad = 0.0;
     system.simulate(*state, system.sourcePlantLoc, false, sourceLoad, false);
     EXPECT_DOUBLE_EQ(1000.0, system.requestedCoolingLoad);
     EXPECT_DOUBLE_EQ(1000.0, system.report.coolingHeatTransferRate);
-    EXPECT_EQ(CurrentMode::CoolingOnly, system.modules(1).result.currentMode);
+    EXPECT_EQ(CurrentMode::CoolingOnly, system.modules[0].result.currentMode);
 
     Real64 heatingLoad = 0.0;
     system.simulate(*state, system.heatingPlantLoc, false, heatingLoad, false);
@@ -1763,7 +1806,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InactiveConnectionPreserves
     EXPECT_DOUBLE_EQ(1000.0, system.requestedCoolingLoad);
     EXPECT_DOUBLE_EQ(0.0, system.requestedHeatingLoad);
     EXPECT_DOUBLE_EQ(1000.0, system.report.coolingHeatTransferRate);
-    EXPECT_EQ(CurrentMode::CoolingOnly, system.modules(1).result.currentMode);
+    EXPECT_EQ(CurrentMode::CoolingOnly, system.modules[0].result.currentMode);
     EXPECT_DOUBLE_EQ(1.0, state->dataLoopNodes->Node(1).MassFlowRateRequest);
     EXPECT_DOUBLE_EQ(2.0, state->dataLoopNodes->Node(5).MassFlowRateRequest);
 
@@ -1772,7 +1815,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InactiveConnectionPreserves
     EXPECT_DOUBLE_EQ(0.0, coolingLoad);
     EXPECT_DOUBLE_EQ(0.0, system.requestedCoolingLoad);
     EXPECT_DOUBLE_EQ(0.0, system.report.coolingHeatTransferRate);
-    EXPECT_EQ(CurrentMode::Off, system.modules(1).result.currentMode);
+    EXPECT_EQ(CurrentMode::Off, system.modules[0].result.currentMode);
     EXPECT_DOUBLE_EQ(0.0, state->dataLoopNodes->Node(1).MassFlowRateRequest);
     EXPECT_DOUBLE_EQ(0.0, state->dataLoopNodes->Node(5).MassFlowRateRequest);
 }
@@ -1948,7 +1991,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     state->dataLoopNodes->Node(system.coolingSetpointNodeNum).TempSetPoint = 7.0;
     state->dataLoopNodes->Node(system.heatingSetpointNodeNum).TempSetPoint = 45.0;
 
-    system.modules.allocate(2);
+    system.modules.resize(2);
     PlantCentralHeatPumpSystem::PerformanceData performance1;
     performance1.compressorMotorEfficiency = 0.80;
     performance1.minimumEvaporatorOutletTemp = 5.0;
@@ -1971,14 +2014,14 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     ASSERT_GT(performance1.coolingEIRPartLoadCurveIndex, 0);
     ASSERT_GT(performance1.heatingEIRPartLoadCurveIndex, 0);
 
-    system.modules(1).initialize(1, performance1, nullptr);
-    auto &chillerHeater = system.modules(1);
+    system.modules[0].initialize(performance1, nullptr);
+    auto &chillerHeater = system.modules[0];
     chillerHeater.sizing.referenceCoolingCapacity = 10000.0;
     chillerHeater.sizing.referenceHeatingCapacity = 10000.0;
     chillerHeater.sizing.referenceHeatingCOP = 4.0;
     chillerHeater.minimumEvaporatorOutletTemp = 5.0;
 
-    auto coolingResult = system.solveCoolingOnly(*state, 1, 1000.0, 1.0, 1.0, 12.0, 30.0);
+    auto coolingResult = system.solveCoolingOnly(*state, 0, 1000.0, 1.0, 1.0, 12.0, 30.0);
 
     EXPECT_EQ(CurrentMode::CoolingOnly, coolingResult.currentMode);
     EXPECT_NEAR(1000.0, coolingResult.qEvaporator, 1.0e-6);
@@ -2002,21 +2045,21 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
 
     system.allModulesVariableFlow = true;
     performance1.coolingCondenserTemperatureMode = PlantCentralHeatPumpSystem::CondenserTemperatureMode::LeavingCondenser;
-    coolingResult = system.solveCoolingOnly(*state, 1, 1000.0, 1.0, 1.0, 12.0, 30.0);
+    coolingResult = system.solveCoolingOnly(*state, 0, 1000.0, 1.0, 1.0, 12.0, 30.0);
     Real64 const coolingCp = water->getSpecificHeat(*state, 12.0, "PlantCentralHeatPumpSystem solver test");
     EXPECT_NEAR(7.0, coolingResult.evaporatorOutletTemp, 1.0e-9);
     EXPECT_NEAR(1000.0 / (coolingCp * 5.0), coolingResult.evaporatorMassFlowRate, 1.0e-9);
     EXPECT_NEAR(coolingResult.condenserOutletTemp, coolingResult.capacityCurveCondenserTemp, 1.0e-12);
     EXPECT_NEAR(0.0, coolingResult.moduleEnergyBalanceResidual(), 1.0e-9);
 
-    auto const tinyHeatingResult = system.solveHeatingOnly(*state, 1, 0.5 * HVAC::SmallLoad, 1.0, 1.0, 15.0, 40.0);
+    auto const tinyHeatingResult = system.solveHeatingOnly(*state, 0, 0.5 * HVAC::SmallLoad, 1.0, 1.0, 15.0, 40.0);
     EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::NotRequired, tinyHeatingResult.solver.outerStatus);
     EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::NotRequired, tinyHeatingResult.solver.partLoadStatus);
     EXPECT_EQ(0, tinyHeatingResult.solver.outerIterations);
     EXPECT_EQ(0, tinyHeatingResult.solver.partLoadIterations);
     EXPECT_EQ(0, tinyHeatingResult.solver.curveEvaluations);
 
-    auto heatingResult = system.solveHeatingOnly(*state, 1, 1200.0, 1.0, 1.0, 15.0, 40.0);
+    auto heatingResult = system.solveHeatingOnly(*state, 0, 1200.0, 1.0, 1.0, 15.0, 40.0);
     EXPECT_EQ(CurrentMode::HeatingOnly, heatingResult.currentMode);
     EXPECT_NEAR(1000.0, heatingResult.qEvaporator, 1.0e-6);
     EXPECT_NEAR(250.0, heatingResult.heatingPower, 1.0e-6);
@@ -2034,7 +2077,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     chillerHeater.mapResultToPlantConnections();
     EXPECT_NEAR(0.0, chillerHeater.result.routingEnergyBalanceResidual(), 1.0e-9);
 
-    auto simultaneousResult = system.solveSimultaneous(*state, 1, 1000.0, 1200.0, 1.0, 1.0, 1.0, 12.0, 40.0, 15.0);
+    auto simultaneousResult = system.solveSimultaneous(*state, 0, 1000.0, 1200.0, 1.0, 1.0, 1.0, 12.0, 40.0, 15.0);
     EXPECT_EQ(CurrentMode::HeatRecovery, simultaneousResult.currentMode);
     EXPECT_NEAR(1000.0, simultaneousResult.qEvaporator, 1.0e-6);
     EXPECT_NEAR(250.0, simultaneousResult.compressorPower, 1.0e-6);
@@ -2045,7 +2088,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     EXPECT_NEAR(0.0, simultaneousResult.moduleEnergyBalanceResidual(), 1.0e-9);
     EXPECT_NEAR(0.0, simultaneousResult.routingEnergyBalanceResidual(), 1.0e-9);
 
-    simultaneousResult = system.solveSimultaneous(*state, 1, 1000.0, 600.0, 1.0, 1.0, 1.0, 12.0, 40.0, 15.0);
+    simultaneousResult = system.solveSimultaneous(*state, 0, 1000.0, 600.0, 1.0, 1.0, 1.0, 12.0, 40.0, 15.0);
     EXPECT_EQ(CurrentMode::CoolingDominant, simultaneousResult.currentMode);
     EXPECT_NEAR(1000.0, simultaneousResult.qEvaporator, 1.0e-6);
     EXPECT_NEAR(1200.0, simultaneousResult.qCondenser, 1.0e-6);
@@ -2057,7 +2100,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     EXPECT_NEAR(0.0, simultaneousResult.moduleEnergyBalanceResidual(), 1.0e-9);
     EXPECT_NEAR(0.0, simultaneousResult.routingEnergyBalanceResidual(), 1.0e-9);
 
-    simultaneousResult = system.solveSimultaneous(*state, 1, 1000.0, 600.0, 1.0, 1.0, 0.0, 12.0, 40.0, 15.0);
+    simultaneousResult = system.solveSimultaneous(*state, 0, 1000.0, 600.0, 1.0, 1.0, 0.0, 12.0, 40.0, 15.0);
     EXPECT_EQ(CurrentMode::HeatRecovery, simultaneousResult.currentMode);
     EXPECT_NEAR(500.0, simultaneousResult.qEvaporator, 1.0e-6);
     EXPECT_NEAR(600.0, simultaneousResult.qCondenser, 1.0e-6);
@@ -2068,7 +2111,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     EXPECT_NEAR(0.0, simultaneousResult.moduleEnergyBalanceResidual(), 1.0e-9);
     EXPECT_NEAR(0.0, simultaneousResult.routingEnergyBalanceResidual(), 1.0e-9);
 
-    simultaneousResult = system.solveSimultaneous(*state, 1, 500.0, 1200.0, 1.0, 1.0, 1.0, 12.0, 40.0, 15.0);
+    simultaneousResult = system.solveSimultaneous(*state, 0, 500.0, 1200.0, 1.0, 1.0, 1.0, 12.0, 40.0, 15.0);
     EXPECT_EQ(CurrentMode::HeatingDominant, simultaneousResult.currentMode);
     EXPECT_NEAR(1000.0, simultaneousResult.qEvaporator, 1.0e-6);
     EXPECT_NEAR(1200.0, simultaneousResult.qCondenser, 1.0e-6);
@@ -2091,7 +2134,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     system.allModulesVariableFlow = false;
     performance1.heatingCondenserTemperatureMode = PlantCentralHeatPumpSystem::CondenserTemperatureMode::LeavingCondenser;
     performance1.heatingReferenceCondenserOutletTemp = 40.5;
-    heatingResult = system.solveHeatingOnly(*state, 1, 5000.0, 1.0, 1.0, 15.0, 40.0);
+    heatingResult = system.solveHeatingOnly(*state, 0, 5000.0, 1.0, 1.0, 15.0, 40.0);
     EXPECT_GT(heatingResult.condenserOutletTemp, performance1.heatingReferenceCondenserOutletTemp);
     EXPECT_NEAR(heatingResult.condenserOutletTemp, heatingResult.capacityCurveCondenserTemp, 1.0e-12);
     EXPECT_NEAR(heatingResult.condenserOutletTemp, heatingResult.eirPartLoadCurveCondenserTemp, 1.0e-12);
@@ -2108,7 +2151,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
 
     performance1.maximumHeatingCondenserOutletTempWasOmitted = false;
     performance1.maximumHeatingCondenserOutletTemp = 40.1;
-    heatingResult = system.solveHeatingOnly(*state, 1, 5000.0, 1.0, 1.0, 15.0, 40.0);
+    heatingResult = system.solveHeatingOnly(*state, 0, 5000.0, 1.0, 1.0, 15.0, 40.0);
     EXPECT_NEAR(40.1, heatingResult.condenserOutletTemp, 1.0e-9);
     EXPECT_GT(heatingResult.unmetHeatingLoad, 0.0);
     EXPECT_NEAR(heatingResult.qCondenser, heatingResult.availableCondenserCapacity, 1.0e-6);
@@ -2118,45 +2161,45 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     performance1.coolingCondenserTemperatureMode = PlantCentralHeatPumpSystem::CondenserTemperatureMode::EnteringCondenser;
     performance1.heatingCondenserTemperatureMode = PlantCentralHeatPumpSystem::CondenserTemperatureMode::EnteringCondenser;
     PlantCentralHeatPumpSystem::PerformanceData performance2 = performance1;
-    system.modules(2).initialize(2, performance2, nullptr);
+    system.modules[1].initialize(performance2, nullptr);
     chillerHeater.sizing.maximumEvaporatorMassFlowRate = 1.0;
     chillerHeater.sizing.maximumCondenserMassFlowRate = 1.0;
-    system.modules(2).sizing.referenceCoolingCapacity = 5000.0;
-    system.modules(2).sizing.referenceHeatingCapacity = 5000.0;
-    system.modules(2).sizing.referenceHeatingCOP = 4.0;
-    system.modules(2).sizing.maximumEvaporatorMassFlowRate = 1.0;
-    system.modules(2).sizing.maximumCondenserMassFlowRate = 1.0;
+    system.modules[1].sizing.referenceCoolingCapacity = 5000.0;
+    system.modules[1].sizing.referenceHeatingCapacity = 5000.0;
+    system.modules[1].sizing.referenceHeatingCOP = 4.0;
+    system.modules[1].sizing.maximumEvaporatorMassFlowRate = 1.0;
+    system.modules[1].sizing.maximumCondenserMassFlowRate = 1.0;
     system.requestedCoolingLoad = 18000.0;
     system.requestedHeatingLoad = 21600.0;
 
     system.calculateSimultaneous(*state, 2.0, 2.0, 2.0, 12.0, 40.0, 15.0);
     EXPECT_FALSE(system.isCoolingDominant);
     EXPECT_FALSE(system.isHeatingDominant);
-    EXPECT_EQ(CurrentMode::HeatRecovery, system.modules(1).result.currentMode);
-    EXPECT_EQ(CurrentMode::HeatRecovery, system.modules(2).result.currentMode);
-    EXPECT_NEAR(10000.0, system.modules(1).result.coolingDelivered, 1.0e-6);
-    EXPECT_NEAR(12000.0, system.modules(1).result.heatingDelivered, 1.0e-6);
-    EXPECT_NEAR(8000.0, system.modules(2).result.requestedCoolingLoad, 1.0e-6);
-    EXPECT_NEAR(9600.0, system.modules(2).result.requestedHeatingLoad, 1.0e-6);
-    EXPECT_NEAR(5000.0, system.modules(2).result.coolingDelivered, 1.0e-6);
-    EXPECT_NEAR(6000.0, system.modules(2).result.heatingDelivered, 1.0e-6);
-    EXPECT_NEAR(3000.0, system.modules(2).result.unmetCoolingLoad, 1.0e-6);
-    EXPECT_NEAR(3600.0, system.modules(2).result.unmetHeatingLoad, 1.0e-6);
+    EXPECT_EQ(CurrentMode::HeatRecovery, system.modules[0].result.currentMode);
+    EXPECT_EQ(CurrentMode::HeatRecovery, system.modules[1].result.currentMode);
+    EXPECT_NEAR(10000.0, system.modules[0].result.coolingDelivered, 1.0e-6);
+    EXPECT_NEAR(12000.0, system.modules[0].result.heatingDelivered, 1.0e-6);
+    EXPECT_NEAR(8000.0, system.modules[1].result.requestedCoolingLoad, 1.0e-6);
+    EXPECT_NEAR(9600.0, system.modules[1].result.requestedHeatingLoad, 1.0e-6);
+    EXPECT_NEAR(5000.0, system.modules[1].result.coolingDelivered, 1.0e-6);
+    EXPECT_NEAR(6000.0, system.modules[1].result.heatingDelivered, 1.0e-6);
+    EXPECT_NEAR(3000.0, system.modules[1].result.unmetCoolingLoad, 1.0e-6);
+    EXPECT_NEAR(3600.0, system.modules[1].result.unmetHeatingLoad, 1.0e-6);
     EXPECT_NEAR(15000.0, system.report.coolingHeatTransferRate, 1.0e-6);
     EXPECT_NEAR(18000.0, system.report.heatingHeatTransferRate, 1.0e-6);
     EXPECT_NEAR(0.0, system.report.sourceHeatTransferRate, 1.0e-6);
     EXPECT_NEAR(3750.0, system.report.coolingElectricPower + system.report.heatingElectricPower, 1.0e-6);
 
-    auto const firstDispatchResult = system.modules(2).result;
+    auto const firstDispatchResult = system.modules[1].result;
     system.calculateSimultaneous(*state, 2.0, 2.0, 2.0, 12.0, 40.0, 15.0);
-    EXPECT_EQ(firstDispatchResult.currentMode, system.modules(2).result.currentMode);
-    EXPECT_NEAR(firstDispatchResult.qEvaporator, system.modules(2).result.qEvaporator, 1.0e-9);
-    EXPECT_NEAR(firstDispatchResult.qCondenser, system.modules(2).result.qCondenser, 1.0e-9);
-    EXPECT_NEAR(firstDispatchResult.unmetCoolingLoad, system.modules(2).result.unmetCoolingLoad, 1.0e-9);
-    EXPECT_NEAR(firstDispatchResult.unmetHeatingLoad, system.modules(2).result.unmetHeatingLoad, 1.0e-9);
+    EXPECT_EQ(firstDispatchResult.currentMode, system.modules[1].result.currentMode);
+    EXPECT_NEAR(firstDispatchResult.qEvaporator, system.modules[1].result.qEvaporator, 1.0e-9);
+    EXPECT_NEAR(firstDispatchResult.qCondenser, system.modules[1].result.qCondenser, 1.0e-9);
+    EXPECT_NEAR(firstDispatchResult.unmetCoolingLoad, system.modules[1].result.unmetCoolingLoad, 1.0e-9);
+    EXPECT_NEAR(firstDispatchResult.unmetHeatingLoad, system.modules[1].result.unmetHeatingLoad, 1.0e-9);
 
-    auto configureConnectionPerformance = [&system](int const moduleNum, Real64 const referenceCapacity) {
-        auto &module = system.modules(moduleNum);
+    auto configureConnectionPerformance = [&system](std::size_t const moduleIndex, Real64 const referenceCapacity) {
+        auto &module = system.modules[moduleIndex];
         module.sizing.referenceCoolingCapacity = referenceCapacity;
         module.sizing.referenceHeatingCapacity = referenceCapacity;
         module.sizing.referenceHeatingCOP = 4.0;
@@ -2165,14 +2208,14 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
         module.sizing.maximumSourceEvaporatorMassFlowRate = 0.12;
         module.sizing.maximumSourceCondenserMassFlowRate = 0.15;
     };
-    configureConnectionPerformance(1, 10000.0);
-    configureConnectionPerformance(2, 5000.0);
+    configureConnectionPerformance(0, 10000.0);
+    configureConnectionPerformance(1, 5000.0);
 
     system.requestedCoolingLoad = 20000.0;
     system.requestedHeatingLoad = 0.0;
     system.calculateCoolingOnly(*state, 0.30, 0.25, 12.0, 15.0);
-    auto const &coolingModule1 = system.modules(1).result;
-    auto const &coolingModule2 = system.modules(2).result;
+    auto const &coolingModule1 = system.modules[0].result;
+    auto const &coolingModule2 = system.modules[1].result;
     EXPECT_EQ(CurrentMode::CoolingOnly, coolingModule1.currentMode);
     EXPECT_EQ(CurrentMode::CoolingOnly, coolingModule2.currentMode);
     EXPECT_NEAR(0.20, coolingModule1.coolingMassFlowRate, 1.0e-12);
@@ -2191,8 +2234,8 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     system.requestedCoolingLoad = 1000.0;
     system.calculateCoolingOnly(*state, 0.30, 0.25, 12.0, 15.0);
     Real64 const expectedVariableCoolingFlow = 1000.0 / (coolingCp * 5.0);
-    EXPECT_NEAR(expectedVariableCoolingFlow, system.modules(1).result.coolingMassFlowRate, 1.0e-9);
-    EXPECT_NEAR(0.0, system.modules(2).result.coolingMassFlowRate, 1.0e-12);
+    EXPECT_NEAR(expectedVariableCoolingFlow, system.modules[0].result.coolingMassFlowRate, 1.0e-9);
+    EXPECT_NEAR(0.0, system.modules[1].result.coolingMassFlowRate, 1.0e-12);
     EXPECT_NEAR(12.0 - 1000.0 / (0.30 * coolingCp), system.report.coolingOutletTemp, 1.0e-9);
     EXPECT_NEAR(system.report.sourceHeatTransferRate, 0.25 * sourceCp * (system.report.sourceOutletTemp - system.report.sourceInletTemp), 1.0e-6);
 
@@ -2200,8 +2243,8 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     system.requestedCoolingLoad = 0.0;
     system.requestedHeatingLoad = 20000.0;
     system.calculateHeatingOnly(*state, 0.15, 0.18, 40.0, 15.0);
-    auto const &heatingModule1 = system.modules(1).result;
-    auto const &heatingModule2 = system.modules(2).result;
+    auto const &heatingModule1 = system.modules[0].result;
+    auto const &heatingModule2 = system.modules[1].result;
     EXPECT_EQ(CurrentMode::HeatingOnly, heatingModule1.currentMode);
     EXPECT_EQ(CurrentMode::HeatingOnly, heatingModule2.currentMode);
     EXPECT_NEAR(0.10, heatingModule1.heatingMassFlowRate, 1.0e-12);
@@ -2218,17 +2261,17 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     system.requestedCoolingLoad = 1000.0;
     system.requestedHeatingLoad = 500.0;
     system.calculateSimultaneous(*state, 0.20, 0.10, 0.30, 12.0, 40.0, 15.0);
-    EXPECT_EQ(CurrentMode::CoolingDominant, system.modules(1).result.currentMode);
-    EXPECT_NEAR(0.15, system.modules(1).result.sourceMassFlowRate, 1.0e-12);
+    EXPECT_EQ(CurrentMode::CoolingDominant, system.modules[0].result.currentMode);
+    EXPECT_NEAR(0.15, system.modules[0].result.sourceMassFlowRate, 1.0e-12);
 
     system.requestedCoolingLoad = 500.0;
     system.requestedHeatingLoad = 1200.0;
     system.calculateSimultaneous(*state, 0.20, 0.10, 0.30, 12.0, 40.0, 15.0);
-    EXPECT_EQ(CurrentMode::HeatingDominant, system.modules(1).result.currentMode);
-    EXPECT_NEAR(0.12, system.modules(1).result.sourceMassFlowRate, 1.0e-12);
+    EXPECT_EQ(CurrentMode::HeatingDominant, system.modules[0].result.currentMode);
+    EXPECT_NEAR(0.12, system.modules[0].result.sourceMassFlowRate, 1.0e-12);
 
-    auto &overAllocatedResult1 = system.modules(1).result;
-    auto &overAllocatedResult2 = system.modules(2).result;
+    auto &overAllocatedResult1 = system.modules[0].result;
+    auto &overAllocatedResult2 = system.modules[1].result;
     overAllocatedResult1 = PlantCentralHeatPumpSystem::ModuleResult();
     overAllocatedResult2 = PlantCentralHeatPumpSystem::ModuleResult();
     overAllocatedResult1.heatingMassFlowRate = 0.20;
@@ -2239,11 +2282,11 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     EXPECT_NEAR((0.20 * 46.0 + 0.10 * 44.0) / 0.30, system.report.heatingOutletTemp, 1.0e-12);
     EXPECT_NE(40.0, system.report.heatingOutletTemp);
 
-    system.modules(1).sizing.designEvaporatorVolFlowRate = 0.0010;
-    system.modules(1).sizing.designCondenserVolFlowRate = 0.0005;
+    system.modules[0].sizing.designEvaporatorVolFlowRate = 0.0010;
+    system.modules[0].sizing.designCondenserVolFlowRate = 0.0005;
     performance1.designHeatingVolFlowRate = 0.0003;
-    system.modules(2).sizing.designEvaporatorVolFlowRate = 0.0020;
-    system.modules(2).sizing.designCondenserVolFlowRate = 0.0025;
+    system.modules[1].sizing.designEvaporatorVolFlowRate = 0.0020;
+    system.modules[1].sizing.designCondenserVolFlowRate = 0.0025;
     performance2.designHeatingVolFlowRate = 0.0004;
     system.initializeDesignFlowLimits(*state);
 
@@ -2256,10 +2299,10 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     EXPECT_NEAR(0.0030 * coolingDensity, system.coolingMassFlowRateMax, 1.0e-9);
     EXPECT_NEAR(0.0007 * heatingDensity, system.heatingMassFlowRateMax, 1.0e-9);
     EXPECT_NEAR(0.0035 * sourceDensity, system.sourceMassFlowRateMax, 1.0e-9);
-    EXPECT_NEAR(0.0010 * coolingDensity, system.modules(1).sizing.maximumCoolingMassFlowRate, 1.0e-9);
-    EXPECT_NEAR(0.0003 * heatingDensity, system.modules(1).sizing.maximumHeatingMassFlowRate, 1.0e-9);
-    EXPECT_NEAR(0.0010 * sourceDensity, system.modules(1).sizing.maximumSourceEvaporatorMassFlowRate, 1.0e-9);
-    EXPECT_NEAR(0.0005 * sourceDensity, system.modules(1).sizing.maximumSourceCondenserMassFlowRate, 1.0e-9);
+    EXPECT_NEAR(0.0010 * coolingDensity, system.modules[0].sizing.maximumCoolingMassFlowRate, 1.0e-9);
+    EXPECT_NEAR(0.0003 * heatingDensity, system.modules[0].sizing.maximumHeatingMassFlowRate, 1.0e-9);
+    EXPECT_NEAR(0.0010 * sourceDensity, system.modules[0].sizing.maximumSourceEvaporatorMassFlowRate, 1.0e-9);
+    EXPECT_NEAR(0.0005 * sourceDensity, system.modules[0].sizing.maximumSourceCondenserMassFlowRate, 1.0e-9);
     EXPECT_NEAR(system.coolingMassFlowRateMax, state->dataLoopNodes->Node(system.coolingInletNodeNum).MassFlowRateMax, 1.0e-9);
     EXPECT_NEAR(system.heatingMassFlowRateMax, state->dataLoopNodes->Node(system.heatingInletNodeNum).MassFlowRateMax, 1.0e-9);
     EXPECT_NEAR(system.sourceMassFlowRateMax, state->dataLoopNodes->Node(system.sourceInletNodeNum).MassFlowRateMax, 1.0e-9);
@@ -2269,16 +2312,16 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     constexpr Real64 steepPartLoadSlope = 1.0e10;
     adversarialPartLoadCurve->coeff[0] = -performance1.heatingMinimumPartLoadRatio * steepPartLoadSlope;
     adversarialPartLoadCurve->coeff[3] = steepPartLoadSlope;
-    auto const exhaustedResult = system.solveHeatingOnly(*state, 1, 5000.0, 1.0, 1.0, 15.0, 40.0);
+    auto const exhaustedResult = system.solveHeatingOnly(*state, 0, 5000.0, 1.0, 1.0, 15.0, 40.0);
     EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::IterationLimit, exhaustedResult.solver.partLoadStatus);
     EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::Converged, exhaustedResult.solver.outerStatus);
     EXPECT_EQ(50 * exhaustedResult.solver.outerIterations, exhaustedResult.solver.partLoadIterations);
     EXPECT_GT(exhaustedResult.solver.loadResidual, 1.0e-7);
-    auto const repeatedExhaustedResult = system.solveHeatingOnly(*state, 1, 5000.0, 1.0, 1.0, 15.0, 40.0);
+    auto const repeatedExhaustedResult = system.solveHeatingOnly(*state, 0, 5000.0, 1.0, 1.0, 15.0, 40.0);
     EXPECT_EQ(PlantCentralHeatPumpSystem::SolverConvergenceStatus::IterationLimit, repeatedExhaustedResult.solver.partLoadStatus);
-    EXPECT_EQ(2, system.modules(1).heatingPartLoadSolverWarning.count);
-    EXPECT_GT(system.modules(1).heatingPartLoadSolverWarning.recurringIndex, 0);
-    EXPECT_EQ(0, system.modules(1).heatingSolverWarning.count);
+    EXPECT_EQ(2, system.modules[0].heatingPartLoadSolverWarning.count);
+    EXPECT_GT(system.modules[0].heatingPartLoadSolverWarning.recurringIndex, 0);
+    EXPECT_EQ(0, system.modules[0].heatingSolverWarning.count);
     EXPECT_NEAR(0.0, exhaustedResult.moduleEnergyBalanceResidual(), 1.0e-9);
 }
 
@@ -2341,7 +2384,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_AuthoritativeResultMapsPlan
     PlantCentralHeatPumpSystem::PerformanceData performance;
     performance.compressorMotorEfficiency = 0.80;
     PlantCentralHeatPumpSystem::Module chillerHeater;
-    chillerHeater.initialize(1, performance, nullptr);
+    chillerHeater.initialize(performance, nullptr);
 
     auto configureResult = [&chillerHeater](CurrentMode const mode) {
         auto &result = chillerHeater.result;
@@ -2410,7 +2453,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_AuthoritativeResultDrivesEn
     PlantCentralHeatPumpSystem::PerformanceData performance;
     performance.compressorMotorEfficiency = 0.80;
     PlantCentralHeatPumpSystem::Module chillerHeater;
-    chillerHeater.initialize(1, performance, nullptr);
+    chillerHeater.initialize(performance, nullptr);
     auto &result = chillerHeater.result;
     result.currentMode = CurrentMode::HeatRecovery;
     result.isAvailable = true;
@@ -2452,7 +2495,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_AuthoritativeResultResetIsC
     PlantCentralHeatPumpSystem::PerformanceData performance;
     performance.compressorMotorEfficiency = 0.80;
     PlantCentralHeatPumpSystem::Module chillerHeater;
-    chillerHeater.initialize(1, performance, nullptr);
+    chillerHeater.initialize(performance, nullptr);
     chillerHeater.result.currentMode = CurrentMode::CoolingOnly;
     chillerHeater.result.isAvailable = true;
     chillerHeater.result.qEvaporator = 8000.0;
