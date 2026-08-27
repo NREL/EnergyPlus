@@ -47,6 +47,7 @@
 
 // C++ Headers
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <format>
@@ -268,26 +269,23 @@ namespace {
                                                    iterationType),
                                        warning.recurringIndex,
                                        bracketOrTemperatureResidual,
-                                       bracketOrTemperatureResidual,
-                                       _,
-                                       std::string(finalOperatingPointUnits),
                                        std::string(finalOperatingPointUnits));
     }
 
 } // namespace
 
-void Module::initialize(PerformanceData const &performance, Sched::Schedule *const availabilitySchedule)
+void Module::initialize(PerformanceData const &performanceData, Sched::Schedule *const schedule)
 {
-    this->performance = &performance;
-    this->availabilitySchedule = availabilitySchedule;
-    this->variableFlow = performance.variableFlow;
+    this->performance = &performanceData;
+    this->availabilitySchedule = schedule;
+    this->variableFlow = performanceData.variableFlow;
     this->sizing = ModuleSizingData();
-    this->sizing.referenceCoolingCapacity = performance.referenceCoolingCapacity;
-    this->sizing.referenceHeatingCapacity = performance.referenceHeatingCapacity;
-    this->sizing.referenceHeatingCOP = performance.referenceHeatingCOP;
-    this->sizing.referenceHeatingPower = performance.referenceHeatingPower;
-    this->sizing.designEvaporatorVolFlowRate = performance.designEvaporatorVolFlowRate;
-    this->sizing.designCondenserVolFlowRate = performance.designCondenserVolFlowRate;
+    this->sizing.referenceCoolingCapacity = performanceData.referenceCoolingCapacity;
+    this->sizing.referenceHeatingCapacity = performanceData.referenceHeatingCapacity;
+    this->sizing.referenceHeatingCOP = performanceData.referenceHeatingCOP;
+    this->sizing.referenceHeatingPower = performanceData.referenceHeatingPower;
+    this->sizing.designEvaporatorVolFlowRate = performanceData.designEvaporatorVolFlowRate;
+    this->sizing.designCondenserVolFlowRate = performanceData.designCondenserVolFlowRate;
     this->minimumEvaporatorOutletTemp = 0.0;
     this->capacityCurveErrorCount = 0;
     this->capacityCurveErrorIndex = 0;
@@ -317,93 +315,93 @@ bool Module::isAvailable() const
 
 ModePerformanceData Module::coolingModePerformance() const
 {
-    auto const &performance = this->performanceData();
+    auto const &definition = this->performanceData();
     ModePerformanceData mode;
-    mode.condenserMode = performance.coolingCondenserTemperatureMode;
-    mode.capacityTemperatureCurveIndex = performance.coolingCapacityTemperatureCurveIndex;
-    mode.eirTemperatureCurveIndex = performance.coolingEIRTemperatureCurveIndex;
-    mode.eirPartLoadCurveIndex = performance.coolingEIRPartLoadCurveIndex;
+    mode.condenserMode = definition.coolingCondenserTemperatureMode;
+    mode.capacityTemperatureCurveIndex = definition.coolingCapacityTemperatureCurveIndex;
+    mode.eirTemperatureCurveIndex = definition.coolingEIRTemperatureCurveIndex;
+    mode.eirPartLoadCurveIndex = definition.coolingEIRPartLoadCurveIndex;
     mode.referenceEvaporatorCapacity = this->sizing.referenceCoolingCapacity;
-    mode.referenceCOP = performance.referenceCoolingCOP;
-    mode.referenceEvaporatorLeavingTemp = performance.coolingReferenceEvaporatorOutletTemp;
-    mode.referenceCondenserEnteringTemp = performance.coolingReferenceCondenserInletTemp;
-    mode.referenceCondenserLeavingTemp = performance.coolingReferenceCondenserOutletTemp;
-    mode.minimumPartLoadRatio = performance.coolingMinimumPartLoadRatio;
-    mode.maximumPartLoadRatio = performance.coolingMaximumPartLoadRatio;
-    mode.optimumPartLoadRatio = performance.coolingOptimumPartLoadRatio;
+    mode.referenceCOP = definition.referenceCoolingCOP;
+    mode.referenceEvaporatorLeavingTemp = definition.coolingReferenceEvaporatorOutletTemp;
+    mode.referenceCondenserEnteringTemp = definition.coolingReferenceCondenserInletTemp;
+    mode.referenceCondenserLeavingTemp = definition.coolingReferenceCondenserOutletTemp;
+    mode.minimumPartLoadRatio = definition.coolingMinimumPartLoadRatio;
+    mode.maximumPartLoadRatio = definition.coolingMaximumPartLoadRatio;
+    mode.optimumPartLoadRatio = definition.coolingOptimumPartLoadRatio;
     return mode;
 }
 
 ModePerformanceData Module::heatingModePerformance() const
 {
-    auto const &performance = this->performanceData();
+    auto const &definition = this->performanceData();
     ModePerformanceData mode;
-    mode.condenserMode = performance.heatingCondenserTemperatureMode;
-    mode.capacityTemperatureCurveIndex = performance.heatingCapacityTemperatureCurveIndex;
-    mode.eirTemperatureCurveIndex = performance.heatingEIRTemperatureCurveIndex;
-    mode.eirPartLoadCurveIndex = performance.heatingEIRPartLoadCurveIndex;
+    mode.condenserMode = definition.heatingCondenserTemperatureMode;
+    mode.capacityTemperatureCurveIndex = definition.heatingCapacityTemperatureCurveIndex;
+    mode.eirTemperatureCurveIndex = definition.heatingEIRTemperatureCurveIndex;
+    mode.eirPartLoadCurveIndex = definition.heatingEIRPartLoadCurveIndex;
     mode.referenceEvaporatorCapacity = this->sizing.referenceHeatingCapacity;
     mode.referenceCOP = this->sizing.referenceHeatingCOP;
-    mode.referenceEvaporatorLeavingTemp = performance.heatingReferenceEvaporatorOutletTemp;
-    mode.referenceCondenserEnteringTemp = performance.heatingReferenceCondenserInletTemp;
-    mode.referenceCondenserLeavingTemp = performance.heatingReferenceCondenserOutletTemp;
-    mode.minimumPartLoadRatio = performance.heatingMinimumPartLoadRatio;
-    mode.maximumPartLoadRatio = performance.heatingMaximumPartLoadRatio;
-    mode.optimumPartLoadRatio = performance.heatingOptimumPartLoadRatio;
+    mode.referenceEvaporatorLeavingTemp = definition.heatingReferenceEvaporatorOutletTemp;
+    mode.referenceCondenserEnteringTemp = definition.heatingReferenceCondenserInletTemp;
+    mode.referenceCondenserLeavingTemp = definition.heatingReferenceCondenserOutletTemp;
+    mode.minimumPartLoadRatio = definition.heatingMinimumPartLoadRatio;
+    mode.maximumPartLoadRatio = definition.heatingMaximumPartLoadRatio;
+    mode.optimumPartLoadRatio = definition.heatingOptimumPartLoadRatio;
     return mode;
 }
 
 void Module::mapResultToPlantConnections()
 {
-    auto &result = this->result;
+    auto &moduleResult = this->result;
 
-    result.coolingInletTemp = 0.0;
-    result.coolingOutletTemp = 0.0;
-    result.coolingMassFlowRate = 0.0;
-    result.heatingInletTemp = 0.0;
-    result.heatingOutletTemp = 0.0;
-    result.heatingMassFlowRate = 0.0;
-    result.sourceInletTemp = 0.0;
-    result.sourceOutletTemp = 0.0;
-    result.sourceMassFlowRate = 0.0;
-    result.coolingDelivered = 0.0;
-    result.heatingDelivered = 0.0;
-    result.heatRecovered = 0.0;
-    result.sourceHeatTransfer = 0.0;
+    moduleResult.coolingInletTemp = 0.0;
+    moduleResult.coolingOutletTemp = 0.0;
+    moduleResult.coolingMassFlowRate = 0.0;
+    moduleResult.heatingInletTemp = 0.0;
+    moduleResult.heatingOutletTemp = 0.0;
+    moduleResult.heatingMassFlowRate = 0.0;
+    moduleResult.sourceInletTemp = 0.0;
+    moduleResult.sourceOutletTemp = 0.0;
+    moduleResult.sourceMassFlowRate = 0.0;
+    moduleResult.coolingDelivered = 0.0;
+    moduleResult.heatingDelivered = 0.0;
+    moduleResult.heatRecovered = 0.0;
+    moduleResult.sourceHeatTransfer = 0.0;
 
-    switch (result.currentMode) {
+    switch (moduleResult.currentMode) {
     case CurrentMode::CoolingOnly:
     case CurrentMode::CoolingDominant:
-        result.coolingInletTemp = result.evaporatorInletTemp;
-        result.coolingOutletTemp = result.evaporatorOutletTemp;
-        result.coolingMassFlowRate = result.evaporatorMassFlowRate;
-        result.sourceInletTemp = result.condenserInletTemp;
-        result.sourceOutletTemp = result.condenserOutletTemp;
-        result.sourceMassFlowRate = result.condenserMassFlowRate;
-        result.coolingDelivered = result.qEvaporator;
-        result.sourceHeatTransfer = result.qCondenser;
+        moduleResult.coolingInletTemp = moduleResult.evaporatorInletTemp;
+        moduleResult.coolingOutletTemp = moduleResult.evaporatorOutletTemp;
+        moduleResult.coolingMassFlowRate = moduleResult.evaporatorMassFlowRate;
+        moduleResult.sourceInletTemp = moduleResult.condenserInletTemp;
+        moduleResult.sourceOutletTemp = moduleResult.condenserOutletTemp;
+        moduleResult.sourceMassFlowRate = moduleResult.condenserMassFlowRate;
+        moduleResult.coolingDelivered = moduleResult.qEvaporator;
+        moduleResult.sourceHeatTransfer = moduleResult.qCondenser;
         break;
     case CurrentMode::HeatingOnly:
     case CurrentMode::HeatingDominant:
-        result.heatingInletTemp = result.condenserInletTemp;
-        result.heatingOutletTemp = result.condenserOutletTemp;
-        result.heatingMassFlowRate = result.condenserMassFlowRate;
-        result.sourceInletTemp = result.evaporatorInletTemp;
-        result.sourceOutletTemp = result.evaporatorOutletTemp;
-        result.sourceMassFlowRate = result.evaporatorMassFlowRate;
-        result.heatingDelivered = result.qCondenser;
-        result.sourceHeatTransfer = -result.qEvaporator;
+        moduleResult.heatingInletTemp = moduleResult.condenserInletTemp;
+        moduleResult.heatingOutletTemp = moduleResult.condenserOutletTemp;
+        moduleResult.heatingMassFlowRate = moduleResult.condenserMassFlowRate;
+        moduleResult.sourceInletTemp = moduleResult.evaporatorInletTemp;
+        moduleResult.sourceOutletTemp = moduleResult.evaporatorOutletTemp;
+        moduleResult.sourceMassFlowRate = moduleResult.evaporatorMassFlowRate;
+        moduleResult.heatingDelivered = moduleResult.qCondenser;
+        moduleResult.sourceHeatTransfer = -moduleResult.qEvaporator;
         break;
     case CurrentMode::HeatRecovery:
-        result.coolingInletTemp = result.evaporatorInletTemp;
-        result.coolingOutletTemp = result.evaporatorOutletTemp;
-        result.coolingMassFlowRate = result.evaporatorMassFlowRate;
-        result.heatingInletTemp = result.condenserInletTemp;
-        result.heatingOutletTemp = result.condenserOutletTemp;
-        result.heatingMassFlowRate = result.condenserMassFlowRate;
-        result.coolingDelivered = result.qEvaporator;
-        result.heatingDelivered = result.qCondenser;
-        result.heatRecovered = result.qCondenser;
+        moduleResult.coolingInletTemp = moduleResult.evaporatorInletTemp;
+        moduleResult.coolingOutletTemp = moduleResult.evaporatorOutletTemp;
+        moduleResult.coolingMassFlowRate = moduleResult.evaporatorMassFlowRate;
+        moduleResult.heatingInletTemp = moduleResult.condenserInletTemp;
+        moduleResult.heatingOutletTemp = moduleResult.condenserOutletTemp;
+        moduleResult.heatingMassFlowRate = moduleResult.condenserMassFlowRate;
+        moduleResult.coolingDelivered = moduleResult.qEvaporator;
+        moduleResult.heatingDelivered = moduleResult.qCondenser;
+        moduleResult.heatRecovered = moduleResult.qCondenser;
         break;
     case CurrentMode::Off:
     case CurrentMode::Invalid:
@@ -411,7 +409,7 @@ void Module::mapResultToPlantConnections()
         break;
     }
 
-    result.updatePowerAccounting(this->performanceData().compressorMotorEfficiency);
+    moduleResult.updatePowerAccounting(this->performanceData().compressorMotorEfficiency);
 }
 
 void Module::updateResultEnergies(Real64 const secondsInTimeStep)
@@ -437,13 +435,12 @@ PlantComponent *CentralHeatPumpSystem::factory(EnergyPlusData &state, std::strin
         state.dataPlantCentralHeatPumpSystem->getSystemInputFlag = false;
     }
 
-    // Now look for this particular object
-    for (auto &system : state.dataPlantCentralHeatPumpSystem->systems) {
-        if (system.Name == objectName) {
-            return &system;
-        }
+    auto &systems = state.dataPlantCentralHeatPumpSystem->systems;
+    if (auto const system = std::ranges::find_if(systems, [&objectName](auto const &candidate) { return candidate.Name == objectName; });
+        system != systems.end()) {
+        return &*system;
     }
-    // If we didn't find it, fatal
+
     ShowFatalError(state,
                    std::format("CentralHeatPumpSystem::factory: Error "
                                "getting inputs for object named: {}",
@@ -841,7 +838,7 @@ void CentralHeatPumpSystem::size(EnergyPlusData &state)
 
         if (state.dataPlnt->PlantFinalSizesOkayToReport && !this->mySizesReported) {
             // create predefined report
-            std::string equipmentName = module.name();
+            const std::string &equipmentName = module.name();
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchMechType, equipmentName, "ChillerHeaterPerformance:Electric:EIR");
             OutputReportPredefined::PreDefTableEntry(
@@ -876,8 +873,6 @@ void CentralHeatPumpSystem::size(EnergyPlusData &state)
     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
         this->mySizesReported = true;
     }
-
-    return;
 }
 
 void CentralHeatPumpSystem::resolveFlowMode(EnergyPlusData &state)
@@ -1563,8 +1558,7 @@ void getPerformanceInput(EnergyPlusData &state)
     static constexpr char referenceHeatingEnteringCondenserTempField[] = "Reference Heating Mode Entering Condenser Fluid Temperature";
     static constexpr char maximumHeatingLeavingCondenserTempField[] = "Maximum Heating Mode Leaving Condenser Water Temperature";
 
-    bool errorsFound = false;                 // True when input errors are found
-    std::vector<Real64> curveValues(11, 0.0); // Used to evaluate PLFFPLR curve objects
+    bool errorsFound = false; // True when input errors are found
 
     auto &inputProcessor = state.dataInputProcessing->inputProcessor;
     auto &performanceDefinitions = state.dataPlantCentralHeatPumpSystem->performanceDefinitions;
@@ -1836,6 +1830,7 @@ void getPerformanceInput(EnergyPlusData &state)
 
             if (performanceDefinition.coolingEIRPartLoadCurveIndex > 0) {
                 bool foundNegativeValue = false;
+                std::array<Real64, 11> curveValues{}; // Used to evaluate PLFFPLR curve objects
                 for (int curvePointIndex = 0; curvePointIndex <= 10; ++curvePointIndex) {
                     Real64 curveValue = evaluatePartLoadCurve(
                         state, performanceDefinition.coolingEIRPartLoadCurveIndex, coolingReferenceCondenserTemp, double(curvePointIndex / 10.0));
@@ -1905,6 +1900,7 @@ void getPerformanceInput(EnergyPlusData &state)
 
             if (performanceDefinition.heatingEIRPartLoadCurveIndex > 0) {
                 bool foundNegativeValue = false;
+                std::array<Real64, 11> curveValues{}; // Used to evaluate PLFFPLR curve objects
                 for (int curvePointIndex = 0; curvePointIndex <= 10; ++curvePointIndex) {
                     Real64 curveValue = evaluatePartLoadCurve(
                         state, performanceDefinition.heatingEIRPartLoadCurveIndex, heatingReferenceCondenserTemp, double(curvePointIndex / 10.0));
@@ -2343,7 +2339,7 @@ void CentralHeatPumpSystem::initialize(EnergyPlusData &state,
 
 ModuleResult CentralHeatPumpSystem::solveCoolingOnly(EnergyPlusData &state,
                                                      std::size_t const moduleIndex,
-                                                     Real64 const requestedCoolingLoad,
+                                                     Real64 const coolingLoad,
                                                      Real64 const evaporatorMassFlowRateMax,
                                                      Real64 const condenserMassFlowRate,
                                                      Real64 const evaporatorInletTemp,
@@ -2356,7 +2352,7 @@ ModuleResult CentralHeatPumpSystem::solveCoolingOnly(EnergyPlusData &state,
     auto const &performance = module.performanceData();
     ModePerformanceData const modePerformance = module.coolingModePerformance();
     ModuleResult result;
-    result.requestedCoolingLoad = max(0.0, requestedCoolingLoad);
+    result.requestedCoolingLoad = max(0.0, coolingLoad);
     result.evaporatorInletTemp = evaporatorInletTemp;
     result.evaporatorOutletTemp = evaporatorInletTemp;
     result.condenserInletTemp = condenserInletTemp;
@@ -2403,11 +2399,10 @@ ModuleResult CentralHeatPumpSystem::solveCoolingOnly(EnergyPlusData &state,
     Real64 capacityModifier = 0.0;
     Real64 eirTemperatureModifier = 0.0;
     Real64 eirPartLoadModifier = 0.0;
-    Real64 condenserCurveTemp = condenserInletTemp;
 
     for (int iteration = 0; iteration < maxOuterSolverIterations; ++iteration) {
         result.solver.outerIterations = iteration + 1;
-        condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletGuess);
+        Real64 const condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletGuess);
         ++result.solver.curveEvaluations;
         capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletGuess, condenserCurveTemp);
         availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
@@ -2484,7 +2479,7 @@ ModuleResult CentralHeatPumpSystem::solveCoolingOnly(EnergyPlusData &state,
         return result;
     }
 
-    condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletTemp);
+    Real64 const condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletTemp);
     ++result.solver.curveEvaluations;
     capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletTemp, condenserCurveTemp);
     availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
@@ -2534,7 +2529,7 @@ ModuleResult CentralHeatPumpSystem::solveCoolingOnly(EnergyPlusData &state,
 
 ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
                                                      std::size_t const moduleIndex,
-                                                     Real64 const requestedHeatingLoad,
+                                                     Real64 const heatingLoad,
                                                      Real64 const evaporatorMassFlowRate,
                                                      Real64 const condenserMassFlowRateMax,
                                                      Real64 const evaporatorInletTemp,
@@ -2547,7 +2542,7 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
     auto const &performance = module.performanceData();
     ModePerformanceData const modePerformance = module.heatingModePerformance();
     ModuleResult result;
-    result.requestedHeatingLoad = max(0.0, requestedHeatingLoad);
+    result.requestedHeatingLoad = max(0.0, heatingLoad);
     result.evaporatorInletTemp = evaporatorInletTemp;
     result.evaporatorOutletTemp = evaporatorInletTemp;
     result.condenserInletTemp = condenserInletTemp;
@@ -2609,14 +2604,13 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
     Real64 capacityModifier = 0.0;
     Real64 eirTemperatureModifier = 0.0;
     Real64 eirPartLoadModifier = 0.0;
-    Real64 condenserCurveTemp = condenserInletTemp;
 
     for (int iteration = 0; iteration < maxOuterSolverIterations; ++iteration) {
         result.solver.outerIterations = iteration + 1;
         result.solver.partLoadStatus = SolverConvergenceStatus::NotRequired;
         result.solver.partLoadBracketWidth = 0.0;
         result.solver.loadResidual = 0.0;
-        condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletGuess);
+        Real64 const condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletGuess);
         ++result.solver.curveEvaluations;
         capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletGuess, condenserCurveTemp);
         availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
@@ -2746,7 +2740,7 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
         return result;
     }
 
-    condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletTemp);
+    Real64 const condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletTemp);
     ++result.solver.curveEvaluations;
     capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletTemp, condenserCurveTemp);
     availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
@@ -2790,11 +2784,11 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
 
 ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
                                                       std::size_t const moduleIndex,
-                                                      Real64 const requestedCoolingLoad,
-                                                      Real64 const requestedHeatingLoad,
-                                                      Real64 const coolingMassFlowRateMax,
-                                                      Real64 const heatingMassFlowRateMax,
-                                                      Real64 const sourceMassFlowRateMax,
+                                                      Real64 const coolingLoad,
+                                                      Real64 const heatingLoad,
+                                                      Real64 const maximumCoolingMassFlowRate,
+                                                      Real64 const maximumHeatingMassFlowRate,
+                                                      Real64 const maximumSourceMassFlowRate,
                                                       Real64 const coolingInletTemp,
                                                       Real64 const heatingInletTemp,
                                                       Real64 const sourceInletTemp)
@@ -2807,8 +2801,8 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
     auto const &sizing = module.sizing;
     ModePerformanceData const modePerformance = module.heatingModePerformance();
     ModuleResult result;
-    result.requestedCoolingLoad = max(0.0, requestedCoolingLoad);
-    result.requestedHeatingLoad = max(0.0, requestedHeatingLoad);
+    result.requestedCoolingLoad = max(0.0, coolingLoad);
+    result.requestedHeatingLoad = max(0.0, heatingLoad);
     result.unmetCoolingLoad = result.requestedCoolingLoad;
     result.unmetHeatingLoad = result.requestedHeatingLoad;
     result.coolingInletTemp = coolingInletTemp;
@@ -2819,8 +2813,9 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
     result.sourceOutletTemp = sourceInletTemp;
 
     if (result.requestedCoolingLoad <= HVAC::SmallLoad || result.requestedHeatingLoad <= HVAC::SmallLoad ||
-        coolingMassFlowRateMax <= DataBranchAirLoopPlant::MassFlowTolerance || heatingMassFlowRateMax <= DataBranchAirLoopPlant::MassFlowTolerance ||
-        modePerformance.referenceEvaporatorCapacity <= 0.0 || modePerformance.referenceCOP <= 0.0) {
+        maximumCoolingMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance ||
+        maximumHeatingMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || modePerformance.referenceEvaporatorCapacity <= 0.0 ||
+        modePerformance.referenceCOP <= 0.0) {
         result.updatePowerAccounting(performance.compressorMotorEfficiency);
         return result;
     }
@@ -2838,7 +2833,7 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
     }
     coolingOutletTarget = max(coolingOutletTarget, module.minimumEvaporatorOutletTemp);
     Real64 const coolingDeltaTempTarget = max(0.0, coolingInletTemp - coolingOutletTarget);
-    Real64 const coolingTarget = min(result.requestedCoolingLoad, coolingMassFlowRateMax * coolingCp * coolingDeltaTempTarget);
+    Real64 const coolingTarget = min(result.requestedCoolingLoad, maximumCoolingMassFlowRate * coolingCp * coolingDeltaTempTarget);
 
     bool hasHeatingOutletLimit = false;
     Real64 heatingOutletLimit = 0.0;
@@ -2854,18 +2849,18 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
     }
     Real64 const heatingDeltaTempTarget = hasHeatingOutletLimit ? max(0.0, heatingOutletLimit - heatingInletTemp) : 0.0;
     Real64 const heatingLimitedHeating =
-        hasHeatingOutletLimit ? heatingMassFlowRateMax * heatingCp * heatingDeltaTempTarget : std::numeric_limits<Real64>::max();
+        hasHeatingOutletLimit ? maximumHeatingMassFlowRate * heatingCp * heatingDeltaTempTarget : std::numeric_limits<Real64>::max();
     Real64 const heatingTarget = min(result.requestedHeatingLoad, heatingLimitedHeating);
 
-    auto sourceFlowLimit = [sourceMassFlowRateMax](Real64 const nodeFlowLimit, Real64 const designFlowLimit) {
+    auto sourceFlowLimit = [maximumSourceMassFlowRate](Real64 const nodeFlowLimit, Real64 const designFlowLimit) {
         Real64 flowLimit = nodeFlowLimit;
         if (flowLimit <= DataBranchAirLoopPlant::MassFlowTolerance) {
             flowLimit = designFlowLimit;
         }
         if (flowLimit <= DataBranchAirLoopPlant::MassFlowTolerance) {
-            flowLimit = sourceMassFlowRateMax;
+            flowLimit = maximumSourceMassFlowRate;
         }
-        return min(sourceMassFlowRateMax, max(0.0, flowLimit));
+        return min(maximumSourceMassFlowRate, max(0.0, flowLimit));
     };
     Real64 const maximumSourceEvaporatorMassFlowRate =
         sourceFlowLimit(sizing.maximumSourceEvaporatorMassFlowRate, sizing.maximumEvaporatorMassFlowRate);
@@ -2883,8 +2878,9 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
 
     Real64 evaporatorCurveTempGuess = coolingOutletTarget;
     Real64 condenserEnteringTempGuess = heatingInletTemp;
-    Real64 condenserLeavingTempGuess =
-        hasHeatingOutletLimit ? min(heatingOutletLimit, heatingInletTemp + heatingTarget / (heatingMassFlowRateMax * heatingCp)) : heatingInletTemp;
+    Real64 condenserLeavingTempGuess = hasHeatingOutletLimit
+                                           ? min(heatingOutletLimit, heatingInletTemp + heatingTarget / (maximumHeatingMassFlowRate * heatingCp))
+                                           : heatingInletTemp;
 
     Real64 availableEvaporatorCapacity = 0.0;
     Real64 availableCondenserCapacity = 0.0;
@@ -2897,7 +2893,6 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
     Real64 capacityModifier = 0.0;
     Real64 eirTemperatureModifier = 0.0;
     Real64 eirPartLoadModifier = 0.0;
-    Real64 condenserCurveTemp = condenserEnteringTempGuess;
 
     Real64 coolingDelivered = 0.0;
     Real64 heatingDelivered = 0.0;
@@ -2921,7 +2916,7 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
         result.solver.partLoadStatus = SolverConvergenceStatus::NotRequired;
         result.solver.partLoadBracketWidth = 0.0;
         result.solver.loadResidual = 0.0;
-        condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserEnteringTempGuess, condenserLeavingTempGuess);
+        Real64 const condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserEnteringTempGuess, condenserLeavingTempGuess);
         ++result.solver.curveEvaluations;
         capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorCurveTempGuess, condenserCurveTemp);
         availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
@@ -2995,14 +2990,14 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
 
         if (this->allModulesVariableFlow) {
             coolingMassFlowRate = coolingDelivered > HVAC::SmallLoad && coolingDeltaTempTarget > 0.0
-                                      ? min(coolingMassFlowRateMax, coolingDelivered / (coolingCp * coolingDeltaTempTarget))
+                                      ? min(maximumCoolingMassFlowRate, coolingDelivered / (coolingCp * coolingDeltaTempTarget))
                                       : 0.0;
             heatingMassFlowRate = heatingDelivered > HVAC::SmallLoad && heatingDeltaTempTarget > 0.0
-                                      ? min(heatingMassFlowRateMax, heatingDelivered / (heatingCp * heatingDeltaTempTarget))
-                                      : heatingMassFlowRateMax;
+                                      ? min(maximumHeatingMassFlowRate, heatingDelivered / (heatingCp * heatingDeltaTempTarget))
+                                      : maximumHeatingMassFlowRate;
         } else {
-            coolingMassFlowRate = coolingDelivered > HVAC::SmallLoad ? coolingMassFlowRateMax : 0.0;
-            heatingMassFlowRate = heatingDelivered > HVAC::SmallLoad ? heatingMassFlowRateMax : 0.0;
+            coolingMassFlowRate = coolingDelivered > HVAC::SmallLoad ? maximumCoolingMassFlowRate : 0.0;
+            heatingMassFlowRate = heatingDelivered > HVAC::SmallLoad ? maximumHeatingMassFlowRate : 0.0;
         }
         if (sourceExtraction > HVAC::SmallLoad) {
             sourceMassFlowRate = maximumSourceEvaporatorMassFlowRate;
@@ -3392,13 +3387,11 @@ void CentralHeatPumpSystem::updateReportingAndNodes(EnergyPlusData &state,
 
     if (this->ancillaryPower > 0.0) {
         Real64 const scheduleValue = this->ancillaryPowerSched != nullptr ? this->ancillaryPowerSched->getCurrentVal() : 1.0;
-        Real64 const ancillaryPower = this->ancillaryPower * scheduleValue;
-        if (totalHeatingHeatTransferRate > HVAC::SmallLoad && totalCoolingHeatTransferRate <= HVAC::SmallLoad) {
-            totalHeatingPower += ancillaryPower;
-        } else if (this->isHeatingDominant) {
-            totalHeatingPower += ancillaryPower;
+        Real64 const availableAncillaryPower = this->ancillaryPower * scheduleValue;
+        if ((totalHeatingHeatTransferRate > HVAC::SmallLoad && totalCoolingHeatTransferRate <= HVAC::SmallLoad) || this->isHeatingDominant) {
+            totalHeatingPower += availableAncillaryPower;
         } else {
-            totalCoolingPower += ancillaryPower;
+            totalCoolingPower += availableAncillaryPower;
         }
     }
 
@@ -3652,7 +3645,6 @@ void CentralHeatPumpSystem::calculate(EnergyPlusData &state, Real64 &load, int c
 
     this->resetOffState(state);
     load = 0.0;
-    return;
 }
 
 void CentralHeatPumpSystem::oneTimeInit([[maybe_unused]] EnergyPlusData &state)

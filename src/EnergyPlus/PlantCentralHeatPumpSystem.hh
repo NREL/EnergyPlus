@@ -302,12 +302,12 @@ namespace PlantCentralHeatPumpSystem {
         SolverWarningData simultaneousPartLoadSolverWarning;
         ModuleResult result;
 
-        void initialize(PerformanceData const &performance, Sched::Schedule *availabilitySchedule);
-        PerformanceData const &performanceData() const;
-        std::string const &name() const;
-        bool isAvailable() const;
-        ModePerformanceData coolingModePerformance() const;
-        ModePerformanceData heatingModePerformance() const;
+        void initialize(PerformanceData const &performanceData, Sched::Schedule *schedule);
+        [[nodiscard]] PerformanceData const &performanceData() const;
+        [[nodiscard]] std::string const &name() const;
+        [[nodiscard]] bool isAvailable() const;
+        [[nodiscard]] ModePerformanceData coolingModePerformance() const;
+        [[nodiscard]] ModePerformanceData heatingModePerformance() const;
         void mapResultToPlantConnections();
         void updateResultEnergies(Real64 secondsInTimeStep);
         void resetResult(Real64 evaporatorInletTemp, Real64 condenserInletTemp);
@@ -411,7 +411,7 @@ namespace PlantCentralHeatPumpSystem {
 
         ModuleResult solveCoolingOnly(EnergyPlusData &state,
                                       std::size_t moduleIndex,
-                                      Real64 requestedCoolingLoad,
+                                      Real64 coolingLoad,
                                       Real64 evaporatorMassFlowRateMax,
                                       Real64 condenserMassFlowRate,
                                       Real64 evaporatorInletTemp,
@@ -419,7 +419,7 @@ namespace PlantCentralHeatPumpSystem {
 
         ModuleResult solveHeatingOnly(EnergyPlusData &state,
                                       std::size_t moduleIndex,
-                                      Real64 requestedHeatingLoad,
+                                      Real64 heatingLoad,
                                       Real64 evaporatorMassFlowRate,
                                       Real64 condenserMassFlowRateMax,
                                       Real64 evaporatorInletTemp,
@@ -427,11 +427,11 @@ namespace PlantCentralHeatPumpSystem {
 
         ModuleResult solveSimultaneous(EnergyPlusData &state,
                                        std::size_t moduleIndex,
-                                       Real64 requestedCoolingLoad,
-                                       Real64 requestedHeatingLoad,
-                                       Real64 coolingMassFlowRateMax,
-                                       Real64 heatingMassFlowRateMax,
-                                       Real64 sourceMassFlowRateMax,
+                                       Real64 coolingLoad,
+                                       Real64 heatingLoad,
+                                       Real64 maximumCoolingMassFlowRate,
+                                       Real64 maximumHeatingMassFlowRate,
+                                       Real64 maximumSourceMassFlowRate,
                                        Real64 coolingInletTemp,
                                        Real64 heatingInletTemp,
                                        Real64 sourceInletTemp);
@@ -455,7 +455,7 @@ namespace PlantCentralHeatPumpSystem {
         static Real64
         selectCondenserCurveTemperature(ModePerformanceData const &modePerformance, Real64 condenserEnteringTemp, Real64 condenserLeavingTemp);
 
-        Real64 evaluateCapacityTemperatureModifier(
+        static Real64 evaluateCapacityTemperatureModifier(
             EnergyPlusData &state, Module &module, ModePerformanceData const &modePerformance, Real64 evaporatorOutletTemp, Real64 condenserTemp);
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
