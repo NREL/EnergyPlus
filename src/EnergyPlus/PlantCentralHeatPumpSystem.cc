@@ -95,8 +95,7 @@ namespace EnergyPlus::PlantCentralHeatPumpSystem {
 // This module simulates the performance of the CentralHeatPumpSystem objects
 // It currently includes one object: ChillerHeaterPerformance:Electric:EIR.
 // The other object available for this CentralHeatPumpSystem object such as
-// HeatPumpPerformance:WaterToWater:EIR
-//      will be implemented later.
+// HeatPumpPerformance:WaterToWater:EIR will be implemented later.
 
 // METHODOLOGY EMPLOYED:
 //  Once the PlantLoopManager determines that the CentralHeatPumpSystem
@@ -241,7 +240,7 @@ namespace {
         ++warning.count;
         if (warning.count == 1) {
             ShowWarningError(state,
-                             std::format("CentralHeatPumpSystem \"{}\" module {} (\"{}\") {} {} failed to converge ({}).",
+                             std::format(R"(CentralHeatPumpSystem "{}" module {} ("{}") {} {} failed to converge ({}).)",
                                          systemName,
                                          moduleNum,
                                          moduleName,
@@ -261,7 +260,7 @@ namespace {
         }
 
         ShowRecurringWarningErrorAtEnd(state,
-                                       std::format("CentralHeatPumpSystem \"{}\" module {} (\"{}\") {} {} convergence failure continues.",
+                                       std::format(R"(CentralHeatPumpSystem "{}" module {} ("{}") {} {} convergence failure continues.)",
                                                    systemName,
                                                    moduleNum,
                                                    moduleName,
@@ -1833,11 +1832,11 @@ void getPerformanceInput(EnergyPlusData &state)
                 std::array<Real64, 11> curveValues{}; // Used to evaluate PLFFPLR curve objects
                 for (int curvePointIndex = 0; curvePointIndex <= 10; ++curvePointIndex) {
                     Real64 curveValue = evaluatePartLoadCurve(
-                        state, performanceDefinition.coolingEIRPartLoadCurveIndex, coolingReferenceCondenserTemp, double(curvePointIndex / 10.0));
+                        state, performanceDefinition.coolingEIRPartLoadCurveIndex, coolingReferenceCondenserTemp, (curvePointIndex / 10.0));
                     if (curveValue < 0.0) {
                         foundNegativeValue = true;
                     }
-                    curveValues[static_cast<std::size_t>(curvePointIndex)] = int(curveValue * 100.0) / 100.0;
+                    curveValues[static_cast<std::size_t>(curvePointIndex)] = int(curveValue * 100.0 / 100.0);
                 }
                 if (foundNegativeValue) {
                     ShowWarningError(state,
@@ -1903,7 +1902,7 @@ void getPerformanceInput(EnergyPlusData &state)
                 std::array<Real64, 11> curveValues{}; // Used to evaluate PLFFPLR curve objects
                 for (int curvePointIndex = 0; curvePointIndex <= 10; ++curvePointIndex) {
                     Real64 curveValue = evaluatePartLoadCurve(
-                        state, performanceDefinition.heatingEIRPartLoadCurveIndex, heatingReferenceCondenserTemp, double(curvePointIndex / 10.0));
+                        state, performanceDefinition.heatingEIRPartLoadCurveIndex, heatingReferenceCondenserTemp, (curvePointIndex / 10.0));
                     if (curveValue < 0.0) {
                         foundNegativeValue = true;
                     }
@@ -2404,7 +2403,7 @@ ModuleResult CentralHeatPumpSystem::solveCoolingOnly(EnergyPlusData &state,
         result.solver.outerIterations = iteration + 1;
         Real64 const condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletGuess);
         ++result.solver.curveEvaluations;
-        capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletGuess, condenserCurveTemp);
+        capacityModifier = evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletGuess, condenserCurveTemp);
         availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
         qEvaporator = std::min({result.requestedCoolingLoad, availableEvaporatorCapacity * maxPartLoadRatio, flowLimitedCooling});
 
@@ -2481,7 +2480,7 @@ ModuleResult CentralHeatPumpSystem::solveCoolingOnly(EnergyPlusData &state,
 
     Real64 const condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletTemp);
     ++result.solver.curveEvaluations;
-    capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletTemp, condenserCurveTemp);
+    capacityModifier = evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletTemp, condenserCurveTemp);
     availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
     ++result.solver.curveEvaluations;
     eirTemperatureModifier = max(0.0, Curve::CurveValue(state, modePerformance.eirTemperatureCurveIndex, evaporatorOutletTemp, condenserCurveTemp));
@@ -2612,7 +2611,7 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
         result.solver.loadResidual = 0.0;
         Real64 const condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletGuess);
         ++result.solver.curveEvaluations;
-        capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletGuess, condenserCurveTemp);
+        capacityModifier = evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletGuess, condenserCurveTemp);
         availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
         ++result.solver.curveEvaluations;
         eirTemperatureModifier =
@@ -2654,15 +2653,15 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
         } else {
             cyclingRatio = 1.0;
             Real64 const loadScale = max({targetCondenserHeat, availableCondenserCapacity, 1.0});
-            auto const bisection =
+            const auto [value, bracketWidth, loadResidual, iterations, status] =
                 solveBisection(minPartLoadRatio, maximumAllowedPLR, targetCondenserHeat, partLoadAbsoluteTolerance, loadScale, [&](Real64 const plr) {
                     return operatingPointAtPLR(plr).condenserLoad;
                 });
-            result.solver.partLoadIterations += bisection.iterations;
-            result.solver.partLoadStatus = bisection.status;
-            result.solver.partLoadBracketWidth = bisection.bracketWidth;
-            result.solver.loadResidual = bisection.loadResidual;
-            partLoadRatio = bisection.value;
+            result.solver.partLoadIterations += iterations;
+            result.solver.partLoadStatus = status;
+            result.solver.partLoadBracketWidth = bracketWidth;
+            result.solver.loadResidual = loadResidual;
+            partLoadRatio = value;
         }
 
         auto const operatingPoint = operatingPointAtPLR(partLoadRatio);
@@ -2742,7 +2741,7 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
 
     Real64 const condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserInletTemp, condenserOutletTemp);
     ++result.solver.curveEvaluations;
-    capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletTemp, condenserCurveTemp);
+    capacityModifier = evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorOutletTemp, condenserCurveTemp);
     availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
     ++result.solver.curveEvaluations;
     eirTemperatureModifier = max(0.0, Curve::CurveValue(state, modePerformance.eirTemperatureCurveIndex, evaporatorOutletTemp, condenserCurveTemp));
@@ -2918,7 +2917,7 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
         result.solver.loadResidual = 0.0;
         Real64 const condenserCurveTemp = selectCondenserCurveTemperature(modePerformance, condenserEnteringTempGuess, condenserLeavingTempGuess);
         ++result.solver.curveEvaluations;
-        capacityModifier = this->evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorCurveTempGuess, condenserCurveTemp);
+        capacityModifier = evaluateCapacityTemperatureModifier(state, module, modePerformance, evaporatorCurveTempGuess, condenserCurveTemp);
         availableEvaporatorCapacity = modePerformance.referenceEvaporatorCapacity * capacityModifier;
         ++result.solver.curveEvaluations;
         eirTemperatureModifier =
@@ -3332,7 +3331,7 @@ void CentralHeatPumpSystem::calculateHeatingOnly(EnergyPlusData &state,
                                   sourceInletTemp);
 }
 
-void CentralHeatPumpSystem::updateReportingAndNodes(EnergyPlusData &state,
+void CentralHeatPumpSystem::updateReportingAndNodes(EnergyPlusData const &state,
                                                     Real64 const coolingMassFlowRate,
                                                     Real64 const heatingMassFlowRate,
                                                     Real64 const sourceMassFlowRate,

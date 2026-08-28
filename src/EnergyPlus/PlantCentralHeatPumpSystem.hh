@@ -444,7 +444,7 @@ namespace PlantCentralHeatPumpSystem {
                                    Real64 heatingInletTemp,
                                    Real64 sourceInletTemp);
 
-        void updateReportingAndNodes(EnergyPlusData &state,
+        void updateReportingAndNodes(EnergyPlusData const &state,
                                      Real64 coolingMassFlowRate,
                                      Real64 heatingMassFlowRate,
                                      Real64 sourceMassFlowRate,
