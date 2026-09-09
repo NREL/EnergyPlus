@@ -503,10 +503,11 @@ namespace PlantChillers {
                 if (thisChiller.DesignHeatRecVolFlowRate > 0.0) {
                     PlantUtilities::RegisterPlantCompDesignFlow(state, thisChiller.HeatRecInletNodeNum, thisChiller.DesignHeatRecVolFlowRate);
                 }
-                // Condenser flow rate must be specified for heat reclaim
+                // Condenser flow rate must be specified or sized for heat reclaim
                 if (thisChiller.CondenserType == DataPlant::CondenserType::AirCooled ||
                     thisChiller.CondenserType == DataPlant::CondenserType::EvapCooled) {
-                    if (thisChiller.CondVolFlowRate <= 0.0) {
+                    if (thisChiller.CondVolFlowRate <= 0.0 && thisChiller.CondVolFlowRate != DataSizing::AutoSize &&
+                        !state.dataIPShortCut->lNumericFieldBlanks(10)) {
                         ShowSevereError(
                             state,
                             std::format("Invalid {}={:.6f}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
@@ -1216,7 +1217,7 @@ namespace PlantChillers {
             // sizing of condenser flow for air/evap-cooled is not reported but the condenser side deltaT is calculated, so at least make it realistic
             if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                 Real64 const desAirVolFlowRate = this->NomCap * 0.000114; // m3/s/w (850 cfm/ton)
-                if (this->CondVolFlowRate == DataSizing::AutoSize) {
+                if (this->CondVolFlowRate == DataSizing::AutoSize || this->CondVolFlowRate == 0.0) {
                     this->CondVolFlowRate = desAirVolFlowRate;
                     BaseSizer::reportSizerOutput(
                         state, "Chiller:Electric", this->Name, "Design Size Design Condenser Fluid Flow Rate [m3/s]", this->CondVolFlowRate);

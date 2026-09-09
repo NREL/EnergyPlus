@@ -157,6 +157,56 @@ TEST_F(EnergyPlusFixture, ElectricChiller_AirCooled_HardAndAutoSizing)
     ch.size(*state);
     Real64 const expectedCondVol = ch.NomCap * 0.000114;
     EXPECT_NEAR(ch.CondVolFlowRate, expectedCondVol, 1e-9);
+
+    // Case 3: A blank numeric input is passed to the model as zero and receives the default sizing
+    ch.CondVolFlowRate = 0.0;
+    ch.size(*state);
+    EXPECT_NEAR(ch.CondVolFlowRate, expectedCondVol, 1e-9);
+}
+
+TEST_F(EnergyPlusFixture, ElectricChiller_AirCooled_HeatRecoveryAllowsAutosizedCondenserFlow)
+{
+    std::string const idf_objects = delimited_string({
+        "Chiller:Electric,",
+        "  Air Cooled Chiller,       !- Name",
+        "  AirCooled,                 !- Condenser Type",
+        "  50000,                     !- Nominal Capacity {W}",
+        "  3.5,                       !- Nominal COP {W/W}",
+        "  Chilled Water Inlet Node,  !- Chilled Water Inlet Node Name",
+        "  Chilled Water Outlet Node, !- Chilled Water Outlet Node Name",
+        "  Condenser Inlet Node,      !- Condenser Inlet Node Name",
+        "  Condenser Outlet Node,     !- Condenser Outlet Node Name",
+        "  0.15,                      !- Minimum Part Load Ratio",
+        "  1.0,                       !- Maximum Part Load Ratio",
+        "  0.65,                      !- Optimum Part Load Ratio",
+        "  35.0,                      !- Design Condenser Inlet Temperature {C}",
+        "  2.778,                     !- Temperature Rise Coefficient",
+        "  6.67,                      !- Design Chilled Water Outlet Temperature {C}",
+        "  0.0011,                    !- Design Chilled Water Flow Rate {m3/s}",
+        "  Autosize,                  !- Design Condenser Fluid Flow Rate {m3/s}",
+        "  0.9949,                    !- Coefficient 1 of Capacity Ratio Curve",
+        "  -0.045954,                 !- Coefficient 2 of Capacity Ratio Curve",
+        "  -0.0013543,                !- Coefficient 3 of Capacity Ratio Curve",
+        "  2.333,                     !- Coefficient 1 of Power Ratio Curve",
+        "  -1.975,                    !- Coefficient 2 of Power Ratio Curve",
+        "  0.6121,                    !- Coefficient 3 of Power Ratio Curve",
+        "  0.03303,                   !- Coefficient 1 of Full Load Ratio Curve",
+        "  0.6852,                    !- Coefficient 2 of Full Load Ratio Curve",
+        "  0.2818,                    !- Coefficient 3 of Full Load Ratio Curve",
+        "  5.0,                       !- Chilled Water Outlet Temperature Lower Limit {C}",
+        "  NotModulated,              !- Chiller Flow Mode",
+        "  0.00055,                   !- Design Heat Recovery Water Flow Rate {m3/s}",
+        "  Heat Recovery Inlet Node,  !- Heat Recovery Inlet Node Name",
+        "  Heat Recovery Outlet Node; !- Heat Recovery Outlet Node Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    state->init_state(*state);
+
+    EXPECT_NO_THROW(ElectricChillerSpecs::getInput(*state));
+    ASSERT_EQ(1, state->dataPlantChillers->NumElectricChillers);
+    EXPECT_TRUE(state->dataPlantChillers->ElectricChiller(1).HeatRecActive);
+    EXPECT_EQ(DataSizing::AutoSize, state->dataPlantChillers->ElectricChiller(1).CondVolFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, ElectricChiller_CondVolFlowSizingSimple)

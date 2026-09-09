@@ -75871,8 +75871,9 @@ Chiller:Electric,
        \autosizable
        \minimum 0.0
        \ip-units gal/min
-       \note This field is only used for Condenser Type = AirCooled or EvaporativelyCooled
-       \note when Heat Recovery is specified
+       \note For Condenser Type = AirCooled or EvaporativelyCooled, this flow rate is used to
+       \note calculate the condenser outlet node conditions. If this field is blank or Autosize,
+       \note the flow rate is estimated using 850 cfm/ton of nominal capacity.
   N11, \field Coefficient 1 of Capacity Ratio Curve
   N12, \field Coefficient 2 of Capacity Ratio Curve
   N13, \field Coefficient 3 of Capacity Ratio Curve
