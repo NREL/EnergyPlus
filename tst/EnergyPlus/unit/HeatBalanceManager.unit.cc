@@ -2576,28 +2576,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSMaterialAbsorptanceUpdatesConstr
     EXPECT_EQ(construction.OutsideAbsorpVis, mat->AbsorpVisibleInputOut);
     EXPECT_EQ(construction.InsideAbsorpVis, mat->AbsorpVisibleInEMSOverride);
 
-    // Test 4: Nothing gets reset via EMS
+    // Test 4: Setting every face-specific actuator to Null restores the input values
     mat->AbsorpThermalOutEMSOverrideOn = false;
     mat->AbsorpThermalInEMSOverrideOn = false;
     mat->AbsorpSolarOutEMSOverrideOn = false;
     mat->AbsorpSolarInEMSOverrideOn = false;
     mat->AbsorpVisibleOutEMSOverrideOn = false;
     mat->AbsorpVisibleInEMSOverrideOn = false;
-    mat->AbsorpThermalOut = mat->AbsorpThermalInputOut;
-    mat->AbsorpThermalIn = mat->AbsorpThermalInputIn;
-    mat->AbsorpSolarOut = mat->AbsorpSolarInputOut;
-    mat->AbsorpSolarIn = mat->AbsorpSolarInputIn;
-    mat->AbsorpVisibleOut = mat->AbsorpVisibleInputOut;
-    mat->AbsorpVisibleIn = mat->AbsorpVisibleInputIn;
-
-    state->dataMaterial->materials(1) = mat;
-
-    construction.InsideAbsorpThermal = mat->AbsorpThermalInputIn;
-    construction.OutsideAbsorpThermal = mat->AbsorpThermalInputOut;
-    construction.InsideAbsorpSolar = mat->AbsorpSolarInputIn;
-    construction.OutsideAbsorpSolar = mat->AbsorpSolarInputOut;
-    construction.InsideAbsorpVis = mat->AbsorpVisibleInputIn;
-    construction.OutsideAbsorpVis = mat->AbsorpVisibleInputOut;
 
     HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties(*state);
 
@@ -2633,6 +2618,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSMaterialAbsorptanceUpdatesConstr
     EXPECT_EQ(mat->AbsorpVisibleIn, mat->AbsorpVisibleEMSOverride);
     EXPECT_EQ(construction.OutsideAbsorpVis, mat->AbsorpVisibleEMSOverride);
     EXPECT_EQ(construction.InsideAbsorpVis, mat->AbsorpVisibleEMSOverride);
+
+    // Test 6: A face-specific actuator takes precedence over a legacy actuator for that face only
+    mat->AbsorpThermalOutEMSOverrideOn = true;
+
+    HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties(*state);
+
+    EXPECT_EQ(mat->AbsorpThermalOut, mat->AbsorpThermalOutEMSOverride);
+    EXPECT_EQ(mat->AbsorpThermalIn, mat->AbsorpThermalEMSOverride);
+    EXPECT_EQ(construction.OutsideAbsorpThermal, mat->AbsorpThermalOutEMSOverride);
+    EXPECT_EQ(construction.InsideAbsorpThermal, mat->AbsorpThermalEMSOverride);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetSpaceData)

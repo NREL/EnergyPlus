@@ -63,7 +63,6 @@
 #include <WCECommon.hpp>
 #include <WCEMultiLayerOptics.hpp>
 #include <WCESingleLayerOptics.hpp>
-#include <WCETarcog.hpp>
 
 // EnergyPlus Headers
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
@@ -82,7 +81,6 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
-#include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -90,7 +88,6 @@
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -123,7 +120,6 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/WindowManagerExteriorData.hh>
@@ -1697,6 +1693,16 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     state.dataHeatBalSurf->SurfAbsThermalInt.dimension(state.dataSurface->TotSurfaces, 0.0);
 
     DisplayString(state, "Setting up Surface Reporting Variables");
+    auto materialUsesEMSActuator = [&state](Material::MaterialBase const *material, std::string_view controlType) {
+        return material != nullptr && std::any_of(state.dataRuntimeLang->EMSActuatorAvailable.begin(),
+                                                  state.dataRuntimeLang->EMSActuatorAvailable.end(),
+                                                  [material, controlType](auto const &actuator) {
+                                                      return actuator.handleCount > 0 && Util::SameString(actuator.ComponentTypeName, "Material") &&
+                                                             Util::SameString(actuator.UniqueIDName, material->Name) &&
+                                                             Util::SameString(actuator.ControlTypeName, controlType);
+                                                  });
+    };
+
     // Setup surface report variables CurrentModuleObject='Opaque Surfaces'
     for (int loop = 1; loop <= state.dataSurface->TotSurfaces; ++loop) {
         auto &surface = state.dataSurface->Surface(loop);
@@ -2181,6 +2187,8 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         if (!construction.TypeIsWindow) {
             bool useInsideThermalAbsorptance = false;
             bool useInsideSolarAbsorptance = false;
+            int const outsideMaterialNum = construction.LayerPoint(1);
+            auto const *outsideMaterial = outsideMaterialNum > 0 ? state.dataMaterial->materials(outsideMaterialNum) : nullptr;
             int const insideMaterialNum = construction.LayerPoint(construction.TotLayers);
             if (insideMaterialNum > 0) {
                 auto const *insideMaterial = state.dataMaterial->materials(insideMaterialNum);
@@ -2194,8 +2202,12 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                     insideVariableAbsorptanceAllowed && (insideMaterial->absorpVarCtrlSignalIn == Material::VariableAbsCtrlSignal::Scheduled
                                                              ? insideMaterial->absorpSolarVarSchedIn != nullptr
                                                              : insideMaterial->absorpSolarVarCurveIn != nullptr);
-                useInsideThermalAbsorptance = insideMaterial->hasAbsorpThermalInputIn || useInsideThermalVariableAbsorptance;
-                useInsideSolarAbsorptance = insideMaterial->hasAbsorpSolarInputIn || useInsideSolarVariableAbsorptance;
+                bool const useThermalEMSActuator = materialUsesEMSActuator(outsideMaterial, "Surface Property Thermal Absorptance Outside Face") ||
+                                                   materialUsesEMSActuator(insideMaterial, "Surface Property Thermal Absorptance Inside Face");
+                bool const useSolarEMSActuator = materialUsesEMSActuator(outsideMaterial, "Surface Property Solar Absorptance Outside Face") ||
+                                                 materialUsesEMSActuator(insideMaterial, "Surface Property Solar Absorptance Inside Face");
+                useInsideThermalAbsorptance = insideMaterial->hasAbsorpThermalInputIn || useInsideThermalVariableAbsorptance || useThermalEMSActuator;
+                useInsideSolarAbsorptance = insideMaterial->hasAbsorpSolarInputIn || useInsideSolarVariableAbsorptance || useSolarEMSActuator;
             }
 
             std::string_view const thermalAbsorptanceName =
@@ -4817,18 +4829,19 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
 
     auto &s_mat = state.dataMaterial;
 
-    state.dataGlobal->AnySurfPropOverridesInModel = false;
-    // first determine if anything needs to be done, once yes, then always init
-    for (auto const *mat : s_mat->materials) {
-        if (mat->group != Material::Group::Regular) {
-            continue;
-        }
+    // Once an override has been active, continue initializing so setting the last actuator to Null restores the input values.
+    if (!state.dataGlobal->AnySurfPropOverridesInModel) {
+        for (auto const *mat : s_mat->materials) {
+            if (mat->group != Material::Group::Regular) {
+                continue;
+            }
 
-        if ((mat->AbsorpSolarEMSOverrideOn) || (mat->AbsorpThermalEMSOverrideOn) || (mat->AbsorpVisibleEMSOverrideOn) ||
-            (mat->AbsorpSolarOutEMSOverrideOn) || (mat->AbsorpThermalOutEMSOverrideOn) || (mat->AbsorpVisibleOutEMSOverrideOn) ||
-            (mat->AbsorpSolarInEMSOverrideOn) || (mat->AbsorpThermalInEMSOverrideOn) || (mat->AbsorpVisibleInEMSOverrideOn)) {
-            state.dataGlobal->AnySurfPropOverridesInModel = true;
-            break;
+            if ((mat->AbsorpSolarEMSOverrideOn) || (mat->AbsorpThermalEMSOverrideOn) || (mat->AbsorpVisibleEMSOverrideOn) ||
+                (mat->AbsorpSolarOutEMSOverrideOn) || (mat->AbsorpThermalOutEMSOverrideOn) || (mat->AbsorpVisibleOutEMSOverrideOn) ||
+                (mat->AbsorpSolarInEMSOverrideOn) || (mat->AbsorpThermalInEMSOverrideOn) || (mat->AbsorpVisibleInEMSOverrideOn)) {
+                state.dataGlobal->AnySurfPropOverridesInModel = true;
+                break;
+            }
         }
     }
 
@@ -4839,10 +4852,10 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
     auto const getEMSOverrideValue =
         [](Real64 inputValue, bool legacyOverrideOn, Real64 legacyOverrideValue, bool faceOverrideOn, Real64 faceOverrideValue) {
             if (faceOverrideOn) {
-                return max(min(faceOverrideValue, 0.9999), 0.0001);
+                return std::clamp(faceOverrideValue, 0.0001, 0.9999);
             }
             if (legacyOverrideOn) {
-                return max(min(legacyOverrideValue, 0.9999), 0.0001);
+                return std::clamp(legacyOverrideValue, 0.0001, 0.9999);
             }
             return inputValue;
         };

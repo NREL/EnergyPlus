@@ -6197,16 +6197,16 @@
     IF Hour < 8,   !- <none>
     Set CC03_Therm_Abs_Out = 0.1,  !- <none>
     Set CC03_Solar_Abs_Out = 0.3,  !- <none>
-    Set CC03_Therm_Abs_In = 0.42,  !- <none>
+    Set CC03_Therm_Abs_In = 0.8,  !- <none>
     Set CC03_Solar_Abs_In = 0.33,  !- <none>
     ELSEIF Hour < 16,  !- <none>
     Set CC03_Therm_Abs_Out = 0.5,  !- <none>
     Set CC03_Solar_Abs_Out = 0.6,  !- <none>
-    Set CC03_Therm_Abs_In = 0.64,  !- <none>
+    Set CC03_Therm_Abs_In = 0.8,  !- <none>
     Set CC03_Solar_Abs_In = 0.63,  !- <none>
     Else,                    !- <none>
     Set CC03_Therm_Abs_Out = 0.1,  !- <none>
     Set CC03_Solar_Abs_Out = 0.3,  !- <none>
-    Set CC03_Therm_Abs_In = 0.43,  !- <none>
+    Set CC03_Therm_Abs_In = 0.8,  !- <none>
     Set CC03_Solar_Abs_In = 0.33,  !- <none>
     ENDIF;                   !- <none>
