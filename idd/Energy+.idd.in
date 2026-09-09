@@ -561,7 +561,7 @@ Building,
        \type integer
        \minimum> 0
        \default 25
-  N5 ; \field Minimum Number of Warmup Days
+  N5 , \field Minimum Number of Warmup Days
        \note The minimum number of warmup days that produce enough temperature and flux history
        \note to start EnergyPlus simulation for all reference buildings was suggested to be 6.
        \note However this can lead to excessive run times as warmup days can be repeated needlessly.
@@ -572,6 +572,11 @@ Building,
        \type integer
        \minimum> 0
        \default 1
+  A4 ; \field Construction Assignment Set Name
+       \note Optional. Provides inherited construction assignments for surfaces and sub-surfaces in the building.
+       \note Assignments referenced by Space take precedence over assignments referenced by Building.
+       \type object-list
+       \object-list ConstructionAssignmentSetNames
 
 ShadowCalculation,
        \unique-object
@@ -5077,10 +5082,28 @@ Material,
        \default .7
        \minimum 0
        \maximum 1
-  N7 ; \field Visible Absorptance
+  N7 , \field Visible Absorptance
        \type real
        \minimum 0
        \default .7
+       \maximum 1
+  N8 , \field Thermal Absorptance Inside Face
+       \note When blank, this value is equal to the Thermal Absorptance field above.
+       \note When entered, the Thermal Absorptance field applies to the outside face and this field applies to the inside face.
+       \type real
+       \minimum> 0
+       \maximum 0.99999
+  N9 , \field Solar Absorptance Inside Face
+       \note When blank, this value is equal to the Solar Absorptance field above.
+       \note When entered, the Solar Absorptance field applies to the outside face and this field applies to the inside face.
+       \type real
+       \minimum 0
+       \maximum 1
+  N10; \field Visible Absorptance Inside Face
+       \note When blank, this value is equal to the Visible Absorptance field above.
+       \note When entered, the Visible Absorptance field applies to the outside face and this field applies to the inside face.
+       \type real
+       \minimum 0
        \maximum 1
 
 Material:NoMass,
@@ -5114,10 +5137,28 @@ Material:NoMass,
        \minimum 0
        \default .7
        \maximum 1
-  N4 ; \field Visible Absorptance
+  N4 , \field Visible Absorptance
        \type real
        \minimum 0
        \default .7
+       \maximum 1
+  N5 , \field Thermal Absorptance Inside Face
+       \note When blank, this value is equal to the Thermal Absorptance field above.
+       \note When entered, the Thermal Absorptance field applies to the outside face and this field applies to the inside face.
+       \type real
+       \minimum> 0
+       \maximum 0.99999
+  N6 , \field Solar Absorptance Inside Face
+       \note When blank, this value is equal to the Solar Absorptance field above.
+       \note When entered, the Solar Absorptance field applies to the outside face and this field applies to the inside face.
+       \type real
+       \minimum 0
+       \maximum 1
+  N7 ; \field Visible Absorptance Inside Face
+       \note When blank, this value is equal to the Visible Absorptance field above.
+       \note When entered, the Visible Absorptance field applies to the outside face and this field applies to the inside face.
+       \type real
+       \minimum 0
        \maximum 1
 
 Material:InfraredTransparent,
@@ -7892,17 +7933,35 @@ MaterialProperty:VariableAbsorptance,
        \key SpaceHeatingCoolingMode
        \key Scheduled
        \default SurfaceTemperature
-       \note the variable that drives the change in thermal/solar absorptance
+       \note the variable that drives the change in outside-face thermal/solar absorptance
   A4 , \field Thermal Absorptance Function Name
        \note A Curve:* or Table:Lookup object encoding the relationship between
-       \note the control signal value and the surface thermal absorptance.
+       \note the control signal value and the outside-face surface thermal absorptance.
   A5 , \field Thermal Absorptance Schedule Name
-       \note only used when Control Signal = "Scheduled"
+       \note only used for the outside face when Control Signal = "Scheduled"
   A6 , \field Solar Absorptance Function Name
        \note A Curve:* or Table:Lookup object encoding the relationship between
-       \note the control signal value and the surface solar absorptance.
-  A7 ; \field Solar Absorptance Schedule Name
-       \note only used when Control Signal = "Scheduled"
+       \note the control signal value and the outside-face surface solar absorptance.
+  A7 , \field Solar Absorptance Schedule Name
+       \note only used for the outside face when Control Signal = "Scheduled"
+  A8 , \field Control Signal Inside Face
+       \type choice
+       \key SurfaceTemperature
+       \key SurfaceReceivedSolarRadiation
+       \key SpaceHeatingCoolingMode
+       \key Scheduled
+       \note the variable that drives the change in thermal/solar absorptance
+       \note when this field is blank the inside-face absorptances remain at the constant values defined by the referenced material
+  A9 , \field Thermal Absorptance Function Name Inside Face
+       \note A Curve:* or Table:Lookup object encoding the relationship between
+       \note the control signal inside face value and the surface thermal absorptance.
+  A10, \field Thermal Absorptance Schedule Name Inside Face
+       \note only used when Control Signal Inside Face = "Scheduled"
+  A11, \field Solar Absorptance Function Name Inside Face
+       \note A Curve:* or Table:Lookup object encoding the relationship between
+       \note the control signal inside face value and the surface solar absorptance.
+  A12; \field Solar Absorptance Schedule Name Inside Face
+       \note only used when Control Signal Inside Face = "Scheduled"
 
 MaterialProperty:HeatAndMoistureTransfer:Settings,
     \memo HeatBalanceAlgorithm = CombinedHeatAndMoistureFiniteElement solution algorithm only.
@@ -9506,6 +9565,93 @@ Construction:WindowDataFile,
        \note default file name is "Window5DataFile.dat"
        \note limit on this field is 100 characters.
 
+ConstructionAssignmentSet,
+       \memo Defines a set of construction assignments for surfaces and sub-surfaces
+       \memo based on their type and outside boundary condition. Can be referenced by Building
+       \memo or Space objects. Space-level assignments take precedence over Building-level.
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference ConstructionAssignmentSetNames
+  A2 , \field Exterior Surface Construction Assignments Name
+       \note Constructions for exterior walls, floors, and roofs (Outside Boundary Condition = Outdoors).
+       \type object-list
+       \object-list SurfaceConstructionAssignmentNames
+  A3 , \field Interior Surface Construction Assignments Name
+       \note Constructions for interior surfaces (Outside Boundary Condition = Surface, Zone, or Space).
+       \type object-list
+       \object-list SurfaceConstructionAssignmentNames
+  A4 , \field Ground Contact Surface Construction Assignments Name
+       \note Constructions for ground-contact surfaces (Outside Boundary Condition = Ground*, Foundation).
+       \type object-list
+       \object-list SurfaceConstructionAssignmentNames
+  A5 , \field Exterior SubSurface Construction Assignments Name
+       \note Constructions for sub-surfaces on exterior base surfaces.
+       \type object-list
+       \object-list SubSurfaceConstructionAssignmentNames
+  A6 , \field Interior SubSurface Construction Assignments Name
+       \note Constructions for sub-surfaces on interior base surfaces.
+       \type object-list
+       \object-list SubSurfaceConstructionAssignmentNames
+  A7 , \field Interior Partition Construction Name
+       \note Construction for InternalMass objects in spaces referencing this set.
+       \type object-list
+       \object-list ConstructionNames
+  A8 ; \field Adiabatic Surface Construction Name
+       \note Construction for surfaces with Outside Boundary Condition = Adiabatic.
+       \type object-list
+       \object-list ConstructionNames
+
+SurfaceConstructionAssignments,
+       \memo Defines construction assignments for the three opaque surface types (Floor, Wall, Roof/Ceiling)
+       \memo for a single boundary-condition category (exterior, interior, or ground-contact).
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference SurfaceConstructionAssignmentNames
+  A2 , \field Floor Construction Name
+       \type object-list
+       \object-list ConstructionNames
+  A3 , \field Wall Construction Name
+       \type object-list
+       \object-list ConstructionNames
+  A4 ; \field Roof Ceiling Construction Name
+       \type object-list
+       \object-list ConstructionNames
+
+SubSurfaceConstructionAssignments,
+       \memo Defines construction assignments for each sub-surface type for a single boundary-condition
+       \memo category (exterior or interior).
+       \memo The generic Window type (kept for backward compatibility) resolves via the Fixed Window slot.
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference SubSurfaceConstructionAssignmentNames
+  A2 , \field Fixed Window Construction Name
+       \type object-list
+       \object-list ConstructionNames
+  A3 , \field Operable Window Construction Name
+       \type object-list
+       \object-list ConstructionNames
+  A4 , \field Door Construction Name
+       \type object-list
+       \object-list ConstructionNames
+  A5 , \field Glass Door Construction Name
+       \type object-list
+       \object-list ConstructionNames
+  A6 , \field Overhead Door Construction Name
+       \type object-list
+       \object-list ConstructionNames
+  A7 , \field Skylight Construction Name
+       \type object-list
+       \object-list ConstructionNames
+  A8 , \field Tubular Daylight Dome Construction Name
+       \type object-list
+       \object-list ConstructionNames
+  A9 ; \field Tubular Daylight Diffuser Construction Name
+       \type object-list
+       \object-list ConstructionNames
+
 \group Thermal Zones and Surfaces
 
 GlobalGeometryRules,
@@ -9623,14 +9769,18 @@ Space,
        \note Space type is used to tag spaces by activity type, such as office, classroom, storage, etc.
        \type alpha
        \default General
-  A4,  \field Tag 1
+  A4,  \field Construction Assignment Set Name
+       \note Optional. Overrides the Building-level Construction Assignment Set for surfaces in this Space.
+       \type object-list
+       \object-list ConstructionAssignmentSetNames
+  A5,  \field Tag 1
        \note Optional reporting tag
        \type alpha
        \begin-extensible
-  A5,  \field Tag 2
+  A6,  \field Tag 2
        \note Optional reporting tag
        \type alpha
-  A6;  \field Tag 3
+  A7;  \field Tag 3
        \note Optional reporting tag
        \type alpha
 
@@ -10310,8 +10460,8 @@ BuildingSurface:Detailed,
        \key Ceiling
        \key Roof
   A3 , \field Construction Name
-       \required-field
-       \note To be matched with a construction in this input file
+       \note To be matched with a construction in this input file.
+       \note If blank, a ConstructionAssignmentSet assigned to the surface's Space or Building is required.
        \type object-list
        \object-list ConstructionNames
   A4 , \field Zone Name
@@ -12600,13 +12750,19 @@ FenestrationSurface:Detailed,
        \required-field
        \type choice
        \key Window
+       \note Window is kept for backward compatibility and is treated as FixedWindow.
+       \note Prefer FixedWindow, OperableWindow, or Skylight for new models.
        \key Door
        \key GlassDoor
        \key TubularDaylightDome
        \key TubularDaylightDiffuser
+       \key FixedWindow
+       \key OperableWindow
+       \key Skylight
+       \key OverheadDoor
   A3 , \field Construction Name
-       \required-field
-       \note To be matched with a construction in this input file
+       \note To be matched with a construction in this input file.
+       \note If blank, a ConstructionAssignmentSet assigned to the surface's Space or Building is required.
        \type object-list
        \object-list ConstructionNames
        \object-list ComplexFenestrationStates
@@ -13503,8 +13659,8 @@ InternalMass,
        \reference AllHeatTranAngFacNames
        \reference RadiantSurfaceNames
   A2 , \field Construction Name
-       \required-field
-       \note To be matched with a construction in this input file
+       \note To be matched with a construction in this input file.
+       \note If blank, a ConstructionAssignmentSet assigned to the surface's Space or Building is required.
        \type object-list
        \object-list ConstructionNames
   A3 , \field Zone or ZoneList Name
