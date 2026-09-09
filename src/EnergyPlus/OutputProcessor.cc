@@ -1347,8 +1347,9 @@ namespace OutputProcessor {
                     // No need to check for units
                     // No need to check for duplicates
 
-                    // Check for duplicates
-                    if (std::find(meter->srcMeterNums.begin(), meter->srcMeterNums.end(), srcMeterNum) != meter->srcMeterNums.end()) {
+                    // srcMeterNums[0] is the source meter whose value is decremented. The remaining entries are meters to subtract,
+                    // so only those entries are duplicates of this group item.
+                    if (std::find(meter->srcMeterNums.begin() + 1, meter->srcMeterNums.end(), srcMeterNum) != meter->srcMeterNums.end()) {
                         ShowWarningCustom(state,
                                           eoh,
                                           std::format("{}=\"{}\" referenced multiple times, only first instance will be used",
