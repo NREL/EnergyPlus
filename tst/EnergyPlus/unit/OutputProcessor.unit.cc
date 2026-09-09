@@ -5164,6 +5164,39 @@ namespace OutputProcessor {
         compare_err_stream(errMsg);
     }
 
+    TEST_F(EnergyPlusFixture, OutputProcessor_MeterCustomDecrement_SameCustomMeterAsSourceAndSubtraction)
+    {
+        std::string const idf_objects = delimited_string({
+            "  Meter:Custom,",
+            "    My Custom Meter,           !- Name",
+            "    Generic,                   !- Resource Type",
+            "    Test Key,                  !- Key Name 1",
+            "    Test Energy;               !- Output Variable or Meter Name 1",
+            "  Meter:CustomDecrement,",
+            "    My Decrement Meter,        !- Name",
+            "    Generic,                   !- Resource Type",
+            "    My Custom Meter,           !- Source Meter Name",
+            "    ,                          !- Key Name 1",
+            "    My Custom Meter;           !- Output Variable or Meter Name 1",
+        });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+        state->init_state(*state);
+
+        Real64 testEnergy = 100.0;
+        SetupOutputVariable(*state, "Test Energy", Constant::Units::J, testEnergy, TimeStepType::Zone, StoreType::Sum, "Test Key");
+
+        bool errorsFound = false;
+        GetCustomMeterInput(*state, errorsFound);
+        ASSERT_FALSE(errorsFound);
+
+        int const decrementMeterNum = GetMeterIndex(*state, "MY DECREMENT METER");
+        ASSERT_NE(-1, decrementMeterNum);
+
+        // The same custom meter is the starting value and the value being subtracted, so the result must be zero.
+        EXPECT_DOUBLE_EQ(0.0, GetInstantMeterValue(*state, decrementMeterNum, TimeStepType::Zone));
+    }
+
     TEST_F(EnergyPlusFixture, OutputProcessor_unitStringToEnum)
     {
 
