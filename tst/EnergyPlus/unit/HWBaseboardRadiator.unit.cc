@@ -441,4 +441,17 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterInputTest)
                                              false));
     EXPECT_TRUE(compare_eio_stream_substring("Component Sizing Information, ZoneHVAC:Baseboard:RadiantConvective:Water, THISISABASEBOARD, "
                                              "User-Specified Heating Design Capacity [W], 1050"));
+
+    // A fully hard-sized baseboard does not require a Sizing:Plant object.
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 0;
+    state->dataSize->ZoneSizingRunDone = false;
+    state->dataSize->FinalZoneSizing.deallocate();
+    state->dataHWBaseboardRad->HWBaseboard(1).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
+    state->dataHWBaseboardRad->HWBaseboard(1).ScaledHeatingCapacity = 1000.0;
+    state->dataHWBaseboardRad->HWBaseboard(1).RatedCapacity = 0.0;
+    state->dataHWBaseboardRad->HWBaseboard(1).WaterVolFlowRateMax = 0.0001;
+
+    EXPECT_NO_THROW(SizeHWBaseboard(*state, 1));
+    EXPECT_EQ(state->dataHWBaseboardRad->HWBaseboard(1).RatedCapacity, 1000.0);
+    EXPECT_GT(state->dataHWBaseboardRad->HWBaseboard(1).UA, 0.0);
 }

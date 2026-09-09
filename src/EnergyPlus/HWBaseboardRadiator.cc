@@ -1110,7 +1110,7 @@ namespace HWBaseboardRadiator {
                 }
                 // If the BB Heating Capacity is hard-sized then sizing uses the BB input for Rated Water Mass Flow Rate to calculate UA.
                 // If the BB is autosized then sizing uses the BB Maximum Water Flow Rate.
-                // The BB input for Heating Capacity is only > 0 when Heating Capacity is autosized and design method = Heating Capacity
+                // The BB input for Heating Capacity is only > 0 when Heating Capacity is hard-sized and design method = Heating Capacity
                 if (hWBaseboard.ScaledHeatingCapacity > 0.0) {
                     DesCoilLoad = RatedCapacityUser;
                     WaterMassFlowRateStd = hWBaseboard.WaterMassFlowRateStd;
@@ -1164,8 +1164,8 @@ namespace HWBaseboardRadiator {
             }
         } else {
             // if there is no heating Sizing:Plant object and autosizing was requested, issue an error message
-            if (hWBaseboard.WaterVolFlowRateMax == DataSizing::AutoSize || hWBaseboard.RatedCapacity == DataSizing::AutoSize ||
-                hWBaseboard.RatedCapacity == 0.0) {
+            if (hWBaseboard.WaterVolFlowRateMax == DataSizing::AutoSize || hWBaseboard.ScaledHeatingCapacity == DataSizing::AutoSize ||
+                RatedCapacityUser == 0.0) {
                 ShowSevereError(state, "Autosizing of hot water baseboard requires a heating loop Sizing:Plant object");
                 ShowContinueError(state, std::format("Occurs in Hot Water Baseboard Heater={}", hWBaseboard.Name));
                 ErrorsFound = true;
