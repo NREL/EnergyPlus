@@ -7549,10 +7549,6 @@ This numeric field contains the chiller-heater's optimum part-load ratio during 
 
 This optional positive numeric field multiplies the autosized Reference Cooling Mode Evaporator Capacity, Design Chilled Water Flow Rate, and Design Condenser Water Flow Rate for this performance object. It does not calculate or scale the explicit Design Hot Water Flow Rate. In general, use consistent hard-sized values or autosize all fields that support autosizing.
 
-\subsubsection{Field: Maximum Heating Mode Leaving Condenser Water Temperature}\label{field-maximum-heating-mode-leaving-condenser-water-temperature}
-
-This optional numeric field specifies an equipment limit for hot-water temperature leaving the condenser in heating-only and simultaneous operation. It must be greater than the Reference Heating Mode Entering Condenser Water Temperature. When both this limit and a plant heating setpoint apply, the lower value limits delivery. When the field is blank, the model does not infer an operating limit from the Reference Heating Mode Leaving Condenser Water Temperature; plant setpoints and applicable plant or fluid limits govern.
-
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
@@ -7588,8 +7584,7 @@ ChillerHeaterPerformance:Electric:EIR,
   ChillerHeaterHtgEIRFPLR,    !- Heating Mode Electric Input to Cooling Output Ratio Function of Part Load
                               !- Ratio Curve Name
   1,                          !- Heating Mode Cooling Capacity Optimum Part Load Ratio
-  1,                          !- Sizing Factor
-  55;                         !- Maximum Heating Mode Leaving Condenser Water Temperature {C}
+  1;                          !- Sizing Factor
 \end{lstlisting}
 
 \subsection{ChillerHeaterPerformance:Electric:EIR Outputs}\label{chillerheaterperformanceelectriceir-outputs}

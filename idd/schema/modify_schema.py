@@ -72,7 +72,6 @@ def isInt(s):
 
 
 extension_renaming = {
-    "CentralHeatPumpSystem": "module_groups",
     "LifeCycleCost:UseAdjustment": "multipliers",
     "LifeCycleCost:UsePriceEscalation": "escalations",
     "ElectricLoadCenter:Transformer": "meters",
@@ -288,11 +287,6 @@ def change_utility_cost(schema):
 
 
 def add_explicit_extensible_bounds(schema):
-    # CentralHeatPumpSystem
-    loc = get_schema_object(schema, "CentralHeatPumpSystem")
-    loc["properties"]["module_groups"]["minItems"] = 1
-    loc["required"].append("module_groups")
-
     # Schedule:Year
     loc = get_schema_object(schema, "Schedule:Year")["properties"]["schedule_weeks"]
     loc["minItems"] = 1

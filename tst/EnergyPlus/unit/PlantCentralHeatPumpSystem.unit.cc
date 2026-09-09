@@ -320,7 +320,6 @@ checkLoopHeatTransfer(Real64 const reportedHeat, Real64 const massFlow, Real64 c
 std::string makeChillerHeaterValidationInput(Real64 const capacityRatio = 0.75,
                                              Real64 const coolingOptimumPLR = 0.5,
                                              Real64 const heatingOptimumPLR = 0.5,
-                                             Real64 const maximumHeatingLeavingTemp = 55.0,
                                              Real64 const coolingMinimumPLR = 0.2)
 {
     std::vector<std::string> const lines{
@@ -352,8 +351,7 @@ std::string makeChillerHeaterValidationInput(Real64 const capacityRatio = 0.75,
         "  Heating Reference Curve,",
         "  Heating PLR Curve,",
         "  " + std::to_string(heatingOptimumPLR) + ",",
-        "  1.0,",
-        "  " + std::to_string(maximumHeatingLeavingTemp) + ";",
+        "  1.0;",
 
         "Curve:Biquadratic,",
         "  Cooling Reference Curve,",
@@ -417,7 +415,6 @@ nlohmann::json makeChillerHeaterNativeJSON(bool const includeOptionalFields = tr
             {"heating_mode_temperature_curve_condenser_water_independent_variable", "EnteringCondenser"},
             {"heating_mode_cooling_capacity_optimum_part_load_ratio", 0.5},
             {"sizing_factor", 1.2},
-            {"maximum_heating_mode_leaving_condenser_water_temperature", 55.0},
         });
     }
 
@@ -448,7 +445,37 @@ nlohmann::json makeChillerHeaterNativeJSON(bool const includeOptionalFields = tr
     };
 }
 
-nlohmann::json makeNativeSystemJSON(bool const useManyGroups)
+struct FixedModuleGroupFieldKeys
+{
+    std::string performanceObjectType;
+    std::string performanceName;
+    std::string controlScheduleName;
+    std::string numberOfModules;
+};
+
+FixedModuleGroupFieldKeys fixedModuleGroupFieldKeys(int const groupNumber)
+{
+    std::string const suffix = std::to_string(groupNumber);
+    FixedModuleGroupFieldKeys keys{
+        "chiller_heater_modules_performance_component_object_type_" + suffix,
+        "chiller_heater_modules_performance_component_name_" + suffix,
+        "chiller_heater_modules_control_schedule_name_" + suffix,
+        "number_of_chiller_heater_modules_" + suffix,
+    };
+    if (groupNumber == 3) {
+        keys.performanceObjectType = "chiller_heater_performance_component_object_type_3";
+        keys.performanceName = "chiller_heater_performance_component_name_3";
+    } else if (groupNumber == 5) {
+        keys.performanceName = "chiller_heater_models_performance_component_name_5";
+    } else if (groupNumber == 11) {
+        keys.controlScheduleName = "chiller_heater_module_control_schedule_name_11";
+    } else if (groupNumber == 18) {
+        keys.controlScheduleName = "chiller_heater_modules_control_control_schedule_name_18";
+    }
+    return keys;
+}
+
+nlohmann::json makeNativeSystemJSON(bool const useAllGroups)
 {
     auto epJSON = makeChillerHeaterNativeJSON();
     epJSON["ScheduleTypeLimits"]["Fraction"] = {
@@ -467,41 +494,38 @@ nlohmann::json makeNativeSystemJSON(bool const useManyGroups)
     };
 
     nlohmann::json system = {
-        {"cooling_loop_inlet_node_name", useManyGroups ? "Cooling Inlet" : "Sparse Cooling Inlet"},
-        {"cooling_loop_outlet_node_name", useManyGroups ? "Cooling Outlet" : "Sparse Cooling Outlet"},
-        {"source_loop_inlet_node_name", useManyGroups ? "Source Inlet" : "Sparse Source Inlet"},
-        {"source_loop_outlet_node_name", useManyGroups ? "Source Outlet" : "Sparse Source Outlet"},
-        {"heating_loop_inlet_node_name", useManyGroups ? "Heating Inlet" : "Sparse Heating Inlet"},
-        {"heating_loop_outlet_node_name", useManyGroups ? "Heating Outlet" : "Sparse Heating Outlet"},
+        {"cooling_loop_inlet_node_name", useAllGroups ? "Cooling Inlet" : "Sparse Cooling Inlet"},
+        {"cooling_loop_outlet_node_name", useAllGroups ? "Cooling Outlet" : "Sparse Cooling Outlet"},
+        {"source_loop_inlet_node_name", useAllGroups ? "Source Inlet" : "Sparse Source Inlet"},
+        {"source_loop_outlet_node_name", useAllGroups ? "Source Outlet" : "Sparse Source Outlet"},
+        {"heating_loop_inlet_node_name", useAllGroups ? "Heating Inlet" : "Sparse Heating Inlet"},
+        {"heating_loop_outlet_node_name", useAllGroups ? "Heating Outlet" : "Sparse Heating Outlet"},
         {"ancillary_power", 25.0},
         {"ancillary_operation_schedule_name", "Ancillary Schedule"},
-        {"module_groups", nlohmann::json::array()},
     };
 
-    auto addGroup = [&system](int const count, std::string_view const scheduleName) {
-        nlohmann::json group = {
-            {"performance_object_type", "ChillerHeaterPerformance:Electric:EIR"},
-            {"performance_name", "Native Mixed Case Module"},
-            {"number_of_modules", count},
-        };
+    auto addGroup = [&system](int const groupNumber, int const count, std::string_view const scheduleName) {
+        auto const keys = fixedModuleGroupFieldKeys(groupNumber);
+        system[keys.performanceObjectType] = "ChillerHeaterPerformance:Electric:EIR";
+        system[keys.performanceName] = "Native Mixed Case Module";
+        system[keys.numberOfModules] = count;
         if (!scheduleName.empty()) {
-            group["control_schedule_name"] = scheduleName;
+            system[keys.controlScheduleName] = scheduleName;
         }
-        system["module_groups"].push_back(std::move(group));
     };
 
-    if (useManyGroups) {
-        for (int group = 1; group <= 21; ++group) {
-            addGroup(1, "Module Schedule");
+    if (useAllGroups) {
+        for (int group = 1; group <= 20; ++group) {
+            addGroup(group, 1, "Module Schedule");
         }
         epJSON["CentralHeatPumpSystem"]["Native Many Groups Wrapper"] = std::move(system);
     } else {
-        addGroup(1, "Module Schedule 1");
-        addGroup(2, "");
-        addGroup(1, "Module Schedule 3");
-        addGroup(1, "Module Schedule 4");
-        addGroup(1, "Missing Module Schedule");
-        addGroup(2, "Module Schedule 6");
+        addGroup(1, 1, "Module Schedule 1");
+        addGroup(2, 2, "");
+        addGroup(3, 1, "Module Schedule 3");
+        addGroup(4, 1, "Module Schedule 4");
+        addGroup(5, 1, "Missing Module Schedule");
+        addGroup(6, 2, "Module Schedule 6");
         epJSON["CentralHeatPumpSystem"]["Native Sparse Wrapper"] = std::move(system);
     }
     return epJSON;
@@ -521,11 +545,11 @@ CentralHeatPumpSystem,
   25.0,
   Ancillary Schedule,
 )IDF";
-    for (int group = 1; group <= 21; ++group) {
+    for (int group = 1; group <= 20; ++group) {
         idf += "  ChillerHeaterPerformance:Electric:EIR,\n";
         idf += "  Native Mixed Case Module,\n";
         idf += "  Module Schedule,\n";
-        idf += group == 21 ? "  1;\n" : "  1,\n";
+        idf += group == 20 ? "  1;\n" : "  1,\n";
     }
     idf += R"IDF(
 ScheduleTypeLimits,
@@ -570,8 +594,7 @@ ChillerHeaterPerformance:Electric:EIR,
   Reference Temperature Curve,
   Reference PLR Curve,
   0.5,
-  1.2,
-  55.0;
+  1.2;
 Curve:Biquadratic,
   Reference Temperature Curve,
   1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -987,8 +1010,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)
         "    ChillerHeaterHtgEIRFT,   !- Heating Mode Electric Input to Cooling Output Ratio Function of Temperature Curve Name",
         "    ChillerHeaterHtgEIRFPLR, !- Heating Mode Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name",
         "    1,                       !- Heating Mode Cooling Capacity Optimum Part Load Ratio",
-        "    1,                       !- Sizing Factor",
-        "    55;                      !- Maximum Heating Mode Leaving Condenser Water Temperature {C}",
+        "    1;                       !- Sizing Factor",
 
         "Curve:Biquadratic,",
         "    ChillerHeaterClgCapFT,   !- Name",
@@ -1099,8 +1121,6 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)
     EXPECT_TRUE(module.variableFlow);
     EXPECT_EQ(module.availabilitySchedule, Sched::GetScheduleAlwaysOn(*state));
     EXPECT_FALSE(module.performanceData().constantFlow);
-    EXPECT_FALSE(module.performanceData().maximumHeatingCondenserOutletTempWasOmitted);
-    EXPECT_DOUBLE_EQ(55.0, module.performanceData().maximumHeatingCondenserOutletTemp);
     ASSERT_FALSE(state->dataPlantCentralHeatPumpSystem->performanceDefinitions.empty());
     EXPECT_EQ(1u, state->dataPlantCentralHeatPumpSystem->performanceDefinitions.size());
     EXPECT_EQ(1, state->dataPlantCentralHeatPumpSystem->numPerformanceReferences);
@@ -1222,8 +1242,6 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativePerformanceInputReads
     EXPECT_DOUBLE_EQ(0.5, performance.coolingOptimumPartLoadRatio);
     EXPECT_DOUBLE_EQ(0.5, performance.heatingOptimumPartLoadRatio);
     EXPECT_DOUBLE_EQ(1.2, performance.sizingFactor);
-    EXPECT_FALSE(performance.maximumHeatingCondenserOutletTempWasOmitted);
-    EXPECT_DOUBLE_EQ(55.0, performance.maximumHeatingCondenserOutletTemp);
     EXPECT_GT(performance.coolingCapacityTemperatureCurveIndex, 0);
     EXPECT_GT(performance.heatingEIRPartLoadCurveIndex, 0);
 
@@ -1233,7 +1251,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativePerformanceInputReads
     EXPECT_FALSE(compare_err_stream_substring("Native Mixed Case Module", true, false));
 }
 
-TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativePerformanceInputAppliesSchemaDefaultsAndTracksOmittedLimit)
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativePerformanceInputAppliesSchemaDefaults)
 {
     ASSERT_TRUE(process_json(makeChillerHeaterNativeJSON(false)));
     state->init_state(*state);
@@ -1262,7 +1280,6 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativePerformanceInputAppli
     EXPECT_DOUBLE_EQ(1.0, performance.coolingOptimumPartLoadRatio);
     EXPECT_DOUBLE_EQ(1.0, performance.heatingOptimumPartLoadRatio);
     EXPECT_DOUBLE_EQ(1.0, performance.sizingFactor);
-    EXPECT_TRUE(performance.maximumHeatingCondenserOutletTempWasOmitted);
 }
 
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativePerformanceInputReportsReferencedField)
@@ -1320,8 +1337,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativePerformanceInpu
         "  Reference Temperature Curve,",
         "  Reference PLR Curve,",
         "  0.5,",
-        "  1.2,",
-        "  55.0;",
+        "  1.2;",
 
         "Curve:Biquadratic,",
         "  Reference Temperature Curve,",
@@ -1360,7 +1376,6 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativePerformanceInpu
     EXPECT_EQ(idfPerformance.referenceCoolingCapacityWasAutoSized, nativePerformance.referenceCoolingCapacityWasAutoSized);
     EXPECT_EQ(idfPerformance.designEvaporatorVolFlowRateWasAutoSized, nativePerformance.designEvaporatorVolFlowRateWasAutoSized);
     EXPECT_EQ(idfPerformance.designCondenserVolFlowRateWasAutoSized, nativePerformance.designCondenserVolFlowRateWasAutoSized);
-    EXPECT_EQ(idfPerformance.maximumHeatingCondenserOutletTempWasOmitted, nativePerformance.maximumHeatingCondenserOutletTempWasOmitted);
     EXPECT_DOUBLE_EQ(idfPerformance.referenceCoolingCapacity, nativePerformance.referenceCoolingCapacity);
     EXPECT_DOUBLE_EQ(idfPerformance.referenceCoolingCOP, nativePerformance.referenceCoolingCOP);
     EXPECT_DOUBLE_EQ(idfPerformance.coolingReferenceEvaporatorOutletTemp, nativePerformance.coolingReferenceEvaporatorOutletTemp);
@@ -1379,14 +1394,13 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativePerformanceInpu
     EXPECT_DOUBLE_EQ(idfPerformance.coolingOptimumPartLoadRatio, nativePerformance.coolingOptimumPartLoadRatio);
     EXPECT_DOUBLE_EQ(idfPerformance.heatingOptimumPartLoadRatio, nativePerformance.heatingOptimumPartLoadRatio);
     EXPECT_DOUBLE_EQ(idfPerformance.sizingFactor, nativePerformance.sizingFactor);
-    EXPECT_DOUBLE_EQ(idfPerformance.maximumHeatingCondenserOutletTemp, nativePerformance.maximumHeatingCondenserOutletTemp);
     EXPECT_DOUBLE_EQ(idfPerformance.coolingMinimumPartLoadRatio, nativePerformance.coolingMinimumPartLoadRatio);
     EXPECT_DOUBLE_EQ(idfPerformance.coolingMaximumPartLoadRatio, nativePerformance.coolingMaximumPartLoadRatio);
     EXPECT_DOUBLE_EQ(idfPerformance.heatingMinimumPartLoadRatio, nativePerformance.heatingMinimumPartLoadRatio);
     EXPECT_DOUBLE_EQ(idfPerformance.heatingMaximumPartLoadRatio, nativePerformance.heatingMaximumPartLoadRatio);
 }
 
-TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativeSystemInputsProduceEquivalentStateForExtensibleGroupsBeyondFormerLimit)
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativeSystemInputsProduceEquivalentStateForAllFixedGroups)
 {
     ASSERT_TRUE(process_idf(makeAllModuleGroupsIDF()));
     state->init_state(*state);
@@ -1395,9 +1409,9 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativeSystemInputsPro
 
     ASSERT_EQ(1u, state->dataPlantCentralHeatPumpSystem->systems.size());
     ASSERT_EQ(1u, state->dataPlantCentralHeatPumpSystem->performanceDefinitions.size());
-    EXPECT_EQ(21, state->dataPlantCentralHeatPumpSystem->numPerformanceReferences);
+    EXPECT_EQ(20, state->dataPlantCentralHeatPumpSystem->numPerformanceReferences);
     auto const &idfSystem = state->dataPlantCentralHeatPumpSystem->systems[0];
-    ASSERT_EQ(21u, idfSystem.modules.size());
+    ASSERT_EQ(20u, idfSystem.modules.size());
     std::array<std::string, 6> const idfNodeNames = {
         state->dataLoopNodes->NodeID(idfSystem.coolingInletNodeNum),
         state->dataLoopNodes->NodeID(idfSystem.coolingOutletNodeNum),
@@ -1431,9 +1445,9 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativeSystemInputsPro
 
     ASSERT_EQ(1u, state->dataPlantCentralHeatPumpSystem->systems.size());
     ASSERT_EQ(1u, state->dataPlantCentralHeatPumpSystem->performanceDefinitions.size());
-    EXPECT_EQ(21, state->dataPlantCentralHeatPumpSystem->numPerformanceReferences);
+    EXPECT_EQ(20, state->dataPlantCentralHeatPumpSystem->numPerformanceReferences);
     auto const &nativeSystem = state->dataPlantCentralHeatPumpSystem->systems[0];
-    ASSERT_EQ(21u, nativeSystem.modules.size());
+    ASSERT_EQ(20u, nativeSystem.modules.size());
     std::array<std::string, 6> const nativeNodeNames = {
         state->dataLoopNodes->NodeID(nativeSystem.coolingInletNodeNum),
         state->dataLoopNodes->NodeID(nativeSystem.coolingOutletNodeNum),
@@ -1466,7 +1480,7 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_IDFAndNativeSystemInputsPro
     EXPECT_FALSE(compare_err_stream_substring("Object=CentralHeatPumpSystem=Native Many Groups Wrapper", true, false));
 }
 
-TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativeSystemInputReadsExtensibleGroupsAndSchedules)
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativeSystemInputReadsFixedGroupsAndSchedules)
 {
     ASSERT_TRUE(process_json(makeNativeSystemJSON(false)));
     state->init_state(*state);
@@ -1509,8 +1523,8 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_PerformanceReferencesRemain
     auto epJSON = makeNativeSystemJSON(false);
     auto &performanceObjects = epJSON["ChillerHeaterPerformance:Electric:EIR"];
     performanceObjects["Second Native Module"] = performanceObjects.at("Native Mixed Case Module");
-    auto &moduleGroups = epJSON["CentralHeatPumpSystem"]["Native Sparse Wrapper"]["module_groups"];
-    moduleGroups.back()["performance_name"] = "Second Native Module";
+    auto &systemObject = epJSON["CentralHeatPumpSystem"]["Native Sparse Wrapper"];
+    systemObject[fixedModuleGroupFieldKeys(6).performanceName] = "Second Native Module";
 
     ASSERT_TRUE(process_json(epJSON));
     state->init_state(*state);
@@ -1537,24 +1551,25 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_PerformanceReferencesRemain
     EXPECT_EQ(&*secondPerformance, modules.back().performance);
 }
 
-TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativeSystemSchemaRequiresAtLeastOneModuleGroup)
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativeSystemSchemaRequiresFirstModuleGroup)
 {
     auto epJSON = makeNativeSystemJSON(true);
-    epJSON["CentralHeatPumpSystem"]["Native Many Groups Wrapper"]["module_groups"] = nlohmann::json::array();
+    epJSON["CentralHeatPumpSystem"]["Native Many Groups Wrapper"].erase(fixedModuleGroupFieldKeys(1).performanceObjectType);
 
     EXPECT_FALSE(process_json(epJSON, false));
-    EXPECT_TRUE(compare_err_stream_substring("Array should contain no fewer than 1 elements", true));
+    EXPECT_TRUE(compare_err_stream_substring("Missing required property", true));
 }
 
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativeSystemInputRejectsInvalidPerformanceReference)
 {
     auto epJSON = makeNativeSystemJSON(false);
-    epJSON["CentralHeatPumpSystem"]["Native Sparse Wrapper"]["module_groups"][1]["performance_name"] = "Missing Performance";
+    auto const group2Keys = fixedModuleGroupFieldKeys(2);
+    epJSON["CentralHeatPumpSystem"]["Native Sparse Wrapper"][group2Keys.performanceName] = "Missing Performance";
     ASSERT_TRUE(process_json(epJSON));
     state->init_state(*state);
 
     EXPECT_THROW(PlantCentralHeatPumpSystem::getCentralHeatPumpSystemInput(*state), std::runtime_error);
-    EXPECT_TRUE(compare_err_stream_substring("performance_name = MISSING PERFORMANCE, item not found.", true));
+    EXPECT_TRUE(compare_err_stream_substring(group2Keys.performanceName + " = MISSING PERFORMANCE, item not found.", true));
 }
 
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_NativeSystemInputRejectsCaseInsensitiveDuplicateNames)
@@ -1596,28 +1611,20 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InputValidationRejectsOptim
 
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InputValidationRejectsInvalidPartLoadCurveDomain)
 {
-    ASSERT_TRUE(process_idf(makeChillerHeaterValidationInput(0.75, 0.5, 0.5, 55.0, -0.1)));
+    ASSERT_TRUE(process_idf(makeChillerHeaterValidationInput(0.75, 0.5, 0.5, -0.1)));
     state->init_state(*state);
 
     EXPECT_THROW(PlantCentralHeatPumpSystem::getPerformanceInput(*state), std::runtime_error);
     EXPECT_TRUE(compare_err_stream_substring("Part-load ratio limits [-0.100, 1.000] must include 1.0", true));
 }
 
-TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_InputValidationRejectsInvalidMaximumHeatingLeavingTemperature)
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_RuntimeRejectsNonpositiveHeatingCapacityRatio)
 {
-    ASSERT_TRUE(process_idf(makeChillerHeaterValidationInput(0.75, 0.5, 0.5, 25.0)));
+    ASSERT_TRUE(process_idf(makeChillerHeaterValidationInput(-0.75)));
     state->init_state(*state);
 
     EXPECT_THROW(PlantCentralHeatPumpSystem::getPerformanceInput(*state), std::runtime_error);
-    EXPECT_TRUE(compare_err_stream_substring(
-        "Maximum Heating Mode Leaving Condenser Water Temperature must be greater than Reference Heating Mode Entering Condenser Fluid Temperature",
-        true));
-}
-
-TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SchemaRejectsNonpositiveHeatingCapacityRatio)
-{
-    EXPECT_FALSE(process_idf(makeChillerHeaterValidationInput(-0.75), false));
-    EXPECT_TRUE(compare_err_stream_substring("Expected number greater than 0.000000", true));
+    EXPECT_TRUE(compare_err_stream_substring("Reference Heating Mode Cooling Capacity Ratio=-0.75", true));
 }
 
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_RuntimeValidationRejectsInvalidStaticPerformanceInputs)
@@ -2008,7 +2015,6 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     performance1.heatingEIRPartLoadCurveIndex = Curve::GetCurveIndex(*state, "BIVARIATE PART LOAD EIR");
     performance1.heatingMinimumPartLoadRatio = 0.3;
     performance1.heatingMaximumPartLoadRatio = 1.0;
-    performance1.maximumHeatingCondenserOutletTempWasOmitted = true;
 
     ASSERT_GT(performance1.coolingCapacityTemperatureCurveIndex, 0);
     ASSERT_GT(performance1.coolingEIRPartLoadCurveIndex, 0);
@@ -2149,15 +2155,6 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_SingleModeSolversUseFinalSt
     EXPECT_LE(heatingResult.solver.loadResidual, 1.0e-7);
     EXPECT_GT(heatingResult.solver.curveEvaluations, 0);
 
-    performance1.maximumHeatingCondenserOutletTempWasOmitted = false;
-    performance1.maximumHeatingCondenserOutletTemp = 40.1;
-    heatingResult = system.solveHeatingOnly(*state, 0, 5000.0, 1.0, 1.0, 15.0, 40.0);
-    EXPECT_NEAR(40.1, heatingResult.condenserOutletTemp, 1.0e-9);
-    EXPECT_GT(heatingResult.unmetHeatingLoad, 0.0);
-    EXPECT_NEAR(heatingResult.qCondenser, heatingResult.availableCondenserCapacity, 1.0e-6);
-    EXPECT_NEAR(0.0, heatingResult.moduleEnergyBalanceResidual(), 1.0e-9);
-
-    performance1.maximumHeatingCondenserOutletTempWasOmitted = true;
     performance1.coolingCondenserTemperatureMode = PlantCentralHeatPumpSystem::CondenserTemperatureMode::EnteringCondenser;
     performance1.heatingCondenserTemperatureMode = PlantCentralHeatPumpSystem::CondenserTemperatureMode::EnteringCondenser;
     PlantCentralHeatPumpSystem::PerformanceData performance2 = performance1;

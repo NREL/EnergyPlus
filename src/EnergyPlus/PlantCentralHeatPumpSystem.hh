@@ -248,8 +248,6 @@ namespace PlantCentralHeatPumpSystem {
         Real64 designHeatingVolFlowRate = 0.0;
         Real64 compressorMotorEfficiency = 0.0;
         Real64 sizingFactor = 1.0;
-        Real64 maximumHeatingCondenserOutletTemp = 0.0;
-        bool maximumHeatingCondenserOutletTempWasOmitted = true;
     };
 
     struct ModuleSizingData

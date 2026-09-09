@@ -132,7 +132,7 @@ In heating-only mode, the evaporator extracts heat from the source loop and the 
 \dot Q_{source,max}=\dot m_{source}c_{p,source}\left(T_{source,in}-T_{source,out,min}\right).
 \end{equation}
 
-The hot-water condenser load is limited by allocated flow and by the lowest applicable outlet limit. The plant heating setpoint is an operating limit when present. The optional \emph{Maximum Heating Mode Leaving Condenser Water Temperature} supplies an additional equipment limit. A blank optional field does not turn the reference heating leaving temperature into a limit.
+The hot-water condenser load is limited by allocated flow and by the plant heating setpoint when one is present. The reference heating leaving temperature is a rating condition and is not treated as an equipment operating limit.
 
 At each temperature iteration the model solves for the PLR whose condenser heat matches the attainable heating target. For a target below the condenser heat at minimum PLR, the compressor operates at minimum PLR and cycles. Otherwise, a bounded bisection solve finds PLR between the minimum and the flow-limited maximum. Each candidate reevaluates EIRFPLR, compressor power, and
 

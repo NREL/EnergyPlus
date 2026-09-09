@@ -921,17 +921,42 @@ void getCentralHeatPumpSystemInput(EnergyPlusData &state)
     static constexpr char ancillaryPowerKey[] = "ancillary_power";
     static constexpr char ancillaryScheduleKey[] = "ancillary_operation_schedule_name";
 
-    static constexpr char moduleGroupsKey[] = "module_groups";
-    static constexpr char performanceObjectTypeKey[] = "performance_object_type";
-    static constexpr char performanceNameKey[] = "performance_name";
-    static constexpr char controlScheduleNameKey[] = "control_schedule_name";
-    static constexpr char numberOfModulesKey[] = "number_of_modules";
-
     struct ResolvedModuleGroup
     {
         std::size_t performanceIndex = 0;
         int moduleCount = 0;
         Sched::Schedule *availabilitySchedule = nullptr;
+    };
+
+    struct ModuleGroupFieldKeys
+    {
+        std::string performanceObjectType;
+        std::string performanceName;
+        std::string controlScheduleName;
+        std::string numberOfModules;
+    };
+
+    auto moduleGroupFieldKeys = [](int const groupNumber) {
+        std::string const suffix = std::to_string(groupNumber);
+        ModuleGroupFieldKeys keys{
+            "chiller_heater_modules_performance_component_object_type_" + suffix,
+            "chiller_heater_modules_performance_component_name_" + suffix,
+            "chiller_heater_modules_control_schedule_name_" + suffix,
+            "number_of_chiller_heater_modules_" + suffix,
+        };
+
+        // These schema keys reflect the original IDD field spellings.
+        if (groupNumber == 3) {
+            keys.performanceObjectType = "chiller_heater_performance_component_object_type_3";
+            keys.performanceName = "chiller_heater_performance_component_name_3";
+        } else if (groupNumber == 5) {
+            keys.performanceName = "chiller_heater_models_performance_component_name_5";
+        } else if (groupNumber == 11) {
+            keys.controlScheduleName = "chiller_heater_module_control_schedule_name_11";
+        } else if (groupNumber == 18) {
+            keys.controlScheduleName = "chiller_heater_modules_control_control_schedule_name_18";
+        }
+        return keys;
     };
 
     bool errorsFound = false;
@@ -1050,26 +1075,23 @@ void getCentralHeatPumpSystemInput(EnergyPlusData &state)
             errorsFound = true;
         }
 
-        auto const moduleGroups = objectFields.find(moduleGroupsKey);
-        if (moduleGroups == objectFields.end() || moduleGroups->empty()) {
-            ShowSevereError(state, std::format("{}: No module groups specified for {}={}", routineName, objectType, system.Name));
-            errorsFound = true;
-            continue;
-        }
-
-        auto const &moduleGroupSchemaProps = objectSchemaProps.at(moduleGroupsKey).at("items").at("properties");
         std::vector<ResolvedModuleGroup> resolvedGroups;
-        resolvedGroups.reserve(moduleGroups->size());
+        resolvedGroups.reserve(20);
         std::size_t totalModuleCount = 0;
-        for (auto const &moduleGroup : *moduleGroups) {
+        for (int groupNumber = 1; groupNumber <= 20; ++groupNumber) {
+            auto const keys = moduleGroupFieldKeys(groupNumber);
+            if (!objectFields.contains(keys.performanceObjectType)) {
+                continue;
+            }
+
             std::string const enteredPerformanceObjectType =
-                inputProcessor->getAlphaFieldValue(moduleGroup, moduleGroupSchemaProps, performanceObjectTypeKey);
-            std::string const performanceName = inputProcessor->getAlphaFieldValue(moduleGroup, moduleGroupSchemaProps, performanceNameKey);
+                inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, keys.performanceObjectType);
+            std::string const performanceName = inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, keys.performanceName);
             if (!Util::SameString(enteredPerformanceObjectType, performanceObjectType)) {
                 ShowSevereError(state,
                                 std::format("{}: {}={} is not a supported performance object type for {}={}",
                                             routineName,
-                                            performanceObjectTypeKey,
+                                            keys.performanceObjectType,
                                             enteredPerformanceObjectType,
                                             objectType,
                                             system.Name));
@@ -1081,25 +1103,26 @@ void getCentralHeatPumpSystemInput(EnergyPlusData &state)
             auto const performance = std::ranges::find_if(
                 performanceDefinitions, [&performanceName](auto const &candidate) { return Util::SameString(performanceName, candidate.Name); });
             if (performance == performanceDefinitions.end()) {
-                ShowSevereItemNotFound(state, eoh, performanceNameKey, performanceName);
+                ShowSevereItemNotFound(state, eoh, keys.performanceName, performanceName);
                 ShowContinueError(state, "Select the name of a ChillerHeaterPerformance:Electric:EIR object.");
                 errorsFound = true;
                 continue;
             }
             auto const performanceIndex = static_cast<std::size_t>(std::distance(performanceDefinitions.begin(), performance));
 
-            int const moduleCount = inputProcessor->getIntFieldValue(moduleGroup, moduleGroupSchemaProps, numberOfModulesKey);
+            int const moduleCount = inputProcessor->getIntFieldValue(objectFields, objectSchemaProps, keys.numberOfModules);
             if (moduleCount < 1) {
-                ShowSevereError(state, std::format("{}: {} must be at least 1 for {}={}", routineName, numberOfModulesKey, objectType, system.Name));
+                ShowSevereError(state,
+                                std::format("{}: {} must be at least 1 for {}={}", routineName, keys.numberOfModules, objectType, system.Name));
                 errorsFound = true;
                 continue;
             }
 
-            std::string const scheduleName = inputProcessor->getAlphaFieldValue(moduleGroup, moduleGroupSchemaProps, controlScheduleNameKey);
+            std::string const scheduleName = inputProcessor->getAlphaFieldValue(objectFields, objectSchemaProps, keys.controlScheduleName);
             Sched::Schedule *availabilitySchedule = Sched::GetScheduleAlwaysOn(state);
             if (!scheduleName.empty() && (availabilitySchedule = Sched::GetSchedule(state, scheduleName)) == nullptr) {
                 availabilitySchedule = Sched::GetScheduleAlwaysOn(state);
-                ShowWarningItemNotFound(state, eoh, controlScheduleNameKey, scheduleName, "the AlwaysOn schedule");
+                ShowWarningItemNotFound(state, eoh, keys.controlScheduleName, scheduleName, "the AlwaysOn schedule");
             }
 
             resolvedGroups.push_back({performanceIndex, moduleCount, availabilitySchedule});
@@ -1535,7 +1558,6 @@ void getPerformanceInput(EnergyPlusData &state)
                                                          "load_ratio_curve_name";
     static constexpr char heatingOptimumPartLoadRatioKey[] = "heating_mode_cooling_capacity_optimum_part_load_ratio";
     static constexpr char sizingFactorKey[] = "sizing_factor";
-    static constexpr char maximumHeatingLeavingCondenserTempKey[] = "maximum_heating_mode_leaving_condenser_water_temperature";
 
     static constexpr char referenceCoolingCapacityField[] = "Reference Cooling Mode Evaporator Capacity";
     static constexpr char referenceCoolingCOPField[] = "Reference Cooling Mode COP";
@@ -1554,8 +1576,6 @@ void getPerformanceInput(EnergyPlusData &state)
     static constexpr char heatingEIRPartLoadCurveField[] = "Heating Mode Electric Input to Cooling Output Ratio Function of Part "
                                                            "Load Ratio Curve Name";
     static constexpr char heatingOptimumPartLoadRatioField[] = "Heating Mode Cooling Capacity Optimum Part Load Ratio";
-    static constexpr char referenceHeatingEnteringCondenserTempField[] = "Reference Heating Mode Entering Condenser Fluid Temperature";
-    static constexpr char maximumHeatingLeavingCondenserTempField[] = "Maximum Heating Mode Leaving Condenser Water Temperature";
 
     bool errorsFound = false; // True when input errors are found
 
@@ -1742,26 +1762,6 @@ void getPerformanceInput(EnergyPlusData &state)
             performanceDefinition.heatingOptimumPartLoadRatio =
                 inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, heatingOptimumPartLoadRatioKey);
             performanceDefinition.sizingFactor = inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, sizingFactorKey);
-
-            performanceDefinition.maximumHeatingCondenserOutletTempWasOmitted =
-                objectFields.find(maximumHeatingLeavingCondenserTempKey) == objectFields.end();
-            if (!performanceDefinition.maximumHeatingCondenserOutletTempWasOmitted) {
-                performanceDefinition.maximumHeatingCondenserOutletTemp =
-                    inputProcessor->getRealFieldValue(objectFields, objectSchemaProps, maximumHeatingLeavingCondenserTempKey);
-                if (performanceDefinition.maximumHeatingCondenserOutletTemp <= performanceDefinition.heatingReferenceCondenserInletTemp) {
-                    ShowSevereError(state, std::format("Invalid {}={}", objectType, performanceDefinition.Name));
-                    ShowContinueError(state,
-                                      std::format("Entered in {}={:.2f}",
-                                                  maximumHeatingLeavingCondenserTempField,
-                                                  performanceDefinition.maximumHeatingCondenserOutletTemp));
-                    ShowContinueError(state,
-                                      std::format("{} must be greater than {}={:.2f}",
-                                                  maximumHeatingLeavingCondenserTempField,
-                                                  referenceHeatingEnteringCondenserTempField,
-                                                  performanceDefinition.heatingReferenceCondenserInletTemp));
-                    errorsFound = true;
-                }
-            }
 
             if (performanceDefinition.sizingFactor <= 0.0) {
                 performanceDefinition.sizingFactor = 1.0;
@@ -2570,11 +2570,6 @@ ModuleResult CentralHeatPumpSystem::solveHeatingOnly(EnergyPlusData &state,
         condenserOutletLimit = plantHeatingSetPoint;
         hasCondenserOutletLimit = true;
     }
-    if (!performance.maximumHeatingCondenserOutletTempWasOmitted) {
-        condenserOutletLimit = hasCondenserOutletLimit ? min(condenserOutletLimit, performance.maximumHeatingCondenserOutletTemp)
-                                                       : performance.maximumHeatingCondenserOutletTemp;
-        hasCondenserOutletLimit = true;
-    }
     Real64 const heatingLimitedCondenserHeat = hasCondenserOutletLimit
                                                    ? max(0.0, condenserMassFlowRateMax * condenserCp * (condenserOutletLimit - condenserInletTemp))
                                                    : std::numeric_limits<Real64>::max();
@@ -2839,11 +2834,6 @@ ModuleResult CentralHeatPumpSystem::solveSimultaneous(EnergyPlusData &state,
     Real64 const plantHeatingSetPoint = state.dataLoopNodes->Node(this->heatingSetpointNodeNum).TempSetPoint;
     if (plantHeatingSetPoint != Node::SensedNodeFlagValue) {
         heatingOutletLimit = plantHeatingSetPoint;
-        hasHeatingOutletLimit = true;
-    }
-    if (!performance.maximumHeatingCondenserOutletTempWasOmitted) {
-        heatingOutletLimit = hasHeatingOutletLimit ? min(heatingOutletLimit, performance.maximumHeatingCondenserOutletTemp)
-                                                   : performance.maximumHeatingCondenserOutletTemp;
         hasHeatingOutletLimit = true;
     }
     Real64 const heatingDeltaTempTarget = hasHeatingOutletLimit ? max(0.0, heatingOutletLimit - heatingInletTemp) : 0.0;
