@@ -58,6 +58,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -232,11 +233,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     EXPECT_TRUE(compare_err_stream(error_string01, true));
     EXPECT_TRUE(testZone.TempOutOfBoundsReported);
 
+    auto forceReissuingCompleteErrorMessages = [this]() {
+        state->dataErrTracking->NumRecurringErrors = 0;
+        state->dataErrTracking->RecurringErrors.clear();
+        state->dataSurface->SurfLowTempErrCount(1) = 0;
+        state->dataSurface->SurfHighTempErrCount(1) = 0;
+    };
+
     // to hot - subsequent times
     surfTemp = 201;
     state->dataGlobal->WarmupFlag = false;
-    state->dataSurface->SurfLowTempErrCount(1) = 0;
-    state->dataSurface->SurfHighTempErrCount(1) = 0;
+    forceReissuingCompleteErrorMessages();
     testZone.TempOutOfBoundsReported = true;
     testZone.FloorArea = 1000;
     testZone.IsControlled = true;
@@ -251,8 +258,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     // to cold - first time
     surfTemp = -101;
     state->dataGlobal->WarmupFlag = false;
-    state->dataSurface->SurfLowTempErrCount(1) = 0;
-    state->dataSurface->SurfHighTempErrCount(1) = 0;
+    forceReissuingCompleteErrorMessages();
     testZone.TempOutOfBoundsReported = false;
     testZone.FloorArea = 1000;
     testZone.IsControlled = true;
@@ -271,8 +277,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     // to cold - subsequent times
     surfTemp = -101;
     state->dataGlobal->WarmupFlag = false;
-    state->dataSurface->SurfLowTempErrCount(1) = 0;
-    state->dataSurface->SurfHighTempErrCount(1) = 0;
+    forceReissuingCompleteErrorMessages();
     testZone.TempOutOfBoundsReported = true;
     testZone.FloorArea = 1000;
     testZone.IsControlled = true;
