@@ -290,10 +290,8 @@ namespace PlantManager {
 
         EXPECT_EQ(state->dataPlnt->PlantLoop(1).PlantSizNum, 2);
         EXPECT_EQ(state->dataPlnt->PlantLoop(2).PlantSizNum, 1);
-        EXPECT_EQ(state->dataSize->PlantSizData(state->dataPlnt->PlantLoop(1).PlantSizNum).PlantLoopName,
-                  state->dataPlnt->PlantLoop(1).Name);
-        EXPECT_EQ(state->dataSize->PlantSizData(state->dataPlnt->PlantLoop(2).PlantSizNum).PlantLoopName,
-                  state->dataPlnt->PlantLoop(2).Name);
+        EXPECT_EQ(state->dataSize->PlantSizData(state->dataPlnt->PlantLoop(1).PlantSizNum).PlantLoopName, state->dataPlnt->PlantLoop(1).Name);
+        EXPECT_EQ(state->dataSize->PlantSizData(state->dataPlnt->PlantLoop(2).PlantSizNum).PlantLoopName, state->dataPlnt->PlantLoop(2).Name);
     }
 
     TEST_F(EnergyPlusFixture, PlantManager_CheckPlantEquipmentCtrlType)

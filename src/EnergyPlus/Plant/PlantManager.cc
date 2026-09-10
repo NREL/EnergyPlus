@@ -3646,15 +3646,19 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
         auto const &rhsNode = nodes[rhs];
         auto const &lhsName = state.dataPlnt->PlantLoop(lhsNode.loopNum).Name;
         auto const &rhsName = state.dataPlnt->PlantLoop(rhsNode.loopNum).Name;
-        if (lhsName != rhsName) return lhsName < rhsName;
-        if (lhsNode.loopSide != rhsNode.loopSide) return lhsNode.loopSide == LoopSideLocation::Demand;
+        if (lhsName != rhsName) {
+            return lhsName < rhsName;
+        }
+        if (lhsNode.loopSide != rhsNode.loopSide) {
+            return lhsNode.loopSide == LoopSideLocation::Demand;
+        }
         return lhsNode.loopNum < rhsNode.loopNum;
     };
 
     auto findNode = [&](int loopNum, DataPlant::LoopSideLocation loopSide) {
-        return static_cast<int>(std::find_if(nodes.begin(), nodes.end(), [&](auto const &node) {
-            return node.loopNum == loopNum && node.loopSide == loopSide;
-        }) - nodes.begin());
+        return static_cast<int>(
+            std::find_if(nodes.begin(), nodes.end(), [&](auto const &node) { return node.loopNum == loopNum && node.loopSide == loopSide; }) -
+            nodes.begin());
     };
 
     std::vector<std::vector<int>> successors(nodes.size());
@@ -3671,7 +3675,9 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
         addDependency(findNode(loopNum, LoopSideLocation::Demand), findNode(loopNum, LoopSideLocation::Supply));
         for (auto loopSide : {LoopSideLocation::Demand, LoopSideLocation::Supply}) {
             auto const &connections = state.dataPlnt->PlantLoop(loopNum).LoopSide(loopSide).Connected;
-            if (!allocated(connections)) continue;
+            if (!allocated(connections)) {
+                continue;
+            }
             for (int connectionNum = 1; connectionNum <= isize(connections); ++connectionNum) {
                 auto const &connection = connections(connectionNum);
                 int currentNode = findNode(loopNum, loopSide);
@@ -3687,7 +3693,9 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
 
     std::vector<int> ready;
     for (int node = 0; node < static_cast<int>(nodes.size()); ++node) {
-        if (indegree[node] == 0) ready.push_back(node);
+        if (indegree[node] == 0) {
+            ready.push_back(node);
+        }
     }
 
     std::vector<int> revisedOrder;
@@ -3698,15 +3706,20 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
         ready.erase(ready.begin());
         revisedOrder.push_back(node);
         for (int successor : successors[node]) {
-            if (--indegree[successor] == 0) ready.push_back(successor);
+            if (--indegree[successor] == 0) {
+                ready.push_back(successor);
+            }
         }
     }
 
     if (revisedOrder.size() != nodes.size()) {
-        ShowWarningError(state, "PlantManager: plant loop calling-order dependencies contain a cycle; using canonical order for unresolved loop sides.");
+        ShowWarningError(state,
+                         "PlantManager: plant loop calling-order dependencies contain a cycle; using canonical order for unresolved loop sides.");
         std::vector<int> unresolved;
         for (int node = 0; node < static_cast<int>(nodes.size()); ++node) {
-            if (std::find(revisedOrder.begin(), revisedOrder.end(), node) == revisedOrder.end()) unresolved.push_back(node);
+            if (std::find(revisedOrder.begin(), revisedOrder.end(), node) == revisedOrder.end()) {
+                unresolved.push_back(node);
+            }
         }
         std::sort(unresolved.begin(), unresolved.end(), nodeLess);
         revisedOrder.insert(revisedOrder.end(), unresolved.begin(), unresolved.end());
@@ -3726,7 +3739,7 @@ int FindLoopSideInCallingOrder(EnergyPlusData &state, int const LoopNum, const L
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   April 2011
     //       MODIFIED       na
-    //       RE-ENGINEERED  Sept. 2026 Joe Robertson
+    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // locate loop and loop side in calling order structure
