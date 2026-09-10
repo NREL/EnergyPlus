@@ -49,6 +49,7 @@
 #include <algorithm>
 #include <cassert>
 #include <format>
+#include <vector>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -3611,70 +3612,110 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   April 2011
     //       MODIFIED       na
-    //       RE-ENGINEERED  na
+    //       RE-ENGINEERED  Sept. 2026 Joe Robertson
 
     // PURPOSE OF THIS SUBROUTINE:
-    // setup the order that plant loops are to be called
+    // Choose the order in which plant loop sides are called. A loop that supplies another loop must be
+    // called first so that the receiving loop sees current conditions. For example, if Loop A supplies
+    // Loop B, the order should be A followed by B, regardless of their order in the input file.
 
     // METHODOLOGY EMPLOYED:
-    // simple rule-based allocation of which order to call the half loops
-    // Examine for interconnected components and rearrange to impose the following rules
+    // The previous method moved entries around in the existing calling-order list as it examined connections.
+    // Because that list followed input order, two otherwise identical input files could produce different results.
+    // The current method treats each loop side as a point in a dependency graph. For example, A -> B means
+    // "call A before B." It also adds Demand -> Supply for every loop, then repeatedly selects an eligible
+    // loop side using loop name and side as stable tie-breakers. If the dependencies say A -> B -> A, the
+    // requirements form a cycle and no perfect order exists; the unresolved sides are placed using the same
+    // stable tie-breakers.
 
-    // Using/Aliasing
-    using PlantUtilities::ShiftPlantLoopSideCallingOrder;
+    struct HalfLoopNode
+    {
+        int loopNum;
+        DataPlant::LoopSideLocation loopSide;
+    };
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    DataPlant::LoopSideLocation LoopSideNum;
-    DataPlant::LoopSideLocation OtherLoopSideNum;
+    std::vector<HalfLoopNode> nodes;
+    nodes.reserve(state.dataPlnt->TotNumHalfLoops);
+    for (int loopNum = 1; loopNum <= state.dataPlnt->TotNumLoops; ++loopNum) {
+        nodes.push_back({loopNum, LoopSideLocation::Demand});
+        nodes.push_back({loopNum, LoopSideLocation::Supply});
+    }
 
-    bool thisLoopPutsDemandOnAnother;
-    int ConnctNum;
+    auto nodeLess = [&](int lhs, int rhs) {
+        auto const &lhsNode = nodes[lhs];
+        auto const &rhsNode = nodes[rhs];
+        auto const &lhsName = state.dataPlnt->PlantLoop(lhsNode.loopNum).Name;
+        auto const &rhsName = state.dataPlnt->PlantLoop(rhsNode.loopNum).Name;
+        if (lhsName != rhsName) return lhsName < rhsName;
+        if (lhsNode.loopSide != rhsNode.loopSide) return lhsNode.loopSide == LoopSideLocation::Demand;
+        return lhsNode.loopNum < rhsNode.loopNum;
+    };
 
-    for (int HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
+    auto findNode = [&](int loopNum, DataPlant::LoopSideLocation loopSide) {
+        return static_cast<int>(std::find_if(nodes.begin(), nodes.end(), [&](auto const &node) {
+            return node.loopNum == loopNum && node.loopSide == loopSide;
+        }) - nodes.begin());
+    };
 
-        int LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-        LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+    std::vector<std::vector<int>> successors(nodes.size());
+    std::vector<int> indegree(nodes.size(), 0);
+    auto addDependency = [&](int before, int after) {
+        auto &successorList = successors[before];
+        if (std::find(successorList.begin(), successorList.end(), after) == successorList.end()) {
+            successorList.push_back(after);
+            ++indegree[after];
+        }
+    };
 
-        if (allocated(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected)) {
-            for (ConnctNum = 1; ConnctNum <= isize(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected); ++ConnctNum) {
-                int OtherLoopNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(ConnctNum).LoopNum;
-                OtherLoopSideNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(ConnctNum).LoopSideNum;
-                state.dataPlantMgr->OtherLoopCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum, OtherLoopSideNum);
-
-                thisLoopPutsDemandOnAnother = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(ConnctNum).LoopDemandsOnRemote;
-                if (thisLoopPutsDemandOnAnother) {                                 // make sure this loop side is called before the other loop side
-                    if (state.dataPlantMgr->OtherLoopCallingIndex < HalfLoopNum) { // rearrange
-                        state.dataPlantMgr->newCallingIndex = min(HalfLoopNum + 1, state.dataPlnt->TotNumHalfLoops);
-                        ShiftPlantLoopSideCallingOrder(state, state.dataPlantMgr->OtherLoopCallingIndex, state.dataPlantMgr->newCallingIndex);
-                    }
-
-                } else {                                                           // make sure the other is called before this one
-                    if (state.dataPlantMgr->OtherLoopCallingIndex > HalfLoopNum) { // rearrange
-                        state.dataPlantMgr->newCallingIndex = max(HalfLoopNum, 1);
-
-                        if (OtherLoopSideNum == LoopSideLocation::Supply) { // if this is a supply side, don't push it before its own demand side
-                            state.dataPlantMgr->OtherLoopDemandSideCallingIndex =
-                                FindLoopSideInCallingOrder(state, OtherLoopNum, LoopSideLocation::Demand);
-                            if (state.dataPlantMgr->OtherLoopDemandSideCallingIndex < HalfLoopNum) { // good to go
-                                state.dataPlantMgr->newCallingIndex = min(state.dataPlantMgr->OtherLoopDemandSideCallingIndex + 1,
-                                                                          state.dataPlnt->TotNumHalfLoops); // put it right after its demand side
-                                ShiftPlantLoopSideCallingOrder(state, state.dataPlantMgr->OtherLoopCallingIndex, state.dataPlantMgr->newCallingIndex);
-                            } else { // move both sides of other loop before this, keeping demand side in front
-                                state.dataPlantMgr->NewOtherDemandSideCallingIndex = max(HalfLoopNum, 1);
-                                ShiftPlantLoopSideCallingOrder(
-                                    state, state.dataPlantMgr->OtherLoopDemandSideCallingIndex, state.dataPlantMgr->NewOtherDemandSideCallingIndex);
-                                // get fresh pointer after it has changed in previous call
-                                state.dataPlantMgr->OtherLoopCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum, OtherLoopSideNum);
-                                state.dataPlantMgr->newCallingIndex = state.dataPlantMgr->NewOtherDemandSideCallingIndex + 1;
-                                ShiftPlantLoopSideCallingOrder(state, state.dataPlantMgr->OtherLoopCallingIndex, state.dataPlantMgr->newCallingIndex);
-                            }
-                        } else {
-                            ShiftPlantLoopSideCallingOrder(state, state.dataPlantMgr->OtherLoopCallingIndex, state.dataPlantMgr->newCallingIndex);
-                        }
-                    }
+    for (int loopNum = 1; loopNum <= state.dataPlnt->TotNumLoops; ++loopNum) {
+        addDependency(findNode(loopNum, LoopSideLocation::Demand), findNode(loopNum, LoopSideLocation::Supply));
+        for (auto loopSide : {LoopSideLocation::Demand, LoopSideLocation::Supply}) {
+            auto const &connections = state.dataPlnt->PlantLoop(loopNum).LoopSide(loopSide).Connected;
+            if (!allocated(connections)) continue;
+            for (int connectionNum = 1; connectionNum <= isize(connections); ++connectionNum) {
+                auto const &connection = connections(connectionNum);
+                int currentNode = findNode(loopNum, loopSide);
+                int remoteNode = findNode(connection.LoopNum, connection.LoopSideNum);
+                if (connection.LoopDemandsOnRemote) {
+                    addDependency(currentNode, remoteNode);
+                } else {
+                    addDependency(remoteNode, currentNode);
                 }
             }
         }
+    }
+
+    std::vector<int> ready;
+    for (int node = 0; node < static_cast<int>(nodes.size()); ++node) {
+        if (indegree[node] == 0) ready.push_back(node);
+    }
+
+    std::vector<int> revisedOrder;
+    revisedOrder.reserve(nodes.size());
+    while (!ready.empty()) {
+        std::sort(ready.begin(), ready.end(), nodeLess);
+        int node = ready.front();
+        ready.erase(ready.begin());
+        revisedOrder.push_back(node);
+        for (int successor : successors[node]) {
+            if (--indegree[successor] == 0) ready.push_back(successor);
+        }
+    }
+
+    if (revisedOrder.size() != nodes.size()) {
+        ShowWarningError(state, "PlantManager: plant loop calling-order dependencies contain a cycle; using canonical order for unresolved loop sides.");
+        std::vector<int> unresolved;
+        for (int node = 0; node < static_cast<int>(nodes.size()); ++node) {
+            if (std::find(revisedOrder.begin(), revisedOrder.end(), node) == revisedOrder.end()) unresolved.push_back(node);
+        }
+        std::sort(unresolved.begin(), unresolved.end(), nodeLess);
+        revisedOrder.insert(revisedOrder.end(), unresolved.begin(), unresolved.end());
+    }
+
+    for (int order = 0; order < static_cast<int>(revisedOrder.size()); ++order) {
+        auto const &node = nodes[revisedOrder[order]];
+        state.dataPlnt->PlantCallingOrderInfo(order + 1).LoopIndex = node.loopNum;
+        state.dataPlnt->PlantCallingOrderInfo(order + 1).LoopSide = node.loopSide;
     }
 }
 
@@ -3685,7 +3726,7 @@ int FindLoopSideInCallingOrder(EnergyPlusData &state, int const LoopNum, const L
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   April 2011
     //       MODIFIED       na
-    //       RE-ENGINEERED  na
+    //       RE-ENGINEERED  Sept. 2026 Joe Robertson
 
     // PURPOSE OF THIS FUNCTION:
     // locate loop and loop side in calling order structure
