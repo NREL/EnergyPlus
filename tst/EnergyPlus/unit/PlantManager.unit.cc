@@ -269,6 +269,58 @@ namespace PlantManager {
         compare_eio_stream_substring(condenser_eio_output, true);
     }
 
+    TEST_F(EnergyPlusFixture, PlantManager_SizingPlantOrderMatchesPlantLoopNames)
+    {
+        // Verify that PlantLoop objects find their matching Sizing:Plant records by name, even when the records are listed in reverse order.
+        state->init_state(*state);
+
+        state->dataPlnt->PlantLoop.allocate(2);
+        state->dataPlnt->PlantLoop(1).Name = "Loop A";
+        state->dataPlnt->PlantLoop(2).Name = "Loop B";
+
+        state->dataSize->NumPltSizInput = 2;
+        state->dataSize->PlantSizData.allocate(2);
+        state->dataSize->PlantSizData(1).PlantLoopName = "Loop B";
+        state->dataSize->PlantSizData(1).ExitTemp = 7.0;
+        state->dataSize->PlantSizData(2).PlantLoopName = "Loop A";
+        state->dataSize->PlantSizData(2).ExitTemp = 29.4;
+
+        InitOneTimePlantSizingInfo(*state, 1);
+        InitOneTimePlantSizingInfo(*state, 2);
+
+        EXPECT_EQ(state->dataPlnt->PlantLoop(1).PlantSizNum, 2);
+        EXPECT_EQ(state->dataPlnt->PlantLoop(2).PlantSizNum, 1);
+        EXPECT_EQ(state->dataSize->PlantSizData(state->dataPlnt->PlantLoop(1).PlantSizNum).PlantLoopName, state->dataPlnt->PlantLoop(1).Name);
+        EXPECT_EQ(state->dataSize->PlantSizData(state->dataPlnt->PlantLoop(2).PlantSizNum).PlantLoopName, state->dataPlnt->PlantLoop(2).Name);
+    }
+
+    TEST_F(EnergyPlusFixture, PlantManager_RevisePlantCallingOrderKeepsDemandBeforeSupply)
+    {
+        state->init_state(*state);
+        state->dataPlnt->TotNumLoops = 3;
+        state->dataPlnt->TotNumHalfLoops = 6;
+        state->dataPlnt->PlantLoop.allocate(3);
+        state->dataPlnt->PlantCallingOrderInfo.allocate(6);
+
+        auto setOrder = [&](int order, int loopNum, LoopSideLocation loopSide) {
+            state->dataPlnt->PlantCallingOrderInfo(order).LoopIndex = loopNum;
+            state->dataPlnt->PlantCallingOrderInfo(order).LoopSide = loopSide;
+        };
+        setOrder(1, 1, LoopSideLocation::Supply);
+        setOrder(2, 2, LoopSideLocation::Demand);
+        setOrder(3, 1, LoopSideLocation::Demand);
+        setOrder(4, 2, LoopSideLocation::Supply);
+        setOrder(5, 3, LoopSideLocation::Supply);
+        setOrder(6, 3, LoopSideLocation::Demand);
+
+        RevisePlantCallingOrder(*state);
+
+        for (int loopNum = 1; loopNum <= state->dataPlnt->TotNumLoops; ++loopNum) {
+            EXPECT_LT(FindLoopSideInCallingOrder(*state, loopNum, LoopSideLocation::Demand),
+                      FindLoopSideInCallingOrder(*state, loopNum, LoopSideLocation::Supply));
+        }
+    }
+
     TEST_F(EnergyPlusFixture, PlantManager_CheckPlantEquipmentCtrlType)
     {
         // Check size and alignment of DataPlant::PlantEquipmentCtrlType
