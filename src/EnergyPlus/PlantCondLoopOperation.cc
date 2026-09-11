@@ -3041,7 +3041,7 @@ void DistributePlantLoad(EnergyPlusData &state,
                 }
                 ++numAvail;
 
-                Real64 const currentMaxLoad = this_component.getDynamicMaxCapacity(state);
+                auto const [currentMaxLoad, maxLoadIsKnown] = this_component.getDynamicMaxCapacity(state);
                 Real64 currentOptLoad = this_component.OptLoad;
                 if (this_component.MaxLoad > 0.0) {
                     currentOptLoad *= currentMaxLoad / this_component.MaxLoad;
@@ -3049,9 +3049,14 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 if (currentOptLoad > 0.0) {
                     ChangeInLoad = min(currentOptLoad, std::abs(RemLoopDemand));
-                    ChangeInLoad = min(ChangeInLoad, currentMaxLoad);
-                } else {
+                    if (maxLoadIsKnown) {
+                        ChangeInLoad = min(ChangeInLoad, currentMaxLoad);
+                    }
+                } else if (maxLoadIsKnown) {
                     ChangeInLoad = min(currentMaxLoad, std::abs(RemLoopDemand));
+                } else {
+                    // Some components do not define a maximum load. Preserve the legacy unrestricted dispatch for them.
+                    ChangeInLoad = std::abs(RemLoopDemand);
                 }
 
                 PlantLocation plantLoc;
@@ -3095,9 +3100,12 @@ void DistributePlantLoad(EnergyPlusData &state,
                         continue;
                     }
 
-                    Real64 const currentMaxLoad = this_component.getDynamicMaxCapacity(state);
+                    auto const [currentMaxLoad, maxLoadIsKnown] = this_component.getDynamicMaxCapacity(state);
                     NewLoad = this_component.MyLoad;
-                    NewLoad = min(currentMaxLoad, std::abs(NewLoad) + DivideLoad);
+                    NewLoad = std::abs(NewLoad) + DivideLoad;
+                    if (maxLoadIsKnown) {
+                        NewLoad = min(currentMaxLoad, NewLoad);
+                    }
                     ChangeInLoad = NewLoad - std::abs(this_component.MyLoad);
                     this_component.MyLoad = sign(NewLoad, RemLoopDemand);
                     RemLoopDemand -= sign(ChangeInLoad, RemLoopDemand);
@@ -3121,8 +3129,8 @@ void DistributePlantLoad(EnergyPlusData &state,
                     if (!this_component.Available) {
                         continue;
                     }
-                    Real64 const currentMaxLoad = this_component.getDynamicMaxCapacity(state);
-                    DivideLoad = currentMaxLoad - std::abs(this_component.MyLoad);
+                    auto const [currentMaxLoad, maxLoadIsKnown] = this_component.getDynamicMaxCapacity(state);
+                    DivideLoad = maxLoadIsKnown ? currentMaxLoad - std::abs(this_component.MyLoad) : std::abs(RemLoopDemand);
                     ChangeInLoad = min(std::abs(RemLoopDemand), DivideLoad);
                     this_component.MyLoad += sign(ChangeInLoad, RemLoopDemand);
                     RemLoopDemand -= sign(ChangeInLoad, RemLoopDemand);
@@ -3151,8 +3159,13 @@ void DistributePlantLoad(EnergyPlusData &state,
                     continue;
                 }
 
-                Real64 const currentMaxLoad = this_component.getDynamicMaxCapacity(state);
-                ChangeInLoad = min(currentMaxLoad, std::abs(RemLoopDemand));
+                auto const [currentMaxLoad, maxLoadIsKnown] = this_component.getDynamicMaxCapacity(state);
+                if (maxLoadIsKnown) {
+                    ChangeInLoad = min(currentMaxLoad, std::abs(RemLoopDemand));
+                } else {
+                    // Some components do not define a maximum load. Preserve the legacy unrestricted dispatch for them.
+                    ChangeInLoad = std::abs(RemLoopDemand);
+                }
 
                 PlantLocation plantLoc;
                 plantLoc.loopNum = LoopNum;
@@ -3197,8 +3210,8 @@ void DistributePlantLoad(EnergyPlusData &state,
                 if (!this_component.Available) {
                     continue;
                 }
-                Real64 const currentMaxLoad = this_component.getDynamicMaxCapacity(state);
-                if (currentMaxLoad > 0.0) {
+                auto const [currentMaxLoad, maxLoadIsKnown] = this_component.getDynamicMaxCapacity(state);
+                if (!maxLoadIsKnown || currentMaxLoad > 0.0) {
                     ++numAvail;
                 }
             }
@@ -3218,8 +3231,12 @@ void DistributePlantLoad(EnergyPlusData &state,
                 if (!this_component.Available) {
                     continue;
                 }
-                Real64 const currentMaxLoad = this_component.getDynamicMaxCapacity(state);
-                ChangeInLoad = min(currentMaxLoad, UniformLoad);
+                auto const [currentMaxLoad, maxLoadIsKnown] = this_component.getDynamicMaxCapacity(state);
+                if (maxLoadIsKnown) {
+                    ChangeInLoad = min(currentMaxLoad, UniformLoad);
+                } else {
+                    ChangeInLoad = UniformLoad;
+                }
 
                 PlantLocation plantLoc;
                 plantLoc.loopNum = LoopNum;
@@ -3258,8 +3275,12 @@ void DistributePlantLoad(EnergyPlusData &state,
                     if (!this_component.Available) {
                         continue;
                     }
-                    Real64 const currentMaxLoad = this_component.getDynamicMaxCapacity(state);
-                    ChangeInLoad = min(currentMaxLoad - std::abs(this_component.MyLoad), std::abs(RemLoopDemand));
+                    auto const [currentMaxLoad, maxLoadIsKnown] = this_component.getDynamicMaxCapacity(state);
+                    if (maxLoadIsKnown) {
+                        ChangeInLoad = min(currentMaxLoad - std::abs(this_component.MyLoad), std::abs(RemLoopDemand));
+                    } else {
+                        ChangeInLoad = std::abs(RemLoopDemand);
+                    }
                     ChangeInLoad = max(0.0, ChangeInLoad);
                     this_component.MyLoad += sign(ChangeInLoad, RemLoopDemand);
                     RemLoopDemand -= sign(ChangeInLoad, RemLoopDemand);
@@ -3293,7 +3314,7 @@ void DistributePlantLoad(EnergyPlusData &state,
                     continue;
                 }
 
-                Real64 const currentMaxLoad = this_component.getDynamicMaxCapacity(state);
+                auto const [currentMaxLoad, maxLoadIsKnown] = this_component.getDynamicMaxCapacity(state);
                 PlantCapacity += currentMaxLoad;
 
                 if (currentMaxLoad < SmallLoad) {
@@ -3353,9 +3374,13 @@ void DistributePlantLoad(EnergyPlusData &state,
                     continue;
                 }
 
-                Real64 const currentMaxLoad = this_component.getDynamicMaxCapacity(state);
+                auto const [currentMaxLoad, maxLoadIsKnown] = this_component.getDynamicMaxCapacity(state);
                 CompLoad = PlantPLR * currentMaxLoad;
-                ChangeInLoad = min(std::abs(RemLoopDemand), CompLoad);
+                if (maxLoadIsKnown) {
+                    ChangeInLoad = min(std::abs(RemLoopDemand), CompLoad);
+                } else {
+                    ChangeInLoad = std::abs(RemLoopDemand);
+                }
 
                 PlantLocation plantLoc;
                 plantLoc.loopNum = LoopNum;
@@ -3408,7 +3433,7 @@ void DistributePlantLoad(EnergyPlusData &state,
                     continue;
                 }
 
-                Real64 const currentMaxLoad = this_component.getDynamicMaxCapacity(state);
+                auto const [currentMaxLoad, maxLoadIsKnown] = this_component.getDynamicMaxCapacity(state);
                 PlantCapacity += currentMaxLoad;
 
                 if (currentMaxLoad < SmallLoad) {
@@ -3449,9 +3474,13 @@ void DistributePlantLoad(EnergyPlusData &state,
                     continue;
                 }
 
-                Real64 const currentMaxLoad = this_component.getDynamicMaxCapacity(state);
+                auto const [currentMaxLoad, maxLoadIsKnown] = this_component.getDynamicMaxCapacity(state);
                 CompLoad = PlantPLR * currentMaxLoad;
-                ChangeInLoad = min(std::abs(RemLoopDemand), CompLoad);
+                if (maxLoadIsKnown) {
+                    ChangeInLoad = min(std::abs(RemLoopDemand), CompLoad);
+                } else {
+                    ChangeInLoad = std::abs(RemLoopDemand);
+                }
 
                 PlantLocation plantLoc;
                 plantLoc.loopNum = LoopNum;
@@ -3751,7 +3780,6 @@ void FindCompSPLoad(EnergyPlusData &state,
     Real64 CurSpecHeat;
     Real64 TempSetPt(0.0);
     Real64 CompMinLoad;
-    Real64 CompMaxLoad;
     Real64 CompOptLoad;
     int DemandNode;
     int CompPtr;
@@ -3777,7 +3805,7 @@ void FindCompSPLoad(EnergyPlusData &state,
 
     // load local variables from the data structures
     CompMinLoad = this_component.MinLoad;
-    CompMaxLoad = this_component.getDynamicMaxCapacity(state);
+    auto const [CompMaxLoad, CompMaxLoadIsKnown] = this_component.getDynamicMaxCapacity(state);
     CompOptLoad = this_component.OptLoad;
     DemandNode = plantLoc.loop->OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).DemandNodeNum;
     SetPtNode = plantLoc.loop->OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).SetPointNodeNum;
@@ -3863,7 +3891,7 @@ void FindCompSPLoad(EnergyPlusData &state,
         }
 
         // Check bounds on MyLoad
-        if (std::abs(this_component.MyLoad) > CompMaxLoad) {
+        if (CompMaxLoadIsKnown && std::abs(this_component.MyLoad) > CompMaxLoad) {
             this_component.MyLoad = sign(CompMaxLoad, this_component.MyLoad);
         }
         //   PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(CompNum)%MyLoad = &

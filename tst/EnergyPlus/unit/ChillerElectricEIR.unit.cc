@@ -406,8 +406,9 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
 
     // Test getDynamicMaxCapacity function for use by plant manager
     PlantComponent *thisChiller = &thisEIR;
-    Real64 dynCap = thisChiller->getDynamicMaxCapacity(*state, thisEIR.RefCap);
-    EXPECT_NEAR(18582.6, dynCap, 1.0);         // capacity used by plant manager, calculated at 12 C OAT and 6 C leaving CHW temperature
+    auto const [dynCapAt12C, dynCapAt12CIsKnown] = thisChiller->getDynamicMaxCapacity(*state);
+    EXPECT_TRUE(dynCapAt12CIsKnown);
+    EXPECT_NEAR(18582.6, dynCapAt12C, 1.0);    // capacity used by plant manager, calculated at 12 C OAT and 6 C leaving CHW temperature
     EXPECT_NEAR(20987.5, thisEIR.RefCap, 1.0); // chiller reference capacity used by plant manager (prior to getDynamicMaxCapacity call)
 
     state->dataLoopNodes->Node(thisEIR.CondInletNodeNum).OutAirDryBulb = 5.0; // condenser inlet temp < evap outlet temp
@@ -419,8 +420,9 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     EXPECT_GT(thisEIR.Power, 1200.0);             // power is non-zero
 
     // Test getDynamicMaxCapacity function for use by plant manager
-    dynCap = thisChiller->getDynamicMaxCapacity(*state, thisEIR.RefCap);
-    EXPECT_NEAR(14354.6, dynCap, 1.0);         // capacity used by plant manager, calculated at 5 C OAT and 6 C leaving CHW temperature
+    auto const [dynCapAt5C, dynCapAt5CIsKnown] = thisChiller->getDynamicMaxCapacity(*state);
+    EXPECT_TRUE(dynCapAt5CIsKnown);
+    EXPECT_NEAR(14354.6, dynCapAt5C, 1.0);     // capacity used by plant manager, calculated at 5 C OAT and 6 C leaving CHW temperature
     EXPECT_NEAR(20987.5, thisEIR.RefCap, 1.0); // chiller reference capacity used by plant manager (prior to getDynamicMaxCapacity call)
 
     // A zero dynamic capacity is valid and must not fall back to the static maximum load
@@ -431,7 +433,9 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     plantComponent.compPtr = thisChiller;
     plantComponent.MaxLoad = 1234.0;
     thisEIR.RefCap = 0.0;
-    EXPECT_EQ(0.0, plantComponent.getDynamicMaxCapacity(*state));
+    auto const [zeroDynCap, zeroDynCapIsKnown] = plantComponent.getDynamicMaxCapacity(*state);
+    EXPECT_TRUE(zeroDynCapIsKnown);
+    EXPECT_EQ(0.0, zeroDynCap);
     thisEIR.RefCap = originalRefCap;
     plantComponent.MaxLoad = originalMaxLoad;
     plantComponent.compPtr = originalCompPtr;

@@ -127,12 +127,15 @@ namespace DataPlant {
         return state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Comp(plantLoc.compNum);
     }
 
-    Real64 CompData::getDynamicMaxCapacity(EnergyPlusData &state) const
+    std::tuple<Real64, bool> CompData::getDynamicMaxCapacity(EnergyPlusData &state) const
     {
-        if (this->compPtr == nullptr) {
-            return this->MaxLoad;
+        if (this->compPtr != nullptr) {
+            auto const [maxCapacity, maxCapacityIsKnown] = this->compPtr->getDynamicMaxCapacity(state);
+            if (maxCapacityIsKnown) {
+                return {maxCapacity, true};
+            }
         }
-        return this->compPtr->getDynamicMaxCapacity(state, this->MaxLoad);
+        return {this->MaxLoad, this->MaxLoad > 0.0};
     }
 } // namespace DataPlant
 } // namespace EnergyPlus

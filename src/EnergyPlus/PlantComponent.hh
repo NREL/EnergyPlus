@@ -48,6 +48,8 @@
 #ifndef PLANTCOMPONENT_HH_INCLUDED
 #define PLANTCOMPONENT_HH_INCLUDED
 
+#include <tuple>
+
 namespace EnergyPlus {
 
 // Forward declarations
@@ -88,9 +90,9 @@ public:
     {
     }
 
-    virtual Real64 getDynamicMaxCapacity([[maybe_unused]] EnergyPlusData &state, Real64 const fallbackMaxCapacity)
+    virtual std::tuple<Real64, bool> getDynamicMaxCapacity([[maybe_unused]] EnergyPlusData &state)
     {
-        return fallbackMaxCapacity;
+        return {0.0, false};
     }
 
     virtual void getCurrentPower([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] Real64 &power)

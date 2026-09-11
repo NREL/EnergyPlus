@@ -2617,7 +2617,7 @@ bool ElectricEIRChillerSpecs::thermosiphonDisabled(EnergyPlusData &state)
     return true;
 }
 
-Real64 ElectricEIRChillerSpecs::getDynamicMaxCapacity(EnergyPlusData &state, [[maybe_unused]] Real64 const fallbackMaxCapacity)
+std::tuple<Real64, bool> ElectricEIRChillerSpecs::getDynamicMaxCapacity(EnergyPlusData &state)
 {
     Real64 sourceInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
     if (this->HeatRecActive && (this->QHeatRecovered + this->QCondenser) > 0.0) {
@@ -2672,7 +2672,7 @@ Real64 ElectricEIRChillerSpecs::getDynamicMaxCapacity(EnergyPlusData &state, [[m
     // evaluate capacity modifier curve and determine load side heat transfer
     Real64 capacityModifierFuncTemp =
         (this->ChillerCapFTIndex > 0) ? Curve::CurveValue(state, this->ChillerCapFTIndex, loadSideOutletSetpointTemp, sourceInletTemp) : 1.0;
-    return this->RefCap * capacityModifierFuncTemp;
+    return {this->RefCap * capacityModifierFuncTemp, true};
 }
 
 } // namespace EnergyPlus::ChillerElectricEIR

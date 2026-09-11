@@ -242,7 +242,7 @@ namespace ChillerElectricEIR {
 
         bool thermosiphonDisabled(EnergyPlusData &state);
 
-        Real64 getDynamicMaxCapacity(EnergyPlusData &state, Real64 fallbackMaxCapacity) override;
+        std::tuple<Real64, bool> getDynamicMaxCapacity(EnergyPlusData &state) override;
     };
 
     void GetElectricEIRChillerInput(EnergyPlusData &state);

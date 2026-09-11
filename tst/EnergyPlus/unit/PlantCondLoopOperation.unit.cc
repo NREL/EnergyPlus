@@ -76,9 +76,9 @@ public:
     {
     }
 
-    Real64 getDynamicMaxCapacity(EnergyPlusData &, [[maybe_unused]] Real64 fallbackMaxCapacity) override
+    std::tuple<Real64, bool> getDynamicMaxCapacity(EnergyPlusData &) override
     {
-        return this->dynamicMaxCapacity;
+        return {this->dynamicMaxCapacity, true};
     }
 };
 
@@ -344,14 +344,14 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialHonorsDynamicCapac
     EXPECT_EQ(0.0, thisBranch.Comp(3).MyLoad);
     EXPECT_EQ(0.0, remainingLoopDemand);
 
-    // Without a dynamic implementation, the static zero maximum is used and the next component meets the load.
+    // Without a dynamic implementation, a zero static maximum retains the legacy unrestricted behavior.
     DistributePlantLoadTest::ResetLoads();
     thisBranch.Comp(1).compPtr = nullptr;
     thisBranch.Comp(1).MaxLoad = 0.0;
     loopDemand = 30.0;
     PlantCondLoopOperation::DistributePlantLoad(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_EQ(0.0, thisBranch.Comp(1).MyLoad);
-    EXPECT_EQ(30.0, thisBranch.Comp(2).MyLoad);
+    EXPECT_EQ(30.0, thisBranch.Comp(1).MyLoad);
+    EXPECT_EQ(0.0, thisBranch.Comp(2).MyLoad);
     EXPECT_EQ(0.0, thisBranch.Comp(3).MyLoad);
     EXPECT_EQ(0.0, remainingLoopDemand);
 }

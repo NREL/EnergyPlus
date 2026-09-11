@@ -344,7 +344,7 @@ namespace DataPlant {
 
         static CompData &getPlantComponent(EnergyPlusData &state, PlantLocation const &plantLoc);
 
-        Real64 getDynamicMaxCapacity(EnergyPlusData &state) const;
+        std::tuple<Real64, bool> getDynamicMaxCapacity(EnergyPlusData &state) const;
     };
 } // namespace DataPlant
 } // namespace EnergyPlus
