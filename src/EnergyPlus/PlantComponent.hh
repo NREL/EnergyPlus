@@ -48,8 +48,6 @@
 #ifndef PLANTCOMPONENT_HH_INCLUDED
 #define PLANTCOMPONENT_HH_INCLUDED
 
-#include <EnergyPlus/DataGlobals.hh>
-
 namespace EnergyPlus {
 
 // Forward declarations
@@ -90,9 +88,9 @@ public:
     {
     }
 
-    virtual Real64 getDynamicMaxCapacity([[maybe_unused]] EnergyPlusData &state)
+    virtual Real64 getDynamicMaxCapacity([[maybe_unused]] EnergyPlusData &state, Real64 const fallbackMaxCapacity)
     {
-        return 0.0;
+        return fallbackMaxCapacity;
     }
 
     virtual void getCurrentPower([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] Real64 &power)

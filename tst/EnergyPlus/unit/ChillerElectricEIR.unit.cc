@@ -406,7 +406,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
 
     // Test getDynamicMaxCapacity function for use by plant manager
     PlantComponent *thisChiller = &thisEIR;
-    Real64 dynCap = thisChiller->getDynamicMaxCapacity(*state);
+    Real64 dynCap = thisChiller->getDynamicMaxCapacity(*state, thisEIR.RefCap);
     EXPECT_NEAR(18582.6, dynCap, 1.0);         // capacity used by plant manager, calculated at 12 C OAT and 6 C leaving CHW temperature
     EXPECT_NEAR(20987.5, thisEIR.RefCap, 1.0); // chiller reference capacity used by plant manager (prior to getDynamicMaxCapacity call)
 
@@ -419,9 +419,22 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     EXPECT_GT(thisEIR.Power, 1200.0);             // power is non-zero
 
     // Test getDynamicMaxCapacity function for use by plant manager
-    dynCap = thisChiller->getDynamicMaxCapacity(*state);
+    dynCap = thisChiller->getDynamicMaxCapacity(*state, thisEIR.RefCap);
     EXPECT_NEAR(14354.6, dynCap, 1.0);         // capacity used by plant manager, calculated at 5 C OAT and 6 C leaving CHW temperature
     EXPECT_NEAR(20987.5, thisEIR.RefCap, 1.0); // chiller reference capacity used by plant manager (prior to getDynamicMaxCapacity call)
+
+    // A zero dynamic capacity is valid and must not fall back to the static maximum load
+    auto &plantComponent = DataPlant::CompData::getPlantComponent(*state, thisEIR.CWPlantLoc);
+    PlantComponent *originalCompPtr = plantComponent.compPtr;
+    Real64 const originalMaxLoad = plantComponent.MaxLoad;
+    Real64 const originalRefCap = thisEIR.RefCap;
+    plantComponent.compPtr = thisChiller;
+    plantComponent.MaxLoad = 1234.0;
+    thisEIR.RefCap = 0.0;
+    EXPECT_EQ(0.0, plantComponent.getDynamicMaxCapacity(*state));
+    thisEIR.RefCap = originalRefCap;
+    plantComponent.MaxLoad = originalMaxLoad;
+    plantComponent.compPtr = originalCompPtr;
 
     MyLoad /= 25.0; // reduce load such that thermosiphon can meet load
     thisEIR.initialize(*state, RunFlag, MyLoad);

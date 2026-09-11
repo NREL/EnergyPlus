@@ -2865,7 +2865,7 @@ bool EIRPlantLoopHeatPump::thermosiphonDisabled(EnergyPlusData &state)
     return true;
 }
 
-Real64 EIRPlantLoopHeatPump::getDynamicMaxCapacity(EnergyPlusData &state)
+Real64 EIRPlantLoopHeatPump::getDynamicMaxCapacity(EnergyPlusData &state, [[maybe_unused]] Real64 const fallbackMaxCapacity)
 {
     Real64 sourceInletTemp = state.dataLoopNodes->Node(this->sourceSideNodes.inlet).Temp;
     Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
@@ -4513,7 +4513,7 @@ void EIRFuelFiredHeatPump::report(EnergyPlusData &state)
     state.dataLoopNodes->Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
 }
 
-Real64 EIRFuelFiredHeatPump::getDynamicMaxCapacity(EnergyPlusData &state)
+Real64 EIRFuelFiredHeatPump::getDynamicMaxCapacity(EnergyPlusData &state, [[maybe_unused]] Real64 const fallbackMaxCapacity)
 {
     // Source (air) side temperature variable
     auto &thisSourceSideInletNode = state.dataLoopNodes->Node(this->sourceSideNodes.inlet);

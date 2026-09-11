@@ -2617,7 +2617,7 @@ bool ElectricEIRChillerSpecs::thermosiphonDisabled(EnergyPlusData &state)
     return true;
 }
 
-Real64 ElectricEIRChillerSpecs::getDynamicMaxCapacity(EnergyPlusData &state)
+Real64 ElectricEIRChillerSpecs::getDynamicMaxCapacity(EnergyPlusData &state, [[maybe_unused]] Real64 const fallbackMaxCapacity)
 {
     Real64 sourceInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
     if (this->HeatRecActive && (this->QHeatRecovered + this->QCondenser) > 0.0) {

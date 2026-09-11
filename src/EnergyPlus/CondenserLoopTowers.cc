@@ -6278,7 +6278,7 @@ namespace CondenserLoopTowers {
         }
     }
 
-    Real64 CoolingTower::getDynamicMaxCapacity(EnergyPlusData &state)
+    Real64 CoolingTower::getDynamicMaxCapacity(EnergyPlusData &state, [[maybe_unused]] Real64 const fallbackMaxCapacity)
     {
         // TODO: does not include faults object impact
         static constexpr std::string_view routineName("getDynamicMaxCapacity");

@@ -129,11 +129,10 @@ namespace DataPlant {
 
     Real64 CompData::getDynamicMaxCapacity(EnergyPlusData &state) const
     {
-        if (this->compPtr == NULL) {
+        if (this->compPtr == nullptr) {
             return this->MaxLoad;
         }
-        Real64 possibleLoad = this->compPtr->getDynamicMaxCapacity(state);
-        return (possibleLoad == 0) ? this->MaxLoad : possibleLoad;
+        return this->compPtr->getDynamicMaxCapacity(state, this->MaxLoad);
     }
 } // namespace DataPlant
 } // namespace EnergyPlus
