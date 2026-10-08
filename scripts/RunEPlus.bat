@@ -1,4 +1,5 @@
 @echo off
+set readvars_status=0
  if Not "%~1" == "" goto :NoErr
  echo usage: %0 InputFileName (req) WeatherFileName (opt)
  echo Current Parameters:
@@ -32,7 +33,6 @@
  echo ===== %0 (Run EnergyPlus) %~1 %2 ===== Start =====
  set program_path=%~dp0
  set program_name=EnergyPlus.exe
- set "PYTHONPATH=%program_path%python_lib;%PYTHONPATH%"
  set input_path=ExampleFiles\
  set output_path=ExampleFiles\Outputs\
  : If called with full path to an existing file, clear these variables since
@@ -325,12 +325,24 @@ if %maxcol%==nolimit SET rvset=unlimited
 : readvars creates audit in append mode.  start it off
 echo %date% %time% ReadVars >readvars.audit
 
-IF EXIST eplusout.inp "%program_path%python_lib\bin\ReadVarsESO.exe" eplusout.inp %rvset%
-IF NOT EXIST eplusout.inp "%program_path%python_lib\bin\ReadVarsESO.exe" " " %rvset%
-IF EXIST eplusmtr.inp "%program_path%python_lib\bin\ReadVarsESO.exe" eplusmtr.inp %rvset%
-IF NOT EXIST eplusmtr.inp echo eplusout.mtr >test.mvi
-IF NOT EXIST eplusmtr.inp echo eplusmtr.csv >>test.mvi
-IF NOT EXIST eplusmtr.inp "%program_path%python_lib\bin\ReadVarsESO.exe" test.mvi %rvset%
+IF EXIST eplusout.inp (
+  "%program_path%energyplus.exe" auxiliary readvars eplusout.inp %rvset%
+  IF ERRORLEVEL 1 SET readvars_status=1
+)
+IF NOT EXIST eplusout.inp (
+  "%program_path%energyplus.exe" auxiliary readvars " " %rvset%
+  IF ERRORLEVEL 1 SET readvars_status=1
+)
+IF EXIST eplusmtr.inp (
+  "%program_path%energyplus.exe" auxiliary readvars eplusmtr.inp %rvset%
+  IF ERRORLEVEL 1 SET readvars_status=1
+)
+IF NOT EXIST eplusmtr.inp IF EXIST eplusout.mtr echo eplusout.mtr >test.mvi
+IF NOT EXIST eplusmtr.inp IF EXIST eplusout.mtr echo eplusmtr.csv >>test.mvi
+IF NOT EXIST eplusmtr.inp IF EXIST eplusout.mtr (
+  "%program_path%energyplus.exe" auxiliary readvars test.mvi %rvset%
+  IF ERRORLEVEL 1 SET readvars_status=1
+)
 :skipReadVars
 
 IF EXIST eplusout.bnd %post_proc%HVAC-Diagram.exe
@@ -430,3 +442,4 @@ goto :eof
  
  :done
  echo ===== %0 %~1 ===== Complete =====
+ exit /b %readvars_status%

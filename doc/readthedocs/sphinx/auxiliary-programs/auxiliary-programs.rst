@@ -12500,11 +12500,12 @@ Postprocessing Program/Files
 
 A postprocessing program *ReadVarsESO* is provided by the ``readvars``
 Python package installed with EnergyPlus. The ``-r`` or ``--readvars``
-EnergyPlus command-line option runs it after the simulation. The package
-executable is installed under ``python_lib/bin`` for use by EnergyPlus
-and the legacy run scripts. It reads an ESO or MTR file and produces a
-file that can be read by Excel\ :sup:`TM`. Further information on this
-program is provided in the `Input Output
+EnergyPlus command-line option runs it after the simulation. It can also
+be run directly with ``energyplus auxiliary readvars``, which uses the
+Python runtime embedded in EnergyPlus. The legacy ``ReadVarsESO`` command
+remains available as a compatibility wrapper for the same implementation.
+It reads an ESO or MTR file and produces a file that can be read by
+Excel\ :sup:`TM`. Further information on this program is provided in the `Input Output
 Reference <InputOutputReference.pdf>`__ under a section heading called
 “Using ReadVarsESO”. OutputControl:Files may also used to write CSV
 output (variables and meters) directly from EnergyPlus instead of using
@@ -12670,10 +12671,10 @@ Instructions appear at the top of the batch file:
    :   4. Copy %2 (weather) into In.epw
    :   5. Execute EnergyPlus
    :   6. If available Copy %1.rvi (post processor commands) into Eplusout.inp
-   :   7. Execute ReadVarsESO.exe (the Post Processing Program)
+   :   7. Execute ReadVarsESO (the Post Processing Program)
    :   8. If available Copy %1.mvi (post processor commands) into test.mvi
    :       or create appropriate input to get meter output from eplusout.mtr
-   :   9. Execute ReadVarsESO.exe (the Post Processing Program) for meter output
+   :   9. Execute ReadVarsESO (the Post Processing Program) for meter output
    :  10. Copy Eplusout.* to %1.*
    :  11. Clean up working directory.
 
@@ -12953,11 +12954,12 @@ Postprocessing Program/Files
 
 A postprocessing program *ReadVarsESO* is provided by the ``readvars``
 Python package installed with EnergyPlus. The ``-r`` or ``--readvars``
-EnergyPlus command-line option runs it after the simulation. The package
-executable is installed under ``python_lib/bin`` for use by EnergyPlus
-and the legacy run scripts. It reads an ESO or MTR file and produces a
-file that can be read by Excel\ :sup:`TM`. Further information on
-this program is provided in the `Input Output
+EnergyPlus command-line option runs it after the simulation. It can also
+be run directly with ``energyplus auxiliary readvars``, which uses the
+Python runtime embedded in EnergyPlus. The legacy ``ReadVarsESO`` command
+remains available as a compatibility wrapper for the same implementation.
+It reads an ESO or MTR file and produces a file that can be read by
+Excel\ :sup:`TM`. Further information on this program is provided in the `Input Output
 Reference <InputOutputReference.pdf>`__ as well as the `Output Details
 and Examples <OutputDetailsAndExamples.pdf>`__ documents.
 OutputControl:Files may also used to write CSV output (variables and

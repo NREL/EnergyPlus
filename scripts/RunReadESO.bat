@@ -1,15 +1,17 @@
 @echo off
 setlocal
-set "rvlib=%~dp0python_lib"
-if not exist "%rvlib%\bin\ReadVarsESO.exe" set "rvlib=%~dp0..\python_lib"
-set "PYTHONPATH=%rvlib%;%PYTHONPATH%"
+set "readvars_status=0"
+set "energyplus=%~dp0energyplus.exe"
+if not exist "%energyplus%" set "energyplus=%~dp0..\energyplus.exe"
 if EXIST eplusout.inp goto :inp
 rem produces all variables in .eso file to .csv
-"%rvlib%\bin\ReadVarsESO.exe"
+"%energyplus%" auxiliary readvars
+set "readvars_status=%errorlevel%"
 goto :done
 :inp
 rem reads variable specifications from input file
-"%rvlib%\bin\ReadVarsESO.exe" eplusout.inp
+"%energyplus%" auxiliary readvars eplusout.inp
+set "readvars_status=%errorlevel%"
 :done
-endlocal
+endlocal & exit /b %readvars_status%
 

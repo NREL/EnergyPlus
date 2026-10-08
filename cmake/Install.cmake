@@ -385,9 +385,11 @@ if(WIN32)
   install(FILES "${PROJECT_SOURCE_DIR}/release/RunEP.ico" DESTINATION "./")
   install(FILES "${PROJECT_SOURCE_DIR}/scripts/RunEPlus.bat" DESTINATION "./")
   install(FILES "${PROJECT_SOURCE_DIR}/scripts/RunReadESO.bat" DESTINATION "./")
+  install(FILES "${PROJECT_SOURCE_DIR}/scripts/ReadVarsESO.bat" DESTINATION "./")
   install(FILES "${PROJECT_SOURCE_DIR}/release/Runep.pif" DESTINATION "./")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/CSVProc/CSVproc.exe" DESTINATION "PostProcess/")
   install(FILES "${PROJECT_SOURCE_DIR}/scripts/RunReadESO.bat" DESTINATION "PostProcess/")
+  install(FILES "${PROJECT_SOURCE_DIR}/scripts/ReadVarsESO.bat" DESTINATION "PostProcess/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/CoeffConv/CoeffCheck.exe" DESTINATION "PreProcess/CoeffConv/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/CoeffConv/CoeffCheckExample.cci" DESTINATION "PreProcess/CoeffConv/")
   install(FILES "${PROJECT_SOURCE_DIR}/bin/CoeffConv/CoeffConv.exe" DESTINATION "PreProcess/CoeffConv/")
@@ -505,6 +507,8 @@ if(APPLE)
   install(PROGRAMS "${PROJECT_BINARY_DIR}/scripts/runenergyplus" DESTINATION "./")
   install(PROGRAMS scripts/runepmacro DESTINATION "./")
   install(PROGRAMS scripts/runreadvars DESTINATION "./")
+  install(PROGRAMS scripts/ReadVarsESO DESTINATION "./")
+  install(PROGRAMS scripts/ReadVarsESO DESTINATION "PostProcess/")
 
   # You need at least one "install(..." command for it to be registered as a component
   install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
@@ -542,6 +546,8 @@ elseif(UNIX)
   install(PROGRAMS "${PROJECT_BINARY_DIR}/scripts/runenergyplus" DESTINATION "./")
   install(PROGRAMS scripts/runepmacro DESTINATION "./")
   install(PROGRAMS scripts/runreadvars DESTINATION "./")
+  install(PROGRAMS scripts/ReadVarsESO DESTINATION "./")
+  install(PROGRAMS scripts/ReadVarsESO DESTINATION "PostProcess/")
 
   # You need at least one "install(..." command for it to be registered as a component
   install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
@@ -655,6 +661,8 @@ if(APPLE AND CPACK_CODESIGNING_DEVELOPER_ID_APPLICATION)
     "runenergyplus"
     "runepmacro"
     "runreadvars"
+    "ReadVarsESO"
+    "PostProcess/ReadVarsESO"
     # Copied-verbatim apps: Already signed because just copied from bin to package
     # "EPMacro"
     # "PreProcess/EP-Launch-Lite.app"

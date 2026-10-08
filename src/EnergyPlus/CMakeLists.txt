@@ -896,6 +896,16 @@ else() # windows
 endif()
 target_link_libraries(energyplus PRIVATE cli11 energyplusapi project_options project_fp_options project_warnings)
 
+if(WIN32)
+  configure_file("${PROJECT_SOURCE_DIR}/scripts/ReadVarsESO.bat" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ReadVarsESO.bat" COPYONLY)
+else()
+  configure_file("${PROJECT_SOURCE_DIR}/scripts/ReadVarsESO" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ReadVarsESO" COPYONLY)
+  file(
+    CHMOD "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ReadVarsESO"
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+  )
+endif()
+
 set_target_properties(energyplus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 

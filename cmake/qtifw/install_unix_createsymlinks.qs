@@ -40,6 +40,8 @@ function Component()
                                      "UNDOEXECUTE", "rm", linktarget + "/runepmacro");
       component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/runreadvars", linktarget,
                                      "UNDOEXECUTE", "rm", linktarget + "/runreadvars");
+      component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/ReadVarsESO", linktarget,
+                                     "UNDOEXECUTE", "rm", linktarget + "/ReadVarsESO");
       component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/PreProcess/GrndTempCalc/Slab", linktarget,
                                      "UNDOEXECUTE", "rm", linktarget + "/Slab");
       component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/PreProcess/GrndTempCalc/SlabGHT.idd", linktarget,
