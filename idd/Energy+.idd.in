@@ -65564,7 +65564,39 @@ AirLoopHVAC:UnitarySystem,
        \note Enter the supply air volume flow rate as a fraction of the heating capacity.
        \note Required field when Heating Supply Air Flow Rate Method is FlowPerHeatingCapacity.
        \note This field may be blank if a heating coil is not included in the unitary system.
-  A22, \field No Load Supply Air Flow Rate Method
+  A22, \field Supplemental Heating Supply Air Flow Rate Method
+       \type choice
+       \key SupplyAirFlowRate
+       \key FlowPerFloorArea
+       \key FractionOfAutosizedHeatingValue
+       \key FlowPerHeatingCapacity
+       \note Enter the method used to determine the supplemental heating supply air volume flow rate.
+       \note If this field is blank, the primary heating supply air flow rate and legacy simulation path are used.
+  N11, \field Supplemental Heating Supply Air Flow Rate
+       \type real
+       \units m3/s
+       \minimum 0.0
+       \autosizable
+       \note Enter the supplemental heating supply air volume flow rate.
+       \note Required field when Supplemental Heating Supply Air Flow Rate Method is SupplyAirFlowRate.
+  N12, \field Supplemental Heating Supply Air Flow Rate Per Floor Area
+       \type real
+       \units m3/s-m2
+       \minimum 0.0
+       \note Enter the supplemental heating supply air volume flow rate per total floor area.
+       \note Required field when Supplemental Heating Supply Air Flow Rate Method is FlowPerFloorArea.
+  N13, \field Supplemental Heating Fraction of Autosized Heating Supply Air Flow Rate
+       \type real
+       \minimum 0.0
+       \note Enter the supplemental heating supply air volume flow rate as a fraction of the autosized heating supply air flow rate.
+       \note Required field when Supplemental Heating Supply Air Flow Rate Method is FractionOfAutosizedHeatingValue.
+  N14, \field Supplemental Heating Supply Air Flow Rate Per Unit of Capacity
+       \type real
+       \units m3/s-W
+       \minimum 0.0
+       \note Enter the supplemental heating supply air volume flow rate as a fraction of supplemental heating capacity.
+       \note Required field when Supplemental Heating Supply Air Flow Rate Method is FlowPerHeatingCapacity.
+  A23, \field No Load Supply Air Flow Rate Method
        \type choice
        \key None
        \key SupplyAirFlowRate
@@ -65586,42 +65618,42 @@ AirLoopHVAC:UnitarySystem,
        \note capacity as determined by the simulation.
        \note FlowPerHeatingCapacity is selected when the supply air volume is a fraction of the heating
        \note capacity as determined by the simulation.
-  N11, \field No Load Supply Air Flow Rate
+  N15, \field No Load Supply Air Flow Rate
        \type real
        \units m3/s
        \minimum 0.0
        \autosizable
        \note Enter the magnitude of the supply air volume flow rate during when no cooling or heating is required.
        \note Required field when No Load Supply Air Flow Rate Method is SupplyAirFlowRate.
-  N12, \field No Load Supply Air Flow Rate Per Floor Area
+  N16, \field No Load Supply Air Flow Rate Per Floor Area
        \type real
        \units m3/s-m2
        \minimum 0.0
        \note Enter the supply air volume flow rate per total floor area fraction.
        \note Required field when No Load Supply Air Flow Rate Method is FlowPerFloorArea.
-  N13, \field No Load Fraction of Autosized Cooling Supply Air Flow Rate
+  N17, \field No Load Fraction of Autosized Cooling Supply Air Flow Rate
        \type real
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
        \note Required field when No Load Supply Air Flow Rate Method is FractionOfAutosizedCoolingValue.
-  N14, \field No Load Fraction of Autosized Heating Supply Air Flow Rate
+  N18, \field No Load Fraction of Autosized Heating Supply Air Flow Rate
        \type real
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
        \note Required field when No Load Supply Air Flow Rate Method is FractionOfAutosizedHeatingValue.
-  N15, \field No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation
+  N19, \field No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation
        \type real
        \units m3/s-W
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the cooling capacity.
        \note Required field when No Load Supply Air Flow Rate Method is FlowPerCoolingCapacity.
-  N16, \field No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation
+  N20, \field No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation
        \type real
        \units m3/s-W
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the heating capacity.
        \note Required field when No Load Supply Air Flow Rate Method is FlowPerHeatingCapacity.
-  A23, \field No Load Supply Air Flow Rate Control Set To Low Speed
+  A24, \field No Load Supply Air Flow Rate Control Set To Low Speed
        \type choice
        \key Yes
        \key No
@@ -65629,36 +65661,36 @@ AirLoopHVAC:UnitarySystem,
        \note This field is not used when Design Specification Multispeed Object Type input is present
        \note When Yes is selected the minimum air flow rate is used.
        \note When No is selected the maximum air flow rate is used.
-  N17, \field Maximum Supply Air Temperature
+  N21, \field Maximum Supply Air Temperature
        \type real
        \units C
        \autosizable
        \default 80.0
        \note Enter the maximum supply air temperature leaving the heating coil.
        \note When Control Type = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed.
-  N18, \field Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
+  N22, \field Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
        \type real
        \units C
        \default 21.0
        \note Enter the maximum outdoor dry-bulb temperature for supplemental heater operation.
-  A24, \field Outdoor Dry-Bulb Temperature Sensor Node Name
+  A25, \field Outdoor Dry-Bulb Temperature Sensor Node Name
        \type node
        \note If this field is blank, outdoor temperature from the weather file is used.
        \note If this field is not blank, the node name specified determines the outdoor temperature used
        \note for controlling supplemental heater operation.
-  N19, \field Ancillary On-Cycle Electric Power
+  N23, \field Ancillary On-Cycle Electric Power
        \type real
        \units W
        \minimum 0
        \default 0
        \note Enter the value of ancillary electric power for controls or other devices consumed during the on cycle.
-  N20, \field Ancillary Off-Cycle Electric Power
+  N24, \field Ancillary Off-Cycle Electric Power
        \type real
        \units W
        \minimum 0
        \default 0
        \note Enter the value of ancillary electric power for controls or other devices consumed during the off cycle.
-  N21, \field Design Heat Recovery Water Flow Rate
+  N25, \field Design Heat Recovery Water Flow Rate
        \type real
        \units m3/s
        \ip-units gal/min
@@ -65666,24 +65698,24 @@ AirLoopHVAC:UnitarySystem,
        \default 0.0
        \note If non-zero, then the heat recovery inlet and outlet node names must be entered.
        \note Used for heat recovery to an EnergyPlus plant loop.
-  N22, \field Maximum Temperature for Heat Recovery
+  N26, \field Maximum Temperature for Heat Recovery
        \type real
        \units C
        \maximum 100.0
        \minimum 0.0
        \default 80.0
        \note Enter the maximum heat recovery inlet temperature allowed for heat recovery.
-  A25, \field Heat Recovery Water Inlet Node Name
+  A26, \field Heat Recovery Water Inlet Node Name
        \type node
        \note Enter the name of the heat recovery water inlet node if plant water loop connections are present.
-  A26, \field Heat Recovery Water Outlet Node Name
+  A27, \field Heat Recovery Water Outlet Node Name
        \type node
        \note Enter the name of the heat recovery water outlet node if plant water loop connections are present.
-  A27, \field Design Specification Multispeed Object Type
+  A28, \field Design Specification Multispeed Object Type
        \type choice
        \key UnitarySystemPerformance:Multispeed
        \note Enter the type of performance specification object used to describe the multispeed coil.
-  A28; \field Design Specification Multispeed Object Name
+  A29; \field Design Specification Multispeed Object Name
        \type object-list
        \object-list UnitarySystemPerformanceNames
        \note The name of the performance specification object used to describe the multispeed coil.
