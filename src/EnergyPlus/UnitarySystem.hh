@@ -122,6 +122,11 @@ namespace UnitarySystems {
         Real64 heating_supply_air_flow_rate_per_floor_area = -999.0;
         Real64 heating_fraction_of_autosized_heating_supply_air_flow_rate = -999.0;
         Real64 heating_supply_air_flow_rate_per_unit_of_capacity = -999.0;
+        std::string supplemental_heating_supply_air_flow_rate_method;
+        Real64 supplemental_heating_supply_air_flow_rate = -999.0;
+        Real64 supplemental_heating_supply_air_flow_rate_per_floor_area = -999.0;
+        Real64 supplemental_heating_fraction_of_autosized_heating_supply_air_flow_rate = -999.0;
+        Real64 supplemental_heating_supply_air_flow_rate_per_unit_of_capacity = -999.0;
         std::string no_load_supply_air_flow_rate_method;
         Real64 no_load_supply_air_flow_rate = -999.0;
         std::string no_load_supply_air_flow_rate_low_speed;
@@ -307,10 +312,12 @@ namespace UnitarySystems {
         Real64 m_SupHeaterLoad = 0.0;
         int m_CoolingSAFMethod = 0;
         int m_HeatingSAFMethod = 0;
+        int m_SuppHeatSAFMethod = 0;
         int m_NoCoolHeatSAFMethod = 0;
         int m_CoolingCapMethod = 0;
         int m_HeatingCapMethod = 0;
         Real64 m_MaxNoCoolHeatAirVolFlow = 0.0;
+        Real64 m_MaxSuppHeatAirVolFlow = 0.0;
         UseCompFlow m_AirFlowControl = UseCompFlow::Invalid;
         bool m_CoolingCoilUpstream = true;
         Real64 m_MaxOATSuppHeat = 0.0;
@@ -1004,8 +1011,10 @@ struct UnitarySystemsData : BaseGlobalStruct
     Real64 QToHeatSetPt = 0.0;          // load to heating set point {W}
     Real64 m_massFlow1 = 0.0;           // Mass flow rate in operating mode 1 (Compressor On) [kg/s]
     Real64 m_massFlow2 = 0.0;           // Mass flow rate in operating mode 2 (Compressor Off) [kg/s]
+    Real64 m_massFlow3 = 0.0;           // Mass flow rate in operating mode 3 (Supplemental Heating) [kg/s]
     Real64 m_runTimeFraction1 = 0.0;    // Fan runtime fraction in operating mode 1 (Compressor On)
     Real64 m_runTimeFraction2 = 0.0;    // Fan runtime fraction in operating mode 2 (Compressor Off)
+    Real64 m_runTimeFraction3 = 0.0;    // Fan runtime fraction in operating mode 3 (Supplemental Heating)
 
     bool initUnitarySystemsErrFlag = false;
     bool initUnitarySystemsErrorsFound = false;
@@ -1050,8 +1059,10 @@ struct UnitarySystemsData : BaseGlobalStruct
         QToHeatSetPt = 0.0;
         m_massFlow1 = 0.0;
         m_massFlow2 = 0.0;
+        m_massFlow3 = 0.0;
         m_runTimeFraction1 = 0.0;
         m_runTimeFraction2 = 0.0;
+        m_runTimeFraction3 = 0.0;
 
         initUnitarySystemsErrFlag = false;
         initUnitarySystemsErrorsFound = false;

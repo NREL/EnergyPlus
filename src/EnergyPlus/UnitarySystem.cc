@@ -1151,8 +1151,10 @@ namespace UnitarySystems {
         this->m_InitHeatPump = true;
         state.dataUnitarySystems->m_massFlow1 = 0.0;
         state.dataUnitarySystems->m_massFlow2 = 0.0;
+        state.dataUnitarySystems->m_massFlow3 = 0.0;
         state.dataUnitarySystems->m_runTimeFraction1 = 0.0;
         state.dataUnitarySystems->m_runTimeFraction2 = 0.0;
+        state.dataUnitarySystems->m_runTimeFraction3 = 0.0;
         if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP) {
             // this should be done in the child. DXElecHeatingPower not reset to 0 if coil is off, ZoneSysAvailManager
             // zero the fan and DX coils electricity consumption
@@ -4015,6 +4017,12 @@ namespace UnitarySystems {
         Real64 loc_m_HeatingSAFMethod_SAFlowPerFloorArea = input_data.heating_supply_air_flow_rate_per_floor_area;
         Real64 loc_m_HeatingSAFMethod_FracOfAutosizedHeatingSAFlow = input_data.heating_fraction_of_autosized_heating_supply_air_flow_rate;
         Real64 loc_m_HeatingSAFMethod_FlowPerHeatingCapacity = input_data.heating_supply_air_flow_rate_per_unit_of_capacity;
+        std::string loc_m_SuppHeatSAFMethod = input_data.supplemental_heating_supply_air_flow_rate_method;
+        Real64 loc_m_SuppHeatSAFMethod_SAFlow = input_data.supplemental_heating_supply_air_flow_rate;
+        Real64 loc_m_SuppHeatSAFMethod_SAFlowPerFloorArea = input_data.supplemental_heating_supply_air_flow_rate_per_floor_area;
+        Real64 loc_m_SuppHeatSAFMethod_FracOfAutosizedHeatingSAFlow =
+            input_data.supplemental_heating_fraction_of_autosized_heating_supply_air_flow_rate;
+        Real64 loc_m_SuppHeatSAFMethod_FlowPerHeatingCapacity = input_data.supplemental_heating_supply_air_flow_rate_per_unit_of_capacity;
         std::string loc_m_NoCoolHeatSAFMethod = input_data.no_load_supply_air_flow_rate_method;
         Real64 loc_m_NoCoolHeatSAFMethod_SAFlow = input_data.no_load_supply_air_flow_rate;
         Real64 loc_m_NoCoolHeatSAFMethod_SAFlowPerFloorArea = input_data.no_load_supply_air_flow_rate_per_floor_area;
@@ -6187,6 +6195,65 @@ namespace UnitarySystems {
             }
         }
 
+        // Determine supplemental heating supply air flow rate sizing method.
+        // A blank method preserves the legacy primary-heating airflow behavior.
+        if (loc_m_SuppHeatSAFMethod.empty()) {
+            this->m_SuppHeatSAFMethod = DataSizing::None;
+            this->m_MaxSuppHeatAirVolFlow = this->m_MaxHeatAirVolFlow;
+        } else if (Util::SameString(loc_m_SuppHeatSAFMethod, "SupplyAirFlowRate")) {
+            this->m_SuppHeatSAFMethod = DataSizing::SupplyAirFlowRate;
+            if (loc_m_SuppHeatSAFMethod_SAFlow != -999.0) {
+                this->m_MaxSuppHeatAirVolFlow = loc_m_SuppHeatSAFMethod_SAFlow;
+                if (this->m_MaxSuppHeatAirVolFlow == DataSizing::AutoSize) {
+                    this->m_RequestAutoSize = true;
+                } else if (this->m_MaxSuppHeatAirVolFlow < 0.0) {
+                    errorsFound = true;
+                }
+            } else {
+                ShowSevereError(state, std::format("{} = {}", cCurrentModuleObject, thisObjectName));
+                ShowContinueError(state, "Input for Supplemental Heating Supply Air Flow Rate Method = SupplyAirFlowRate.");
+                ShowContinueError(state, "Blank field not allowed for Supplemental Heating Supply Air Flow Rate.");
+                errorsFound = true;
+            }
+        } else if (Util::SameString(loc_m_SuppHeatSAFMethod, "FlowPerFloorArea")) {
+            this->m_SuppHeatSAFMethod = DataSizing::FlowPerFloorArea;
+            if (loc_m_SuppHeatSAFMethod_SAFlowPerFloorArea != -999.0) {
+                this->m_MaxSuppHeatAirVolFlow = loc_m_SuppHeatSAFMethod_SAFlowPerFloorArea * TotalFloorAreaOnAirLoop;
+                this->m_RequestAutoSize = true;
+            } else {
+                ShowSevereError(state, std::format("{} = {}", cCurrentModuleObject, thisObjectName));
+                ShowContinueError(state, "Input for Supplemental Heating Supply Air Flow Rate Method = FlowPerFloorArea.");
+                ShowContinueError(state, "Blank field not allowed for Supplemental Heating Supply Air Flow Rate Per Floor Area.");
+                errorsFound = true;
+            }
+        } else if (Util::SameString(loc_m_SuppHeatSAFMethod, "FractionOfAutosizedHeatingValue")) {
+            this->m_SuppHeatSAFMethod = DataSizing::FractionOfAutosizedHeatingAirflow;
+            if (loc_m_SuppHeatSAFMethod_FracOfAutosizedHeatingSAFlow != -999.0) {
+                this->m_MaxSuppHeatAirVolFlow = loc_m_SuppHeatSAFMethod_FracOfAutosizedHeatingSAFlow;
+                this->m_RequestAutoSize = true;
+            } else {
+                ShowSevereError(state, std::format("{} = {}", cCurrentModuleObject, thisObjectName));
+                ShowContinueError(state, "Input for Supplemental Heating Supply Air Flow Rate Method = FractionOfAutosizedHeatingValue.");
+                ShowContinueError(state, "Blank field not allowed for Supplemental Heating Fraction of Autosized Heating Supply Air Flow Rate.");
+                errorsFound = true;
+            }
+        } else if (Util::SameString(loc_m_SuppHeatSAFMethod, "FlowPerHeatingCapacity")) {
+            this->m_SuppHeatSAFMethod = DataSizing::FlowPerHeatingCapacity;
+            if (loc_m_SuppHeatSAFMethod_FlowPerHeatingCapacity != -999.0) {
+                this->m_MaxSuppHeatAirVolFlow = loc_m_SuppHeatSAFMethod_FlowPerHeatingCapacity;
+                this->m_RequestAutoSize = true;
+            } else {
+                ShowSevereError(state, std::format("{} = {}", cCurrentModuleObject, thisObjectName));
+                ShowContinueError(state, "Input for Supplemental Heating Supply Air Flow Rate Method = FlowPerHeatingCapacity.");
+                ShowContinueError(state, "Blank field not allowed for Supplemental Heating Supply Air Flow Rate Per Unit of Capacity.");
+                errorsFound = true;
+            }
+        } else {
+            ShowSevereError(state, std::format("{} = {}", cCurrentModuleObject, thisObjectName));
+            ShowContinueError(state, std::format("Illegal Supplemental Heating Supply Air Flow Rate Method = {}.", loc_m_SuppHeatSAFMethod));
+            errorsFound = true;
+        }
+
         // Determine supply air flow rate sizing method when cooling or heating is not needed
         if (Util::SameString(loc_m_NoCoolHeatSAFMethod, "SupplyAirFlowRate")) {
             this->m_NoCoolHeatSAFMethod = DataSizing::SupplyAirFlowRate;
@@ -7927,6 +7994,24 @@ namespace UnitarySystems {
                 }
                 if (auto it = fields.find("heating_supply_air_flow_rate_per_unit_of_capacity"); it != fields.end()) { // not required field
                     thisSys.input_specs.heating_supply_air_flow_rate_per_unit_of_capacity = it.value().get<Real64>();
+                }
+                if (auto it = fields.find("supplemental_heating_supply_air_flow_rate_method"); it != fields.end()) { // not required field
+                    thisSys.input_specs.supplemental_heating_supply_air_flow_rate_method = it.value().get<std::string>();
+                }
+                if (auto it = fields.find("supplemental_heating_supply_air_flow_rate"); it != fields.end()) { // not required field, autosizable
+                    thisSys.input_specs.supplemental_heating_supply_air_flow_rate =
+                        (it.value().type() == nlohmann::detail::value_t::string && Util::SameString(it.value().get<std::string>(), "Autosize"))
+                            ? DataSizing::AutoSize
+                            : it.value().get<Real64>();
+                }
+                if (auto it = fields.find("supplemental_heating_supply_air_flow_rate_per_floor_area"); it != fields.end()) { // not required field
+                    thisSys.input_specs.supplemental_heating_supply_air_flow_rate_per_floor_area = it.value().get<Real64>();
+                }
+                if (auto it = fields.find("supplemental_heating_fraction_of_autosized_heating_supply_air_flow_rate"); it != fields.end()) { // not required field
+                    thisSys.input_specs.supplemental_heating_fraction_of_autosized_heating_supply_air_flow_rate = it.value().get<Real64>();
+                }
+                if (auto it = fields.find("supplemental_heating_supply_air_flow_rate_per_unit_of_capacity"); it != fields.end()) { // not required field
+                    thisSys.input_specs.supplemental_heating_supply_air_flow_rate_per_unit_of_capacity = it.value().get<Real64>();
                 }
                 if (auto it = fields.find("no_load_supply_air_flow_rate_method"); it != fields.end()) { // not required field
                     thisSys.input_specs.no_load_supply_air_flow_rate_method = it.value().get<std::string>();
@@ -11007,6 +11092,7 @@ namespace UnitarySystems {
         state.dataUnitarySystems->CompOffFlowRatio = 0.0;
         state.dataUnitarySystems->m_massFlow1 = 0.0;
         state.dataUnitarySystems->m_massFlow2 = 0.0;
+        state.dataUnitarySystems->m_massFlow3 = 0.0;
         state.dataUnitarySystems->OACompOnMassFlow = 0.0;
         state.dataUnitarySystems->OACompOffMassFlow = 0.0;
 
@@ -11488,6 +11574,7 @@ namespace UnitarySystems {
 
         state.dataUnitarySystems->m_massFlow1 = state.dataUnitarySystems->CompOnMassFlow;
         state.dataUnitarySystems->m_massFlow2 = state.dataUnitarySystems->CompOffMassFlow;
+        state.dataUnitarySystems->m_massFlow3 = 0.0;
 
         // Set the system mass flow rates
         this->setAverageAirFlow(state, PartLoadRatio, OnOffAirFlowRatio);
@@ -11516,6 +11603,7 @@ namespace UnitarySystems {
 
         state.dataUnitarySystems->m_runTimeFraction1 = 0.0;
         state.dataUnitarySystems->m_runTimeFraction2 = 0.0;
+        state.dataUnitarySystems->m_runTimeFraction3 = 0.0;
 
         Real64 localFanPartLoadRatio = PartLoadRatio;
         if (this->m_SimASHRAEModel) {
@@ -11526,6 +11614,10 @@ namespace UnitarySystems {
         }
         int SpeedNum = max(this->m_CoolingSpeedNum, this->m_HeatingSpeedNum, this->m_EconoSpeedNum);
         int InletNode = this->AirInNode;
+
+        Real64 PLR_Off = 0.0;
+        Real64 PLR_DXOnly = 0.0;
+        Real64 PLR_SuppHeat = 0.0;
 
         if (SpeedNum > 1) {
             if ((state.dataUnitarySystems->CoolingLoad && this->m_MultiOrVarSpeedCoolCoil) ||
@@ -11549,6 +11641,23 @@ namespace UnitarySystems {
         } else {
             AverageUnitMassFlow = (localFanPartLoadRatio * state.dataUnitarySystems->CompOnMassFlow) +
                                   ((1.0 - localFanPartLoadRatio) * state.dataUnitarySystems->CompOffMassFlow);
+
+            if (this->m_SuppHeatPartLoadFrac > 0.0) {
+                // this assumes DX heat at the same time
+                //PLR_Off = 1.0 - localFanPartLoadRatio;
+                //PLR_DXOnly = localFanPartLoadRatio - this->m_SuppHeatPartLoadFrac;
+                //PLR_SuppHeat = this->m_SuppHeatPartLoadFrac;
+
+                // this assumes switchover
+                PLR_Off = 1.0 - localFanPartLoadRatio;
+                PLR_DXOnly = 0.0;
+                PLR_SuppHeat = localFanPartLoadRatio;
+
+                Real64 const suppHeatMassFlow = this->m_MaxSuppHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
+                AverageUnitMassFlow = (PLR_Off * state.dataUnitarySystems->CompOffMassFlow) +
+                                      (PLR_SuppHeat * suppHeatMassFlow) +
+                                      (PLR_DXOnly * state.dataUnitarySystems->CompOnMassFlow);
+            }
         }
 
         if (state.dataUnitarySystems->CompOffFlowRatio > 0.0) {
@@ -11590,6 +11699,15 @@ namespace UnitarySystems {
                     state.dataUnitarySystems->m_runTimeFraction2 = 0.0;
                 }
             }
+        }
+
+        if (this->m_SuppHeatPartLoadFrac > 0.0 && this->m_FanExists && this->m_FanType == HVAC::FanType::SystemModel) {
+            state.dataUnitarySystems->m_massFlow1 = state.dataUnitarySystems->CompOnMassFlow;
+            state.dataUnitarySystems->m_runTimeFraction1 = PLR_DXOnly;
+            state.dataUnitarySystems->m_massFlow2 = state.dataUnitarySystems->CompOffMassFlow;
+            state.dataUnitarySystems->m_runTimeFraction2 = PLR_Off;
+            state.dataUnitarySystems->m_massFlow3 = this->m_MaxSuppHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
+            state.dataUnitarySystems->m_runTimeFraction3 = PLR_SuppHeat;
         }
 
         if (this->OAMixerExists) {
@@ -11643,6 +11761,10 @@ namespace UnitarySystems {
             // fan will turn on unless these are reset, or maybe one of them. Might be a better way when calling fan.
             state.dataUnitarySystems->m_massFlow1 = 0.0;
             state.dataUnitarySystems->m_massFlow2 = 0.0;
+            state.dataUnitarySystems->m_massFlow3 = 0.0;
+            state.dataUnitarySystems->m_runTimeFraction1 = 0.0;
+            state.dataUnitarySystems->m_runTimeFraction2 = 0.0;
+            state.dataUnitarySystems->m_runTimeFraction3 = 0.0;
             OnOffAirFlowRatio = 1.0;
             if (this->OAMixerExists) {
                 // maybe can just set MaxAvail = 0?
@@ -11736,7 +11858,9 @@ namespace UnitarySystems {
                            state.dataUnitarySystems->m_runTimeFraction1,
                            state.dataUnitarySystems->m_massFlow2,
                            state.dataUnitarySystems->m_runTimeFraction2,
-                           _);
+                           _,
+                           state.dataUnitarySystems->m_massFlow3,
+                           state.dataUnitarySystems->m_runTimeFraction3);
         }
 
         if (this->m_CoolingCoilUpstream) {
@@ -11771,7 +11895,9 @@ namespace UnitarySystems {
                                state.dataUnitarySystems->m_runTimeFraction1,
                                state.dataUnitarySystems->m_massFlow2,
                                state.dataUnitarySystems->m_runTimeFraction2,
-                               _);
+                               _,
+                               state.dataUnitarySystems->m_massFlow3,
+                               state.dataUnitarySystems->m_runTimeFraction3);
 
                 if (this->m_CoolCoilExists) {
                     this->calcUnitaryCoolingSystem(
@@ -11821,7 +11947,9 @@ namespace UnitarySystems {
                                state.dataUnitarySystems->m_runTimeFraction1,
                                state.dataUnitarySystems->m_massFlow2,
                                state.dataUnitarySystems->m_runTimeFraction2,
-                               _);
+                               _,
+                               state.dataUnitarySystems->m_massFlow3,
+                               state.dataUnitarySystems->m_runTimeFraction3);
 
                 if (this->m_HeatCoilExists) {
                     this->calcUnitaryHeatingSystem(state, AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad);
@@ -11853,9 +11981,14 @@ namespace UnitarySystems {
                            state.dataUnitarySystems->m_runTimeFraction1,
                            state.dataUnitarySystems->m_massFlow2,
                            state.dataUnitarySystems->m_runTimeFraction2,
-                           _);
+                           _,
+                           state.dataUnitarySystems->m_massFlow3,
+                           state.dataUnitarySystems->m_runTimeFraction3);
         }
         if (this->m_SuppCoilExists) {
+            if (SuppCoilLoad > 0.0) {
+                state.dataLoopNodes->Node(this->m_SuppCoilAirInletNode).MassFlowRate = this->m_MaxSuppHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
+            }
             this->calcUnitarySuppHeatingSystem(state, FirstHVACIteration, SuppCoilLoad);
             if ((state.dataLoopNodes->Node(this->SuppCoilOutletNodeNum).Temp > this->DesignMaxOutletTemp) && this->m_SuppHeatPartLoadFrac > 0.0 &&
                 !this->m_SimASHRAEModel) {
@@ -15740,7 +15873,9 @@ namespace UnitarySystems {
                            state.dataUnitarySystems->m_runTimeFraction1,
                            state.dataUnitarySystems->m_massFlow2,
                            state.dataUnitarySystems->m_runTimeFraction2,
-                           _);
+                           _,
+                           state.dataUnitarySystems->m_massFlow3,
+                           state.dataUnitarySystems->m_runTimeFraction3);
         }
 
         if (this->m_CoolingCoilUpstream) {
@@ -15797,7 +15932,9 @@ namespace UnitarySystems {
                            state.dataUnitarySystems->m_runTimeFraction1,
                            state.dataUnitarySystems->m_massFlow2,
                            state.dataUnitarySystems->m_runTimeFraction2,
-                           _);
+                           _,
+                           state.dataUnitarySystems->m_massFlow3,
+                           state.dataUnitarySystems->m_runTimeFraction3);
         }
 
         // CALL reheat coils next
