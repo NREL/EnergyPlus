@@ -582,7 +582,7 @@
     85,                      !- Maximum Case Temperature {C}
     80,                      !- Target Case Operating Temperature {C}
     ColdPlateThermalResistanceModifier,  !- Thermal Resistance Modifier Curve Name
-    LMTD,                    !- Thermal Resistance Method
+    Standard,                !- Thermal Resistance Method
     autosize,                !- Nominal Liquid Flow Rate {m3/s}
     autosize,                !- Maximum Liquid Flow Rate {m3/s}
     30,                      !- Auxiliary Electric Power {W}
