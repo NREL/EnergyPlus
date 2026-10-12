@@ -13479,7 +13479,11 @@ namespace SurfaceGeometry {
             }
         }
 
-        ShowSevereError(state, std::format("CalcCoordinateTransformation: No boundary edge longer than 1 mm; cannot establish coordinate transformation for surface=\"{}\":", surf.Name));
+        ShowSevereError(
+            state,
+            std::format(
+                "CalcCoordinateTransformation: No boundary edge longer than 1 mm; cannot establish coordinate transformation for surface=\"{}\":",
+                surf.Name));
         for (int I = 1; I <= surf.Sides; ++I) {
             auto const &point = surf.Vertex(I);
             ShowContinueError(state, std::format(" ({:8.3F},{:8.3F},{:8.3F})", point.x, point.y, point.z));

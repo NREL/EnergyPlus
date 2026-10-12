@@ -3050,14 +3050,16 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CalcCoordinateTransformationAllEdgesIn
     EXPECT_THROW(CalcCoordinateTransformation(*state, 1, compCoordTranslVector), std::runtime_error);
 
     std::string const error_string = delimited_string({
-        "   ** Severe  ** CalcCoordinateTransformation: No boundary edge longer than 1 mm; cannot establish coordinate transformation for surface=\"COLLAPSED TRIANGLE\":",
+        "   ** Severe  ** CalcCoordinateTransformation: No boundary edge longer than 1 mm; cannot establish coordinate transformation for "
+        "surface=\"COLLAPSED TRIANGLE\":",
         "   **   ~~~   **  (   1.000,   2.000,   3.000)",
         "   **   ~~~   **  (   1.001,   2.000,   3.000)",
         "   **   ~~~   **  (   1.000,   2.001,   3.000)",
         "   **  Fatal  ** CalcCoordinateTransformation: Program terminates due to preceding condition.",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=1",
-        "   ..... Last severe error=CalcCoordinateTransformation: No boundary edge longer than 1 mm; cannot establish coordinate transformation for surface=\"COLLAPSED TRIANGLE\":",
+        "   ..... Last severe error=CalcCoordinateTransformation: No boundary edge longer than 1 mm; cannot establish coordinate transformation for "
+        "surface=\"COLLAPSED TRIANGLE\":",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
