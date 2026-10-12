@@ -3651,12 +3651,44 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
     // Setup the order that plant loop sides are to be called while preserving demand-before-supply for each loop.
 
     // METHODOLOGY EMPLOYED:
-    // Repeatedly rearrange loop sides for interconnected components, then restore demand-before-supply for
-    // every loop. A repair can disturb an interconnection that was already ordered, so continue until every
-    // ordering constraint is satisfied. If the repair heuristic repeats a calling order or reaches its revision
-    // limit, use a stable topological ordering of the dependency graph. Failure of the topological ordering means
-    // the graph contains a genuine cycle; in that case warn that demand-before-supply is preserved but not every
-    // inter-loop ordering constraint can be honored.
+    // The dependency graph is a map of required calling order: each loop side is a node, and an arrow from A to B
+    // means A must be called before B.
+    // This graph is built once up front and used to check each order; the topological sort is only a fallback.
+    // An interconnection is a call-order dependency created by equipment connected to two loops. For example, a
+    // water-cooled chiller connects chilled-water and condenser-water loops; the chilled-water supply side places
+    // a demand on the condenser-water loop, so it must be called before the condenser-water demand side.
+
+    // The steps below walk through the repair, fallback, and warning cases, with a small example for each. In the
+    // examples, D means demand side and S means supply side.
+
+    // 1. Rearrange loop sides to satisfy interconnection ordering, restoring demand-before-supply for each loop
+    //    after every pass.
+    //    In other words, each loop's demand side remains ahead of its supply side while the connected equipment's
+    //    ordering needs are worked out.
+
+    //    Example: Starting with A-D, B-D, A-S, B-S and requiring A-S before B-D, move B-D after A-S to get
+    //    A-D, A-S, B-D, B-S.
+
+    // 2. If these repairs repeat an order or reach their revision limit without satisfying all constraints, run
+    //    a stable topological sort on the existing dependency graph to find a valid order if one exists.
+    //    This is Kahn's algorithm: repeatedly place a side whose required predecessors have already been placed,
+    //    then make its successors eligible. When several sides are ready, prefer the one earliest in the current
+    //    order.
+    //    The repair loop allows up to TotNumHalfLoops full sweeps, with each sweep visiting every half-loop.
+    //    A repeated order only means these step-by-step repairs are stuck; it does not by itself mean that no
+    //    valid calling order exists. The graph-based attempt checks whether all requirements can be met together.
+
+    //    Example: with C-D, C-S, A-D, A-S, B-D, B-S and requirements A-D -> B-D -> C-D (plus each
+    //    loop's D -> S), a repair can satisfy one requirement while undoing an earlier move, eventually revisiting
+    //    an order it has already tried. This is a cycle in the sequence of attempted orders, not in the
+    //    requirements: A-D -> B-D -> C-D is one-way, so the fallback can produce A-D, A-S, B-D, C-D, C-S, B-S.
+
+    // 3. If the graph has a genuine cycle and no valid order exists, keep demand-before-supply intact and warn
+    //    that some inter-loop ordering constraints cannot be honored.
+
+    //    Example: A-D -> A-S -> B-D -> B-S -> A-D. Following these requirements leads back to A-D, which would
+    //    have to be called before itself. No sequence can satisfy this, so the function warns and preserves each
+    //    loop's demand-before-supply order.
 
     // Using/Aliasing
     using PlantUtilities::ShiftPlantLoopSideCallingOrder;
@@ -3685,9 +3717,10 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
         return -1;
     };
 
-    // Build the actual dependency graph once. Each loop contributes demand -> supply, and each interconnection
-    // contributes the direction described by LoopDemandsOnRemote. Reciprocal Connected records describe the same
-    // edge, so suppress duplicates when calculating in-degrees later.
+    // Treat each half-loop as a graph node (demand is even, supply is odd). An edge A -> B means A must be
+    // called before B: every loop adds demand -> supply, and each connection adds the direction described by
+    // LoopDemandsOnRemote. Reciprocal Connected records describe the same edge, so suppress duplicates when
+    // calculating in-degrees later.
     std::vector<std::vector<int>> dependencyEdges(state.dataPlnt->TotNumHalfLoops);
     auto addDependency = [&dependencyEdges](int const beforeNode, int const afterNode) {
         if (beforeNode < 0 || afterNode < 0 || beforeNode >= static_cast<int>(dependencyEdges.size()) ||
@@ -3765,6 +3798,7 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
             }
         }
 
+        // Keep the current order as the tie-breaker, and reject an invalid or duplicate half-loop before sorting.
         std::vector<int> currentOrder;
         currentOrder.reserve(state.dataPlnt->TotNumHalfLoops);
         for (int callingIndex = 1; callingIndex <= state.dataPlnt->TotNumHalfLoops; ++callingIndex) {
@@ -3779,6 +3813,8 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
         std::vector<bool> emitted(dependencyEdges.size(), false);
         std::vector<int> topologicalOrder;
         topologicalOrder.reserve(dependencyEdges.size());
+        // Kahn's algorithm: repeatedly emit the earliest currently-ready half-loop from the existing order.
+        // This preserves the old order as a tie-breaker while satisfying every dependency edge.
         while (topologicalOrder.size() < dependencyEdges.size()) {
             int selectedNode = -1;
             for (int const node : currentOrder) {
@@ -3788,6 +3824,7 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
                 }
             }
             if (selectedNode < 0) {
+                // No remaining node is ready, so the un-emitted dependency graph contains a directed cycle.
                 return false;
             }
             emitted[selectedNode] = true;
@@ -3808,6 +3845,7 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
 
     // Track every calling order seen so a cycle in the state space (not just an immediate fixed point) can be
     // detected and stopped early instead of always running the full number-of-half-loops revision limit.
+    // Each entry is one complete order, represented as (loop index, loop side) pairs in calling sequence.
     std::vector<std::vector<std::pair<int, DataPlant::LoopSideLocation>>> callingOrderHistory;
     callingOrderHistory.push_back(snapshotCallingOrder());
 
@@ -3816,6 +3854,8 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
     for (int revision = 1; revision <= state.dataPlnt->TotNumHalfLoops; ++revision) {
         revisionsPerformed = revision;
 
+        // Repair interconnections against the current order. A move made for one connection can invalidate
+        // another, so repeat this sweep until the full constraint check succeeds or the order stops progressing.
         for (int HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
 
             int LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
@@ -3866,6 +3906,8 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
             }
         }
 
+        // Reassert each loop's demand-before-supply invariant after the interconnection moves; these moves can
+        // in turn disturb inter-loop ordering, which is why all graph constraints are checked afterward.
         for (int loopNum = 1; loopNum <= state.dataPlnt->TotNumLoops; ++loopNum) {
             int demandIndex = FindLoopSideInCallingOrder(state, loopNum, LoopSideLocation::Demand);
             int supplyIndex = FindLoopSideInCallingOrder(state, loopNum, LoopSideLocation::Supply);
@@ -3879,8 +3921,9 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
             break;
         }
 
-        // A cyclic dependency can make the calling order oscillate among a handful of states instead of settling
-        // on one; stop as soon as a previously seen state repeats since further revisions cannot make progress.
+        // Reaching this check means the current order failed the full constraint check. A repeated permutation
+        // means this repair heuristic is oscillating, not necessarily that the dependency graph has a cycle. Stop
+        // the sweep here; the topological fallback below distinguishes those cases.
         auto currentSnapshot = snapshotCallingOrder();
         if (std::find(callingOrderHistory.begin(), callingOrderHistory.end(), currentSnapshot) != callingOrderHistory.end()) {
             break;
