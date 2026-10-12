@@ -25002,6 +25002,7 @@ Daylighting:Controls,
        \type choice
        \key SplitFlux
        \key DElight
+       \note DElight is deprecated and will be removed in a future version.
        \default SplitFlux
   A4,  \field Availability Schedule Name
        \type object-list
