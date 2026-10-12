@@ -172,9 +172,10 @@ $P_{SuppHeat}$ and $P_{DXOnly}$ are calculated at their respective operating
 airflows. These equations are reproduced from the [original issue
 proposal](https://github.com/NatLabRockies/EnergyPlus/issues/11166#issuecomment-5284033235).
 
-When the new input method is blank, the supplemental heater will continue to
-use the primary heating airflow and the existing calculation path. Existing
-models will therefore retain their current results.
+When the supplemental airflow method is blank, its resolved airflow defaults to
+the primary heating airflow. The same operating-state calculation is used;
+because the two airflow rates are equal, the weighted airflow reduces to the
+existing primary flow and model results remain unchanged.
 
 ## Approach ##
 
@@ -195,7 +196,7 @@ precede `No Load Supply Air Flow Rate Method` in the object definition.
        \key FractionOfAutosizedHeatingValue
        \key FlowPerHeatingCapacity
        \note Enter the method used to determine the supplemental heating supply air volume flow rate.
-       \note If this field is blank, the primary heating supply air flow rate and legacy simulation path are used.
+       \note If this field is blank, the primary heating supply air flow rate is used for supplemental heating.
   N11, \field Supplemental Heating Supply Air Flow Rate
        \type real
        \units m3/s
@@ -224,8 +225,9 @@ precede `No Load Supply Air Flow Rate Method` in the object definition.
 
 For `FlowPerHeatingCapacity`, the airflow will be based on the supplemental
 heating coil capacity. An autosized direct airflow will default to the autosized
-primary heating airflow. A blank method will use the primary heating airflow
-and the legacy simulation path.
+primary heating airflow. A blank method resolves the supplemental airflow to
+the primary heating airflow, so the weighted airflow reduces to the primary
+flow.
 
 ### Operating-State Airflow and Fan Power ###
 
@@ -319,6 +321,17 @@ off/no-load mode. Use physical mode runtime fractions for exclusive operating
 states when available; use $PLR_{SuppHeat}$ and its complement only for the
 concurrent two-condition approximation.
 
+The supplemental coil is simulated at its specified operating airflow even
+when that condition has only part of the timestep weight. In a series
+configuration, the supplemental coil outlet is also the unitary-system outlet
+node, so its simulated flow and state must be replaced after coil simulation
+with the timestep-average flow and mass-weighted outlet state. The $h_{out,i}$
+and humidity-ratio terms above represent condition-specific states. If the
+supplemental coil's outlet change already reflects its timestep-weighted load,
+recover the condition-specific enthalpy and humidity-ratio changes relative to
+the DX outlet before applying the supplemental condition weight in the final
+average. Do not apply that weight twice or reweight the shared DX outlet state.
+
 The supply fan design flow will be the maximum of the cooling, primary
 heating, supplemental heating, and no-load operating flows. A hard-sized fan
 with insufficient flow will produce input validation consistent with the
@@ -345,14 +358,14 @@ Real64 supplemental_heating_supply_air_flow_rate_per_unit_of_capacity = -999.0;
 
 **Input processing (`UnitarySystem.cc`, approximately lines 3733-4050)**
 
-Read and validate the new fields in `processInputSpec`, preserving the legacy
-path when the method is blank and rejecting the initially unsupported
-outdoor-air, latent-control, and `CoolReheat` combinations:
+Read and validate the new fields in `processInputSpec`. When the method is
+blank, resolve supplemental airflow to the primary heating airflow. Reject the
+initially unsupported outdoor-air, latent-control, and `CoolReheat` combinations:
 
 ```cpp
 auto const &supplementalMethod = input_data.supplemental_heating_supply_air_flow_rate_method;
 if (supplementalMethod.empty()) {
-    // Use the existing primary-heating airflow path.
+    // Default supplemental airflow to primary heating airflow.
 } else {
     // Validate method, fields, and supported operating configuration.
 }
@@ -379,23 +392,33 @@ if (supplementalMethod == DataSizing::SupplyAirFlowRate) {
 
 **Operating-state selection and component simulation (`UnitarySystem.cc`)**
 
-`calcUnitarySystemToLoad` should select DX-only, supplemental-only, concurrent,
-or no-heating operation from the current primary compressor state,
-supplemental-heater load, and supplemental availability/lockout conditions. Do
-not infer the current compressor state from a value left by a previous HVAC
-iteration. Retain the supplemental-heater PLR as an effective weight only for
-the concurrent case; it may represent capacity, speed, or cycling depending on
-coil type and is not necessarily a physical runtime fraction.
+`calcUnitarySystemToLoad` should determine the effective primary compressor
+state before selecting the heating airflow, including the heating-coil
+availability schedule and DX minimum outdoor-temperature lockout. Begin with
+the existing `setAverageAirFlow` or `setOnOffMassFlowRate` result, then apply
+the supplemental PLR-derived condition weights to the node flow, the DX
+on/off-to-average airflow ratio, and the SystemModel fan's operating-mode flow
+and weight pairs. These are effective timestep condition weights, not
+necessarily physical coil runtime fractions.
 
-`setAverageAirFlow` should preserve the existing primary airflow for DX-only
-operation, use the supplemental airflow directly for supplemental-only
-operation, apply the effective PLR weights only for concurrent operation, and
-retain the existing compressor-off/no-load airflow behavior when neither
-heating component operates. Any off/no-load timestep contribution is accounted
-for separately from the concurrent DX/supplemental weights. The supplemental
-coil should continue to be simulated at the resolved supplemental airflow.
+Keep the supplemental coil inlet at its specified operating airflow while
+simulating that coil. Because its outlet node is shared with the unitary-system
+outlet, restore the unitary outlet after coil simulation: set its flow to the
+timestep-average flow and reconstruct enthalpy and humidity ratio by mass-
+weighting the DX-only, supplemental, and off/no-load conditions. When the
+supplemental coil outlet state already includes the timestep load weight,
+remove that weight from the supplemental outlet change before the final
+weighted average applies it once. The blank supplemental method resolves to
+the primary airflow, so the weighted calculation reduces to the existing
+primary-flow result.
 
 **Fan power (`Fans.cc`)**
+
+Initial support is limited to `Fan:SystemModel` because the supplemental
+airflow feature requires fan power and heat to be evaluated separately at each
+operating airflow and then timestep-weighted. Other fan models currently
+calculate from a single flow condition; supporting them requires equivalent
+multi-mode handling to preserve power and fan-heat accounting.
 
 Extend `Fan:SystemModel` to accept a third operating mode for supplemental
 airflow, alongside its existing compressor-on/primary and
@@ -432,13 +455,14 @@ IDF files must therefore receive five blank fields at this location:
 ```
 
 The existing no-load fields follow these inserted blanks. Blank supplemental
-fields preserve the existing primary-heating airflow behavior and legacy
-simulation path, so existing models retain their current results after the
-field insertion. Example files and transition documentation will be updated
-with the inserted blank fields.
+fields resolve supplemental airflow to primary heating airflow. Since the two
+operating flows are equal, the weighted calculation preserves existing model
+results after the field insertion. Example files and transition documentation
+will be updated with the inserted blank fields.
 
-When a supplemental heating airflow method is provided, the simulation will
-use the supplemental-heating operating-state logic described above.
+For DX heating with supplemental load, the simulation uses the supplemental-
+heating operating-state logic described above. A blank method supplies the
+primary heating airflow as the supplemental operating flow.
 
 ## Testing/Validation/Data Sources ##
 
@@ -474,8 +498,9 @@ description in `doc/input-output-reference/src/overview/group-unitary-equipment.
 > Select the method used to determine the supplemental heating supply air flow
 > rate. Choices are `SupplyAirFlowRate`, `FlowPerFloorArea`,
 > `FractionOfAutosizedHeatingValue`, and `FlowPerHeatingCapacity`. If this
-> field is blank, the primary heating supply air flow rate and legacy
-> simulation path are used.
+> field is blank, the primary heating supply air flow rate is used for
+> supplemental heating. The shared calculation then uses equal airflow values,
+> preserving the primary-flow result.
 
 > **Field: Supplemental Heating Supply Air Flow Rate**
 >
@@ -540,7 +565,8 @@ effective-weighted energy use.
 
 The Unitary System section will document DX-only, supplemental-only, concurrent,
 and no-heating airflow selection; three-mode fan-power evaluation; and mass and
-enthalpy averaging equations in
+enthalpy averaging, including reconstruction of the shared supplemental-coil/
+unitary-system outlet state, in
 `doc/engineering-reference/src/simulation-models-encyclopedic-reference-002/air-system-compound-component-groups.tex`.
 
 ## Example File and Transition Changes ##
