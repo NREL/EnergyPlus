@@ -79,7 +79,10 @@ namespace {
     constexpr char const *pg25Idf = "FluidProperties:GlycolConcentration,\n  PG25, PropyleneGlycol, , 0.25;\n";
 
     // A plant loop with the cold plate alone on the demand side, and a cold plate with both flow rates autosized
-    void setupColdPlate(EnergyPlusData &state, CoilCoolingITEColdPlateData &coldPlate, ThermalResistanceMethod const method)
+    void setupColdPlate(EnergyPlusData &state,
+                        CoilCoolingITEColdPlateData &coldPlate,
+                        ThermalResistanceMethod const method,
+                        Real64 const sizingFactor = 1.0)
     {
         state.init_state(state);
 
@@ -127,6 +130,7 @@ namespace {
         coldPlate.nominalFlowRateWasAutoSized = true;
         coldPlate.maximumFlowRate = DataSizing::AutoSize;
         coldPlate.maximumFlowRateWasAutoSized = true;
+        coldPlate.sizingFactor = sizingFactor;
 
         coldPlate.onInitLoopEquip(state, coldPlate.plantLoc);
     }
@@ -190,6 +194,26 @@ TEST_F(EnergyPlusFixture, CoilCoolingITEColdPlate_StandardMethod)
     EXPECT_NEAR(maxCapacity, coldPlate.heatRemovedByFluid, 1.0e-6);
     EXPECT_NEAR(2000.0 - maxCapacity, coldPlate.zoneHeatGainRate, 1.0e-6);
     EXPECT_NEAR(maxCaseTemp, coldPlate.caseTemperature, 1.0e-6);
+}
+
+TEST_F(EnergyPlusFixture, CoilCoolingITEColdPlate_SizingFactor)
+{
+    ASSERT_TRUE(process_idf(pg25Idf));
+    constexpr Real64 sizingFactor = 0.25; // e.g. four identical cold plates sharing the load
+
+    CoilCoolingITEColdPlateData coldPlate;
+    setupColdPlate(*state, coldPlate, ThermalResistanceMethod::Standard, sizingFactor);
+
+    auto *glycol = state->dataPlnt->PlantLoop(1).glycol;
+    Real64 const rho = glycol->getDensity(*state, designInletTemp, "UnitTest");
+    Real64 const cp = glycol->getSpecificHeat(*state, designInletTemp, "UnitTest");
+
+    // The autosized flow rates are the full design flow rate scaled by the sizing factor
+    Real64 const designLoad = (targetCaseTemp - designInletTemp) / nominalResistance;
+    Real64 const designFlow = designLoad / (rho * cp * loopDeltaT);
+    EXPECT_NEAR(sizingFactor * designFlow, coldPlate.nominalFlowRate, 1.0e-10);
+    EXPECT_NEAR(sizingFactor * designFlow, coldPlate.maximumFlowRate, 1.0e-10);
+    EXPECT_NEAR(sizingFactor * designFlow * rho, coldPlate.nominalMassFlowRate, 1.0e-8);
 }
 
 TEST_F(EnergyPlusFixture, CoilCoolingITEColdPlate_LMTDMethod)

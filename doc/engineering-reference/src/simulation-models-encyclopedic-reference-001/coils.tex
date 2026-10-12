@@ -7905,10 +7905,16 @@ For the LMTD method the design load is:
 \dot{Q}_{d} = \frac{LMTD_{d}}{R_{d}}, \qquad LMTD_{d} = \frac{\PB{T_{target} - T_{out,d}} - \PB{T_{target} - T_{in,d}}}{\ln\PB{\dfrac{T_{target} - T_{out,d}}{T_{target} - T_{in,d}}}}
 \end{equation}
 
-The target case operating temperature must be greater than the design outlet temperature for the LMTD method, and the design load must be greater than zero. The nominal liquid volume flow rate is the flow rate that carries the design load with the design temperature difference of the loop:
+The target case operating temperature must be greater than the design outlet temperature for the LMTD method, and the design load must be greater than zero. The design load is multiplied by the user-specified sizing factor, \(F_{s}\), which allows several cold plates to share the load of a plant loop (for example \(F_{s} = 1/X\) for \(X\) identical cold plates):
 
 \begin{equation}
-\dot{V}_{nom} = \frac{\dot{Q}_{d}}{\rho \, c_p \, \Delta T_{d}}
+\dot{Q}_{d,sized} = F_{s} \, \dot{Q}_{d}
+\end{equation}
+
+The nominal liquid volume flow rate is the flow rate that carries the design load with the design temperature difference of the loop:
+
+\begin{equation}
+\dot{V}_{nom} = \frac{\dot{Q}_{d,sized}}{\rho \, c_p \, \Delta T_{d}}
 \end{equation}
 
 where the density, \(\rho\), and the specific heat are evaluated at the design inlet temperature. When the target case operating temperature is greater than the design outlet temperature, the cold plate removes the design load at this flow rate with the case at the target temperature. When the maximum liquid flow rate is autosized, it is equal to the nominal flow rate. When it is specified by the user, it must be greater than or equal to the nominal flow rate. If the nominal flow rate is specified by the user and a Sizing:Plant object exists, the value above is calculated and reported for comparison.

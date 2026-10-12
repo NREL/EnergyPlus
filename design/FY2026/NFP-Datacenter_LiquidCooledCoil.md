@@ -4,7 +4,7 @@ Liquid-Cooled Plant Equipment
 **Jeremy Lerond, Pacific Northwest National Laboratory**
 
  - Original Date: June 2026
- - Revision Date: 10/09/2026
+ - Revision Date: 10/12/2026
 
 ## Justification for New Feature ##
 
@@ -51,6 +51,8 @@ As shown in [[8]][Eaton], cold plate selection is driven by $T_{case,max}$, whic
 [[5]][Wang et al.], [[6]][Cheng et al.], and [[10]][Shaeri et al.] show that the thermal resistance varies as a function of coolant flow rate (and, for two-phase flow, heat flux as well), so the thermal resistance will be adjusted from its nominal value using a dimensionless multiplier from a user-defined empirical curve. For the single-phase flow supported in this NFP, only the flow rate dependence is relevant.
 
 A target case operating temperature is used to size the nominal liquid coolant flow rate through the cold plate. During operation, the flow rate is then adjusted to maintain this target temperature. If the maximum flow rate is reached, the case temperature may rise up to $T_{case,max}$.
+
+The design load used for autosizing is calculated as if a single cold plate served the plant loop. When several cold plates share a loop, the optional `Sizing Factor` field, similar to the field of the same name on supply-side plant equipment, multiplies the design load (for example 1/X for X identical cold plates) so that the autosized flow rates, and therefore the autosized loop flow rate, are not overstated. It applies to autosizing only.
 
 The proposed object, together with a `HeatExchanger:FluidToFluid` object and a pump (on the supply side of the same `PlantLoop`), will represent a coolant distribution unit (CDU). Users will add it to the demand side of a `PlantLoop`. As requested by [[0]][Issue #11408], this approach allows D2C to "_be connected to existing EnergyPlus PlantLoop architecture_". Additionally, this approach supports the requirement that liquids with other heat transfer properties "_be handled at the loop level with the fluid_type and user_defined_fluid_type fields_". Coolant properties can be specified using the `FluidProperties` family of objects. Note that PG25 (a mixture of 25% propylene glycol and water) is a widely used single-phase coolant (see [[5]][Wang et al.]) natively supported by EnergyPlus when using the `FluidProperties:GlycolConcentration` object. Two-phase heat transfer is not currently handled in EnergyPlus; this NFP therefore focuses on single-phase D2C. Two-phase D2C can be modeled using the `Coil:Cooling:ITE:UserDefined` object being developed concurrently, or addressed in a future NFP.
 
@@ -203,12 +205,19 @@ Coil:Cooling:ITE:ColdPlate,
        \type alpha
        \retaincase
        \default General
-  A10; \field IT Equipment Load Schedule Name
+  A10, \field IT Equipment Load Schedule Name
        \note Optional schedule specifying an IT equipment heat load in watts added to any load set by
        \note a paired ElectricEquipment:ITE:LiquidCooled object. When both are present their
        \note contributions are summed. When no paired object exists this schedule is the sole load source.
        \type object-list
        \object-list ScheduleNames
+  N7;  \field Sizing Factor
+       \note Multiplies the design load used to autosize the nominal liquid flow rate. Use a value less than 1.0
+       \note when several cold plates share the cooling load, for example 1/X for X identical cold plates.
+       \note Applies to autosizing only.
+       \type real
+       \minimum> 0.0
+       \default 1.0
 ```
 
 ## Outputs Description ##

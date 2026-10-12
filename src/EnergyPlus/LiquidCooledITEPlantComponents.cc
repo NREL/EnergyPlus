@@ -283,7 +283,7 @@ void CoilCoolingITEColdPlateData::sizeColdPlate(EnergyPlusData &state)
             Real64 const cp = this->plantLoc.loop->glycol->getSpecificHeat(state, plantSizing.ExitTemp, routineName);
             Real64 const rho = this->plantLoc.loop->glycol->getDensity(state, this->getReferenceTemperature(state), routineName);
             // ExitTemp is the loop supply (inlet to cold plate); ExitTemp+DeltaT is the return (outlet from cold plate)
-            designLoad = this->getDesignLoad(state, plantSizing.ExitTemp, plantSizing.ExitTemp + plantSizing.DeltaT);
+            designLoad = this->sizingFactor * this->getDesignLoad(state, plantSizing.ExitTemp, plantSizing.ExitTemp + plantSizing.DeltaT);
             if (designLoad > 0.0) {
                 designFlowRate = designLoad / (plantSizing.DeltaT * cp * rho);
             }
@@ -589,6 +589,7 @@ void CoilCoolingITEColdPlateData::processInputForCoilCoolingITEColdPlate(EnergyP
             errorsFound = true;
         }
         thisColdPlate.auxPower = ip->getRealFieldValue(fields, schemaProps, "auxiliary_electric_power");
+        thisColdPlate.sizingFactor = ip->getRealFieldValue(fields, schemaProps, "sizing_factor");
         thisColdPlate.endUseSubcategory = ip->getAlphaFieldValue(fields, schemaProps, "end_use_subcategory");
 
         // Get the curve (optional — absent or blank means modifier = 1.0)

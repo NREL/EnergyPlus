@@ -63935,12 +63935,19 @@ Coil:Cooling:ITE:ColdPlate,
        \type alpha
        \retaincase
        \default General
-  A10; \field IT Equipment Load Schedule Name
+  A10, \field IT Equipment Load Schedule Name
        \note Optional schedule specifying an IT equipment heat load in watts added to any load set by
        \note a paired ElectricEquipment:ITE:LiquidCooled object. When both are present their
        \note contributions are summed. When no paired object exists this schedule is the sole load source.
        \type object-list
        \object-list ScheduleNames
+  N7;  \field Sizing Factor
+       \note Multiplies the design load used to autosize the nominal liquid flow rate. Use a value less than 1.0
+       \note when several cold plates share the cooling load, for example 1/X for X identical cold plates.
+       \note Applies to autosizing only.
+       \type real
+       \minimum> 0.0
+       \default 1.0
 
 \group Evaporative Coolers
 

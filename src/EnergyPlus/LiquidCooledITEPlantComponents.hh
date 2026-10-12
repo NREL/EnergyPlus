@@ -92,6 +92,7 @@ namespace LiquidCooledITEPlantComponents {
         Real64 maximumFlowRate = 0.0;                // maximum volumetric coolant flow rate [m3/s]
         bool maximumFlowRateWasAutoSized = false;    // true if maximum_liquid_flow_rate was input as Autosize
         Real64 auxPower = 0.0;                       // rated auxiliary electric power [W]
+        Real64 sizingFactor = 1.0;                   // multiplier on the design load used for autosizing [-]
         std::string endUseSubcategory = "General";   // ABUPS end-use sub-category label
         int inletNode = 0;
         int outletNode = 0;

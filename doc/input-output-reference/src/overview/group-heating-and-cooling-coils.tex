@@ -9581,6 +9581,10 @@ This alpha field allows the auxiliary electric energy to be assigned to a user-d
 
 This optional alpha field contains the name of a schedule (ref: Schedules) with the IT equipment heat load, in W. The load is added to any load provided by a paired \textbf{ElectricEquipment:ITE:LiquidCooled} object. When there is no paired object, this schedule is the only source of load. The schedule values must not be negative. If this field is blank, no load is taken from a schedule.
 
+\paragraph{Field: Sizing Factor}\label{field-sizing-factor-coilcoolingitecoldplate}
+
+This numeric field is a multiplier applied to the design load that is used to autosize the nominal liquid flow rate. It is used when several cold plates share the cooling load of a plant loop. The design load of a cold plate is calculated as if that cold plate alone served the loop, so a value less than 1.0 should be entered for each cold plate, for example 1/X for X identical cold plates. The value must be greater than 0. The default is 1.0. This field affects autosizing only. It does not scale flow rates that are specified by the user, and it does not change the operation of the cold plate.
+
 An example of this object in an IDF is shown below.
 
 \begin{lstlisting}
@@ -9600,7 +9604,8 @@ Coil:Cooling:ITE:ColdPlate,
   Zone One,                     !- Zone Name
   VariableFlow,                 !- Flow Mode
   ColdPlateAuxiliary,           !- End-Use Subcategory
-  ITELoad;                      !- IT Equipment Load Schedule Name
+  ITELoad,                      !- IT Equipment Load Schedule Name
+  1;                            !- Sizing Factor
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-coilcoolingitecoldplate}
