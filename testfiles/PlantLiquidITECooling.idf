@@ -49,7 +49,7 @@
 !                          on the demand side.
 
   Version,
-    26.2;                    !- Version Identifier
+    27.1;                    !- Version Identifier
 
   Building,
     Plant Load Profile Example,  !- Name
@@ -550,16 +550,19 @@
     ITELoad,                 !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Saturday Sunday,           !- Field 2
+    For: Saturday Sunday,    !- Field 2
     Until: 24:00,            !- Field 3
-    0.0,                    !- Field 4
+    0.0,                     !- Field 4
     For: Weekdays,           !- Field 5
     Until: 08:00,            !- Field 6
     1500,                    !- Field 7
     Until: 14:00,            !- Field 8
-    2000,                    !- Field 9
+    3000,                    !- Field 9
     Until: 24:00,            !- Field 10
-    1500;                    !- Field 11
+    1500,                    !- Field 11
+    For: AllOtherDays,       !- Field 12
+    Until: 24:00,            !- Field 13
+    0.0;                     !- Field 14
 
   Schedule:Compact,
     ColdPlateAvailability,   !- Name
