@@ -11772,9 +11772,9 @@ namespace UnitarySystems {
 
         Real64 CoilCoolHeatRat = 1.0; // ratio of cooling to heating PLR for cycling fan RH control
         Real64 averageUnitMassFlow = 0.0;
-        Real64 dxOnlyRuntimeFraction = 0.0;
-        Real64 suppHeatRuntimeFraction = 0.0;
-        Real64 offRuntimeFraction = 0.0;
+        Real64 dxOnlyPeriodWeight = 0.0;
+        Real64 suppHeatPeriodWeight = 0.0;
+        Real64 offPeriodWeight = 0.0;
         Real64 suppHeatMassFlow = 0.0;
         bool supplementalAirflowBlendActive = false;
 
@@ -11800,6 +11800,7 @@ namespace UnitarySystems {
         // Apply DX compressor availability and low-OAT lockout before choosing the heating airflow state.
         if (this->m_DXHeatingCoil && this->m_SuppHeatPartLoadFrac > 0.0 && state.dataUnitarySystems->HeatingLoad &&
             HeatingCompOn == HVAC::CompressorOp::On) {
+            // The load controller can request compressor operation before the DX coil applies its own availability limits.
             Real64 outdoorDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             if (this->m_CondenserNodeNum != 0) {
                 auto const &condenserNode = state.dataLoopNodes->Node(this->m_CondenserNodeNum);
@@ -11813,48 +11814,40 @@ namespace UnitarySystems {
             }
         }
 
-DisplayString(state, "");
-DisplayString(state, std::format(" - {} {}: CompressorOn={} : PLR={:.3f} : m_SuppHeatPLF={:.4f} : OnOffAirFlowRatio={:.4f} : AverageUnitMassFlow={:.4f}",
-                        state.dataEnvrn->CurMnDy,
-                        General::CreateSysTimeIntervalString(state),
-                        HeatingCompOn == HVAC::CompressorOp::On,
-                        max(CoolPLR, HeatPLR),
-                        this->m_SuppHeatPartLoadFrac,
-                        OnOffAirFlowRatio,
-                        state.dataLoopNodes->Node(this->AirInNode).MassFlowRate));
-
-        // Start from the existing compressor-on/off airflow calculation.
+        // Start from the existing compressor-on/off airflow calculation so its mode weights and DX ratio remain available.
         if (this->m_NumOfSpeedCooling > 0 || this->m_NumOfSpeedHeating > 0) {
             this->setOnOffMassFlowRate(state, OnOffAirFlowRatio, max(CoolPLR, HeatPLR));
         } else {
             this->setAverageAirFlow(state, max(CoolPLR, HeatPLR), OnOffAirFlowRatio);
         }
 
-        // Reweight the heating runtime between DX-only and supplemental conditions; if DX is locked out, use supplemental-only flow.
+        // Split the existing heating-period weight using PLR as an effective condition weight, not as physical coil runtime.
         if (this->m_DXHeatingCoil && this->m_SuppHeatPartLoadFrac > 0.0 && state.dataUnitarySystems->HeatingLoad) {
             Real64 const suppHeatConditionWeight = min(1.0, max(0.0, this->m_SuppHeatPartLoadFrac));
-            Real64 const heatingRuntimeFraction = state.dataUnitarySystems->m_runTimeFraction1;
-            offRuntimeFraction = state.dataUnitarySystems->m_runTimeFraction2;
+            Real64 const heatingPeriodWeight = state.dataUnitarySystems->m_runTimeFraction1;
+            // Keep any off-cycle flow as its own condition; it is not part of the DX/supplemental PLR split.
+            offPeriodWeight = state.dataUnitarySystems->m_runTimeFraction2;
             suppHeatMassFlow = this->m_MaxSuppHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
-            suppHeatRuntimeFraction = heatingRuntimeFraction;
+            suppHeatPeriodWeight = heatingPeriodWeight;
 
             if (HeatingCompOn == HVAC::CompressorOp::On) {
-                dxOnlyRuntimeFraction = heatingRuntimeFraction * (1.0 - suppHeatConditionWeight);
-                suppHeatRuntimeFraction = heatingRuntimeFraction * suppHeatConditionWeight;
+                dxOnlyPeriodWeight = heatingPeriodWeight * (1.0 - suppHeatConditionWeight);
+                suppHeatPeriodWeight = heatingPeriodWeight * suppHeatConditionWeight;
             }
 
-            // Include the off-cycle contribution separately from the heating-condition weights.
-            averageUnitMassFlow = (dxOnlyRuntimeFraction * state.dataUnitarySystems->CompOnMassFlow) +
-                                  (offRuntimeFraction * state.dataUnitarySystems->CompOffMassFlow) +
-                                  (suppHeatRuntimeFraction * suppHeatMassFlow);
+            // With DX locked out, dxOnlyPeriodWeight stays zero and the heating share uses supplemental airflow.
+            averageUnitMassFlow = (dxOnlyPeriodWeight * state.dataUnitarySystems->CompOnMassFlow) +
+                                  (offPeriodWeight * state.dataUnitarySystems->CompOffMassFlow) +
+                                  (suppHeatPeriodWeight * suppHeatMassFlow);
             supplementalAirflowBlendActive = true;
+            // Set the timestep-average node flow; air-loop controllers own MaxAvail for air-loop equipment.
             auto &unitaryInletNode = state.dataLoopNodes->Node(this->AirInNode);
             unitaryInletNode.MassFlowRate = averageUnitMassFlow;
             if (!this->m_AirLoopEquipment) {
                 unitaryInletNode.MassFlowRateMaxAvail = averageUnitMassFlow;
             }
 
-            // DX coils use the on-cycle-to-average airflow ratio; retain the coil's operating flow for that calculation.
+            // DX coils receive the on-cycle/average ratio separately, while their operating flow includes both heating conditions.
             Real64 const dxOperatingMassFlow = HeatingCompOn == HVAC::CompressorOp::On
                                                    ? ((1.0 - suppHeatConditionWeight) * state.dataUnitarySystems->CompOnMassFlow) +
                                                          (suppHeatConditionWeight * suppHeatMassFlow)
@@ -11866,25 +11859,15 @@ DisplayString(state, std::format(" - {} {}: CompressorOn={} : PLR={:.3f} : m_Sup
                 OnOffAirFlowRatio = 1.0;
             }
 
-            // SystemModel fans evaluate power at each mode's flow, not at the blended node flow.
+            // SystemModel fans calculate each mode's power separately; pass the same condition weights used for node-flow averaging.
             if (this->m_FanExists && this->m_FanType == HVAC::FanType::SystemModel) {
                 state.dataUnitarySystems->m_massFlow1 = state.dataUnitarySystems->CompOnMassFlow;
-                state.dataUnitarySystems->m_runTimeFraction1 = dxOnlyRuntimeFraction;
+                state.dataUnitarySystems->m_runTimeFraction1 = dxOnlyPeriodWeight;
                 state.dataUnitarySystems->m_massFlow2 = state.dataUnitarySystems->CompOffMassFlow;
-                state.dataUnitarySystems->m_runTimeFraction2 = offRuntimeFraction;
+                state.dataUnitarySystems->m_runTimeFraction2 = offPeriodWeight;
                 state.dataUnitarySystems->m_massFlow3 = suppHeatMassFlow;
-                state.dataUnitarySystems->m_runTimeFraction3 = suppHeatRuntimeFraction;
+                state.dataUnitarySystems->m_runTimeFraction3 = suppHeatPeriodWeight;
             }
-
-DisplayString(state, std::format("  - {} {}: CompressorOn={} : heatingRuntimeFraction={:.4f} : PLR_DXOnly={:.4f} : PLR_SuppHeat={:.4f} : PLR_Off={:.4f} : AverageUnitMassFlow={:.4f}",
-                        state.dataEnvrn->CurMnDy,
-                        General::CreateSysTimeIntervalString(state),
-                                      HeatingCompOn == HVAC::CompressorOp::On,
-                                      heatingRuntimeFraction,
-                                      dxOnlyRuntimeFraction,
-                                      suppHeatRuntimeFraction,
-                                      offRuntimeFraction,
-                                      state.dataLoopNodes->Node(this->AirInNode).MassFlowRate));
         }
 
         // Call the series of components that simulate a Unitary System
@@ -12050,6 +12033,7 @@ DisplayString(state, std::format("  - {} {}: CompressorOn={} : heatingRuntimeFra
             Real64 offOutletEnthalpy = 0.0;
             Real64 offOutletHumRat = 0.0;
             if (SuppCoilLoad > 0.0) {
+                // Save the primary-coil outlet state before the supplemental coil changes its shared series outlet node.
                 auto const &dxOnlyOutletNode = state.dataLoopNodes->Node(this->m_SuppCoilAirInletNode);
                 dxOnlyOutletEnthalpy = dxOnlyOutletNode.Enthalpy;
                 dxOnlyOutletHumRat = dxOnlyOutletNode.HumRat;
@@ -12078,33 +12062,31 @@ DisplayString(state, std::format("  - {} {}: CompressorOn={} : heatingRuntimeFra
             }
 
             if (supplementalAirflowBlendActive && SuppCoilLoad > 0.0 && averageUnitMassFlow > HVAC::SmallMassFlow) {
-                // The supplemental coil runs at its own airflow; re-average its shared outlet with the other operating modes.
+                // In this series layout, the supplemental coil outlet is also the unitary outlet. Simulating the coil at its specified flow
+                // writes that condition's flow and state to the shared node; leaving them there would make downstream components see
+                // supplemental flow for the whole timestep, even when supplemental heat has only part of the heating-period weight.
+                // Keep the coil at its required operating flow, then reconstruct the shared outlet from each condition below.
                 auto const &suppHeatOutletNode = state.dataLoopNodes->Node(this->SuppCoilOutletNodeNum);
-                Real64 const dxOnlyMassWeight = dxOnlyRuntimeFraction * state.dataUnitarySystems->CompOnMassFlow;
-                Real64 const suppHeatMassWeight = suppHeatRuntimeFraction * suppHeatMassFlow;
-                Real64 const offMassWeight = offRuntimeFraction * state.dataUnitarySystems->CompOffMassFlow;
-                Real64 const weightedMassFlow = dxOnlyMassWeight + suppHeatMassWeight + offMassWeight;
+                Real64 const dxOnlyMassWeight = dxOnlyPeriodWeight * state.dataUnitarySystems->CompOnMassFlow;
+                Real64 const suppHeatMassWeight = suppHeatPeriodWeight * suppHeatMassFlow;
+                Real64 const offMassWeight = offPeriodWeight * state.dataUnitarySystems->CompOffMassFlow;
 
-                if (weightedMassFlow > HVAC::SmallMassFlow) {
-                    // The DX outlet is shared by both heating conditions; only recover the supplemental coil's already load-scaled outlet rise.
+                if (averageUnitMassFlow > HVAC::SmallMassFlow) {
+                    // Undo the supplemental condition weight in the coil outlet change; the weighted-average formula below multiplies by that weight once.
                     Real64 suppHeatConditionEnthalpy = suppHeatOutletNode.Enthalpy;
                     Real64 suppHeatConditionHumRat = suppHeatOutletNode.HumRat;
-                    if (suppHeatRuntimeFraction > 0.0) {
-                        suppHeatConditionEnthalpy = dxOnlyOutletEnthalpy +
-                                                    (suppHeatOutletNode.Enthalpy - dxOnlyOutletEnthalpy) / suppHeatRuntimeFraction;
-                        suppHeatConditionHumRat = dxOnlyOutletHumRat +
-                                                  (suppHeatOutletNode.HumRat - dxOnlyOutletHumRat) / suppHeatRuntimeFraction;
+                    if (suppHeatPeriodWeight > 0.0) {
+                        suppHeatConditionEnthalpy = dxOnlyOutletEnthalpy + (suppHeatOutletNode.Enthalpy - dxOnlyOutletEnthalpy) / suppHeatPeriodWeight;
+                        suppHeatConditionHumRat = dxOnlyOutletHumRat + (suppHeatOutletNode.HumRat - dxOnlyOutletHumRat) / suppHeatPeriodWeight;
                     }
 
-                    Real64 const outletEnthalpy = (dxOnlyMassWeight * dxOnlyOutletEnthalpy + suppHeatMassWeight * suppHeatConditionEnthalpy +
-                                                    offMassWeight * offOutletEnthalpy) /
-                                                   weightedMassFlow;
-                    Real64 const outletHumRat = (dxOnlyMassWeight * dxOnlyOutletHumRat + suppHeatMassWeight * suppHeatConditionHumRat +
-                                                 offMassWeight * offOutletHumRat) /
-                                                weightedMassFlow;
+                    // Average enthalpy and humidity using each mode's mass flow, then set the outlet to the timestep-average flow.
+                    Real64 const outletEnthalpy = (dxOnlyMassWeight * dxOnlyOutletEnthalpy + suppHeatMassWeight * suppHeatConditionEnthalpy + offMassWeight * offOutletEnthalpy) / averageUnitMassFlow;
+                    Real64 const outletHumRat = (dxOnlyMassWeight * dxOnlyOutletHumRat + suppHeatMassWeight * suppHeatConditionHumRat + offMassWeight * offOutletHumRat) / averageUnitMassFlow;
+
                     auto &unitaryOutletNode = state.dataLoopNodes->Node(this->AirOutNode);
-                    unitaryOutletNode.MassFlowRate = weightedMassFlow;
-                    unitaryOutletNode.MassFlowRateMaxAvail = weightedMassFlow;
+                    unitaryOutletNode.MassFlowRate = averageUnitMassFlow;
+                    unitaryOutletNode.MassFlowRateMaxAvail = averageUnitMassFlow;
                     unitaryOutletNode.Enthalpy = outletEnthalpy;
                     unitaryOutletNode.HumRat = outletHumRat;
                     unitaryOutletNode.Temp = Psychrometrics::PsyTdbFnHW(outletEnthalpy, outletHumRat);
