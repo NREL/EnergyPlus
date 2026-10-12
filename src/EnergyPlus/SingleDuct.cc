@@ -2233,7 +2233,9 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     if (this->ZoneMinAirFracMethod == MinFlowFraction::Scheduled) {
         this->ZoneMinAirFracDes = this->zoneMinAirFracSched->getCurrentVal();
         // now reset inlet node min avail
-        state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = this->AirMassFlowRateMax * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
+        state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail =
+            min(this->AirMassFlowRateMax * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac,
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
     }
 
     if (FirstHVACIteration) {
@@ -2265,12 +2267,14 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
             }
         } else {
             state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = 0.0;
+            state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = 0.0;
         }
 
         if ((state.dataLoopNodes->Node(InletNode).MassFlowRate > 0.0) && (this->availSched->getCurrentVal() > 0.0)) {
             if (!(state.afn->distribution_simulated && state.afn->AirflowNetworkFanActivated)) {
                 state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail =
-                    this->AirMassFlowRateMax * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
+                    min(this->AirMassFlowRateMax * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac,
+                        state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
             }
         } else {
             state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = 0.0;
