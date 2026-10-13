@@ -2504,6 +2504,8 @@ namespace InternalHeatGains {
                 }
 
                 std::array<DataHeatBalance::ITELiquidCoolingCoilSpec, DataHeatBalance::MaxITELiquidCoolingCoils> coolingCoils;
+                std::array<bool, DataHeatBalance::MaxITELiquidCoolingCoils> coilIsActive{};
+                std::array<bool, DataHeatBalance::MaxITELiquidCoolingCoils> coilHasLoadFracInput{};
                 for (int coilIdx = 0; coilIdx < DataHeatBalance::MaxITELiquidCoolingCoils; ++coilIdx) {
                     int const typeAlpha = coilTypeAlphaIdx[coilIdx];
                     int const nameAlpha = coilNameAlphaIdx[coilIdx];
@@ -2518,6 +2520,7 @@ namespace InternalHeatGains {
                         }
                         continue; // this coil slot is not used
                     }
+                    coilIsActive[coilIdx] = true;
 
                     thisCoil.CoilType =
                         static_cast<ITECoolingCoilType>(getEnumValue(ITECoolingCoilTypeNamesUC, Util::makeUPPER(IHGAlphas(typeAlpha))));
@@ -2542,6 +2545,7 @@ namespace InternalHeatGains {
 
                     bool const hasLoadFrac = !IHGNumericFieldBlanks(loadFracNum);
                     bool const hasLoadFracSched = !IHGAlphaFieldBlanks(loadFracSchedAlpha);
+                    coilHasLoadFracInput[coilIdx] = hasLoadFrac || hasLoadFracSched;
                     if (hasLoadFrac && hasLoadFracSched) {
                         ShowWarningCustom(state,
                                          eoh,
@@ -2557,6 +2561,27 @@ namespace InternalHeatGains {
                         }
                     } else if (hasLoadFrac) {
                         thisCoil.LoadFraction = IHGNumbers(loadFracNum);
+                    }
+                }
+
+                // A Load Fraction (static or scheduled) is only truly ambiguous when more than one coil
+                // slot is active; a lone active coil with neither specified is assumed to take the entire
+                // liquid load, matching the common single-coil-per-rack case.
+                int numActiveCoils = 0;
+                for (bool const active : coilIsActive) {
+                    if (active) ++numActiveCoils;
+                }
+                for (int coilIdx = 0; coilIdx < DataHeatBalance::MaxITELiquidCoolingCoils; ++coilIdx) {
+                    if (!coilIsActive[coilIdx] || coilHasLoadFracInput[coilIdx]) continue;
+                    if (numActiveCoils == 1) {
+                        coolingCoils[coilIdx].LoadFraction = 1.0;
+                    } else {
+                        ShowSevereCustom(state,
+                                        eoh,
+                                        std::format("{} or {} must be specified when more than one cooling coil is referenced.",
+                                                     IHGNumericFieldNames(coilLoadFracNumIdx[coilIdx]),
+                                                     IHGAlphaFieldNames(coilLoadFracSchedAlphaIdx[coilIdx])));
+                        ErrorsFound = true;
                     }
                 }
 
@@ -8004,9 +8029,11 @@ namespace InternalHeatGains {
         // heat generation between the liquid cooling loop and the zone air for ElectricEquipment:ITE:LiquidCooled.
         //
         // Note: The cooling coils referenced by this object (Coil:Cooling:ITE:ColdPlate / Coil:Cooling:ITE:UserDefined)
-        // do not exist yet, so the liquid heat capture fraction is applied directly with no physical capacity limit
-        // imposed by the coil. Once those coil objects exist, Liquid Heat Gain should be capped at the coil's
-        // physical maximum, with any shortfall added to Air Heat Gain to Zone instead.
+        // do not exist yet, so each coil's apportioned share of the target liquid load (per its Load Fraction) is
+        // assumed to be captured in full, with no physical capacity limit imposed by the coil. Once those coil
+        // objects exist, each coil's achieved liquid load should be capped at its own physical maximum (queried
+        // from the coil rather than assumed equal to its target), with any shortfall added to Air Heat Gain to
+        // Zone instead.
 
         using Curve::CurveValue;
 
@@ -8059,10 +8086,20 @@ namespace InternalHeatGains {
                 liquidHeatCaptureFraction *= thisEquip.liquidHeatCaptureFracSched->getCurrentVal();
             }
             liquidHeatCaptureFraction = min(max(liquidHeatCaptureFraction, 0.0), 1.0);
+            Real64 const targetTotalLiquidHeat = totalHeatGen * liquidHeatCaptureFraction;
 
-            // Cooling Coil 1-4 do not yet perform any physical capacity limiting (see function header note),
-            // so the full target liquid load is assumed to be captured by the liquid loop.
-            Real64 const liquidHeatGain = totalHeatGen * liquidHeatCaptureFraction;
+            // Split the target liquid load across this rack's active coil slots by Load Fraction (static or
+            // scheduled), then sum each coil's achieved load back up. Cooling Coil 1-4 do not yet perform any
+            // physical capacity limiting (see function header note), so each coil's achieved load is assumed
+            // equal to its own apportioned target for now.
+            Real64 liquidHeatGain = 0.0;
+            for (auto const &coil : thisEquip.CoolingCoils) {
+                if (coil.CoilType == ITECoolingCoilType::Invalid) continue; // this coil slot is not used
+                Real64 const loadFraction = (coil.LoadFractionSched != nullptr) ? coil.LoadFractionSched->getCurrentVal() : coil.LoadFraction;
+                Real64 const targetForThisCoil = targetTotalLiquidHeat * loadFraction;
+                Real64 const achievedForThisCoil = targetForThisCoil; // no physical cap available until the coil exists
+                liquidHeatGain += achievedForThisCoil;
+            }
             Real64 const airHeatGain = totalHeatGen - liquidHeatGain;
 
             thisEquip.PowerRpt[(int)LiquidITERptVars::CPU] = cpuPower;
