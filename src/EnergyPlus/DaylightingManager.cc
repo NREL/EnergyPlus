@@ -4615,6 +4615,13 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
                                              s_ipsc->cCurrentModuleObject,
                                              s_ipsc->cAlphaArgs(1)));
                 ShowContinueError(state, "SplitFlux assumed, and the simulation continues.");
+            } else if (daylightControl.DaylightMethod == DaylightingMethod::DElight) {
+                ShowWarningError(state,
+                                 std::format("{}=\"{}\" uses deprecated {}=\"{}\". DElight will be removed in a future version.",
+                                             s_ipsc->cCurrentModuleObject,
+                                             daylightControl.Name,
+                                             s_ipsc->cAlphaFieldNames(3),
+                                             s_ipsc->cAlphaArgs(3)));
             }
         }
         dl->enclDaylight(daylightControl.enclIndex).hasSplitFluxDaylighting |= (daylightControl.DaylightMethod == DaylightingMethod::SplitFlux);
