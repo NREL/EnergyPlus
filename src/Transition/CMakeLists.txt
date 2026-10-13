@@ -159,6 +159,14 @@ install(FILES "SupportFiles/Report Variables 26-2-0 to 27-1-0.csv" DESTINATION "
 
 if(BUILD_TESTING)
   if(Pytest_AVAILABLE)
+    # Keep the support files needed by historical transition tests beside the executables.
+    # The top-level build only copies the IDD for the immediately previous release.
+    file(COPY
+      "${CMAKE_CURRENT_SOURCE_DIR}/../../idd/versions/V26-1-0-Energy+.idd"
+      "${CMAKE_CURRENT_SOURCE_DIR}/../../idd/versions/V26-2-0-Energy+.idd"
+      "${CMAKE_CURRENT_SOURCE_DIR}/SupportFiles/Report Variables 26-1-0 to 26-2-0.csv"
+      DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    )
     add_test(NAME Transition.transition_tests
       COMMAND ${Python_EXECUTABLE} -m pytest --verbose
               --transition-cli-dir "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"

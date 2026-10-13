@@ -50,6 +50,7 @@
 #include <cassert>
 #include <cmath>
 #include <format>
+#include <ranges>
 #include <string>
 
 // ObjexxFCL Headers
@@ -3648,7 +3649,7 @@ namespace SurfaceGeometry {
                     }
                 }
                 surfTemp.Vertex.allocate(surfTemp.Sides);
-                GetVertices(state, SurfNum, surfTemp.Sides, s_ipsc->rNumericArgs({2, _}));
+                GetVertices(state, SurfNum, surfTemp.Sides, s_ipsc->rNumericArgs, 2);
                 CheckConvexity(state, SurfNum, surfTemp.Sides);
                 if (state.dataReportFlag->MakeMirroredDetachedShading) {
                     MakeMirrorSurface(state, SurfNum);
@@ -4416,7 +4417,7 @@ namespace SurfaceGeometry {
                 }
                 surfTemp.Vertex.allocate(surfTemp.Sides);
                 surfTemp.NewVertex.allocate(surfTemp.Sides);
-                GetVertices(state, SurfNum, surfTemp.Sides, s_ipsc->rNumericArgs({3, _}));
+                GetVertices(state, SurfNum, surfTemp.Sides, s_ipsc->rNumericArgs, 3);
                 if (surfTemp.Area <= 0.0) {
                     ShowSevereError(
                         state,
@@ -5401,7 +5402,7 @@ namespace SurfaceGeometry {
                 surfTemp.Multiplier = 1.0;
             }
 
-            GetVertices(state, SurfNum, surfTemp.Sides, s_ipsc->rNumericArgs({4, _}));
+            GetVertices(state, SurfNum, surfTemp.Sides, s_ipsc->rNumericArgs, 4);
 
             CheckConvexity(state, SurfNum, surfTemp.Sides);
             surfTemp.windowShadingControlList.clear();
@@ -6576,7 +6577,7 @@ namespace SurfaceGeometry {
                 surfTemp.Sides = s_ipsc->rNumericArgs(1);
             }
             surfTemp.Vertex.allocate(surfTemp.Sides);
-            GetVertices(state, SurfNum, surfTemp.Sides, s_ipsc->rNumericArgs({2, _}));
+            GetVertices(state, SurfNum, surfTemp.Sides, s_ipsc->rNumericArgs, 2);
             CheckConvexity(state, SurfNum, surfTemp.Sides);
             //    IF (SurfaceTmp(SurfNum)%Sides == 3) THEN
             //      CALL ShowWarningError(state, TRIM(s_ipsc->cCurrentModuleObject)//'="'//TRIM(SurfaceTmp(SurfNum)%Name)//  &
@@ -9219,9 +9220,10 @@ namespace SurfaceGeometry {
     }
 
     void GetVertices(EnergyPlusData &state,
-                     int const SurfNum,             // Current surface number
-                     int const NSides,              // Number of sides to figure
-                     Array1S<Real64> const Vertices // Vertices, in specified order
+                     int const SurfNum,              // Current surface number
+                     int const NSides,               // Number of sides to figure
+                     Array1D<Real64> const &Numbers, // Numeric input fields, vertices in specified order
+                     int const firstVertexIndex      // Index in Numbers of the first vertex coordinate
     )
     {
 
@@ -9265,13 +9267,13 @@ namespace SurfaceGeometry {
         if (NSides > state.dataSurface->MaxVerticesPerSurface) {
             state.dataSurface->MaxVerticesPerSurface = NSides;
         }
-        int Ptr = 1;
+        int Ptr = firstVertexIndex;
         for (n = 1; n <= NSides; ++n) {
-            surfTemp.Vertex(n).x = Vertices(Ptr);
+            surfTemp.Vertex(n).x = Numbers(Ptr);
             ++Ptr;
-            surfTemp.Vertex(n).y = Vertices(Ptr);
+            surfTemp.Vertex(n).y = Numbers(Ptr);
             ++Ptr;
-            surfTemp.Vertex(n).z = Vertices(Ptr);
+            surfTemp.Vertex(n).z = Numbers(Ptr);
             ++Ptr;
         }
 
@@ -11601,14 +11603,14 @@ namespace SurfaceGeometry {
                 }
             }
 
-            if (s_ipsc->rNumericArgs(1) > 0.0 && !any_ne(s_ipsc->rNumericArgs({3, 7}), 0.0) &&
-                (!state.dataSurface->OSC(OSCNum).SinusoidalConstTempCoef)) {
+            bool const allCoefficientsZero = std::ranges::all_of(std::views::iota(3, 8), [&](int const i) { return s_ipsc->rNumericArgs(i) == 0.0; });
+
+            if (s_ipsc->rNumericArgs(1) > 0.0 && allCoefficientsZero && (!state.dataSurface->OSC(OSCNum).SinusoidalConstTempCoef)) {
                 ShowSevereError(state, std::format("{}=\"{}\" has zeros for all coefficients.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ShowContinueError(state, "...The outdoor air temperature for surfaces using this OtherSideCoefficients object will always be 0C.");
             }
 
-            if (s_ipsc->rNumericArgs(1) <= 0.0 && !any_ne(s_ipsc->rNumericArgs({3, 7}), 0.0) &&
-                (!state.dataSurface->OSC(OSCNum).SinusoidalConstTempCoef)) {
+            if (s_ipsc->rNumericArgs(1) <= 0.0 && allCoefficientsZero && (!state.dataSurface->OSC(OSCNum).SinusoidalConstTempCoef)) {
                 ShowSevereError(state, std::format("{}=\"{}\" has zeros for all coefficients.", s_ipsc->cCurrentModuleObject, s_ipsc->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   "...The outside surface temperature for surfaces using this OtherSideCoefficients object will always be 0C.");
@@ -12101,7 +12103,9 @@ namespace SurfaceGeometry {
                 thisFace.FacePoints.allocate(thisSurface.Sides);
                 thisFace.NSides = thisSurface.Sides;
                 thisFace.SurfNum = SurfNum;
-                thisFace.FacePoints({1, thisSurface.Sides}) = thisSurface.Vertex({1, thisSurface.Sides});
+                for (int i = 1; i <= thisSurface.Sides; ++i) {
+                    thisFace.FacePoints(i) = thisSurface.Vertex(i);
+                }
                 Vectors::CreateNewellAreaVector(thisFace.FacePoints, thisFace.NSides, thisFace.NewellAreaVector);
                 SumAreas += Vectors::VecLength(thisFace.NewellAreaVector);
             }
@@ -13440,46 +13444,52 @@ namespace SurfaceGeometry {
         //       AUTHOR         George Walton, BLAST
         //       DATE WRITTEN   August 1976
         //       MODIFIED       LKL, May 2004 -- >4 sided polygons
+        //                      Joe Robertson, Oct. 2026 -- fall back to another polygon edge when edge 2-3 is too short
         //       RE-ENGINEERED  Yes
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine develops a coordinate transformation such that the X-axis goes
-        // through points 2 and 3 and the Y-axis goes through point 1
-        // of a plane figure in 3-d space.
+        // This subroutine projects a reference vertex onto a polygon edge to establish the coordinate origin. It tries boundary edges in
+        // cyclic order, starting with edge 2-3, until it finds one that is long enough.
 
         // REFERENCES:
         // 'NECAP' - NASA'S Energy-Cost Analysis Program
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 Gamma; // Intermediate Result
-        Real64 DotSelfX23;
-
-        // Object Data
-        Vector x21;
-        Vector x23;
-
-        // Determine Components of the Coordinate Translation Vector.
         auto const &surf = state.dataSurface->Surface(SurfNum);
 
-        x21 = surf.Vertex(2) - surf.Vertex(1);
-        x23 = surf.Vertex(2) - surf.Vertex(3);
-
-        DotSelfX23 = magnitude_squared(x23);
-
-        if (DotSelfX23 <= Constant::OneMillionth) {
-            ShowSevereError(state, std::format("CalcCoordinateTransformation: Invalid dot product, surface=\"{}\":", surf.Name));
-            for (int I = 1; I <= surf.Sides; ++I) {
-                auto const &point = surf.Vertex(I);
-                ShowContinueError(state, std::format(" ({:8.3F},{:8.3F},{:8.3F})", point.x, point.y, point.z));
+        auto const projectOntoEdge = [&](int const edgeStartIndex, int const edgeEndIndex, int const vertexToProjectIndex) {
+            auto const &edgeStart = surf.Vertex(edgeStartIndex);
+            Vector const edge = surf.Vertex(edgeEndIndex) - edgeStart;
+            Real64 const edgeLengthSquared = magnitude_squared(edge);
+            if (edgeLengthSquared <= Constant::OneMillionth) {
+                return false;
             }
-            ShowFatalError(
-                state, "CalcCoordinateTransformation: Program terminates due to preceding condition.", OptionalOutputFileRef{state.files.eso});
-            return;
+
+            Real64 const gamma = dot(surf.Vertex(vertexToProjectIndex) - edgeStart, edge) / edgeLengthSquared;
+            CompCoordTranslVector = edgeStart + gamma * edge;
+            return true;
+        };
+
+        for (int edgeOffset = 0; edgeOffset < surf.Sides; ++edgeOffset) {
+            int const edgeStartIndex = (edgeOffset + 1) % surf.Sides + 1;
+            int const edgeEndIndex = (edgeStartIndex == surf.Sides) ? 1 : edgeStartIndex + 1;
+            int const vertexToProjectIndex = (edgeStartIndex == 1) ? surf.Sides : edgeStartIndex - 1;
+            if (projectOntoEdge(edgeStartIndex, edgeEndIndex, vertexToProjectIndex)) {
+                return;
+            }
         }
 
-        Gamma = dot(x21, x23) / magnitude_squared(x23);
-
-        CompCoordTranslVector = surf.Vertex(2) + Gamma * (surf.Vertex(3) - surf.Vertex(2));
+        ShowSevereError(
+            state,
+            std::format(
+                "CalcCoordinateTransformation: No boundary edge longer than 1 mm; cannot establish coordinate transformation for surface=\"{}\":",
+                surf.Name));
+        for (int I = 1; I <= surf.Sides; ++I) {
+            auto const &point = surf.Vertex(I);
+            ShowContinueError(state, std::format(" ({:8.3F},{:8.3F},{:8.3F})", point.x, point.y, point.z));
+        }
+        ShowFatalError(state, "CalcCoordinateTransformation: Program terminates due to preceding condition.", OptionalOutputFileRef{state.files.eso});
+        return;
     }
 
     void CreateShadedWindowConstruction(EnergyPlusData &state,
@@ -13550,7 +13560,9 @@ namespace SurfaceGeometry {
             if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == DataSurfaces::WinShadingType::IntShade ||
                 state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == DataSurfaces::WinShadingType::IntBlind) {
                 // Interior shading device
-                thisConstructNewSh.LayerPoint({1, TotLayersOld}) = state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
+                for (int i = 1; i <= TotLayersOld; ++i) {
+                    thisConstructNewSh.LayerPoint(i) = state.dataConstruction->Construct(ConstrNum).LayerPoint(i);
+                }
                 thisConstructNewSh.LayerPoint(TotLayersNew) = ShDevNum;
                 thisConstructNewSh.InsideAbsorpSolar = thisMaterialSh->AbsorpSolarIn;
                 thisConstructNewSh.InsideAbsorpThermal = thisMaterialSh->AbsorpThermalBack;
@@ -13560,7 +13572,9 @@ namespace SurfaceGeometry {
             } else {
                 // Exterior shading device
                 thisConstructNewSh.LayerPoint(1) = ShDevNum;
-                thisConstructNewSh.LayerPoint({2, TotLayersNew}) = state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
+                for (int i = 2; i <= TotLayersNew; ++i) {
+                    thisConstructNewSh.LayerPoint(i) = state.dataConstruction->Construct(ConstrNum).LayerPoint(i - 1);
+                }
                 auto const *thisMaterialShInside = s_mat->materials(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(TotLayersNew));
                 thisConstructNewSh.InsideAbsorpSolar = thisMaterialShInside->AbsorpSolarIn;
                 thisConstructNewSh.InsideAbsorpThermal = thisMaterialShInside->AbsorpThermalBack;
@@ -13763,10 +13777,12 @@ namespace SurfaceGeometry {
             thisConstruct.setArraysBasedOnMaxSolidWinLayers(state);
 
             int TotLayersOld = state.dataConstruction->Construct(oldConstruction).TotLayers;
-            thisConstruct.LayerPoint({1, Construction::MaxLayersInConstruct}) = 0;
+            thisConstruct.LayerPoint = 0; // sized to Construction::MaxLayersInConstruct
             thisConstruct.LayerPoint(1) = stormMaterial;
             thisConstruct.LayerPoint(2) = gapMaterial;
-            thisConstruct.LayerPoint({3, TotLayersOld + 2}) = state.dataConstruction->Construct(oldConstruction).LayerPoint({1, TotLayersOld});
+            for (int i = 3; i <= TotLayersOld + 2; ++i) {
+                thisConstruct.LayerPoint(i) = state.dataConstruction->Construct(oldConstruction).LayerPoint(i - 2);
+            }
             thisConstruct.Name = name;
             thisConstruct.TotLayers = TotLayersOld + 2;
             thisConstruct.TotSolidLayers = state.dataConstruction->Construct(oldConstruction).TotSolidLayers + 1;
@@ -13904,7 +13920,9 @@ namespace SurfaceGeometry {
         H = Vectors::VecLength(TVect); // SQRT((X(1)-X(2))**2 + (Y(1)-Y(2))**2 + (Z(1)-Z(2))**2)
 
         // Save coordinates of original window in case Window 5 data overwrites.
-        OriginalCoord.Vertex({1, surfTemp.Sides}) = surfTemp.Vertex({1, surfTemp.Sides});
+        for (int i = 1; i <= surfTemp.Sides; ++i) {
+            OriginalCoord.Vertex(i) = surfTemp.Vertex(i);
+        }
 
         // Height and width of first glazing system
         h1 = state.dataConstruction->Construct(IConst).W5FileGlazingSysHeight;
@@ -14075,7 +14093,9 @@ namespace SurfaceGeometry {
         H = Vectors::VecLength(TVect); // SQRT((X(1)-X(2))**2 + (Y(1)-Y(2))**2 + (Z(1)-Z(2))**2)
 
         // Save coordinates of original window in case Window 5 data overwrites.
-        OriginalCoord.Vertex({1, surfTemp.Sides}) = surfTemp.Vertex({1, surfTemp.Sides});
+        for (int i = 1; i <= surfTemp.Sides; ++i) {
+            OriginalCoord.Vertex(i) = surfTemp.Vertex(i);
+        }
 
         // Height and width of first glazing system
         h1 = state.dataConstruction->Construct(IConst).W5FileGlazingSysHeight;
