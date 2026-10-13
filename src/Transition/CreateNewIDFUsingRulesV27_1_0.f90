@@ -383,6 +383,21 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with A, insert the rules here
 
+              ! If your original object starts with B, insert the rules here
+
+              CASE('BRANCH')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                  DO i = 3, CurArgs, 2
+                    IF (OutArgs(i) == 'EvaporativeCooler:Direct:ResearchSpecial') THEN
+                      OutArgs(i)='EvaporativeCooler:Direct:UserEffectiveness'
+                      nodiff=.false.
+                    ELSEIF (OutArgs(i) == 'EvaporativeCooler:Indirect:ResearchSpecial') THEN
+                      OutArgs(i)='EvaporativeCooler:Indirect:UserEffectiveness'
+                      nodiff=.false.
+                    ENDIF
+                  END DO
+
               ! If your original object starts with C, insert the rules here
 
               ! If your original object starts with D, insert the rules here
@@ -390,15 +405,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with E, insert the rules here
 
               CASE('EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL')
+                  ObjectName = 'EvaporativeCooler:Direct:UserEffectiveness'
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                   nodiff=.false.
-                  ObjectName = 'EVAPORATIVECOOLER:DIRECT:USEREFFECTIVENESS'
                   OutArgs(1:CurArgs)=InArgs(1:CurArgs)
 
               CASE('EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL')
+                  ObjectName = 'EvaporativeCooler:Indirect:UserEffectiveness'
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                   nodiff=.false.
-                  ObjectName = 'EVAPORATIVECOOLER:INDIRECT:USEREFFECTIVENESS'
                   OutArgs(1:CurArgs)=InArgs(1:CurArgs)
 
               ! If your original object starts with F, insert the rules here
