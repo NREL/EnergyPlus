@@ -809,5 +809,9 @@ TEST_F(EnergyPlusFixture, ZoneExhaustFan_InputTest)
     EXPECT_GT(fanExhaust->outletAirTemp, fanExhaust->inletAirTemp);
     EXPECT_GT(fanExhaust->outletAirEnthalpy, fanExhaust->inletAirEnthalpy);
     EXPECT_EQ(fanExhaust->outletAirHumRat, fanExhaust->inletAirHumRat);
+
+    fanExhaust->heatLossDest = Fans::HeatLossDest::Zone;
+    fanExhaust->simulateZoneExhaust(*state);
+    EXPECT_NEAR(5.5555, fanExhaust->powerLossToZone, 0.0001);
 }
 } // namespace EnergyPlus
