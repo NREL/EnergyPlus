@@ -792,7 +792,6 @@ TEST_F(EnergyPlusFixture, ZoneExhaustFan_InputTest)
     fanExhaust->inletAirTemp = 20.0;
     fanExhaust->inletAirHumRat = 0.008;
     fanExhaust->inletAirEnthalpy = Psychrometrics::PsyHFnTdbW(fanExhaust->inletAirTemp, fanExhaust->inletAirHumRat);
-    ;
     fanExhaust->inletAirMassFlowRate = 1.0;
 
     fanExhaust->simulateZoneExhaust(*state);
