@@ -57,7 +57,7 @@ using namespace EnergyPlus;
 
 TEST_F(GeometryFixture, Vector2D_Basic)
 {
-    Vector2D v(15.0); // Uniform value construction
+    Vector2D v(15.0, 15.0); // Value construction
     EXPECT_EQ(15.0f, v.x);
     EXPECT_EQ(15.0f, v.y);
     v.normalize();
@@ -102,12 +102,12 @@ TEST_F(GeometryFixture, Vector2D_Comparisons)
     EXPECT_EQ(v, w);
 
     // Reduce v and test inequality
-    v -= Vector2D(0.5);
+    v -= Vector2D(0.5, 0.5);
     EXPECT_TRUE(v != w);
     EXPECT_TRUE(!(v == w));
 
     // Increase v and test inequality
-    v += Vector2D(1.0);
+    v += Vector2D(1.0, 1.0);
     EXPECT_TRUE(v != w);
     EXPECT_TRUE(!(v == w));
 
@@ -168,8 +168,8 @@ TEST_F(GeometryFixture, Vector2D_BinaryOperations)
     EXPECT_DOUBLE_EQ(v.length_squared(), v.dot(w)); // v == w here
 
     // Check midpoint (should match original vector)
-    v += Vector2D(1.0);
-    w -= Vector2D(1.0);
+    v += Vector2D(1.0, 1.0);
+    w -= Vector2D(1.0, 1.0);
     Vector2D const midpoint(0.5 * (v + w));
     EXPECT_DOUBLE_EQ(original.x, midpoint.x);
     EXPECT_DOUBLE_EQ(original.y, midpoint.y);

@@ -117,7 +117,7 @@ Real64 AreaPolygon(int const n, Array1D<Vector> &p)
 
     //  Initialize csum
     Vector csum;
-    csum = Vector3D(0.0);
+    csum = Vector3D();
 
     for (int i = 0; i <= n - 2; ++i) {
         csum += p[i].cross(p[i + 1]);
@@ -291,7 +291,7 @@ void CreateNewellAreaVector(Array1D<Vector> const &VList, int const NSides, Vect
     // REFERENCES:
     // Collaboration with Bill Carroll, LBNL.
 
-    OutNewellAreaVector = Vector3D(0.0);
+    OutNewellAreaVector = Vector3D();
 
     Vector V1 = VList(2) - VList(1);
     for (int Vert = 3; Vert <= NSides; ++Vert) {
@@ -327,7 +327,7 @@ void CreateNewellSurfaceNormalVector(Array1D<Vector> const &VList, int const NSi
     //    Returning Normalize(Normal)
     // End Function
 
-    OutNewellSurfaceNormalVector = Vector3D(0.0);
+    OutNewellSurfaceNormalVector = Vector3D();
     Real64 xvalue = 0.0;
     Real64 yvalue = 0.0;
     Real64 zvalue = 0.0;

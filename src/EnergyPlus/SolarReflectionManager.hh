@@ -92,7 +92,7 @@ namespace SolarReflectionManager {
         int NumPossibleObs;              // Number of possible obstructions for a receiving surface
 
         // Default Constructor
-        SolReflRecSurfData() : SurfNum(0), NumRecPts(0), NormVec(0.0), ThetaNormVec(0.0), PhiNormVec(0.0), NumReflRays(0), NumPossibleObs(0)
+        SolReflRecSurfData() : SurfNum(0), NumRecPts(0), NormVec(), ThetaNormVec(0.0), PhiNormVec(0.0), NumReflRays(0), NumPossibleObs(0)
         {
         }
     };
@@ -185,15 +185,15 @@ struct SolarReflectionManagerData : BaseGlobalStruct
     void clear_state() override
     {
         this->IHr = 0;
-        this->SunVec = Vector3D(0.0);
+        this->SunVec = Vector3D();
         this->RecSurfNum = 0;
         this->SurfNum = 0;
         this->RecPtNum = 0;
         this->NumRecPts = 0;
         this->HitPtSurfNum = 0;
         this->RayNum = 0;
-        this->OriginThisRay = Vector3D(0.0);
-        this->ObsHitPt = Vector3D(0.0);
+        this->OriginThisRay = Vector3D();
+        this->ObsHitPt = Vector3D();
         this->ObsSurfNum = 0;
         this->CosIncBmAtHitPt = 0.0;
         this->CosIncBmAtHitPt2 = 0.0;
@@ -201,12 +201,12 @@ struct SolarReflectionManagerData : BaseGlobalStruct
         this->dReflBeamToDiffSol = 0.0;
         this->SunLitFract = 0.0;
         this->NumHr = 0;
-        this->SunVect = Vector3D(0.0);
-        this->SunVecMir = Vector3D(0.0);
-        this->RecPt = Vector3D(0.0);
-        this->HitPtRefl = Vector3D(0.0);
-        this->HitPtObs = Vector3D(0.0);
-        this->ReflNorm = Vector3D(0.0);
+        this->SunVect = Vector3D();
+        this->SunVecMir = Vector3D();
+        this->RecPt = Vector3D();
+        this->HitPtRefl = Vector3D();
+        this->HitPtObs = Vector3D();
+        this->ReflNorm = Vector3D();
         this->SpecReflectance = 0.0;
         this->ConstrNumRefl = 0;
         this->CosIncAngRefl = 0.0;
@@ -221,13 +221,13 @@ struct SolarReflectionManagerData : BaseGlobalStruct
         this->HitPntSurfNum = 0;
         this->HitPtSurfNumX = 0;
         this->iRayNum = 0;
-        this->HitPntRefl = Vector3D(0.0);
-        this->HitPntObs = Vector3D(0.0);
+        this->HitPntRefl = Vector3D();
+        this->HitPntObs = Vector3D();
         this->SkyReflSolRadiance = 0.0;
         this->dReflSkySol = 0.0;
-        this->URay = Vector3D(0.0);
-        this->SurfVertToGndPt = Vector3D(0.0);
-        this->SurfVert = Vector3D(0.0);
+        this->URay = Vector3D();
+        this->SurfVertToGndPt = Vector3D();
+        this->SurfVert = Vector3D();
     }
 
     // Default Constructor

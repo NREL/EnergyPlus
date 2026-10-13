@@ -95,7 +95,7 @@ public: // Types
 
 public: // Creation
     // Default Constructor
-    SurfaceOctreeCube() : d_(0u), n_(0u), l_(Vertex(0.0)), u_(Vertex(0.0)), c_(Vertex(0.0)), w_(0.0), r_(0.0)
+    SurfaceOctreeCube() : d_(0u), n_(0u), l_(Vertex()), u_(Vertex()), c_(Vertex()), w_(0.0), r_(0.0)
     {
         for (auto &cube : cubes_) {
             cube = nullptr; // VC++ 2013 compatible initialization
@@ -103,7 +103,7 @@ public: // Creation
     }
 
     // Surfaces Outer Cube Constructor
-    SurfaceOctreeCube(EPVector<Surface> &surfaces) : d_(0u), n_(0u), l_(Vertex(0.0)), u_(Vertex(0.0)), c_(Vertex(0.0)), w_(0.0), r_(0.0)
+    SurfaceOctreeCube(EPVector<Surface> &surfaces) : d_(0u), n_(0u), l_(Vertex()), u_(Vertex()), c_(Vertex()), w_(0.0), r_(0.0)
     {
         for (auto &cube : cubes_) {
             cube = nullptr; // VC++ 2013 compatible initialization

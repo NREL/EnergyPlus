@@ -651,7 +651,7 @@ struct SolarShadingData : BaseGlobalStruct
     // Default Constructor
     SolarShadingData()
         : cOverLapStatus(6, {"No-Overlap", "1st-Surf-within-2nd", "2nd-Surf-within-1st", "Partial-Overlap", "Too-Many-Vertices", "Too-Many-Figures"}),
-          SUNCOS(3)
+          SUNCOS()
     {
     }
 };

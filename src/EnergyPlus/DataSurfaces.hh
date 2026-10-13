@@ -539,14 +539,14 @@ namespace DataSurfaces {
         // Constructor
         Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v, Vector2D const &vl, Vector2D const &vu);
 
-    public:                                              // Data
-        int axis = 0;                                    // Axis of projection (0=x, 1=y, 2=z)
-        Vertices vertices;                               // Vertices
-        Vector2D vl = Vector2D(0.0), vu = Vector2D(0.0); // Bounding box lower and upper corner vertices
-        Vectors edges;                                   // Edge vectors around the vertices
-        Real64 s1 = 0.0, s3 = 0.0;                       // Rectangle side widths squared
-        SlabYs slabYs;                                   // Y coordinates of slabs
-        Slabs slabs;                                     // Y slice slabs for fast nonconvex and many vertex intersections
+    public:                                        // Data
+        int axis = 0;                              // Axis of projection (0=x, 1=y, 2=z)
+        Vertices vertices;                         // Vertices
+        Vector2D vl = Vector2D(), vu = Vector2D(); // Bounding box lower and upper corner vertices
+        Vectors edges;                             // Edge vectors around the vertices
+        Real64 s1 = 0.0, s3 = 0.0;                 // Rectangle side widths squared
+        SlabYs slabYs;                             // Y coordinates of slabs
+        Slabs slabs;                               // Y slice slabs for fast nonconvex and many vertex intersections
 
     }; // Surface2D
 

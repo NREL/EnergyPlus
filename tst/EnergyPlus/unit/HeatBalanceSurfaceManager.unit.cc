@@ -5986,7 +5986,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     int constexpr HoursInDay(24);
     state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
     for (int hour = 1; hour <= HoursInDay; hour++) {
-        state->dataSurface->SurfSunCosHourly(hour) = Vector3D(0.0);
+        state->dataSurface->SurfSunCosHourly(hour) = Vector3D();
     }
     //    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
     //    EXPECT_FALSE(ErrorsFound);

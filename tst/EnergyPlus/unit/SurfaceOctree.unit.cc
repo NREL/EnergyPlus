@@ -125,19 +125,19 @@ TEST(SurfaceOctreeTest, Basic)
         surfaces.clear();
     }
     { // Diagonal
-        Vertex const a(0.0), b(1.0), dir((b - a).normalize());
+        Vertex const a(0.0, 0.0, 0.0), b(1.0, 1.0, 1.0), dir((b - a).normalize());
         EXPECT_TRUE(cube.segmentIntersectsSphere(a, b));
         EXPECT_TRUE(cube.rayIntersectsSphere(a, dir));
         EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
     }
     { // Center up half-diagonal
-        Vertex const a(0.5), b(2.0), dir((b - a).normalize());
+        Vertex const a(0.5, 0.5, 0.5), b(2.0, 2.0, 2.0), dir((b - a).normalize());
         EXPECT_TRUE(cube.segmentIntersectsSphere(a, b));
         EXPECT_TRUE(cube.rayIntersectsSphere(a, dir));
         EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
     }
     { // Outward at corner
-        Vertex const a(1.0), b(2.0), dir((b - a).normalize());
+        Vertex const a(1.0, 1.0, 1.0), b(2.0, 2.0, 2.0), dir((b - a).normalize());
         EXPECT_TRUE(cube.segmentIntersectsSphere(a, b));
         EXPECT_TRUE(cube.rayIntersectsSphere(a, dir));
         EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
@@ -149,25 +149,25 @@ TEST(SurfaceOctreeTest, Basic)
         EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
     }
     { // Inward outside but pointing to corner
-        Vertex const a(3.0), b(2.0), dir((b - a).normalize());
+        Vertex const a(3.0, 3.0, 3.0), b(2.0, 2.0, 2.0), dir((b - a).normalize());
         EXPECT_FALSE(cube.segmentIntersectsSphere(a, b));
         EXPECT_TRUE(cube.rayIntersectsSphere(a, dir));
         EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
     }
     { // Just beyond corner
-        Vertex const a(1.0000001), b(2.0000002), dir((b - a).normalize());
+        Vertex const a(1.0000001, 1.0000001, 1.0000001), b(2.0000002, 2.0000002, 2.0000002), dir((b - a).normalize());
         EXPECT_FALSE(cube.segmentIntersectsSphere(a, b));
         EXPECT_FALSE(cube.rayIntersectsSphere(a, dir));
         EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
     }
     { // Way outside cube but along diagonal
-        Vertex const a(5.0), b(9.0), dir((b - a).normalize());
+        Vertex const a(5.0, 5.0, 5.0), b(9.0, 9.0, 9.0), dir((b - a).normalize());
         EXPECT_FALSE(cube.segmentIntersectsSphere(a, b));
         EXPECT_FALSE(cube.rayIntersectsSphere(a, dir));
         EXPECT_TRUE(cube.lineIntersectsSphere(a, dir));
     }
     { // Way outside cube with no contact
-        Vertex const a(9.0), b(12.0, 8.0, 4.0), dir((b - a).normalize());
+        Vertex const a(9.0, 9.0, 9.0), b(12.0, 8.0, 4.0), dir((b - a).normalize());
         EXPECT_FALSE(cube.segmentIntersectsSphere(a, b));
         EXPECT_FALSE(cube.rayIntersectsSphere(a, dir));
         EXPECT_FALSE(cube.lineIntersectsSphere(a, dir));
@@ -190,19 +190,19 @@ TEST(SurfaceOctreeTest, Basic)
         EXPECT_EQ(6u, surfaces.size());
     }
     { // Diagonal
-        Vertex const a(0.0), b(1.0), dir((b - a).normalize()), dir_inv(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
+        Vertex const a(0.0, 0.0, 0.0), b(1.0, 1.0, 1.0), dir((b - a).normalize()), dir_inv(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
         EXPECT_TRUE(cube.segmentIntersectsCube(a, b));
         EXPECT_TRUE(cube.rayIntersectsCube(a, dir, dir_inv));
         EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
     }
     { // Center up half-diagonal
-        Vertex const a(0.5), b(2.0), dir((b - a).normalize()), dir_inv(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
+        Vertex const a(0.5, 0.5, 0.5), b(2.0, 2.0, 2.0), dir((b - a).normalize()), dir_inv(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
         EXPECT_TRUE(cube.segmentIntersectsCube(a, b));
         EXPECT_TRUE(cube.rayIntersectsCube(a, dir, dir_inv));
         EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
     }
     { // Outward at corner
-        Vertex const a(1.0), b(2.0), dir((b - a).normalize()), dir_inv(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
+        Vertex const a(1.0, 1.0, 1.0), b(2.0, 2.0, 2.0), dir((b - a).normalize()), dir_inv(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
         EXPECT_TRUE(cube.segmentIntersectsCube(a, b));
         EXPECT_TRUE(cube.rayIntersectsCube(a, dir, dir_inv));
         EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
@@ -215,25 +215,26 @@ TEST(SurfaceOctreeTest, Basic)
         EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
     }
     { // Inward outside but pointing to corner
-        Vertex const a(3.0), b(2.0), dir((b - a).normalize()), dir_inv(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
+        Vertex const a(3.0, 3.0, 3.0), b(2.0, 2.0, 2.0), dir((b - a).normalize()), dir_inv(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
         EXPECT_FALSE(cube.segmentIntersectsCube(a, b));
         EXPECT_TRUE(cube.rayIntersectsCube(a, dir, dir_inv));
         EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
     }
     { // Just beyond corner
-        Vertex const a(1.0000001), b(2.0000002), dir((b - a).normalize()), dir_inv(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
+        Vertex const a(1.0000001, 1.0000001, 1.0000001), b(2.0000002, 2.0000002, 2.0000002), dir((b - a).normalize()),
+            dir_inv(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
         EXPECT_FALSE(cube.segmentIntersectsCube(a, b));
         EXPECT_FALSE(cube.rayIntersectsCube(a, dir, dir_inv));
         EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
     }
     { // Way outside cube but along diagonal
-        Vertex const a(5.0), b(9.0), dir((b - a).normalize()), dir_inv(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
+        Vertex const a(5.0, 5.0, 5.0), b(9.0, 9.0, 9.0), dir((b - a).normalize()), dir_inv(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
         EXPECT_FALSE(cube.segmentIntersectsCube(a, b));
         EXPECT_FALSE(cube.rayIntersectsCube(a, dir, dir_inv));
         EXPECT_TRUE(cube.lineIntersectsCube(a, dir, dir_inv));
     }
     { // Way outside cube with no contact
-        Vertex const a(9.0), b(12.0, 8.0, 4.0), dir((b - a).normalize()), dir_inv(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
+        Vertex const a(9.0, 9.0, 9.0), b(12.0, 8.0, 4.0), dir((b - a).normalize()), dir_inv(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
         EXPECT_FALSE(cube.segmentIntersectsCube(a, b));
         EXPECT_FALSE(cube.rayIntersectsCube(a, dir, dir_inv));
         EXPECT_FALSE(cube.lineIntersectsCube(a, dir, dir_inv));

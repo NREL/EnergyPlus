@@ -168,7 +168,7 @@ namespace SolarReflectionManager {
         Real64 VertexWt; // Vertex weighting factor for calculating receiving points
 
         static Vector3D const unit_z(0.0, 0.0, 1.0);
-        static Vector3D const zero3(0.0);
+        static Vector3D const zero3;
 
         // Find number of surfaces that are sun-exposed exterior building heat transfer surfaces.
         // These are candidates for receiving solar reflected from obstructions and ground.
@@ -265,7 +265,7 @@ namespace SolarReflectionManager {
 
         state.dataSurface->MaxReflRays = AltAngStepsForSolReflCalc * AzimAngStepsForSolReflCalc;
         for (RecSurfNum = 1; RecSurfNum <= state.dataSolarReflectionManager->TotSolReflRecSurf; ++RecSurfNum) {
-            state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NormVec = Vector3D(0.0);
+            state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NormVec = Vector3D();
             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).RecPt.dimension(state.dataSurface->MaxRecPts, zero3);
             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).RayVec.dimension(state.dataSurface->MaxReflRays, zero3);
             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).CosIncAngRay.dimension(state.dataSurface->MaxReflRays, 0.0);
@@ -356,7 +356,7 @@ namespace SolarReflectionManager {
 
             NumRecPts = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NumRecPts;
             for (J = 1; J <= NumRecPts; ++J) {
-                state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).RecPt(J) = Vector3D(0.0);
+                state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).RecPt(J) = Vector3D();
                 for (K = 1; K <= NumRecPts; ++K) {
                     if (NumRecPts == 3) { // Receiving surface is a triangle
                         VertexWt = 0.2;

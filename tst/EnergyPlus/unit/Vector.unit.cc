@@ -80,7 +80,7 @@ TEST_F(EnergyPlusFixture, VectorTest_Basic)
         EXPECT_EQ(0.0, v.length_squared());
         EXPECT_EQ(0.0, v.length());
         EXPECT_EQ(0.0, v.length_squared());
-        v += Vector(2.0);
+        v += Vector(2.0, 2.0, 2.0);
         EXPECT_EQ(2.0, v.x);
         EXPECT_EQ(2.0, v.y);
         EXPECT_EQ(2.0, v.z);
@@ -92,7 +92,7 @@ TEST_F(EnergyPlusFixture, VectorTest_Basic)
         EXPECT_EQ(1.0, v.z);
         EXPECT_EQ(3.0, v.length_squared());
         EXPECT_EQ(3.0, v.length_squared());
-        v -= Vector(1.0);
+        v -= Vector(1.0, 1.0, 1.0);
         EXPECT_EQ(0.0, v.x);
         EXPECT_EQ(0.0, v.y);
         EXPECT_EQ(0.0, v.z);
@@ -106,7 +106,7 @@ TEST_F(EnergyPlusFixture, VectorTest_Basic)
         EXPECT_EQ(u.z, v.z);
     }
     {
-        Vector v(3.0);
+        Vector v(3.0, 3.0, 3.0);
         EXPECT_EQ(3.0, v.x);
         EXPECT_EQ(3.0, v.y);
         EXPECT_EQ(3.0, v.z);
@@ -144,7 +144,7 @@ TEST_F(EnergyPlusFixture, VectorTest_Basic)
         EXPECT_EQ(3.0, v.z);
         EXPECT_EQ(14.0, v.length_squared());
         EXPECT_EQ(14.0, v.length_squared());
-        Vector u(2.0);
+        Vector u(2.0, 2.0, 2.0);
         EXPECT_EQ(2.0, u.distance_squared(v));
         EXPECT_EQ(12.0, u.dot(v));
         Vector x(u.cross(v));

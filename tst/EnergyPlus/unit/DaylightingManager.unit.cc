@@ -942,7 +942,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
 
     state->dataSurface->SurfSunCosHourly.allocate(Constant::iHoursInDay);
     for (int hour = 1; hour <= Constant::iHoursInDay; hour++) {
-        state->dataSurface->SurfSunCosHourly(hour) = Vector3D(0.0);
+        state->dataSurface->SurfSunCosHourly(hour) = Vector3D();
     }
     CalcDayltgCoefficients(*state);
     int zoneNum = 1;
@@ -2659,7 +2659,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     state->dataGlobal->WeightPreviousHour = 0.0;
     state->dataSurface->SurfSunCosHourly.allocate(Constant::iHoursInDay);
     for (int hour = 1; hour <= Constant::iHoursInDay; hour++) {
-        state->dataSurface->SurfSunCosHourly(hour) = Vector3D(0.0);
+        state->dataSurface->SurfSunCosHourly(hour) = Vector3D();
     }
     CalcDayltgCoefficients(*state);
     int zoneNum = 1;
@@ -3359,7 +3359,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     int constexpr HoursInDay(24);
     state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
     for (int hour = 1; hour <= HoursInDay; hour++) {
-        state->dataSurface->SurfSunCosHourly(hour) = Vector3D(0.0);
+        state->dataSurface->SurfSunCosHourly(hour) = Vector3D();
     }
     SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                            // expect no errors

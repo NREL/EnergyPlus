@@ -8740,7 +8740,7 @@ void DayltgClosestObstruction(EnergyPlusData &state,
 
     NearestHitSurfNum = 0;
     Real64 NearestHitDistance_sq(std::numeric_limits<Real64>::max()); // Distance squared from receiving point to nearest hit point for a ray (m^2)
-    NearestHitPt = Vector3D(0.0);
+    NearestHitPt = Vector3D();
     if (s_surf->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
         for (int ObsSurfNum : s_surf->AllShadowPossObstrSurfaceList) {

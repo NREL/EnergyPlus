@@ -71,11 +71,6 @@ public:
     /// Default Constructor: Zero-Initializes All Elements
     constexpr Vector3D() = default;
 
-    /// Uniform Value Constructor
-    explicit constexpr Vector3D(double t) : x(t), y(t), z(t)
-    {
-    }
-
     /// Value Constructor
     constexpr Vector3D(double x_, double y_, double z_) : x(x_), y(y_), z(z_)
     {

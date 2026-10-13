@@ -70,11 +70,6 @@ public:
     /// Default Constructor: Zero-Initializes All Elements
     constexpr Vector2D() = default;
 
-    /// Uniform Value Constructor
-    explicit constexpr Vector2D(double t) : x(t), y(t)
-    {
-    }
-
     /// Value Constructor
     constexpr Vector2D(double x_, double y_) : x(x_), y(y_)
     {

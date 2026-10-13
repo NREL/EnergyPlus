@@ -115,7 +115,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     state->dataHeatBal->SurfWinBackSurfOverlaps.allocate(HoursInDay, NumTimeSteps, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
     state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
     for (int hour = 1; hour <= HoursInDay; hour++) {
-        state->dataSurface->SurfSunCosHourly(hour) = Vector3D(0.0);
+        state->dataSurface->SurfSunCosHourly(hour) = Vector3D();
     }
     // Test non-integrated option first, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 for all hours
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
@@ -3246,7 +3246,7 @@ TEST_F(EnergyPlusFixture, WindowShadingManager_Lum_Test)
     state->dataSolarShading->SurfAnisoSkyMult = 1.0;
     state->dataEnvrn->DifSolarRad = 100.0;
     state->dataEnvrn->BeamSolarRad = 100.0;
-    state->dataEnvrn->SOLCOS = Vector3D(0.5);
+    state->dataEnvrn->SOLCOS = Vector3D(0.5, 0.5, 0.5);
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 10;
     state->dataGlobal->TimeStepsInHour = NumTimeSteps;

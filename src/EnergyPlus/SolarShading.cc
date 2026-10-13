@@ -965,7 +965,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
 
     s_surf->SurfSunCosHourly.allocate(Constant::iHoursInDay);
     for (int hour = 1; hour <= Constant::iHoursInDay; hour++) {
-        s_surf->SurfSunCosHourly(hour) = Vector3D(0.0);
+        s_surf->SurfSunCosHourly(hour) = Vector3D();
     }
     s_surf->SurfSunlitArea.dimension(s_surf->TotSurfaces, 0.0);
     s_surf->SurfSunlitFrac.dimension(s_surf->TotSurfaces, 0.0);
@@ -2835,8 +2835,8 @@ void CHKBKS(EnergyPlusData &state,
     Real64 DOTP; // Dot product of C and D
 
     // Object Data
-    Vector CVec(0.0); // Vector perpendicular to surface at vertex 1
-    Vector DVec(0.0); // Vector from vertex 1 of first surface to vertex 'n' of second surface
+    Vector CVec; // Vector perpendicular to surface at vertex 1
+    Vector DVec; // Vector from vertex 1 of first surface to vertex 'n' of second surface
 
     auto &s_surf = state.dataSurface;
 
@@ -10914,12 +10914,12 @@ void CalcFrameDividerShadow(EnergyPlusData &state,
     Real64 FracShFDin; // Fraction of glazing that illuminates frame and divider
     //  inside projections with beam radiation
 
-    Vector3D WinNorm(3);  // Window outward normal unit vector // Why the (3)?
-    Real64 ThWin;         // Azimuth angle of WinNorm
-    Vector3D SunPrime(3); // Projection of sun vector onto plane (perpendicular to // Why the (3)?
+    Vector3D WinNorm;  // Window outward normal unit vector
+    Real64 ThWin;      // Azimuth angle of WinNorm
+    Vector3D SunPrime; // Projection of sun vector onto plane (perpendicular to
     //  window plane) determined by WinNorm and vector along
     //  baseline of window
-    Vector3D WinNormCrossBase(3); // Cross product of WinNorm and vector along window baseline // Why the (3)?
+    Vector3D WinNormCrossBase; // Cross product of WinNorm and vector along window baseline
 
     auto &s_surf = state.dataSurface;
 

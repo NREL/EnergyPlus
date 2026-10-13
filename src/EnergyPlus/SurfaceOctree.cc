@@ -108,7 +108,7 @@ void SurfaceOctreeCube::init(EPVector<Surface> &surfaces)
 
     // No surfaces handler
     if (surfaces_.empty()) {
-        l_ = u_ = c_ = Vertex(0.0);
+        l_ = u_ = c_ = Vertex();
         w_ = r_ = 0.0;
         return;
     }
@@ -131,8 +131,8 @@ void SurfaceOctreeCube::init(EPVector<Surface> &surfaces)
     w_ = ObjexxFCL::max(diagonal.x, diagonal.y, diagonal.z);
     r_ = 0.75 * (w_ * w_);
     Real const h(0.5 * w_); // Half-width
-    l_ = c_ - Vertex(h);
-    u_ = c_ + Vertex(h);
+    l_ = c_ - Vertex(h, h, h);
+    u_ = c_ + Vertex(h, h, h);
 
     assert(valid());
 

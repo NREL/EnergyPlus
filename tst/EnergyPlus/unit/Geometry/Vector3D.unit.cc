@@ -61,7 +61,7 @@ TEST(Vector3Test, Basic)
     EXPECT_EQ(0.0, d.x);
     EXPECT_EQ(0.0, d.y);
     EXPECT_EQ(0.0, d.z);
-    Vector3D v(15.0); // Uniform value construction
+    Vector3D v(15.0, 15.0, 15.0); // Value construction
     EXPECT_EQ(15.0, v.x);
     EXPECT_EQ(15.0, v.y);
     EXPECT_EQ(15.0, v.z);
