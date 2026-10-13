@@ -11916,9 +11916,9 @@ namespace AirflowNetwork {
                     }
                 }
                 ZoneAngDiff = ZoneAng1 - ZoneAng2;
-                if (ZoneAngDiff > 0.01) {
+                if (std::abs(ZoneAngDiff) > 0.01) {
                     ShowWarningError(m_state,
-                                     "AirflowNetwork:Multizone:Zone = " + MultizoneZoneData(AFNZnNum).ZoneName +
+                                     "AirflowNetwork:Multizone:Zone = " + MultizoneZoneData(ZnNum).ZoneName +
                                          " has single side wind pressure coefficient type \"ADVANCED\", but has openings which are not coplanar.");
                     ShowContinueError(m_state, "The openings should be coplanar for the model to be valid. Simulation Continues.");
                 }
