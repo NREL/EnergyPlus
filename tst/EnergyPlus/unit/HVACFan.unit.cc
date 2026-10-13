@@ -810,6 +810,7 @@ TEST_F(EnergyPlusFixture, ZoneExhaustFan_InputTest)
     EXPECT_GT(fanExhaust->outletAirEnthalpy, fanExhaust->inletAirEnthalpy);
     EXPECT_EQ(fanExhaust->outletAirHumRat, fanExhaust->inletAirHumRat);
 
+    // check that remaining heat to zone is difference between fan power and power loss to air
     fanExhaust->heatLossDest = Fans::HeatLossDest::Zone;
     fanExhaust->simulateZoneExhaust(*state);
     EXPECT_NEAR(5.5555, fanExhaust->powerLossToZone, 0.0001);
