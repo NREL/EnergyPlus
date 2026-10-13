@@ -3940,11 +3940,13 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
         // Demand-before-supply is still guaranteed for every loop, but the inter-loop calling order cannot reflect
         // every interconnection.
         ShowWarningError(state,
-                         std::format("RevisePlantCallingOrder: Could not find a plant calling order that satisfies all interconnected loop side "
-                                     "requirements after revision {}; a cyclic dependency exists between two or more interconnected loops "
-                                     "(e.g., reciprocal heat recovery equipment). Demand-before-supply ordering is preserved for every loop, "
-                                     "but some inter-loop calling order constraints may not be honored.",
-                                     revisionsPerformed));
+                         std::format("RevisePlantCallingOrder: Could not find a plant calling order that satisfies all interconnected loop side "));
+        ShowContinueError(
+            state,
+            std::format("requirements after revision {}; a cyclic dependency exists between two or more interconnected loops ", revisionsPerformed));
+        ShowContinueError(state,
+                          std::format("(e.g., reciprocal heat recovery equipment). Demand-before-supply ordering is preserved for every loop, "));
+        ShowContinueError(state, std::format("but some inter-loop calling order constraints may not be honored."));
     }
 }
 
