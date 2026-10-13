@@ -11833,6 +11833,7 @@ namespace AirflowNetwork {
         ExtOpenNum = 1;
         for (SrfNum = 1; SrfNum <= AirflowNetworkNumOfSurfaces; ++SrfNum) {
             if (m_state.dataSurface->Surface(MultizoneSurfaceData(SrfNum).SurfNum).ExtBoundCond == ExternalEnvironment) {
+                DetOpenNum = 0;
                 if (AirflowNetworkNumOfDetOpenings > 0) {
                     DetOpenNum = Util::FindItemInList(
                         MultizoneSurfaceData(SrfNum).OpeningName, MultizoneCompDetOpeningData, &AirflowNetwork::DetailedOpening::name);
@@ -11853,16 +11854,22 @@ namespace AirflowNetwork {
                             ++ExtOpenNum;
                         }
                     }
-                } else if (AirflowNetworkNumOfSimOpenings > 0) {
+                }
+                if (DetOpenNum == 0 && AirflowNetworkNumOfSimOpenings > 0) {
                     SimOpenNum = Util::FindItemInList(
                         MultizoneSurfaceData(SrfNum).OpeningName, MultizoneCompSimpleOpeningData, &AirflowNetwork::SimpleOpening::name);
-                    if (SimOpenNum > 0) {
+                    MZDZoneNum = Util::FindItemInList(
+                        m_state.dataSurface->Surface(MultizoneSurfaceData(SrfNum).SurfNum).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName);
+                    if (SimOpenNum > 0 && MultizoneZoneData(MZDZoneNum).SingleSidedCpType == "ADVANCED") {
                         AFNExtSurfaces(ExtOpenNum).SurfNum = MultizoneSurfaceData(SrfNum).SurfNum;
+                        AFNExtSurfaces(ExtOpenNum).NodeHeight = m_state.dataSurface->Surface(AFNExtSurfaces(ExtOpenNum).SurfNum).Centroid.z;
                         AFNExtSurfaces(ExtOpenNum).ZoneNum = m_state.dataSurface->Surface(MultizoneSurfaceData(SrfNum).SurfNum).Zone;
                         AFNExtSurfaces(ExtOpenNum).ZoneName = m_state.dataSurface->Surface(MultizoneSurfaceData(SrfNum).SurfNum).ZoneName;
                         AFNExtSurfaces(ExtOpenNum).MZDZoneNum =
                             Util::FindItemInList(AFNExtSurfaces(ExtOpenNum).ZoneName, MultizoneZoneData, &MultizoneZoneProp::ZoneName);
                         AFNExtSurfaces(ExtOpenNum).ExtNodeNum = MultizoneSurfaceData(SrfNum).NodeNums[1];
+                        AFNExtSurfaces(ExtOpenNum).facadeNum =
+                            MultizoneExternalNodeData(AFNExtSurfaces(ExtOpenNum).ExtNodeNum - AirflowNetworkNumOfZones).facadeNum;
                         AFNExtSurfaces(ExtOpenNum).DischCoeff = MultizoneCompSimpleOpeningData(SimOpenNum).DischCoeff;
                         ++ExtOpenNum;
                     }
