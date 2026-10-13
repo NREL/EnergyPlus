@@ -3756,6 +3756,26 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 }
             }
 
+            bool hasZoneNightVentManager = false;
+            bool zoneNightVentOn = false;
+            if (ZoneCompNum > 0 && ValidSAMComp) {
+                auto const &componentAvailability = state.dataAvail->ZoneComp((int)zoneEquipType).ZoneCompAvailMgrs(ZoneCompNum);
+                for (int managerNum = 1; managerNum <= componentAvailability.NumAvailManagers; ++managerNum) {
+                    auto const &manager = componentAvailability.availManagers(managerNum);
+                    if (manager.type == Avail::ManagerType::NightVent) {
+                        hasZoneNightVentManager = true;
+                        if (manager.Num > 0 && state.dataAvail->NightVentData(manager.Num).availStatus == Avail::Status::CycleOn) {
+                            zoneNightVentOn = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            bool const savedZoneEquipmentNightVentOn = state.dataHVACGlobal->NightVentOn;
+            if (hasZoneNightVentManager) {
+                state.dataHVACGlobal->NightVentOn = zoneNightVentOn;
+            }
+
             // If SpaceHVAC is active and this equipment has a space splitter, scale the zone load if needed
             if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->DoingSizing &&
                 zoneEquipList.zoneEquipSplitterIndex(EquipPtr) > -1) {
@@ -4126,6 +4146,10 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
             default:
                 break;
+            }
+
+            if (hasZoneNightVentManager) {
+                state.dataHVACGlobal->NightVentOn = savedZoneEquipmentNightVentOn;
             }
 
             zoneEquipConfig.ZoneExh +=
