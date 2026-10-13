@@ -89,11 +89,10 @@ namespace Fans {
         Invalid = -1,
         Zone,
         Outside,
-        AirStream,
         Num
     };
 
-    static constexpr std::array<std::string_view, (int)HeatLossDest::Num> heatLossDestNamesUC = {"ZONE", "OUTSIDE", "AIRSTREAM"};
+    static constexpr std::array<std::string_view, (int)HeatLossDest::Num> heatLossDestNamesUC = {"ZONE", "OUTSIDE"};
 
     struct FanBase
     {

@@ -364,7 +364,7 @@ namespace DataHeatBalance {
         "ELECTRICLOADCENTER:STORAGE:CONVERTER",
         "FAN:SYSTEMMODEL",
         "INDOORGREEN",
-        "FANZONEEXHAUST"};
+        "FAN:ZONEEXHAUST"};
 
     static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::Num)> IntGainTypeNamesCC = {
         "People",

@@ -579,12 +579,12 @@ void GetFanInput(EnergyPlusData &state)
         fan->heatLossDest = static_cast<HeatLossDest>(getEnumValue(heatLossDestNamesUC, cAlphaArgs(10)));
         if (fan->heatLossDest == HeatLossDest::Zone) {
             if ((fan->zoneNum = Util::FindItemInList(cAlphaArgs(11), state.dataHeatBal->Zone)) == 0) {
-                fan->heatLossDest = HeatLossDest::AirStream;
+                fan->heatLossDest = HeatLossDest::Outside;
                 ShowWarningItemNotFound(state,
                                         eoh,
                                         cAlphaFieldNames(11),
                                         cAlphaArgs(11),
-                                        "Zone or Space not found. Exhaust fan motor heat losses will not be added to a zone or space");
+                                        "Zone not found. Exhaust fan motor heat losses will not be added to a zone.");
                 // continue with simulation but motor losses not sent to a zone.
             } else {
                 SetupZoneInternalGain(state, fan->zoneNum, fan->Name, DataHeatBalance::IntGainType::FanZoneExhaust, &fan->powerLossToZone);
@@ -2143,8 +2143,9 @@ void FanComponent::simulateZoneExhaust(EnergyPlusData &state)
 
     if (_fanIsRunning) {
         // Fan is operating
-        totalPower = max(0.0, _massFlow * _deltaPress / (_totalEff * _rhoAir)); // total fan power
-        powerLossToAir = totalPower * motorInAirFrac;
+        Real64 const _shaftPower = std::fmax(0.0, _massFlow * _deltaPress / _rhoAir);
+        totalPower = _shaftPower / _totalEff; // total fan power
+        powerLossToAir = _shaftPower + (totalPower - _shaftPower) * motorInAirFrac;
         powerLossToZone = (heatLossDest == HeatLossDest::Zone) ? totalPower - powerLossToAir : 0.0;
         outletAirEnthalpy = inletAirEnthalpy + powerLossToAir / _massFlow;
         // This fan does not change the moisture or Mass Flow across the component
