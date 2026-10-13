@@ -1937,7 +1937,8 @@ void FanComponent::simulateOnOff(EnergyPlusData &state, ObjexxFCL::Optional<Real
     Real64 _motorInAirFrac = motorInAirFrac;
     Real64 _rhoAir = rhoAirStdInit;
 
-    if (state.dataHVACGlobal->NightVentOn && nightVentPerfNum > 0) {
+    bool const nightVentMode = state.dataHVACGlobal->NightVentOn && nightVentPerfNum > 0;
+    if (nightVentMode) {
         auto const &nightVentPerf = state.dataFans->NightVentPerf(nightVentPerfNum);
         _deltaPress = nightVentPerf.DeltaPress;
         _totalEff = nightVentPerf.FanEff;
@@ -2010,7 +2011,7 @@ void FanComponent::simulateOnOff(EnergyPlusData &state, ObjexxFCL::Optional<Real
             totalPower = max(0.0, _maxAirMassFlowRate * runtimeFrac * _deltaPress / (_totalEff * _rhoAir));
 
             //    Do not modify fan power calculation unless fan power vs speed ratio curve is used.
-            if (powerRatioAtSpeedRatioCurveNum > 0) {
+            if (powerRatioAtSpeedRatioCurveNum > 0 && !nightVentMode) {
 
                 //      adjust RTF to be in line with speed ratio (i.e., MaxAirMassFlowRate is not MAX when SpeedRatio /= 1)
                 //      PLR = Mdot/MAXFlow => Mdot/(MAXFlow * SpeedRatio), RTF = PLR/PLF => PLR/SpeedRatio/PLF = RTF / SpeedRatio
