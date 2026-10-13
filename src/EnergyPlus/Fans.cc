@@ -488,7 +488,7 @@ void GetFanInput(EnergyPlusData &state)
             ShowWarningCustom(
                 state,
                 eoh,
-                std::format("{}={} has fracdtional values. Only 0.0 in the schedule value turns the fan off.", cAlphaFieldNames(2), cAlphaArgs(2)));
+                std::format("{}={} has fractional values. Only 0.0 in the schedule value turns the fan off.", cAlphaFieldNames(2), cAlphaArgs(2)));
         }
 
         fan->totalEff = rNumericArgs(1);

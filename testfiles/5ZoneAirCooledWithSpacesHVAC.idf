@@ -2757,9 +2757,9 @@
     Coupled,                 !- System Availability Manager Coupling Mode
     ,                        !- Minimum Zone Temperature Limit Schedule Name
     ,                        !- Balanced Exhaust Fraction Schedule Name
-    Zone,                    !- Fan Heat Rejection Location
+    Zone,                    !- Motor Loss Location
     0.7,                     !- Motor in Airstream Fraction
-    PLENUM-1;                !- Fan Heat Rejection Zone or Space Name
+    PLENUM-1;                !- Motor Loss Zone Name
 
   ZoneHVAC:AirDistributionUnit,
     Zone 1 ATU,              !- Name

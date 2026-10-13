@@ -53045,7 +53045,8 @@ Fan:ZoneExhaust,
        \maximum 1.0
        \default 1.0
   A11; \field Motor Loss Zone Name
-       \type alpha
+       \type object-list
+       \object-list ZoneNames
        \note Only used when Motor Loss Location = Zone.
        \note Zone Name must be a valid zone otherwise remaining motor heat losses is rejected outdoors using 1 - Motor in Airstream Fraction.
 
