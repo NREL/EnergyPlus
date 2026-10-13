@@ -2442,6 +2442,11 @@ namespace InternalHeatGains {
             static constexpr std::array<int, DataHeatBalance::MaxITELiquidCoolingCoils> coilLoadFracNumIdx = {5, 6, 7, 8};
             static constexpr std::array<int, DataHeatBalance::MaxITELiquidCoolingCoils> coilLoadFracSchedAlphaIdx = {9, 12, 15, 18};
 
+            // Each cooling coil (cold plate, or a coil used to model immersion cooling / a rear door heat
+            // exchanger via Coil:Cooling:ITE:UserDefined) is dedicated to a single rack, so track which
+            // ITE equipment object has already claimed a given coil to catch accidental reuse.
+            std::map<std::pair<DataHeatBalance::ITECoolingCoilType, std::string>, std::string> coilNameToOwner;
+
             int itEqLCNum = 0;
             for (int itEqLCInputNum = 1; itEqLCInputNum <= numZoneITEqLiquidCooledStatements; ++itEqLCInputNum) {
 
@@ -2525,6 +2530,14 @@ namespace InternalHeatGains {
                         ErrorsFound = true;
                     } else {
                         thisCoil.CoilName = IHGAlphas(nameAlpha);
+                        if (thisCoil.CoilType != ITECoolingCoilType::Invalid) {
+                            auto const [it, inserted] = coilNameToOwner.try_emplace(
+                                std::make_pair(thisCoil.CoilType, Util::makeUPPER(thisCoil.CoilName)), std::string(eoh.objectName));
+                            if (!inserted) {
+                                ShowSevereDuplicateAssignment(state, eoh, IHGAlphaFieldNames(nameAlpha), IHGAlphas(nameAlpha), it->second);
+                                ErrorsFound = true;
+                            }
+                        }
                     }
 
                     bool const hasLoadFrac = !IHGNumericFieldBlanks(loadFracNum);
