@@ -12501,10 +12501,8 @@ Postprocessing Program/Files
 A postprocessing program *ReadVarsESO* is provided by the ``readvars``
 Python package installed with EnergyPlus. The ``-r`` or ``--readvars``
 EnergyPlus command-line option runs it after the simulation. It can also
-be run directly with ``energyplus auxiliary readvars``, which uses the
-Python runtime embedded in EnergyPlus. The legacy ``ReadVarsESO`` command
-remains available as a compatibility wrapper for the same implementation.
-It reads an ESO or MTR file and produces a file that can be read by
+be run via compatibility wrappers as ``ReadVarsESO`` or as ``energyplus auxiliary readvars``, which uses the
+Python runtime embedded in EnergyPlus. It reads an ESO or MTR file and produces a file that can be read by
 Excel\ :sup:`TM`. Further information on this program is provided in the `Input Output
 Reference <InputOutputReference.pdf>`__ under a section heading called
 “Using ReadVarsESO”. OutputControl:Files may also used to write CSV
@@ -12647,7 +12645,7 @@ Instructions appear at the top of the batch file:
    :   %pausing%      contains Y if pause should occur between major portions of
    :                  batch file (mostly commented out)
    :   %maxcol%       contains "250" if limited to 250 columns otherwise contains
-   :                  "nolimit" if unlimited (used when calling readVarsESO)
+   :                  "nolimit" if unlimited (used when calling ReadVarsESO)
 
 ::
 
@@ -12955,10 +12953,8 @@ Postprocessing Program/Files
 A postprocessing program *ReadVarsESO* is provided by the ``readvars``
 Python package installed with EnergyPlus. The ``-r`` or ``--readvars``
 EnergyPlus command-line option runs it after the simulation. It can also
-be run directly with ``energyplus auxiliary readvars``, which uses the
-Python runtime embedded in EnergyPlus. The legacy ``ReadVarsESO`` command
-remains available as a compatibility wrapper for the same implementation.
-It reads an ESO or MTR file and produces a file that can be read by
+be run via compatibility wrappers as ``ReadVarsESO`` or as ``energyplus auxiliary readvars``, which uses the
+Python runtime embedded in EnergyPlus. It reads an ESO or MTR file and produces a file that can be read by
 Excel\ :sup:`TM`. Further information on this program is provided in the `Input Output
 Reference <InputOutputReference.pdf>`__ as well as the `Output Details
 and Examples <OutputDetailsAndExamples.pdf>`__ documents.

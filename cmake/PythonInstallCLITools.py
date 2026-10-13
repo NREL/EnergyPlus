@@ -63,20 +63,8 @@ PKGS = {
     "energyplus_launch": "3.7.4",
     "energyplus_transition_tools": "3.0.0",
     "ghedesigner": "2.1.1",
-    "readvars": "0.0.2",
+    "readvars": "0.0.3",
 }
-
-
-def remove_generated_readvars_launchers(python_lib_dir: Path):
-    # The pip-generated scripts use the build machine's Python shebang and do not
-    # work in a relocated EnergyPlus installation. EnergyPlus provides its own
-    # relocatable ReadVarsESO launcher next to the main executable instead.
-    for scripts_dir_name in ("bin", "Scripts"):
-        scripts_dir = python_lib_dir / scripts_dir_name
-        for launcher_name in ("ReadVarsESO", "ReadVarsESO.exe", "readvars", "readvars.exe"):
-            launcher = scripts_dir / launcher_name
-            if launcher.is_file() or launcher.is_symlink():
-                launcher.unlink()
 
 
 def install_packages(python_lib_dir: Path):
@@ -85,7 +73,6 @@ def install_packages(python_lib_dir: Path):
 
     if not pkgs_to_install:
         print("PYTHON: All CLI packages found and up to date, no pip install needed")
-        remove_generated_readvars_launchers(python_lib_dir)
         return
 
     to_install = [f"{n}=={v}" for n, v in pkgs_to_install.items()]
@@ -107,7 +94,6 @@ def install_packages(python_lib_dir: Path):
 
     print(f"PYTHON: CLI packages not found or out of date, pip installing these now: {to_install}")
     run([executable, "-m", "pip", "install", f"--target={python_lib_dir}", "--upgrade", *to_install], check=True)
-    remove_generated_readvars_launchers(python_lib_dir)
 
 
 def existing_dir(path_str):
