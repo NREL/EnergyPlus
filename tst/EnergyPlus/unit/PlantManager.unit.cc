@@ -457,8 +457,8 @@ namespace PlantManager {
         ASSERT_NO_THROW(RevisePlantCallingOrder(*state));
 
         EXPECT_TRUE(compare_err_stream_substring(
-            "RevisePlantCallingOrder: Could not find a plant calling order that satisfies all interconnected loop side requirements", false));
-        EXPECT_TRUE(compare_err_stream_substring("after revision 4"));
+            "RevisePlantCallingOrder: Could not find a plant calling order that satisfies all interconnected loop side", false));
+        EXPECT_TRUE(compare_err_stream_substring("requirements after revision 4"));
 
         for (int loopNum = 1; loopNum <= state->dataPlnt->TotNumLoops; ++loopNum) {
             EXPECT_LT(FindLoopSideInCallingOrder(*state, loopNum, LoopSideLocation::Demand),
