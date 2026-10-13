@@ -2585,6 +2585,9 @@ namespace InternalHeatGains {
                     }
                 }
 
+                std::string const endUseSubcategoryCPU = (IHGNumAlphas > 18) ? std::string(IHGAlphas(19)) : "ITE-CPU";
+                std::string const endUseSubcategoryFan = (IHGNumAlphas > 19) ? std::string(IHGAlphas(20)) : "ITE-Fans";
+
                 auto &thisITEqLCInput = iTEqLiquidCooledObjects(itEqLCInputNum);
                 for (int Item1 = 1; Item1 <= thisITEqLCInput.numOfSpaces; ++Item1) {
                     ++itEqLCNum;
@@ -2603,6 +2606,8 @@ namespace InternalHeatGains {
                     thisZoneITELC.LiquidHeatCaptureFractionDesign = IHGNumericFieldBlanks(4) ? 0.8 : IHGNumbers(4);
                     thisZoneITELC.liquidHeatCaptureFracSched = liquidHeatCaptureFracSchedPtr;
                     thisZoneITELC.CoolingCoils = coolingCoils;
+                    thisZoneITELC.EndUseSubcategoryCPU = endUseSubcategoryCPU;
+                    thisZoneITELC.EndUseSubcategoryFan = endUseSubcategoryFan;
 
                     if (!ErrorsFound) {
                         SetupSpaceInternalGain(state,
@@ -6467,7 +6472,7 @@ namespace InternalHeatGains {
                                 Constant::eResource::Electricity,
                                 OutputProcessor::Group::Building,
                                 OutputProcessor::EndUseCat::InteriorEquipment,
-                                "ITE-CPU",
+                                state.dataHeatBal->ZoneITELiquidCooled(itEqLCNum).EndUseSubcategoryCPU,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITELiquidCooled(itEqLCNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITELiquidCooled(itEqLCNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITELiquidCooled(itEqLCNum).ZonePtr).ListMultiplier,
@@ -6482,7 +6487,7 @@ namespace InternalHeatGains {
                                 Constant::eResource::Electricity,
                                 OutputProcessor::Group::Building,
                                 OutputProcessor::EndUseCat::InteriorEquipment,
-                                "ITE-Fans",
+                                state.dataHeatBal->ZoneITELiquidCooled(itEqLCNum).EndUseSubcategoryFan,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITELiquidCooled(itEqLCNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITELiquidCooled(itEqLCNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITELiquidCooled(itEqLCNum).ZonePtr).ListMultiplier,

@@ -198,12 +198,14 @@ ElectricEquipment:ITE:LiquidCooled,
        \type object-list
        \object-list CoilCoolingITENames
        \note The specific name of the first cooling component handling physical heat transfer.
+       \note A given coil (its object type and name together) may be referenced by only one ElectricEquipment:ITE:LiquidCooled object; referencing the same coil from more than one rack is an input error.
   N5 , \field Cooling Coil 1 Load Fraction
        \type real
        \minimum 0.0
        \maximum 1.0
        \note A static fraction (0.0 to 1.0) of the total IT liquid load directed to this coil.
        \note If this field is used, the Schedule Name field below should be left blank.
+       \note If this is the only active Cooling Coil N slot on the object and neither this field nor the schedule below is specified, this coil is assumed to receive the entire liquid load (fraction = 1.0). If more than one Cooling Coil N slot is active, one of this field or the schedule below must be specified for every active slot.
   A9 , \field Cooling Coil 1 Load Fraction Schedule Name
        \type object-list
        \object-list ScheduleNames

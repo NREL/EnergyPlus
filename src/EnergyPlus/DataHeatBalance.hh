@@ -1114,6 +1114,8 @@ namespace DataHeatBalance {
         Sched::Schedule *liquidHeatCaptureFracSched = nullptr; // Optional schedule multiplying the design liquid heat capture fraction
 
         std::array<ITELiquidCoolingCoilSpec, MaxITELiquidCoolingCoils> CoolingCoils;
+        std::string EndUseSubcategoryCPU; // User defined name for the end use category for the CPU
+        std::string EndUseSubcategoryFan; // User defined name for the end use category for the Fans
 
         // Report variables
         std::array<Real64, (int)LiquidITERptVars::Num> PowerRpt;
