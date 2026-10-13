@@ -580,11 +580,8 @@ void GetFanInput(EnergyPlusData &state)
         if (fan->heatLossDest == HeatLossDest::Zone) {
             if ((fan->zoneNum = Util::FindItemInList(cAlphaArgs(11), state.dataHeatBal->Zone)) == 0) {
                 fan->heatLossDest = HeatLossDest::Outside;
-                ShowWarningItemNotFound(state,
-                                        eoh,
-                                        cAlphaFieldNames(11),
-                                        cAlphaArgs(11),
-                                        "Zone not found. Exhaust fan motor heat losses will not be added to a zone.");
+                ShowWarningItemNotFound(
+                    state, eoh, cAlphaFieldNames(11), cAlphaArgs(11), "Zone not found. Exhaust fan motor heat losses will not be added to a zone.");
                 // continue with simulation but motor losses not sent to a zone.
             } else {
                 SetupZoneInternalGain(state, fan->zoneNum, fan->Name, DataHeatBalance::IntGainType::FanZoneExhaust, &fan->powerLossToZone);

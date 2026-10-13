@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 namespace EnergyPlus {
 
@@ -780,12 +781,34 @@ TEST_F(EnergyPlusFixture, ZoneExhaustFan_InputTest)
     state->dataSize->CurOASysNum = 0;
     state->dataEnvrn->StdRhoAir = 1.2;
 
-    auto *fan = state->dataFans->fans(1);
-    assert(fan != nullptr);
-    EXPECT_ENUM_EQ(Fans::HeatLossDest::Outside, fan->heatLossDest);
-    EXPECT_EQ(0.9, fan->motorInAirFrac);
-    EXPECT_EQ(0, fan->zoneNum);
-    EXPECT_EQ(0.6, fan->totalEff);
-    EXPECT_EQ(1.0, fan->maxAirFlowRate);
+    auto *fanExhaust = dynamic_cast<Fans::FanComponent *>(state->dataFans->fans(1));
+    assert(fanExhaust != nullptr);
+    EXPECT_ENUM_EQ(Fans::HeatLossDest::Outside, fanExhaust->heatLossDest);
+    EXPECT_EQ(0.9, fanExhaust->motorInAirFrac);
+    EXPECT_EQ(0, fanExhaust->zoneNum);
+    EXPECT_EQ(0.6, fanExhaust->totalEff);
+    EXPECT_EQ(1.0, fanExhaust->maxAirFlowRate);
+
+    fanExhaust->inletAirTemp = 20.0;
+    fanExhaust->inletAirHumRat = 0.008;
+    fanExhaust->inletAirEnthalpy = Psychrometrics::PsyHFnTdbW(fanExhaust->inletAirTemp, fanExhaust->inletAirHumRat);
+    ;
+    fanExhaust->inletAirMassFlowRate = 1.0;
+
+    fanExhaust->simulateZoneExhaust(*state);
+
+    EXPECT_EQ(fanExhaust->inletAirMassFlowRate, fanExhaust->outletAirMassFlowRate);
+    Real64 const shaftPower = fanExhaust->inletAirMassFlowRate * 100.0 / state->dataEnvrn->StdRhoAir;
+    EXPECT_NEAR(83.3333, shaftPower, 0.0001);
+    Real64 const powerLostToAir = shaftPower + (fanExhaust->totalPower - shaftPower) * fanExhaust->motorInAirFrac;
+    EXPECT_NEAR(138.8888, fanExhaust->totalPower, 0.0001);
+    EXPECT_NEAR(133.3333, fanExhaust->powerLossToAir, 0.0001);
+    EXPECT_NEAR(powerLostToAir, fanExhaust->powerLossToAir, 0.0001);
+
+    EXPECT_NEAR(0.0, fanExhaust->powerLossToZone, 0.0001);
+    EXPECT_NEAR(20.1307, fanExhaust->outletAirTemp, 0.0001);
+    EXPECT_GT(fanExhaust->outletAirTemp, fanExhaust->inletAirTemp);
+    EXPECT_GT(fanExhaust->outletAirEnthalpy, fanExhaust->inletAirEnthalpy);
+    EXPECT_EQ(fanExhaust->outletAirHumRat, fanExhaust->inletAirHumRat);
 }
 } // namespace EnergyPlus
