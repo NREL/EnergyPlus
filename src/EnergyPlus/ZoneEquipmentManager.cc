@@ -3756,14 +3756,15 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 }
             }
 
-            bool hasZoneNightVentManager = false;
+            // NightVentOn is global, so derive a temporary value from this zone component's managers.
+            // Leaving it false when no manager is assigned prevents inheriting stale state from an air loop.
+            bool const scopeZoneNightVentOn = ZoneCompNum > 0 && ValidSAMComp;
             bool zoneNightVentOn = false;
-            if (ZoneCompNum > 0 && ValidSAMComp) {
+            if (scopeZoneNightVentOn) {
                 auto const &componentAvailability = state.dataAvail->ZoneComp((int)zoneEquipType).ZoneCompAvailMgrs(ZoneCompNum);
                 for (int managerNum = 1; managerNum <= componentAvailability.NumAvailManagers; ++managerNum) {
                     auto const &manager = componentAvailability.availManagers(managerNum);
                     if (manager.type == Avail::ManagerType::NightVent) {
-                        hasZoneNightVentManager = true;
                         if (manager.Num > 0 && state.dataAvail->NightVentData(manager.Num).availStatus == Avail::Status::CycleOn) {
                             zoneNightVentOn = true;
                             break;
@@ -3772,7 +3773,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 }
             }
             bool const savedZoneEquipmentNightVentOn = state.dataHVACGlobal->NightVentOn;
-            if (hasZoneNightVentManager) {
+            if (scopeZoneNightVentOn) {
                 state.dataHVACGlobal->NightVentOn = zoneNightVentOn;
             }
 
@@ -4148,7 +4149,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 break;
             }
 
-            if (hasZoneNightVentManager) {
+            // Restore the caller's global value so this component's mode does not leak into later simulations.
+            if (scopeZoneNightVentOn) {
                 state.dataHVACGlobal->NightVentOn = savedZoneEquipmentNightVentOn;
             }
 

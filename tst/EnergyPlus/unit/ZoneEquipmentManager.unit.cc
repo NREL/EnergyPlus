@@ -5712,8 +5712,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneExhaustFanNightVentUsesServin
     EXPECT_TRUE(state->dataHVACGlobal->NightVentOn);
 }
 
-namespace {
-
 // Verify each zone fan uses its component's NightVentilation status: the active zone gets night performance with the global flag off,
 // while the inactive zone keeps design flow when a stale global flag is on.
 std::vector<std::string> zoneFanNightVentInputs(std::string_view fanType)
@@ -5876,6 +5874,7 @@ std::vector<std::string> zoneFanNightVentInputs(std::string_view fanType)
     return idfObjects;
 }
 
+// Simulate active and inactive zone managers, then remove zone 2's manager to verify it ignores stale global night-vent state.
 void runZoneFanNightVentTest(EnergyPlus::EnergyPlusData &state)
 {
     state.init_state(state);
@@ -5947,7 +5946,8 @@ void runZoneFanNightVentTest(EnergyPlus::EnergyPlusData &state)
     for (int zoneNum = 1; zoneNum <= 2; ++zoneNum) {
         auto &componentAvailability = unitHeaterAvailability.ZoneCompAvailMgrs(zoneNum);
         componentAvailability.availStatus = zoneNum == 1 ? Avail::Status::CycleOn : Avail::Status::NoAction;
-        state.dataAvail->NightVentData(zoneNum).availStatus = componentAvailability.availStatus;
+        int const managerNum = componentAvailability.availManagers(1).Num;
+        state.dataAvail->NightVentData(managerNum).availStatus = componentAvailability.availStatus;
     }
 
     int const fan1Num = Fans::GetFanIndex(state, "ZONE 1 FAN");
@@ -5972,9 +5972,18 @@ void runZoneFanNightVentTest(EnergyPlus::EnergyPlusData &state)
     EXPECT_NEAR(fan1.outletAirMassFlowRate, nightVentMassFlow, 0.0001);
     EXPECT_NEAR(fan2.outletAirMassFlowRate, designMassFlow, 0.0001);
     EXPECT_TRUE(state.dataHVACGlobal->NightVentOn);
-}
 
-} // namespace
+    // Remove zone 2's manager; it must still ignore a stale global night-vent flag.
+    auto &zone2Availability = unitHeaterAvailability.ZoneCompAvailMgrs(2);
+    zone2Availability.AvailManagerListName.clear();
+    zone2Availability.NumAvailManagers = 0;
+    zone2Availability.availManagers.deallocate();
+    state.dataHVACGlobal->NightVentOn = true;
+    SimZoneEquipment(state, true, simAir);
+    EXPECT_NEAR(fan1.outletAirMassFlowRate, nightVentMassFlow, 0.0001);
+    EXPECT_NEAR(fan2.outletAirMassFlowRate, designMassFlow, 0.0001);
+    EXPECT_TRUE(state.dataHVACGlobal->NightVentOn);
+}
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneOnOffFanUsesComponentNightVentilation)
 {
