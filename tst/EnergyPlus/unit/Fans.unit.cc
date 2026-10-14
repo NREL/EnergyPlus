@@ -194,8 +194,7 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
     EXPECT_DOUBLE_EQ(Result2_FanPower, fan1->totalPower); // expects zero
 }
 
-namespace {
-
+// Initialize the shared design and night-vent performance inputs for standalone fan simulation tests.
 void configureNightVentFan(EnergyPlus::EnergyPlusData &state, Fans::FanComponent &fan, HVAC::FanType type)
 {
     state.init_state(state);
@@ -233,8 +232,6 @@ void configureNightVentFan(EnergyPlus::EnergyPlusData &state, Fans::FanComponent
     nightVentPerf.MotEff = 0.6;
     nightVentPerf.MotInAirFrac = 0.25;
 }
-
-} // namespace
 
 TEST_F(EnergyPlusFixture, Fans_ConstantVolume_NightVentilationPerformance)
 {
@@ -337,6 +334,7 @@ TEST_F(EnergyPlusFixture, Fans_ZoneExhaust_NightVentilationPerformance)
     EXPECT_DOUBLE_EQ(105.0, fan.powerLossToAir);       // 0.6 * 150 W + (150 W - 0.6 * 150 W) * 0.25
 }
 
+// Verify the fixed-speed alternate-mode assumption documented in the IDD and I/O Reference for FanPerformance:NightVentilation.
 TEST_F(EnergyPlusFixture, Fans_OnOff_NightVentilationUsesFixedSpeedPower)
 {
     Fans::FanComponent fan;
@@ -411,14 +409,32 @@ TEST_F(EnergyPlusFixture, Fans_ZoneExhaust_NightVentilationUsesFixedSpeedPower)
     EXPECT_DOUBLE_EQ(105.0, fan.powerLossToAir);
 }
 
+// Verify a fouled-filter flow reduction cannot exceed the tighter night-ventilation flow cap.
 TEST_F(EnergyPlusFixture, Fans_NightVentilationFlowCapWithFouledFilter)
 {
-    state->init_state(*state);
-    state->dataEnvrn->StdRhoAir = 1.0;
-    state->dataHVACGlobal->NightVentOn = true;
-    state->dataHVACGlobal->TurnFansOn = true;
-    state->dataHVACGlobal->TurnFansOff = false;
-    state->dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
+    Fans::FanComponent fanTemplate;
+    configureNightVentFan(*state, fanTemplate, HVAC::FanType::Constant);
+    fanTemplate.Name = "Test Fan";
+    fanTemplate.deltaPress = 1017.59;
+    fanTemplate.totalEff = 0.7;
+    fanTemplate.motorEff = 0.8;
+    fanTemplate.motorInAirFrac = 1.0;
+    fanTemplate.maxAirFlowRate = 18.194;
+    fanTemplate.maxAirMassFlowRate = 18.194;
+    fanTemplate.minAirMassFlowRate = 0.0;
+    fanTemplate.inletAirMassFlowRate = 18.194;
+    fanTemplate.inletAirTemp = 20.0;
+    fanTemplate.inletAirEnthalpy = 40000.0;
+    fanTemplate.inletAirHumRat = 0.008;
+    fanTemplate.rhoAirStdInit = 1.0;
+    fanTemplate.faultyFilterFlag = true;
+    fanTemplate.faultyFilterIndex = 1;
+
+    auto &nightVentPerf = state->dataFans->NightVentPerf(1);
+    nightVentPerf.FanName = fanTemplate.Name;
+    nightVentPerf.MaxAirMassFlowRate = 5.0;
+    nightVentPerf.MotEff = 0.8;
+    nightVentPerf.MotInAirFrac = 1.0;
 
     auto *curve = Curve::AddCurve(*state, "Fouled Filter Fan Curve");
     curve->curveType = Curve::CurveType::Cubic;
@@ -440,48 +456,19 @@ TEST_F(EnergyPlusFixture, Fans_NightVentilationFlowCapWithFouledFilter)
     fault.pressFracSched = &pressureFractionSchedule;
     fault.fanCurveNum = 1;
 
-    state->dataFans->NumNightVentPerf = 1;
-    state->dataFans->NightVentPerf.allocate(1);
-    state->dataFans->NightVentPerf(1).DeltaPress = 100.0;
-    state->dataFans->NightVentPerf(1).FanEff = 0.5;
-    state->dataFans->NightVentPerf(1).MaxAirMassFlowRate = 5.0;
-    state->dataFans->NightVentPerf(1).MotEff = 0.8;
-    state->dataFans->NightVentPerf(1).MotInAirFrac = 1.0;
-
-    auto configureFan = [&](Fans::FanComponent &fan, HVAC::FanType type) {
-        fan.Name = "Test Fan";
-        fan.type = type;
-        fan.deltaPress = 1017.59;
-        fan.totalEff = 0.7;
-        fan.motorEff = 0.8;
-        fan.motorInAirFrac = 1.0;
-        fan.availSched = Sched::GetScheduleAlwaysOn(*state);
-        fan.maxAirFlowRate = 18.194;
-        fan.maxAirMassFlowRate = 18.194;
-        fan.minAirMassFlowRate = 0.0;
-        fan.inletAirMassFlowRate = 18.194;
-        fan.inletAirTemp = 20.0;
-        fan.inletAirEnthalpy = 40000.0;
-        fan.inletAirHumRat = 0.008;
-        fan.rhoAirStdInit = 1.0;
-        fan.nightVentPerfNum = 1;
-        fan.faultyFilterFlag = true;
-        fan.faultyFilterIndex = 1;
-    };
-
     // The active filter fault leaves the design maximum above 5 kg/s, so the night cap must remain the tighter limit.
-    Fans::FanComponent constantFan;
-    configureFan(constantFan, HVAC::FanType::Constant);
+    Fans::FanComponent constantFan = fanTemplate;
+    constantFan.type = HVAC::FanType::Constant;
     constantFan.simulateConstant(*state);
     EXPECT_DOUBLE_EQ(5.0, constantFan.outletAirMassFlowRate);
 
-    Fans::FanComponent onOffFan;
-    configureFan(onOffFan, HVAC::FanType::OnOff);
+    Fans::FanComponent onOffFan = fanTemplate;
+    onOffFan.type = HVAC::FanType::OnOff;
     onOffFan.simulateOnOff(*state);
     EXPECT_DOUBLE_EQ(5.0, onOffFan.outletAirMassFlowRate);
 
-    Fans::FanComponent vavFan;
-    configureFan(vavFan, HVAC::FanType::VAV);
+    Fans::FanComponent vavFan = fanTemplate;
+    vavFan.type = HVAC::FanType::VAV;
     vavFan.simulateVAV(*state);
     EXPECT_DOUBLE_EQ(5.0, vavFan.outletAirMassFlowRate);
 
