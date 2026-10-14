@@ -4344,10 +4344,10 @@ namespace InternalHeatGains {
                     coilHasLoadFracInput[coilIdx] = hasLoadFrac || hasLoadFracSched;
                     if (hasLoadFrac && hasLoadFracSched) {
                         ShowWarningCustom(state,
-                                         eoh,
-                                         std::format("Both {} and {} are specified; the schedule will be used.",
-                                                     IHGNumericFieldNames(loadFracNum),
-                                                     IHGAlphaFieldNames(loadFracSchedAlpha)));
+                                          eoh,
+                                          std::format("Both {} and {} are specified; the schedule will be used.",
+                                                      IHGNumericFieldNames(loadFracNum),
+                                                      IHGAlphaFieldNames(loadFracSchedAlpha)));
                     }
                     if (hasLoadFracSched) {
                         thisCoil.LoadFractionSched = Sched::GetSchedule(state, IHGAlphas(loadFracSchedAlpha));
@@ -4365,16 +4365,20 @@ namespace InternalHeatGains {
                 // liquid load, matching the common single-coil-per-rack case.
                 int numActiveCoils = 0;
                 for (bool const active : coilIsActive) {
-                    if (active) ++numActiveCoils;
+                    if (active) {
+                        ++numActiveCoils;
+                    }
                 }
                 for (int coilIdx = 0; coilIdx < DataHeatBalance::MaxITELiquidCoolingCoils; ++coilIdx) {
-                    if (!coilIsActive[coilIdx] || coilHasLoadFracInput[coilIdx]) continue;
+                    if (!coilIsActive[coilIdx] || coilHasLoadFracInput[coilIdx]) {
+                        continue;
+                    }
                     if (numActiveCoils == 1) {
                         coolingCoils[coilIdx].LoadFraction = 1.0;
                     } else {
                         ShowSevereCustom(state,
-                                        eoh,
-                                        std::format("{} or {} must be specified when more than one cooling coil is referenced.",
+                                         eoh,
+                                         std::format("{} or {} must be specified when more than one cooling coil is referenced.",
                                                      IHGNumericFieldNames(coilLoadFracNumIdx[coilIdx]),
                                                      IHGAlphaFieldNames(coilLoadFracSchedAlphaIdx[coilIdx])));
                         ErrorsFound = true;
@@ -8761,9 +8765,9 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITELiquidCooled(itEqLCNum).ZonePtr).ListMultiplier,
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneITELiquidCooled(itEqLCNum).spaceIndex).spaceType);
             for (int i : {(int)LiquidITERptVars::TotalElectric,
-                         (int)LiquidITERptVars::TotalHeatGen,
-                         (int)LiquidITERptVars::LiquidHeatGain,
-                         (int)LiquidITERptVars::AirHeatGain}) {
+                          (int)LiquidITERptVars::TotalHeatGen,
+                          (int)LiquidITERptVars::LiquidHeatGain,
+                          (int)LiquidITERptVars::AirHeatGain}) {
                 SetupOutputVariable(state,
                                     LiquidITEEnergyOutputVariableStrings[i],
                                     Constant::Units::J,
@@ -10367,7 +10371,9 @@ namespace InternalHeatGains {
             // equal to its own apportioned target for now.
             Real64 liquidHeatGain = 0.0;
             for (auto const &coil : thisEquip.CoolingCoils) {
-                if (coil.CoilType == ITECoolingCoilType::Invalid) continue; // this coil slot is not used
+                if (coil.CoilType == ITECoolingCoilType::Invalid) {
+                    continue; // this coil slot is not used
+                }
                 Real64 const loadFraction = (coil.LoadFractionSched != nullptr) ? coil.LoadFractionSched->getCurrentVal() : coil.LoadFraction;
                 Real64 const targetForThisCoil = targetTotalLiquidHeat * loadFraction;
                 Real64 const achievedForThisCoil = targetForThisCoil; // no physical cap available until the coil exists
@@ -10419,15 +10425,16 @@ namespace InternalHeatGains {
         // OutputDataStructure.doc (EnergyPlus documentation)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static constexpr std::array<DataHeatBalance::IntGainType, 9> TradIntGainTypes = {DataHeatBalance::IntGainType::People,
-                                                                                         DataHeatBalance::IntGainType::Lights,
-                                                                                         DataHeatBalance::IntGainType::ElectricEquipment,
-                                                                                         DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
-                                                                                         DataHeatBalance::IntGainType::ElectricEquipmentITELiquidCooled,
-                                                                                         DataHeatBalance::IntGainType::GasEquipment,
-                                                                                         DataHeatBalance::IntGainType::HotWaterEquipment,
-                                                                                         DataHeatBalance::IntGainType::SteamEquipment,
-                                                                                         DataHeatBalance::IntGainType::OtherEquipment};
+        static constexpr std::array<DataHeatBalance::IntGainType, 9> TradIntGainTypes = {
+            DataHeatBalance::IntGainType::People,
+            DataHeatBalance::IntGainType::Lights,
+            DataHeatBalance::IntGainType::ElectricEquipment,
+            DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
+            DataHeatBalance::IntGainType::ElectricEquipmentITELiquidCooled,
+            DataHeatBalance::IntGainType::GasEquipment,
+            DataHeatBalance::IntGainType::HotWaterEquipment,
+            DataHeatBalance::IntGainType::SteamEquipment,
+            DataHeatBalance::IntGainType::OtherEquipment};
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
             auto &thisPeople = state.dataHeatBal->People(Loop);
