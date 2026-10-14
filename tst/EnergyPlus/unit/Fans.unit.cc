@@ -247,10 +247,10 @@ TEST_F(EnergyPlusFixture, Fans_ConstantVolume_NightVentilationPerformance)
     // With night ventilation off, design performance governs the inlet flow, power, and fan heat.
     fan.simulateConstant(*state);
 
-    EXPECT_DOUBLE_EQ(300.0 / 0.7, designElecPower);          // 1.0 kg/s * 300 Pa / 0.7 total efficiency
-    EXPECT_DOUBLE_EQ(1.0, fan.outletAirMassFlowRate);        // normal mode uses the 1.0 kg/s inlet flow
-    EXPECT_DOUBLE_EQ(designElecPower, fan.totalPower);       // normal power at full flow
-    EXPECT_DOUBLE_EQ(designElecPower, fan.powerLossToAir);   // all fan power enters the air with a 1.0 motor-in-air fraction
+    EXPECT_DOUBLE_EQ(300.0 / 0.7, designElecPower);        // 1.0 kg/s * 300 Pa / 0.7 total efficiency
+    EXPECT_DOUBLE_EQ(1.0, fan.outletAirMassFlowRate);      // normal mode uses the 1.0 kg/s inlet flow
+    EXPECT_DOUBLE_EQ(designElecPower, fan.totalPower);     // normal power at full flow
+    EXPECT_DOUBLE_EQ(designElecPower, fan.powerLossToAir); // all fan power enters the air with a 1.0 motor-in-air fraction
 
     state->dataHVACGlobal->NightVentOn = true;
     // Night mode selects the alternate performance and limits flow to the lower night maximum.
@@ -272,10 +272,10 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_NightVentilationPerformance)
     // With night ventilation off, the on/off fan should use its design performance.
     fan.simulateOnOff(*state);
 
-    EXPECT_DOUBLE_EQ(300.0 / 0.7, designElecPower);          // 1.0 kg/s * 300 Pa / 0.7 total efficiency
-    EXPECT_DOUBLE_EQ(1.0, fan.outletAirMassFlowRate);        // normal mode uses the 1.0 kg/s inlet flow
-    EXPECT_DOUBLE_EQ(designElecPower, fan.totalPower);       // normal power at full flow
-    EXPECT_DOUBLE_EQ(designElecPower, fan.powerLossToAir);   // all fan power enters the air with a 1.0 motor-in-air fraction
+    EXPECT_DOUBLE_EQ(300.0 / 0.7, designElecPower);        // 1.0 kg/s * 300 Pa / 0.7 total efficiency
+    EXPECT_DOUBLE_EQ(1.0, fan.outletAirMassFlowRate);      // normal mode uses the 1.0 kg/s inlet flow
+    EXPECT_DOUBLE_EQ(designElecPower, fan.totalPower);     // normal power at full flow
+    EXPECT_DOUBLE_EQ(designElecPower, fan.powerLossToAir); // all fan power enters the air with a 1.0 motor-in-air fraction
 
     state->dataHVACGlobal->NightVentOn = true;
     // Night mode selects the alternate performance and limits flow to the lower night maximum.
@@ -323,10 +323,10 @@ TEST_F(EnergyPlusFixture, Fans_ZoneExhaust_NightVentilationPerformance)
     // A coupled zone exhaust fan should use design performance normally and its alternate settings in night mode.
     fan.simulateZoneExhaust(*state);
 
-    EXPECT_DOUBLE_EQ(300.0 / 0.7, designElecPower);          // 1.0 kg/s * 300 Pa / 0.7 total efficiency
-    EXPECT_DOUBLE_EQ(1.0, fan.outletAirMassFlowRate);        // normal mode uses the 1.0 kg/s inlet flow
-    EXPECT_DOUBLE_EQ(designElecPower, fan.totalPower);       // normal power at full flow
-    EXPECT_DOUBLE_EQ(designElecPower, fan.powerLossToAir);   // zone exhaust fans put all fan power into the air
+    EXPECT_DOUBLE_EQ(300.0 / 0.7, designElecPower);        // 1.0 kg/s * 300 Pa / 0.7 total efficiency
+    EXPECT_DOUBLE_EQ(1.0, fan.outletAirMassFlowRate);      // normal mode uses the 1.0 kg/s inlet flow
+    EXPECT_DOUBLE_EQ(designElecPower, fan.totalPower);     // normal power at full flow
+    EXPECT_DOUBLE_EQ(designElecPower, fan.powerLossToAir); // zone exhaust fans put all fan power into the air
 
     state->dataHVACGlobal->NightVentOn = true;
     // Night mode selects the alternate pressure, efficiency, and 0.75 kg/s flow cap.
