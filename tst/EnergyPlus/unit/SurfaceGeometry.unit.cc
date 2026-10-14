@@ -96,9 +96,6 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     state->dataSurface->MaxVerticesPerSurface = 5;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->ShadeV.allocate(state->dataSurface->TotSurfaces);
-    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
-        state->dataSurface->Surface(SurfNum).Vertex.allocate(state->dataSurface->MaxVerticesPerSurface);
-    }
 
     bool ErrorsFound(false);
     int ThisSurf(0);
@@ -108,6 +105,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     state->dataSurface->Surface(ThisSurf).Azimuth = 180.0;
     state->dataSurface->Surface(ThisSurf).Tilt = 90.0;
     state->dataSurface->Surface(ThisSurf).Sides = 4;
+    state->dataSurface->Surface(ThisSurf).Vertex.allocate(state->dataSurface->Surface(ThisSurf).Sides);
     state->dataSurface->Surface(ThisSurf).GrossArea = 10.0;
 
     state->dataSurface->Surface(ThisSurf).Vertex(1).x = 0.0;
@@ -135,6 +133,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     state->dataSurface->Surface(ThisSurf).Azimuth = 180.0;
     state->dataSurface->Surface(ThisSurf).Tilt = 90.0;
     state->dataSurface->Surface(ThisSurf).Sides = 4;
+    state->dataSurface->Surface(ThisSurf).Vertex.allocate(state->dataSurface->Surface(ThisSurf).Sides);
     state->dataSurface->Surface(ThisSurf).GrossArea = 8.0;
 
     state->dataSurface->Surface(ThisSurf).Vertex(1).x = 0.0;
@@ -162,6 +161,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     state->dataSurface->Surface(ThisSurf).Azimuth = 180.0;
     state->dataSurface->Surface(ThisSurf).Tilt = 90.0;
     state->dataSurface->Surface(ThisSurf).Sides = 4;
+    state->dataSurface->Surface(ThisSurf).Vertex.allocate(state->dataSurface->Surface(ThisSurf).Sides);
     state->dataSurface->Surface(ThisSurf).GrossArea = 10.0;
 
     state->dataSurface->Surface(ThisSurf).Vertex(1).x = 0.0;
@@ -189,6 +189,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     state->dataSurface->Surface(ThisSurf).Azimuth = 180.0;
     state->dataSurface->Surface(ThisSurf).Tilt = 90.0;
     state->dataSurface->Surface(ThisSurf).Sides = 3;
+    state->dataSurface->Surface(ThisSurf).Vertex.allocate(state->dataSurface->Surface(ThisSurf).Sides);
     state->dataSurface->Surface(ThisSurf).GrossArea = 10.0;
 
     state->dataSurface->Surface(ThisSurf).Vertex(1).x = 0.0;
@@ -212,6 +213,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     state->dataSurface->Surface(ThisSurf).Azimuth = 180.0;
     state->dataSurface->Surface(ThisSurf).Tilt = 90.0;
     state->dataSurface->Surface(ThisSurf).Sides = 5;
+    state->dataSurface->Surface(ThisSurf).Vertex.allocate(state->dataSurface->Surface(ThisSurf).Sides);
     state->dataSurface->Surface(ThisSurf).GrossArea = 10.0;
 
     state->dataSurface->Surface(ThisSurf).Vertex(1).x = 0.0;
@@ -1084,8 +1086,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isAlmostEqual3dPt)
 
 TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isAlmostEqual2dPt)
 {
-    DataVectorTypes::Vector_2d a;
-    DataVectorTypes::Vector_2d b;
+    Vector2D a;
+    Vector2D b;
 
     a.x = 0.;
     a.y = 0.;
@@ -3025,12 +3027,12 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CalcCoordinateTransformationAlternateE
     Vector compCoordTranslVector(0.0, 0.0, 0.0);
     EXPECT_NO_THROW(CalcCoordinateTransformation(*state, 1, compCoordTranslVector));
     Vector const edge31 = surface.Vertex(1) - surface.Vertex(3);
-    Real64 const gamma = dot(surface.Vertex(2) - surface.Vertex(3), edge31) / magnitude_squared(edge31);
+    Real64 const gamma = (surface.Vertex(2) - surface.Vertex(3)).dot(edge31) / edge31.length_squared();
     Vector const expectedTranslation = surface.Vertex(3) + gamma * edge31;
     EXPECT_NEAR(compCoordTranslVector.x, expectedTranslation.x, 1.0e-9);
     EXPECT_NEAR(compCoordTranslVector.y, expectedTranslation.y, 1.0e-9);
     EXPECT_NEAR(compCoordTranslVector.z, expectedTranslation.z, 1.0e-9);
-    EXPECT_NEAR(magnitude_squared(surface.lcsx), 1.0, 1.0e-12);
+    EXPECT_NEAR(surface.lcsx.length_squared(), 1.0, 1.0e-12);
     EXPECT_TRUE(compare_err_stream("", true));
 }
 
@@ -3078,14 +3080,14 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CalcCoordinateTransformationPentagonFa
     surface.Vertex(4) = {10.0, 10.0, 0.0};
     surface.Vertex(5) = {-10.0, 10.0, 0.0};
 
-    EXPECT_LE(magnitude_squared(surface.Vertex(2) - surface.Vertex(3)), Constant::OneMillionth);
-    EXPECT_LE(magnitude_squared(surface.Vertex(2) - surface.Vertex(1)), Constant::OneMillionth);
+    EXPECT_LE((surface.Vertex(2) - surface.Vertex(3)).length_squared(), Constant::OneMillionth);
+    EXPECT_LE((surface.Vertex(2) - surface.Vertex(1)).length_squared(), Constant::OneMillionth);
 
     Vector compCoordTranslVector(0.0, 0.0, 0.0);
     EXPECT_NO_THROW(CalcCoordinateTransformation(*state, 1, compCoordTranslVector));
 
     Vector const edge34 = surface.Vertex(4) - surface.Vertex(3);
-    Real64 const gamma = dot(surface.Vertex(2) - surface.Vertex(3), edge34) / magnitude_squared(edge34);
+    Real64 const gamma = (surface.Vertex(2) - surface.Vertex(3)).dot(edge34) / edge34.length_squared();
     Vector const expectedTranslation = surface.Vertex(3) + gamma * edge34;
     EXPECT_NEAR(compCoordTranslVector.x, expectedTranslation.x, 1.0e-9);
     EXPECT_NEAR(compCoordTranslVector.y, expectedTranslation.y, 1.0e-9);
@@ -3115,7 +3117,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CalcCoordinateTransformationFallbackSh
     Real64 const cosTilt = std::cos(tiltRadians);
     Real64 const sinTilt = std::sin(tiltRadians);
     auto const tiltPoint = [rotationAxis, cosTilt, sinTilt](Vector const &point) {
-        return cosTilt * point + sinTilt * cross(rotationAxis, point) + (1.0 - cosTilt) * dot(rotationAxis, point) * rotationAxis;
+        return cosTilt * point + sinTilt * rotationAxis.cross(point) + (1.0 - cosTilt) * rotationAxis.dot(point) * rotationAxis;
     };
 
     auto &base = state->dataSurface->Surface(1);
@@ -3133,8 +3135,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CalcCoordinateTransformationFallbackSh
     base.Vertex(5) = tiltPoint(Vector{0.0, 20.0, 0.0});
 
     // Edges 2-3 and 1-2 are both below the 1 mm threshold; initialize the parent's local basis.
-    EXPECT_LE(magnitude_squared(base.Vertex(2) - base.Vertex(3)), Constant::OneMillionth);
-    EXPECT_LE(magnitude_squared(base.Vertex(2) - base.Vertex(1)), Constant::OneMillionth);
+    EXPECT_LE((base.Vertex(2) - base.Vertex(3)).length_squared(), Constant::OneMillionth);
+    EXPECT_LE((base.Vertex(2) - base.Vertex(1)).length_squared(), Constant::OneMillionth);
     Vectors::CreateNewellSurfaceNormalVector(base.Vertex, base.Sides, base.NewellSurfaceNormalVector);
     Vectors::DetermineAzimuthAndTilt(base.Vertex, base.Azimuth, base.Tilt, base.lcsx, base.lcsy, base.lcsz, base.NewellSurfaceNormalVector);
     EXPECT_NEAR(base.Tilt, 30.0, 1.0e-8);
@@ -3164,23 +3166,23 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CalcCoordinateTransformationFallbackSh
     // Reconstruct the origin that the original 2-3 projection would have produced, for comparison only.
     Vector const fallbackOrigin{state->dataSurface->X0(1), state->dataSurface->Y0(1), state->dataSurface->Z0(1)};
     Vector const originalEdge = base.Vertex(3) - base.Vertex(2);
-    Real64 const originalGamma = dot(base.Vertex(1) - base.Vertex(2), originalEdge) / magnitude_squared(originalEdge);
+    Real64 const originalGamma = (base.Vertex(1) - base.Vertex(2)).dot(originalEdge) / originalEdge.length_squared();
     Vector const originalOrigin = base.Vertex(2) + originalGamma * originalEdge;
 
     // Compute the parent shifts and the child's local coordinates under the fallback and original origins.
     auto const &baseShade = state->dataSurface->ShadeV(1);
     Vector const processedBaseVertex2{baseShade.XV(2), baseShade.YV(2), baseShade.ZV(2)};
     Vector const baseVertexOffset = processedBaseVertex2 - fallbackOrigin;
-    Real64 const fallbackXShift = dot(base.lcsx, baseVertexOffset);
-    Real64 const fallbackYShift = dot(base.lcsy, baseVertexOffset);
+    Real64 const fallbackXShift = base.lcsx.dot(baseVertexOffset);
+    Real64 const fallbackYShift = base.lcsy.dot(baseVertexOffset);
     Vector const childVertexOffset = child.Vertex(1) - base.Vertex(2);
     Real64 const childRelativeX =
         -childVertexOffset.x * std::cos(base.Azimuth * Constant::DegToRad) + childVertexOffset.y * std::sin(base.Azimuth * Constant::DegToRad);
     Real64 const childRelativeY = -childVertexOffset.x * std::sin(base.Azimuth * Constant::DegToRad) * std::cos(base.Tilt * Constant::DegToRad) -
                                   childVertexOffset.y * std::cos(base.Azimuth * Constant::DegToRad) * std::cos(base.Tilt * Constant::DegToRad) +
                                   childVertexOffset.z * std::sin(base.Tilt * Constant::DegToRad);
-    Real64 const originalXShift = dot(base.lcsx, processedBaseVertex2 - originalOrigin);
-    Real64 const originalYShift = dot(base.lcsy, processedBaseVertex2 - originalOrigin);
+    Real64 const originalXShift = base.lcsx.dot(processedBaseVertex2 - originalOrigin);
+    Real64 const originalYShift = base.lcsy.dot(processedBaseVertex2 - originalOrigin);
     Real64 const originalChildX = childRelativeX + originalXShift;
     Real64 const originalChildY = childRelativeY + originalYShift;
     auto const &childShade = state->dataSurface->ShadeV(2);
