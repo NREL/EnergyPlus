@@ -73,6 +73,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include <algorithm>
@@ -3005,6 +3006,198 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
+// Reproduces issue #11707: use another polygon edge when the 2-3 edge is too short.
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CalcCoordinateTransformationAlternateEdge)
+{
+    state->dataSurface->Surface.allocate(1);
+    auto &surface = state->dataSurface->Surface(1);
+    surface.Name = "BLOCK BATIMENT0000000293627145-PART231 STOREY 0 ROOF 0001";
+    surface.Sides = 3;
+    surface.Vertex.allocate(surface.Sides);
+    surface.Vertex(1) = {696212.1442928468, 7044674.109177616, 6.8};
+    surface.Vertex(2) = {696211.199943949, 7044696.100094359, 6.8};
+    surface.Vertex(3) = {696211.1998310842, 7044696.100282936, 6.8};
+
+    Vectors::CreateNewellSurfaceNormalVector(surface.Vertex, surface.Sides, surface.NewellSurfaceNormalVector);
+    Vectors::DetermineAzimuthAndTilt(
+        surface.Vertex, surface.Azimuth, surface.Tilt, surface.lcsx, surface.lcsy, surface.lcsz, surface.NewellSurfaceNormalVector);
+
+    Vector compCoordTranslVector(0.0, 0.0, 0.0);
+    EXPECT_NO_THROW(CalcCoordinateTransformation(*state, 1, compCoordTranslVector));
+    Vector const edge31 = surface.Vertex(1) - surface.Vertex(3);
+    Real64 const gamma = dot(surface.Vertex(2) - surface.Vertex(3), edge31) / magnitude_squared(edge31);
+    Vector const expectedTranslation = surface.Vertex(3) + gamma * edge31;
+    EXPECT_NEAR(compCoordTranslVector.x, expectedTranslation.x, 1.0e-9);
+    EXPECT_NEAR(compCoordTranslVector.y, expectedTranslation.y, 1.0e-9);
+    EXPECT_NEAR(compCoordTranslVector.z, expectedTranslation.z, 1.0e-9);
+    EXPECT_NEAR(magnitude_squared(surface.lcsx), 1.0, 1.0e-12);
+    EXPECT_TRUE(compare_err_stream("", true));
+}
+
+// Verify the fatal error remains when all three triangle edges are too short.
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CalcCoordinateTransformationAllEdgesInvalid)
+{
+    state->dataSurface->Surface.allocate(1);
+    auto &surface = state->dataSurface->Surface(1);
+    surface.Name = "COLLAPSED TRIANGLE";
+    surface.Sides = 3;
+    surface.Vertex.allocate(surface.Sides);
+    surface.Vertex(1) = {1.0, 2.0, 3.0};
+    surface.Vertex(2) = {1.0006, 2.0002, 3.0};
+    surface.Vertex(3) = {1.0004, 2.0006, 3.0};
+
+    Vector compCoordTranslVector;
+    EXPECT_THROW(CalcCoordinateTransformation(*state, 1, compCoordTranslVector), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** CalcCoordinateTransformation: No boundary edge longer than 1 mm; cannot establish coordinate transformation for "
+        "surface=\"COLLAPSED TRIANGLE\":",
+        "   **   ~~~   **  (   1.000,   2.000,   3.000)",
+        "   **   ~~~   **  (   1.001,   2.000,   3.000)",
+        "   **   ~~~   **  (   1.000,   2.001,   3.000)",
+        "   **  Fatal  ** CalcCoordinateTransformation: Program terminates due to preceding condition.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=CalcCoordinateTransformation: No boundary edge longer than 1 mm; cannot establish coordinate transformation for "
+        "surface=\"COLLAPSED TRIANGLE\":",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+// Verify a pentagon falls back to edge 3-4 when edges 2-3 and 1-2 are too short.
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CalcCoordinateTransformationPentagonFallback)
+{
+    state->dataSurface->Surface.allocate(1);
+    auto &surface = state->dataSurface->Surface(1);
+    surface.Name = "PENTAGON WITH CLUSTERED INITIAL VERTICES";
+    surface.Sides = 5;
+    surface.Vertex.allocate(surface.Sides);
+    surface.Vertex(1) = {0.0, 0.0, 0.0};
+    surface.Vertex(2) = {0.0002, 0.0, 0.0};
+    surface.Vertex(3) = {0.0004, 0.0002, 0.0};
+    surface.Vertex(4) = {10.0, 10.0, 0.0};
+    surface.Vertex(5) = {-10.0, 10.0, 0.0};
+
+    EXPECT_LE(magnitude_squared(surface.Vertex(2) - surface.Vertex(3)), Constant::OneMillionth);
+    EXPECT_LE(magnitude_squared(surface.Vertex(2) - surface.Vertex(1)), Constant::OneMillionth);
+
+    Vector compCoordTranslVector(0.0, 0.0, 0.0);
+    EXPECT_NO_THROW(CalcCoordinateTransformation(*state, 1, compCoordTranslVector));
+
+    Vector const edge34 = surface.Vertex(4) - surface.Vertex(3);
+    Real64 const gamma = dot(surface.Vertex(2) - surface.Vertex(3), edge34) / magnitude_squared(edge34);
+    Vector const expectedTranslation = surface.Vertex(3) + gamma * edge34;
+    EXPECT_NEAR(compCoordTranslVector.x, expectedTranslation.x, 1.0e-9);
+    EXPECT_NEAR(compCoordTranslVector.y, expectedTranslation.y, 1.0e-9);
+    EXPECT_NEAR(compCoordTranslVector.z, expectedTranslation.z, 1.0e-9);
+    EXPECT_TRUE(compare_err_stream("", true));
+}
+
+// With edges 2-3 and 1-2 too short, edge 3-4 supplies the fallback origin. On this nonhorizontal parent, the child's
+// local shading coordinates change, but its world placement (original 3D coordinates) is unchanged when transformed
+// with the matching parent origin and basis.
+// This confirms the fallback produces a consistent transform for this nonhorizontal parent/child case.
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CalcCoordinateTransformationFallbackShiftsChildCoordinates)
+{
+    state->init_state(*state);
+
+    // Allocate the parent/child surfaces and arrays consumed by ProcessSurfaceVertices.
+    state->dataSurface->TotSurfaces = 2;
+    state->dataSurface->MaxVerticesPerSurface = 5;
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->ShadeV.allocate(2);
+    state->dataSurface->X0.dimension(2, 0.0);
+    state->dataSurface->Y0.dimension(2, 0.0);
+    state->dataSurface->Z0.dimension(2, 0.0);
+
+    Real64 const tiltRadians = 30.0 * Constant::DegToRad;
+    Vector const rotationAxis = Vectors::VecNormalize(Vector{0.0002, 0.0002, 0.0});
+    Real64 const cosTilt = std::cos(tiltRadians);
+    Real64 const sinTilt = std::sin(tiltRadians);
+    auto const tiltPoint = [rotationAxis, cosTilt, sinTilt](Vector const &point) {
+        return cosTilt * point + sinTilt * cross(rotationAxis, point) + (1.0 - cosTilt) * dot(rotationAxis, point) * rotationAxis;
+    };
+
+    auto &base = state->dataSurface->Surface(1);
+    base.Name = "TILTED BASE WITH SHORT REFERENCE EDGE";
+    base.Class = SurfaceClass::Roof;
+    base.BaseSurf = 1;
+    base.HeatTransSurf = true;
+    base.Sides = 5;
+    base.GrossArea = 100.0;
+    base.Vertex.allocate(base.Sides);
+    base.Vertex(1) = tiltPoint(Vector{10.0, 10.0, 0.0});
+    base.Vertex(2) = tiltPoint(Vector{10.0002, 10.0, 0.0});
+    base.Vertex(3) = tiltPoint(Vector{10.0004, 10.0002, 0.0});
+    base.Vertex(4) = tiltPoint(Vector{20.0, 20.0, 0.0});
+    base.Vertex(5) = tiltPoint(Vector{0.0, 20.0, 0.0});
+
+    // Edges 2-3 and 1-2 are both below the 1 mm threshold; initialize the parent's local basis.
+    EXPECT_LE(magnitude_squared(base.Vertex(2) - base.Vertex(3)), Constant::OneMillionth);
+    EXPECT_LE(magnitude_squared(base.Vertex(2) - base.Vertex(1)), Constant::OneMillionth);
+    Vectors::CreateNewellSurfaceNormalVector(base.Vertex, base.Sides, base.NewellSurfaceNormalVector);
+    Vectors::DetermineAzimuthAndTilt(base.Vertex, base.Azimuth, base.Tilt, base.lcsx, base.lcsy, base.lcsz, base.NewellSurfaceNormalVector);
+    EXPECT_NEAR(base.Tilt, 30.0, 1.0e-8);
+
+    // Define a child in world coordinates so its processed local coordinates can be compared with the fallback origin.
+    auto &child = state->dataSurface->Surface(2);
+    child.Name = "CHILD TRIANGULAR WINDOW";
+    child.Class = SurfaceClass::Window;
+    child.BaseSurf = 1;
+    child.HeatTransSurf = true;
+    child.Sides = 3;
+    child.Area = 0.125;
+    child.Azimuth = base.Azimuth;
+    child.Tilt = base.Tilt;
+    child.Vertex.allocate(child.Sides);
+    child.Vertex(1) = tiltPoint(Vector{11.0, 14.0, 0.0});
+    child.Vertex(2) = tiltPoint(Vector{12.0, 14.0, 0.0});
+    child.Vertex(3) = tiltPoint(Vector{11.5, 15.0, 0.0});
+
+    // The parent must be processed first because it establishes the origin and shifts inherited by the child.
+    bool errorsFound = false;
+    ProcessSurfaceVertices(*state, 1, errorsFound);
+    ASSERT_FALSE(errorsFound);
+    ProcessSurfaceVertices(*state, 2, errorsFound);
+    ASSERT_FALSE(errorsFound);
+
+    // Reconstruct the origin that the original 2-3 projection would have produced, for comparison only.
+    Vector const fallbackOrigin{state->dataSurface->X0(1), state->dataSurface->Y0(1), state->dataSurface->Z0(1)};
+    Vector const originalEdge = base.Vertex(3) - base.Vertex(2);
+    Real64 const originalGamma = dot(base.Vertex(1) - base.Vertex(2), originalEdge) / magnitude_squared(originalEdge);
+    Vector const originalOrigin = base.Vertex(2) + originalGamma * originalEdge;
+
+    // Compute the parent shifts and the child's local coordinates under the fallback and original origins.
+    auto const &baseShade = state->dataSurface->ShadeV(1);
+    Vector const processedBaseVertex2{baseShade.XV(2), baseShade.YV(2), baseShade.ZV(2)};
+    Vector const baseVertexOffset = processedBaseVertex2 - fallbackOrigin;
+    Real64 const fallbackXShift = dot(base.lcsx, baseVertexOffset);
+    Real64 const fallbackYShift = dot(base.lcsy, baseVertexOffset);
+    Vector const childVertexOffset = child.Vertex(1) - base.Vertex(2);
+    Real64 const childRelativeX =
+        -childVertexOffset.x * std::cos(base.Azimuth * Constant::DegToRad) + childVertexOffset.y * std::sin(base.Azimuth * Constant::DegToRad);
+    Real64 const childRelativeY = -childVertexOffset.x * std::sin(base.Azimuth * Constant::DegToRad) * std::cos(base.Tilt * Constant::DegToRad) -
+                                  childVertexOffset.y * std::cos(base.Azimuth * Constant::DegToRad) * std::cos(base.Tilt * Constant::DegToRad) +
+                                  childVertexOffset.z * std::sin(base.Tilt * Constant::DegToRad);
+    Real64 const originalXShift = dot(base.lcsx, processedBaseVertex2 - originalOrigin);
+    Real64 const originalYShift = dot(base.lcsy, processedBaseVertex2 - originalOrigin);
+    Real64 const originalChildX = childRelativeX + originalXShift;
+    Real64 const originalChildY = childRelativeY + originalYShift;
+    auto const &childShade = state->dataSurface->ShadeV(2);
+
+    // The origin change is visible in local coordinates, even though it does not move the child in world space.
+    EXPECT_NE(childShade.XV(1), originalChildX);
+    EXPECT_NEAR(childShade.YV(1), originalChildY, 1.0e-4);
+    EXPECT_NEAR(childShade.XV(1), childRelativeX + fallbackXShift, 1.0e-4);
+    EXPECT_NEAR(childShade.YV(1), childRelativeY + fallbackYShift, 1.0e-4);
+
+    // Applying the fallback origin and basis to the stored child coordinates recovers its input world vertex.
+    Vector const reconstructedChildVertex = fallbackOrigin + childShade.XV(1) * base.lcsx + childShade.YV(1) * base.lcsy;
+    EXPECT_NEAR(reconstructedChildVertex.x, child.Vertex(1).x, 1.0e-4);
+    EXPECT_NEAR(reconstructedChildVertex.y, child.Vertex(1).y, 1.0e-4);
+    EXPECT_NEAR(reconstructedChildVertex.z, child.Vertex(1).z, 1.0e-4);
+}
+
 TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest)
 {
 
@@ -3213,7 +3406,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest_9118)
     surface.GrossArea = 100.0;
     vertices.deallocate();
     vertices.allocate(8);
-    vertices = actualVertices;
+    std::copy(actualVertices.begin(), actualVertices.end(), vertices.begin());
     CheckConvexity(*state, 1, surface.Sides);
 
     EXPECT_EQ(4, surface.Sides);
@@ -3270,7 +3463,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest_ASHRAE901_Hospital_
         {27.4320, 48.7680, 21.3415},
         {9.1440, 48.7680, 21.3415},
     };
-    surface.Vertex = vertices;
+    surface.Vertex.allocate(static_cast<int>(vertices.size()));
+    std::copy(vertices.begin(), vertices.end(), surface.Vertex.begin());
 
     CheckConvexity(*state, 1, surface.Sides);
 
@@ -3328,7 +3522,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexity_ColinearStability)
         floorSurface.Name = "Floor";
         floorSurface.Vertex.allocate(nVertices);
 
-        floorSurface.Vertex = floorVertices;
+        std::copy(floorVertices.begin(), floorVertices.end(), floorSurface.Vertex.begin());
 
         CheckConvexity(*state, floorSurfNum, floorSurface.Sides);
 
@@ -3347,7 +3541,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexity_ColinearStability)
         ceilingSurface.Name = "Ceiling";
         ceilingSurface.Vertex.allocate(nVertices);
 
-        ceilingSurface.Vertex = ceilingVertices;
+        std::copy(ceilingVertices.begin(), ceilingVertices.end(), ceilingSurface.Vertex.begin());
 
         CheckConvexity(*state, ceilingSurfNum, ceilingSurface.Sides);
 
@@ -5829,6 +6023,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
     EXPECT_FALSE(ErrorsFound); // expect no errors
+    state->dataHeatBalSurf->SurfAbsThermalInt.dimension(state->dataSurface->TotSurfaces, 0.9);
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
     HeatBalanceIntRadExchange::InitInteriorRadExchange(*state);
 
@@ -5888,7 +6083,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     // Check MRT calculations
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(3);
     state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(3);
-    state->dataHeatBalSurf->SurfTempIn.allocate(7);
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(7);
     auto &zoneHB1 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
     auto &zoneHB2 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(2);
     auto &zoneHB3 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(3);
@@ -5899,11 +6094,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     auto &encl2 = state->dataViewFactor->EnclRadInfo(2);
 
     // Case 1 - all surfaces the same temperature
-    state->dataHeatBalSurf->SurfTempIn(Zone1Surface1) = 10.0;
-    state->dataHeatBalSurf->SurfTempIn(Zone2Surface1) = 10.0;
-    state->dataHeatBalSurf->SurfTempIn(Zone1Floor) = 10.0;
-    state->dataHeatBalSurf->SurfTempIn(Zone2Floor) = 10.0;
-    state->dataHeatBalSurf->SurfTempIn(Zone3Floor) = 10.0;
+    state->dataHeatBalSurf->SurfTempInTmp(Zone1Surface1) = 10.0;
+    state->dataHeatBalSurf->SurfTempInTmp(Zone2Surface1) = 10.0;
+    state->dataHeatBalSurf->SurfTempInTmp(Zone1Floor) = 10.0;
+    state->dataHeatBalSurf->SurfTempInTmp(Zone2Floor) = 10.0;
+    state->dataHeatBalSurf->SurfTempInTmp(Zone3Floor) = 10.0;
 
     HeatBalanceSurfaceManager::CalculateZoneMRT(*state);
     EXPECT_NEAR(zoneHB1.MRT, 10.0, 0.001);
@@ -5916,11 +6111,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_EQ(spaceHB3.MRT, encl1.MRT);
 
     // Case 2 - all surfaces in each zone same temperature
-    state->dataHeatBalSurf->SurfTempIn(Zone1Surface1) = 10.0;
-    state->dataHeatBalSurf->SurfTempIn(Zone2Surface1) = 20.0;
-    state->dataHeatBalSurf->SurfTempIn(Zone1Floor) = 10.0;
-    state->dataHeatBalSurf->SurfTempIn(Zone2Floor) = 20.0;
-    state->dataHeatBalSurf->SurfTempIn(Zone3Floor) = 30.0;
+    state->dataHeatBalSurf->SurfTempInTmp(Zone1Surface1) = 10.0;
+    state->dataHeatBalSurf->SurfTempInTmp(Zone2Surface1) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(Zone1Floor) = 10.0;
+    state->dataHeatBalSurf->SurfTempInTmp(Zone2Floor) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(Zone3Floor) = 30.0;
 
     HeatBalanceSurfaceManager::CalculateZoneMRT(*state);
     EXPECT_NEAR(zoneHB1.MRT, 10.0, 0.001);
@@ -16783,4 +16978,342 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SpaceOutsideBC_SpacesInput)
     EXPECT_EQ(izIntWin.Class, DataSurfaces::SurfaceClass::Window);
     // SINGLE PANE HW WINDOW is a single-layer construction, so the same construction works for both sides
     EXPECT_EQ(state->dataConstruction->Construct(izIntWin.Construction).Name, "SINGLE PANE HW WINDOW");
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_NewSubSurfaceTypes)
+{
+    // Verify that FixedWindow/OperableWindow/Skylight/OverheadDoor are parsed correctly,
+    // remapped to Window/Door in Class while OriginalClass retains the fine-grained type,
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  Zone1,                                  !- Name",
+        "  0,                                      !- Direction of Relative North {deg}",
+        "  0,                                      !- X Origin {m}",
+        "  0,                                      !- Y Origin {m}",
+        "  0,                                      !- Z Origin {m}",
+        "  ,                                       !- Type",
+        "  1,                                      !- Multiplier",
+        "  ,                                       !- Ceiling Height {m}",
+        "  ,                                       !- Volume {m3}",
+        "  ,                                       !- Floor Area {m2}",
+        "  ,                                       !- Zone Inside Convection Algorithm",
+        "  ,                                       !- Zone Outside Convection Algorithm",
+        "  Yes;                                    !- Part of Total Floor Area",
+
+        "BuildingSurface:Detailed,",
+        "  1-SOUTH,                                !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  15, 0, 3,                               !- X,Y,Z Vertex 1 {m}",
+        "  0, 0, 3,                                !- X,Y,Z Vertex 2 {m}",
+        "  0, 0, 0,                                !- X,Y,Z Vertex 3 {m}",
+        "  15, 0, 0;                               !- X,Y,Z Vertex 4 {m}",
+
+        "FenestrationSurface:Detailed,",
+        "  Door Door,                              !- Name",
+        "  Door,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  1-SOUTH,                                !- Building Surface Name",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Frame and Divider Name",
+        "  ,                                       !- Multiplier",
+        "  ,                                       !- Number of Vertices",
+        "  7, 0, 2,                                !- X,Y,Z Vertex 1 {m}",
+        "  7, 0, 0,                                !- X,Y,Z Vertex 2 {m}",
+        "  8, 0, 0,                                !- X,Y,Z Vertex 3 {m}",
+        "  8, 0, 2;                                !- X,Y,Z Vertex 4 {m}",
+
+        "FenestrationSurface:Detailed,",
+        "  Door GlassDoor,                         !- Name",
+        "  GlassDoor,                              !- Surface Type",
+        "  Simple Glazing,                         !- Construction Name",
+        "  1-SOUTH,                                !- Building Surface Name",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Frame and Divider Name",
+        "  ,                                       !- Multiplier",
+        "  ,                                       !- Number of Vertices",
+        "  12, 0, 2,                               !- X,Y,Z Vertex 1 {m}",
+        "  12, 0, 0,                               !- X,Y,Z Vertex 2 {m}",
+        "  13, 0, 0,                               !- X,Y,Z Vertex 3 {m}",
+        "  13, 0, 2;                               !- X,Y,Z Vertex 4 {m}",
+
+        "FenestrationSurface:Detailed,",
+        "  Door OverheadDoor,                      !- Name",
+        "  OverheadDoor,                           !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  1-SOUTH,                                !- Building Surface Name",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Frame and Divider Name",
+        "  ,                                       !- Multiplier",
+        "  ,                                       !- Number of Vertices",
+        "  0.5, 0, 2.5,                            !- X,Y,Z Vertex 1 {m}",
+        "  0.5, 0, 0,                              !- X,Y,Z Vertex 2 {m}",
+        "  4.5, 0, 0,                              !- X,Y,Z Vertex 3 {m}",
+        "  4.5, 0, 2.5;                            !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  2-WEST,                                 !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  0, 0, 3,                                !- X,Y,Z Vertex 1 {m}",
+        "  0, 10, 3,                               !- X,Y,Z Vertex 2 {m}",
+        "  0, 10, 0,                               !- X,Y,Z Vertex 3 {m}",
+        "  0, 0, 0;                                !- X,Y,Z Vertex 4 {m}",
+
+        "FenestrationSurface:Detailed,",
+        "  Window FixedWindow,                     !- Name",
+        "  FixedWindow,                            !- Surface Type",
+        "  Simple Glazing,                         !- Construction Name",
+        "  2-WEST,                                 !- Building Surface Name",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Frame and Divider Name",
+        "  ,                                       !- Multiplier",
+        "  ,                                       !- Number of Vertices",
+        "  0, 9.9746, 1.96812712579906,            !- X,Y,Z Vertex 1 {m}",
+        "  0, 9.9746, 0.762,                       !- X,Y,Z Vertex 2 {m}",
+        "  0, 0.0254000000000012, 0.762,           !- X,Y,Z Vertex 3 {m}",
+        "  0, 0.0254000000000012, 1.96812712579906; !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  3-EAST,                                 !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  15, 10, 3,                              !- X,Y,Z Vertex 1 {m}",
+        "  15, 0, 3,                               !- X,Y,Z Vertex 2 {m}",
+        "  15, 0, 0,                               !- X,Y,Z Vertex 3 {m}",
+        "  15, 10, 0;                              !- X,Y,Z Vertex 4 {m}",
+
+        "FenestrationSurface:Detailed,",
+        "  Window OperableWindow,                  !- Name",
+        "  OperableWindow,                         !- Surface Type",
+        "  Simple Glazing,                         !- Construction Name",
+        "  3-EAST,                                 !- Building Surface Name",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Frame and Divider Name",
+        "  ,                                       !- Multiplier",
+        "  ,                                       !- Number of Vertices",
+        "  15, 0.0254, 1.96812712579906,           !- X,Y,Z Vertex 1 {m}",
+        "  15, 0.0254, 0.762,                      !- X,Y,Z Vertex 2 {m}",
+        "  15, 9.9746, 0.762,                      !- X,Y,Z Vertex 3 {m}",
+        "  15, 9.9746, 1.96812712579906;           !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  4-NORTH,                                !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  0, 10, 3,                               !- X,Y,Z Vertex 1 {m}",
+        "  15, 10, 3,                              !- X,Y,Z Vertex 2 {m}",
+        "  15, 10, 0,                              !- X,Y,Z Vertex 3 {m}",
+        "  0, 10, 0;                               !- X,Y,Z Vertex 4 {m}",
+
+        "FenestrationSurface:Detailed,",
+        "  Window Window,                          !- Name",
+        "  Window,                                 !- Surface Type",
+        "  Simple Glazing,                         !- Construction Name",
+        "  4-NORTH,                                !- Building Surface Name",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Frame and Divider Name",
+        "  ,                                       !- Multiplier",
+        "  ,                                       !- Number of Vertices",
+        "  14.9746, 10, 1.96607781018382,          !- X,Y,Z Vertex 1 {m}",
+        "  14.9746, 10, 0.762,                     !- X,Y,Z Vertex 2 {m}",
+        "  0.0254000000000012, 10, 0.762,          !- X,Y,Z Vertex 3 {m}",
+        "  0.0254000000000012, 10, 1.96607781018382; !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  Space1 Floor,                           !- Name",
+        "  Floor,                                  !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Ground,                                 !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  NoSun,                                  !- Sun Exposure",
+        "  NoWind,                                 !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  15, 10, 0,                              !- X,Y,Z Vertex 1 {m}",
+        "  15, 0, 0,                               !- X,Y,Z Vertex 2 {m}",
+        "  0, 0, 0,                                !- X,Y,Z Vertex 3 {m}",
+        "  0, 10, 0;                               !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  Space1 RoofCeiling,                     !- Name",
+        "  Roof,                                   !- Surface Type",
+        "  R13 Construction,                       !- Construction Name",
+        "  Zone1,                                  !- Zone Name",
+        "  ,                                       !- Space Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  0, 10, 3,                               !- X,Y,Z Vertex 1 {m}",
+        "  0, 0, 3,                                !- X,Y,Z Vertex 2 {m}",
+        "  15, 0, 3,                               !- X,Y,Z Vertex 3 {m}",
+        "  15, 10, 3;                              !- X,Y,Z Vertex 4 {m}",
+
+        "FenestrationSurface:Detailed,",
+        "  Window Skylight,                        !- Name",
+        "  Skylight,                               !- Surface Type",
+        "  Simple Glazing,                         !- Construction Name",
+        "  Space1 RoofCeiling,                     !- Building Surface Name",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Frame and Divider Name",
+        "  ,                                       !- Multiplier",
+        "  ,                                       !- Number of Vertices",
+        "  2.75658350974743, 8.16227766016838, 3,  !- X,Y,Z Vertex 1 {m}",
+        "  2.75658350974743, 1.83772233983162, 3,  !- X,Y,Z Vertex 2 {m}",
+        "  12.2434164902526, 1.83772233983162, 3,  !- X,Y,Z Vertex 3 {m}",
+        "  12.2434164902526, 8.16227766016838, 3;  !- X,Y,Z Vertex 4 {m}",
+
+        "Material,",
+        "  M15 200mm heavyweight concrete,         !- Name",
+        "  MediumRough,                            !- Roughness",
+        "  0.2032,                                 !- Thickness {m}",
+        "  1.95,                                   !- Conductivity {W/m-K}",
+        "  2240,                                   !- Density {kg/m3}",
+        "  900,                                    !- Specific Heat {J/kg-K}",
+        "  0.9,                                    !- Thermal Absorptance",
+        "  0.7,                                    !- Solar Absorptance",
+        "  0.7;                                    !- Visible Absorptance",
+
+        "Material:NoMass,",
+        "  R13-IP,                                 !- Name",
+        "  Smooth,                                 !- Roughness",
+        "  2.28943238786998,                       !- Thermal Resistance {m2-K/W}",
+        "  0.9,                                    !- Thermal Absorptance",
+        "  0.7,                                    !- Solar Absorptance",
+        "  0.7;                                    !- Visible Absorptance",
+
+        "WindowMaterial:SimpleGlazingSystem,",
+        "  Simple Glazing Mat,                     !- Name",
+        "  0.1,                                    !- U-Factor {W/m2-K}",
+        "  0.1;                                    !- Solar Heat Gain Coefficient",
+
+        "Construction,",
+        "  R13 Construction,                       !- Name",
+        "  M15 200mm heavyweight concrete,         !- Layer 1",
+        "  R13-IP;                                 !- Layer 2",
+
+        "Construction,",
+        "  Simple Glazing,                         !- Name",
+        "  Simple Glazing Mat;                     !- Layer 1",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    state->init_state(*state);
+
+    bool ErrorsFound = false;
+    GetMaterialData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    GetConstructData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = 0.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+
+    GetSurfaceData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    int fixedWinNum = Util::FindItemInList("WINDOW FIXEDWINDOW", state->dataSurface->Surface);
+    int operableWinNum = Util::FindItemInList("WINDOW OPERABLEWINDOW", state->dataSurface->Surface);
+    int skylightNum = Util::FindItemInList("WINDOW SKYLIGHT", state->dataSurface->Surface);
+    int overheadDoorNum = Util::FindItemInList("DOOR OVERHEADDOOR", state->dataSurface->Surface);
+    int windowNum = Util::FindItemInList("WINDOW WINDOW", state->dataSurface->Surface);
+    int doorNum = Util::FindItemInList("DOOR DOOR", state->dataSurface->Surface);
+    int glassDoorNum = Util::FindItemInList("DOOR GLASSDOOR", state->dataSurface->Surface);
+
+    ASSERT_GT(fixedWinNum, 0);
+    ASSERT_GT(operableWinNum, 0);
+    ASSERT_GT(skylightNum, 0);
+    ASSERT_GT(overheadDoorNum, 0);
+    ASSERT_GT(windowNum, 0);
+    ASSERT_GT(doorNum, 0);
+    ASSERT_GT(glassDoorNum, 0);
+
+    auto const &fixedWin = state->dataSurface->Surface(fixedWinNum);
+    auto const &operableWin = state->dataSurface->Surface(operableWinNum);
+    auto const &skylight = state->dataSurface->Surface(skylightNum);
+    auto const &overheadDoor = state->dataSurface->Surface(overheadDoorNum);
+    auto const &window = state->dataSurface->Surface(windowNum);
+    auto const &door = state->dataSurface->Surface(doorNum);
+    auto const &glassDoor = state->dataSurface->Surface(glassDoorNum);
+
+    // OriginalClass retains fine-grained type
+    EXPECT_ENUM_EQ(SurfaceClass::FixedWindow, fixedWin.OriginalClass);
+    EXPECT_ENUM_EQ(SurfaceClass::OperableWindow, operableWin.OriginalClass);
+    EXPECT_ENUM_EQ(SurfaceClass::Skylight, skylight.OriginalClass);
+    EXPECT_ENUM_EQ(SurfaceClass::OverheadDoor, overheadDoor.OriginalClass);
+    // Backward-compat types preserve their OriginalClass
+    EXPECT_ENUM_EQ(SurfaceClass::Window, window.OriginalClass);
+    EXPECT_ENUM_EQ(SurfaceClass::Door, door.OriginalClass);
+    EXPECT_ENUM_EQ(SurfaceClass::GlassDoor, glassDoor.OriginalClass);
+
+    // Class is remapped for heat transfer calculations
+    EXPECT_ENUM_EQ(SurfaceClass::Window, fixedWin.Class);
+    EXPECT_ENUM_EQ(SurfaceClass::Window, operableWin.Class);
+    EXPECT_ENUM_EQ(SurfaceClass::Window, skylight.Class);
+    EXPECT_ENUM_EQ(SurfaceClass::Door, overheadDoor.Class);
+    EXPECT_ENUM_EQ(SurfaceClass::Window, window.Class);
+    EXPECT_ENUM_EQ(SurfaceClass::Door, door.Class);
+    EXPECT_ENUM_EQ(SurfaceClass::Window, glassDoor.Class); // GlassDoor remaps to Window
+
+    // All glazed surfaces are within the space WindowSurfaceFirst/Last range
+    int spaceNum = fixedWin.spaceNum;
+    auto const &thisSpace = state->dataHeatBal->space(spaceNum);
+    EXPECT_GT(thisSpace.WindowSurfaceFirst, 0);
+    EXPECT_GE(thisSpace.WindowSurfaceLast, thisSpace.WindowSurfaceFirst);
+    for (int surfNum : {fixedWinNum, operableWinNum, skylightNum, windowNum, glassDoorNum}) {
+        EXPECT_GE(surfNum, thisSpace.WindowSurfaceFirst);
+        EXPECT_LE(surfNum, thisSpace.WindowSurfaceLast);
+    }
 }

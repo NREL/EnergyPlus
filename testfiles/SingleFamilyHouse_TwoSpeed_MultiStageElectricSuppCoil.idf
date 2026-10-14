@@ -99,7 +99,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,26.2;
+  Version,27.1;
 
   Building,
     Single family House,     !- Name
@@ -2029,6 +2029,8 @@
   Output:Variable,*,Heating Coil Heating Energy,TimeStep;
 
   Output:Variable,*,Heating Coil Heating Energy,TimeStep;
+
+  Output:Variable,*,Heating Coil Runtime Fraction,TimeStep;
 
   Output:Variable,*,Zone Air Temperature,TimeStep;
 

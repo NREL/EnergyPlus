@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
+#include <algorithm>
 #include <cmath>
 #include <format>
 
@@ -438,6 +439,13 @@ namespace HeatingCoils {
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 heatingCoil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Runtime Fraction",
+                                Constant::Units::None,
+                                heatingCoil.RTF,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
+                                heatingCoil.Name);
         }
 
         // Get the data for electric heating coils
@@ -565,6 +573,13 @@ namespace HeatingCoils {
                                 "Heating Coil Electricity Rate",
                                 Constant::Units::W,
                                 heatingCoil.ElecUseRate,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
+                                heatingCoil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Runtime Fraction",
+                                Constant::Units::None,
+                                heatingCoil.RTF,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 heatingCoil.Name);
@@ -1645,7 +1660,7 @@ namespace HeatingCoils {
             heatingCoil.MSNominalCapacity(heatingCoil.NumOfStages) = TempCap;
             bool IsAutoSize = false;
             int NumOfStages; // total number of stages of multi-stage heating coil
-            if (any_eq(heatingCoil.MSNominalCapacity, DataSizing::AutoSize)) {
+            if (std::ranges::any_of(heatingCoil.MSNominalCapacity, [&](auto const &elem) { return elem == DataSizing::AutoSize; })) {
                 IsAutoSize = true;
             }
             if (IsAutoSize) {
@@ -1875,6 +1890,7 @@ namespace HeatingCoils {
         }
 
         heatingCoil.HeatingCoilLoad = HeatingCoilLoad;
+        heatingCoil.RTF = heatingCoil.NominalCapacity > 0.0 ? HeatingCoilLoad / heatingCoil.NominalCapacity : 0.0;
 
         // Set the outlet conditions
         heatingCoil.OutletAirTemp = TempAirOut;
@@ -1958,9 +1974,13 @@ namespace HeatingCoils {
 
         Real64 OutdoorPressure = state.dataEnvrn->OutBaroPress;
 
+        heatingCoil.RTF = 0.0;
+
         if ((AirMassFlow > 0.0) && (heatingCoil.availSched->getCurrentVal() > 0.0) && ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
 
             if (StageNum > 1) {
+
+                heatingCoil.RTF = 1.0;
 
                 TotCapLS = heatingCoil.MSNominalCapacity(StageNumLS);
                 TotCapHS = heatingCoil.MSNominalCapacity(StageNumHS);
@@ -1999,6 +2019,7 @@ namespace HeatingCoils {
             } else if (CycRatio > 0.0) {
 
                 PartLoadRat = min(1.0, CycRatio);
+                heatingCoil.RTF = PartLoadRat;
 
                 // for cycling fan, reset mass flow to full on rate
                 if (fanOp == HVAC::FanOp::Cycling) {
