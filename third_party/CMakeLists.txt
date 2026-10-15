@@ -21,21 +21,6 @@ set(all_third_party_targets "")
 
 # SAM Is included up here to make sure it doesn't get the C++20 flags
 # SAM Simulation Core (SSC)
-mark_as_advanced(FORCE JSONCPP_USE_SECURE_MEMORY)
-mark_as_advanced(FORCE JSONCPP_WITH_CMAKE_PACKAGE)
-mark_as_advanced(FORCE JSONCPP_WITH_EXAMPLE)
-mark_as_advanced(FORCE JSONCPP_WITH_PKGCONFIG_SUPPORT)
-mark_as_advanced(FORCE JSONCPP_WITH_STRICT_ISO)
-mark_as_advanced(FORCE JSONCPP_WITH_TESTS)
-set(JSONCPP_WITH_TESTS
-    OFF
-    CACHE BOOL "Compile and (for jsoncpp_check) run JsonCpp test executables" FORCE)
-mark_as_advanced(FORCE JSONCPP_WITH_WARNING_AS_ERROR)
-mark_as_advanced(FORCE DEBUG_LIBNAME_SUFFIX)
-mark_as_advanced(FORCE JSONCPP_WITH_POST_BUILD_UNITTEST)
-set(JSONCPP_WITH_POST_BUILD_UNITTEST
-    OFF
-    CACHE BOOL "Automatically run unit-tests as a post build step" FORCE)
 mark_as_advanced(FORCE CCACHE_FOUND)
 set(SAMAPI_EXPORT
     OFF

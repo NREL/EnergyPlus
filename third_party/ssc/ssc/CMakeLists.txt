@@ -85,7 +85,6 @@ endif()
 set( DEPENDENCIES
 	shared
 	splinter
-	jsoncpp_lib
 	)
 foreach( name ${DEPENDENCIES} )
 	target_link_libraries(ssc PUBLIC ${name})
