@@ -6388,6 +6388,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                 auto const &sysSizing = state.dataSize->SysSizing(DDNum, AirLoopNum);
                 if (sysSizing.SensCoolCap > state.dataSize->SensCoolCapTemp(AirLoopNum)) {
                     state.dataSize->SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD = DDNum;
+                    state.dataSize->SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDName = sysSizing.CoolDesDay;
                     state.dataSize->SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
                     state.dataSize->SensCoolCapTemp(AirLoopNum) = sysSizing.SensCoolCap;
                     if (sysSizing.coolingPeakLoad == DataSizing::PeakLoad::SensibleCooling) {
@@ -6423,6 +6424,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
 
                 if (sysSizing.TotCoolCap > state.dataSize->TotCoolCapTemp(AirLoopNum)) {
                     state.dataSize->SysSizPeakDDNum(AirLoopNum).TotCoolPeakDD = DDNum;
+                    state.dataSize->SysSizPeakDDNum(AirLoopNum).cTotCoolPeakDDName = sysSizing.CoolDesDay;
                     state.dataSize->SysSizPeakDDNum(AirLoopNum).cTotCoolPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
                     state.dataSize->TotCoolCapTemp(AirLoopNum) = sysSizing.TotCoolCap;
                     if (sysSizing.coolingPeakLoad == DataSizing::PeakLoad::TotalCooling) {
@@ -6459,6 +6461,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                 if (sysSizing.CoinCoolMassFlow > state.dataSize->CalcSysSizing(AirLoopNum).CoinCoolMassFlow) {
                     state.dataSize->CalcSysSizing(AirLoopNum).CoinCoolMassFlow = sysSizing.CoinCoolMassFlow;
                     state.dataSize->SysSizPeakDDNum(AirLoopNum).CoolFlowPeakDD = DDNum;
+                    state.dataSize->SysSizPeakDDNum(AirLoopNum).cCoolFlowPeakDDName = sysSizing.CoolDesDay;
                     state.dataSize->SysSizPeakDDNum(AirLoopNum).cCoolFlowPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
                 }
 

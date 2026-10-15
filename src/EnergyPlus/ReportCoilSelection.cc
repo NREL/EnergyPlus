@@ -1214,24 +1214,49 @@ namespace ReportCoilSelection {
 
             // These next blocks does not always work with SizingPeriod:WeatherFileDays or SizingPeriod:WeatherFileConditionType, protect against hard
             // crash
-            if (SysSizPeakDDNum(curSysNum).SensCoolPeakDD > 0 && SysSizPeakDDNum(curSysNum).SensCoolPeakDD <= state.dataEnvrn->TotDesDays) {
-                c->desDayNameAtSensPeak = state.dataWeather->DesDayInput(SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Title;
-                c->coilSensePeakHrMin = PeakHrMinString(state,
-                                                        SysSizPeakDDNum(curSysNum).SensCoolPeakDD,
-                                                        SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(SysSizPeakDDNum(curSysNum).SensCoolPeakDD));
+            if (SysSizPeakDDNum(curSysNum).SensCoolPeakDD > 0) {
+                if (SysSizPeakDDNum(curSysNum).SensCoolPeakDD <= state.dataEnvrn->TotDesDays) {
+                    c->desDayNameAtSensPeak = state.dataWeather->DesDayInput(SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Title;
+                    c->coilSensePeakHrMin =
+                        PeakHrMinString(state,
+                                        SysSizPeakDDNum(curSysNum).SensCoolPeakDD,
+                                        SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(SysSizPeakDDNum(curSysNum).SensCoolPeakDD));
+                } else {
+                    c->desDayNameAtSensPeak = SysSizPeakDDNum(curSysNum).cSensCoolPeakDDName;
+                    c->coilSensePeakHrMin =
+                        std::format("{} {}",
+                                    SysSizPeakDDNum(curSysNum).cSensCoolPeakDDDate,
+                                    getTimeText(state, SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(SysSizPeakDDNum(curSysNum).SensCoolPeakDD)));
+                }
             }
-            if (SysSizPeakDDNum(curSysNum).TotCoolPeakDD > 0 && SysSizPeakDDNum(curSysNum).TotCoolPeakDD <= state.dataEnvrn->TotDesDays) {
-                c->desDayNameAtTotalPeak = state.dataWeather->DesDayInput(SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Title;
-                c->coilTotalPeakHrMin = PeakHrMinString(state,
-                                                        SysSizPeakDDNum(curSysNum).TotCoolPeakDD,
-                                                        SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(SysSizPeakDDNum(curSysNum).TotCoolPeakDD));
+            if (SysSizPeakDDNum(curSysNum).TotCoolPeakDD > 0) {
+                if (SysSizPeakDDNum(curSysNum).TotCoolPeakDD <= state.dataEnvrn->TotDesDays) {
+                    c->desDayNameAtTotalPeak = state.dataWeather->DesDayInput(SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Title;
+                    c->coilTotalPeakHrMin = PeakHrMinString(state,
+                                                            SysSizPeakDDNum(curSysNum).TotCoolPeakDD,
+                                                            SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(SysSizPeakDDNum(curSysNum).TotCoolPeakDD));
+                } else {
+                    c->desDayNameAtTotalPeak = SysSizPeakDDNum(curSysNum).cTotCoolPeakDDName;
+                    c->coilTotalPeakHrMin =
+                        std::format("{} {}",
+                                    SysSizPeakDDNum(curSysNum).cTotCoolPeakDDDate,
+                                    getTimeText(state, SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(SysSizPeakDDNum(curSysNum).TotCoolPeakDD)));
+                }
             }
 
-            if (SysSizPeakDDNum(curSysNum).CoolFlowPeakDD > 0 && SysSizPeakDDNum(curSysNum).CoolFlowPeakDD <= state.dataEnvrn->TotDesDays) {
-                c->desDayNameAtAirFlowPeak = state.dataWeather->DesDayInput(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Title;
-                c->airPeakHrMin = PeakHrMinString(state,
-                                                  SysSizPeakDDNum(curSysNum).CoolFlowPeakDD,
-                                                  SysSizPeakDDNum(curSysNum).TimeStepAtCoolFlowPk(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD));
+            if (SysSizPeakDDNum(curSysNum).CoolFlowPeakDD > 0) {
+                if (SysSizPeakDDNum(curSysNum).CoolFlowPeakDD <= state.dataEnvrn->TotDesDays) {
+                    c->desDayNameAtAirFlowPeak = state.dataWeather->DesDayInput(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Title;
+                    c->airPeakHrMin = PeakHrMinString(state,
+                                                      SysSizPeakDDNum(curSysNum).CoolFlowPeakDD,
+                                                      SysSizPeakDDNum(curSysNum).TimeStepAtCoolFlowPk(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD));
+                } else {
+                    c->desDayNameAtAirFlowPeak = SysSizPeakDDNum(curSysNum).cCoolFlowPeakDDName;
+                    c->airPeakHrMin =
+                        std::format("{} {}",
+                                    SysSizPeakDDNum(curSysNum).cCoolFlowPeakDDDate,
+                                    getTimeText(state, SysSizPeakDDNum(curSysNum).TimeStepAtCoolFlowPk(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD)));
+                }
             }
 
             auto const &finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
@@ -1508,6 +1533,7 @@ namespace ReportCoilSelection {
         if (curSysNum > 0 && c->zoneEqNum == 0 && curSysNum <= int(state.dataSize->FinalSysSizing.size())) {
             auto &finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
             c->desDayNameAtSensPeak = finalSysSizing.HeatDesDay;
+            c->desDayNameAtTotalPeak = finalSysSizing.HeatDesDay;
 
             c->oaPeakTemp = finalSysSizing.HeatOutTemp;
             c->oaPeakHumRat = finalSysSizing.HeatOutHumRat;
@@ -1577,6 +1603,7 @@ namespace ReportCoilSelection {
 
             if (finalSysSizing.HeatDDNum > 0 && finalSysSizing.HeatDDNum <= state.dataEnvrn->TotDesDays) {
                 c->coilSensePeakHrMin = PeakHrMinString(state, finalSysSizing.HeatDDNum, finalSysSizing.SysHeatCoilTimeStepPk);
+                c->coilTotalPeakHrMin = c->coilSensePeakHrMin;
 
                 c->airPeakHrMin = PeakHrMinString(state, finalSysSizing.HeatDDNum, finalSysSizing.SysHeatAirTimeStepPk);
 
@@ -1638,6 +1665,7 @@ namespace ReportCoilSelection {
                 c->zoneName[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName;
             }
             c->desDayNameAtSensPeak = finalZoneSizing.HeatDesDay;
+            c->desDayNameAtTotalPeak = finalZoneSizing.HeatDesDay;
             c->oaPeakTemp = finalZoneSizing.OutTempAtHeatPeak;
             c->oaPeakHumRat = finalZoneSizing.OutHumRatAtHeatPeak;
             c->raPeakTemp = finalZoneSizing.ZoneRetTempAtHeatPeak;
@@ -1648,6 +1676,7 @@ namespace ReportCoilSelection {
                 Psychrometrics::PsyRhFnTdbWPb(state, c->rmPeakTemp, c->rmPeakHumRat, state.dataEnvrn->StdBaroPress) * 100.0; // convert to percentage
             if (finalZoneSizing.HeatDDNum > 0 && finalZoneSizing.HeatDDNum <= state.dataEnvrn->TotDesDays) {
                 c->coilSensePeakHrMin = PeakHrMinString(state, finalZoneSizing.HeatDDNum, finalZoneSizing.TimeStepNumAtHeatMax);
+                c->coilTotalPeakHrMin = c->coilSensePeakHrMin;
                 c->airPeakHrMin = PeakHrMinString(state, finalZoneSizing.HeatDDNum, finalZoneSizing.TimeStepNumAtHeatMax);
             }
             c->desDayNameAtAirFlowPeak = finalZoneSizing.HeatDesDay;

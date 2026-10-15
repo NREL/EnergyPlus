@@ -1022,10 +1022,13 @@ namespace DataSizing {
     {
         // Members
         int SensCoolPeakDD;                // design day containing the sensible cooling peak
+        std::string cSensCoolPeakDDName;   // name of design period causing sensible cooling peak
         std::string cSensCoolPeakDDDate;   // date string of design day causing sensible cooling peak
         int TotCoolPeakDD;                 // design day containing total cooling peak
+        std::string cTotCoolPeakDDName;    // name of design period causing total cooling peak
         std::string cTotCoolPeakDDDate;    // date string of design day causing total cooling peak
         int CoolFlowPeakDD;                // design day containing the cooling air flow peak
+        std::string cCoolFlowPeakDDName;   // name of design period causing cooling air flow peak
         std::string cCoolFlowPeakDDDate;   // date string of design day causing cooling air flow peak
         int HeatPeakDD;                    // design day containing the heating peak
         std::string cHeatPeakDDDate;       // date string of design day causing heating peak

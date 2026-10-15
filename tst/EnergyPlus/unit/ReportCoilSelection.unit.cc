@@ -65,6 +65,7 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 
@@ -813,6 +814,78 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoolingCoil)
                                                 DXFlowPerCapMaxRatio);
     EXPECT_NEAR(RatedCoilTotCap * coilCapFunTempFac, c1->coilTotCapAtPeak, 0.000001);
     EXPECT_LT(RatedCoilTotCap, c1->coilTotCapAtPeak);
+}
+
+TEST_F(EnergyPlusFixture, ReportCoilSelection_WeatherFileCoolingPeakDates)
+{
+    state->dataGlobal->TimeStepsInHour = 4;
+    state->dataGlobal->MinutesInTimeStep = 15;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataEnvrn->TotDesDays = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataSize->FinalSysSizing.allocate(1);
+    state->dataSize->SysSizPeakDDNum.allocate(1);
+
+    auto &peakData = state->dataSize->SysSizPeakDDNum(1);
+    peakData.SensCoolPeakDD = 2;
+    peakData.cSensCoolPeakDDName = "Weather File Sensible Cooling Period";
+    peakData.cSensCoolPeakDDDate = "7/20";
+    peakData.TimeStepAtSensCoolPk.allocate(2);
+    peakData.TimeStepAtSensCoolPk(2) = 12;
+    peakData.TotCoolPeakDD = 2;
+    peakData.cTotCoolPeakDDName = "Weather File Total Cooling Period";
+    peakData.cTotCoolPeakDDDate = "7/21";
+    peakData.TimeStepAtTotCoolPk.allocate(2);
+    peakData.TimeStepAtTotCoolPk(2) = 16;
+    peakData.CoolFlowPeakDD = 2;
+    peakData.cCoolFlowPeakDDName = "Weather File Cooling Airflow Period";
+    peakData.cCoolFlowPeakDDDate = "7/22";
+    peakData.TimeStepAtCoolFlowPk.allocate(2);
+    peakData.TimeStepAtCoolFlowPk(2) = 20;
+
+    int const coilIndex = ReportCoilSelection::getReportIndex(*state, "Weather File Peak Coil", HVAC::CoilType::CoolingDXSingleSpeed);
+    ReportCoilSelection::setCoilCoolingCapacity(*state, coilIndex, 1000.0, true, 1, 0, 0, 0.0, 1.0, 0.0, 0.0);
+
+    auto const &coil = state->dataRptCoilSelection->coils[coilIndex];
+    EXPECT_EQ("Weather File Sensible Cooling Period", coil->desDayNameAtSensPeak);
+    EXPECT_EQ("7/20 03:00:00", coil->coilSensePeakHrMin);
+    EXPECT_EQ("Weather File Total Cooling Period", coil->desDayNameAtTotalPeak);
+    EXPECT_EQ("7/21 04:00:00", coil->coilTotalPeakHrMin);
+    EXPECT_EQ("Weather File Cooling Airflow Period", coil->desDayNameAtAirFlowPeak);
+    EXPECT_EQ("7/22 05:00:00", coil->airPeakHrMin);
+}
+
+TEST_F(EnergyPlusFixture, ReportCoilSelection_HeatingTotalPeakMatchesSensiblePeak)
+{
+    state->dataGlobal->TimeStepsInHour = 4;
+    state->dataGlobal->MinutesInTimeStep = 15;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataEnvrn->TotDesDays = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataSize->FinalSysSizing.allocate(1);
+    state->dataWeather->DesDayInput.allocate(1);
+
+    auto &designDay = state->dataWeather->DesDayInput(1);
+    designDay.Title = "Heating Design Day";
+    designDay.Month = 1;
+    designDay.DayOfMonth = 21;
+
+    auto &finalSysSizing = state->dataSize->FinalSysSizing(1);
+    finalSysSizing.HeatDesDay = designDay.Title;
+    finalSysSizing.HeatDDNum = 1;
+    finalSysSizing.SysHeatCoilTimeStepPk = 12;
+    finalSysSizing.SysHeatAirTimeStepPk = 16;
+
+    int const coilIndex = ReportCoilSelection::getReportIndex(*state, "Heating Coil", HVAC::CoilType::HeatingWater);
+    ReportCoilSelection::setCoilHeatingCapacity(*state, coilIndex, 1000.0, true, 1, 0, 0, 0.0, 1.0, 0.0, 0.0);
+
+    auto const &coil = state->dataRptCoilSelection->coils[coilIndex];
+    EXPECT_EQ("Heating Design Day", coil->desDayNameAtSensPeak);
+    EXPECT_EQ("1/21 03:00:00", coil->coilSensePeakHrMin);
+    EXPECT_EQ(coil->desDayNameAtSensPeak, coil->desDayNameAtTotalPeak);
+    EXPECT_EQ(coil->coilSensePeakHrMin, coil->coilTotalPeakHrMin);
+    EXPECT_EQ("Heating Design Day", coil->desDayNameAtAirFlowPeak);
+    EXPECT_EQ("1/21 04:00:00", coil->airPeakHrMin);
 }
 
 TEST_F(EnergyPlusFixture, ReportCoilSelection_4PipeFCU_ElecHeatingCoil)
