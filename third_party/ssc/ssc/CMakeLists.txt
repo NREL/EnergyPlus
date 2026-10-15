@@ -4,7 +4,7 @@
 #
 #####################################################################################################################
 
-include_directories(. ../splinter ../shared ../nlopt ../lpsolve ../solarpilot ../tcs ../ssc)
+include_directories(. ../splinter ../shared ../ssc)
 
 set(SSC_SRC
 #		cmod_6parsolve.cpp

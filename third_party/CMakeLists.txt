@@ -37,14 +37,6 @@ set(JSONCPP_WITH_POST_BUILD_UNITTEST
     OFF
     CACHE BOOL "Automatically run unit-tests as a post build step" FORCE)
 mark_as_advanced(FORCE CCACHE_FOUND)
-set(SAM_SKIP_TOOLS
-    ON
-    CACHE BOOL "Skips the sdktool and tcsconsole builds" FORCE)
-mark_as_advanced(FORCE SAM_SKIP_TOOLS)
-set(SAM_SKIP_TESTS
-    ON
-    CACHE BOOL "Skips building tests" FORCE)
-mark_as_advanced(FORCE SAM_SKIP_TESTS)
 set(SAMAPI_EXPORT
     OFF
     CACHE BOOL "Export of ssc binaries to the SAM_api directory; for Unix, compile ssc libraries for SAM_api" FORCE)
