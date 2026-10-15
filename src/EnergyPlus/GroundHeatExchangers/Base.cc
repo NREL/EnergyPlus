@@ -551,6 +551,7 @@ Real64 GLHEBase::interpGFunc(Real64 const x_val) const
 
     auto const &x = this->myRespFactors->LNTTS;
     auto const &y = this->myRespFactors->GFNC;
+    // Using raw pointers to avoid too much overhead due to safe iterators in Debug mode (`_GLIBCXX_DEBUG`)
     auto const *x_begin = x.data();
     auto const *x_end = x_begin + x.size();
     auto const *upper_it = std::upper_bound(x_begin, x_end, x_val);
