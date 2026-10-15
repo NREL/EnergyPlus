@@ -331,7 +331,7 @@ TEST_F(EnergyPlusFixture, Fans_ZoneExhaust_NightVentilationPerformance)
 
     EXPECT_DOUBLE_EQ(0.75, fan.outletAirMassFlowRate); // min(1.0 kg/s inlet flow, 0.75 kg/s night maximum)
     EXPECT_DOUBLE_EQ(150.0, fan.totalPower);           // 0.75 kg/s * 100 Pa / 0.5 night efficiency
-    EXPECT_DOUBLE_EQ(105.0, fan.powerLossToAir);       // 0.6 * 150 W + (150 W - 0.6 * 150 W) * 0.25
+    EXPECT_DOUBLE_EQ(93.75, fan.powerLossToAir);       // 75 W air power + (150 W - 75 W) * 0.25; night-vent MotEff is not applied
 }
 
 // Verify the fixed-speed alternate-mode assumption documented in the IDD and I/O Reference for FanPerformance:NightVentilation.
@@ -406,7 +406,7 @@ TEST_F(EnergyPlusFixture, Fans_ZoneExhaust_NightVentilationUsesFixedSpeedPower)
 
     EXPECT_DOUBLE_EQ(0.75, fan.outletAirMassFlowRate);
     EXPECT_DOUBLE_EQ(150.0, fan.totalPower);
-    EXPECT_DOUBLE_EQ(105.0, fan.powerLossToAir);
+    EXPECT_DOUBLE_EQ(93.75, fan.powerLossToAir); // Night-vent MotEff is not applied to zone exhaust fans.
 }
 
 // Verify a fouled-filter flow reduction cannot exceed the tighter night-ventilation flow cap.

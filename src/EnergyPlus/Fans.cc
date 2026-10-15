@@ -2120,7 +2120,6 @@ void FanComponent::simulateZoneExhaust(EnergyPlusData &state)
     Real64 _deltaPress = deltaPress; // [N/m2]
     Real64 _totalEff = totalEff;
     Real64 _maxAirMassFlowRate = maxAirMassFlowRate;
-    Real64 _motorEff = 1.0;
     Real64 _motorInAirFrac = motorInAirFrac;
 
     if (state.dataHVACGlobal->NightVentOn && nightVentPerfNum > 0) {
@@ -2128,7 +2127,6 @@ void FanComponent::simulateZoneExhaust(EnergyPlusData &state)
         _deltaPress = nightVentPerf.DeltaPress;
         _totalEff = nightVentPerf.FanEff;
         _maxAirMassFlowRate = nightVentPerf.MaxAirMassFlowRate;
-        _motorEff = nightVentPerf.MotEff;
         _motorInAirFrac = nightVentPerf.MotInAirFrac;
     }
 
@@ -2169,8 +2167,9 @@ void FanComponent::simulateZoneExhaust(EnergyPlusData &state)
 
     if (_fanIsRunning) {
         // Fan is operating
-        totalPower = std::fmax(0.0, _massFlow * _deltaPress / (_totalEff * _rhoAir)); // total fan power
-        Real64 const _shaftPower = _motorEff * totalPower; // power delivered to shaft
+        Real64 const _shaftPower = std::fmax(0.0, _massFlow * _deltaPress / _rhoAir);
+        totalPower = _shaftPower / _totalEff; // total fan power
+        // Zone exhaust fan heat uses the air power; night-vent motor efficiency does not affect this calculation.
         powerLossToAir = _shaftPower + (totalPower - _shaftPower) * _motorInAirFrac;
         powerLossToZone = (heatLossDest == HeatLossDest::Zone) ? totalPower - powerLossToAir : 0.0;
         outletAirEnthalpy = inletAirEnthalpy + powerLossToAir / _massFlow;

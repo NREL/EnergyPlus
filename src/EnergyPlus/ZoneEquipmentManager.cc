@@ -3556,6 +3556,36 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
     }
 }
 
+bool getZoneEquipmentNightVentStatus(EnergyPlusData &state,
+                                     DataZoneEquipment::ZoneEquipType const zoneEquipType,
+                                     DataZoneEquipment::EquipConfiguration const &zoneEquipConfig,
+                                     int const zoneCompNum,
+                                     bool const validSAMComp)
+{
+    bool zoneNightVentOn = false;
+    if (zoneEquipType == DataZoneEquipment::ZoneEquipType::AirDistributionUnit) {
+        for (int inletNodeNum = 1; inletNodeNum <= zoneEquipConfig.NumInletNodes; ++inletNodeNum) {
+            int const airLoopNum = zoneEquipConfig.InletNodeAirLoopNum(inletNodeNum);
+            if (airLoopNum > 0 && state.dataAirLoop->AirLoopControlInfo(airLoopNum).NightVent) {
+                zoneNightVentOn = true;
+                break;
+            }
+        }
+    } else if (zoneCompNum > 0 && validSAMComp) {
+        auto const &componentAvailability = state.dataAvail->ZoneComp((int)zoneEquipType).ZoneCompAvailMgrs(zoneCompNum);
+        for (int managerNum = 1; managerNum <= componentAvailability.NumAvailManagers; ++managerNum) {
+            auto const &manager = componentAvailability.availManagers(managerNum);
+            if (manager.type == Avail::ManagerType::NightVent) {
+                if (manager.Num > 0 && state.dataAvail->NightVentData(manager.Num).availStatus == Avail::Status::CycleOn) {
+                    zoneNightVentOn = true;
+                    break;
+                }
+            }
+        }
+    }
+    return zoneNightVentOn;
+}
+
 void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool &SimAir)
 {
 
@@ -3756,26 +3786,12 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 }
             }
 
-            // NightVentOn is global, so derive a temporary value from this zone component's managers.
-            // Leaving it false when no manager is assigned prevents inheriting stale state from an air loop.
-            bool const scopeZoneNightVentOn = ZoneCompNum > 0 && ValidSAMComp;
-            bool zoneNightVentOn = false;
-            if (scopeZoneNightVentOn) {
-                auto const &componentAvailability = state.dataAvail->ZoneComp((int)zoneEquipType).ZoneCompAvailMgrs(ZoneCompNum);
-                for (int managerNum = 1; managerNum <= componentAvailability.NumAvailManagers; ++managerNum) {
-                    auto const &manager = componentAvailability.availManagers(managerNum);
-                    if (manager.type == Avail::ManagerType::NightVent) {
-                        if (manager.Num > 0 && state.dataAvail->NightVentData(manager.Num).availStatus == Avail::Status::CycleOn) {
-                            zoneNightVentOn = true;
-                            break;
-                        }
-                    }
-                }
-            }
+            // NightVentOn is global, so derive a temporary value from this zone component's controls.
+            // Leaving it false when no control is active prevents inheriting stale state from another simulation.
+            bool const zoneNightVentOn =
+                getZoneEquipmentNightVentStatus(state, zoneEquipType, zoneEquipConfig, ZoneCompNum, ValidSAMComp);
             bool const savedZoneEquipmentNightVentOn = state.dataHVACGlobal->NightVentOn;
-            if (scopeZoneNightVentOn) {
-                state.dataHVACGlobal->NightVentOn = zoneNightVentOn;
-            }
+            state.dataHVACGlobal->NightVentOn = zoneNightVentOn;
 
             // If SpaceHVAC is active and this equipment has a space splitter, scale the zone load if needed
             if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->DoingSizing &&
@@ -4150,9 +4166,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             }
 
             // Restore the caller's global value so this component's mode does not leak into later simulations.
-            if (scopeZoneNightVentOn) {
-                state.dataHVACGlobal->NightVentOn = savedZoneEquipmentNightVentOn;
-            }
+            state.dataHVACGlobal->NightVentOn = savedZoneEquipmentNightVentOn;
 
             zoneEquipConfig.ZoneExh +=
                 (state.dataHVACGlobal->UnbalExhMassFlow +

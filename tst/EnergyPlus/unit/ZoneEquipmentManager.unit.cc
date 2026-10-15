@@ -59,6 +59,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -5874,7 +5875,72 @@ std::vector<std::string> zoneFanNightVentInputs(std::string_view fanType)
     return idfObjects;
 }
 
-// Simulate active and inactive zone managers, then remove zone 2's manager to verify it ignores stale global night-vent state.
+// Simulate active and inactive zone managers, remove zone 2's manager, and verify unmanaged equipment ignores stale global night-vent state.
+class NightVentFlagCaptureSystem : public HVACSystemData
+{
+public:
+    int simulateCount = 0;
+    bool nightVentOnDuringSimulation = true;
+
+    void simulate(EnergyPlus::EnergyPlusData &state,
+                  std::string_view,
+                  bool const,
+                  int,
+                  int &,
+                  bool &,
+                  bool &,
+                  int const,
+                  Real64 const,
+                  bool const,
+                  Real64 &sysOutputProvided,
+                  Real64 &latOutputProvided) override
+    {
+        ++simulateCount;
+        nightVentOnDuringSimulation = state.dataHVACGlobal->NightVentOn;
+        sysOutputProvided = 0.0;
+        latOutputProvided = 0.0;
+    }
+
+    void sizeSystem(EnergyPlus::EnergyPlusData &, bool const, int const) override
+    {
+    }
+
+    int getAirInNode(EnergyPlus::EnergyPlusData &, std::string_view, int const, bool &) override
+    {
+        return 0;
+    }
+
+    int getAirOutNode(EnergyPlus::EnergyPlusData &, std::string_view, int const, bool &) override
+    {
+        return 0;
+    }
+
+    int getAirOutletNode() override
+    {
+        return 0;
+    }
+
+    int getMixerOANode() override
+    {
+        return 0;
+    }
+
+    int getMixerMixNode() override
+    {
+        return 0;
+    }
+
+    int getMixerRetNode() override
+    {
+        return 0;
+    }
+
+    int getEquipIndex() override
+    {
+        return 0;
+    }
+};
+
 void runZoneFanNightVentTest(EnergyPlus::EnergyPlusData &state)
 {
     state.init_state(state);
@@ -5983,22 +6049,86 @@ void runZoneFanNightVentTest(EnergyPlus::EnergyPlusData &state)
     EXPECT_NEAR(fan1.outletAirMassFlowRate, nightVentMassFlow, 0.0001);
     EXPECT_NEAR(fan2.outletAirMassFlowRate, designMassFlow, 0.0001);
     EXPECT_TRUE(state.dataHVACGlobal->NightVentOn);
+
+    auto &zoneEquipList1ForCapture = state.dataZoneEquip->ZoneEquipList(1);
+    auto &zoneEquipList2ForCapture = state.dataZoneEquip->ZoneEquipList(2);
+    auto const savedZoneEquipType1 = zoneEquipList1ForCapture.EquipType(1);
+    auto const savedZoneEquipType2 = zoneEquipList2ForCapture.EquipType(1);
+    int const equipPtr = 1;
+    auto *savedComponent1 = zoneEquipList1ForCapture.compPointer[equipPtr];
+    auto *savedComponent2 = zoneEquipList2ForCapture.compPointer[equipPtr];
+    NightVentFlagCaptureSystem captureSystem;
+    zoneEquipList1ForCapture.compPointer[equipPtr] = &captureSystem;
+    zoneEquipList2ForCapture.compPointer[equipPtr] = &captureSystem;
+    zoneEquipList1ForCapture.EquipType(1) = DataZoneEquipment::ZoneEquipType::UnitarySystem;
+    zoneEquipList2ForCapture.EquipType(1) = DataZoneEquipment::ZoneEquipType::UnitarySystem;
+
+    // Unmanaged zone equipment must see false instead of inheriting stale global night-ventilation state.
+    state.dataHVACGlobal->NightVentOn = true;
+    SimZoneEquipment(state, true, simAir);
+    EXPECT_EQ(captureSystem.simulateCount, 2);
+    EXPECT_FALSE(captureSystem.nightVentOnDuringSimulation);
+    EXPECT_TRUE(state.dataHVACGlobal->NightVentOn);
+
+    zoneEquipList1ForCapture.EquipType(1) = savedZoneEquipType1;
+    zoneEquipList2ForCapture.EquipType(1) = savedZoneEquipType2;
+    zoneEquipList1ForCapture.compPointer[equipPtr] = savedComponent1;
+    zoneEquipList2ForCapture.compPointer[equipPtr] = savedComponent2;
 }
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneOnOffFanUsesComponentNightVentilation)
 {
     ASSERT_TRUE(process_idf(delimited_string(zoneFanNightVentInputs("Fan:OnOff"))));
+    // Check zone-manager behavior and ensure unmanaged zone equipment ignores stale global state.
     runZoneFanNightVentTest(*state);
 }
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneVariableVolumeFanUsesComponentNightVentilation)
 {
     ASSERT_TRUE(process_idf(delimited_string(zoneFanNightVentInputs("Fan:VariableVolume"))));
+    // Check zone-manager behavior and ensure unmanaged zone equipment ignores stale global state.
     runZoneFanNightVentTest(*state);
 }
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneConstantVolumeFanUsesComponentNightVentilation)
 {
     ASSERT_TRUE(process_idf(delimited_string(zoneFanNightVentInputs("Fan:ConstantVolume"))));
+    // Check zone-manager behavior and ensure unmanaged zone equipment ignores stale global state.
     runZoneFanNightVentTest(*state);
+}
+
+TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ADUUsesConnectedLoopNightVentilation)
+{
+    state->init_state(*state);
+    state->dataAirLoop->AirLoopControlInfo.allocate(2);
+    state->dataAirLoop->AirLoopControlInfo(1).NightVent = true;
+    state->dataAirLoop->AirLoopControlInfo(2).NightVent = false;
+
+    DataZoneEquipment::EquipConfiguration zoneEquipConfig;
+    zoneEquipConfig.NumInletNodes = 2;
+    zoneEquipConfig.InletNodeAirLoopNum.allocate(2);
+    zoneEquipConfig.InletNodeAirLoopNum(1) = 1;
+    zoneEquipConfig.InletNodeAirLoopNum(2) = 2;
+
+    // PIUs are simulated through their ADU; the ADU must inherit night ventilation from its serving loop.
+    state->dataHVACGlobal->NightVentOn = false;
+    EXPECT_TRUE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
+        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, zoneEquipConfig, 0, false));
+
+    // A stale global flag must not activate a PIU whose connected loop is not night ventilating.
+    state->dataHVACGlobal->NightVentOn = true;
+    state->dataAirLoop->AirLoopControlInfo(1).NightVent = false;
+    EXPECT_FALSE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
+        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, zoneEquipConfig, 0, false));
+
+    // Any connected loop can activate the ADU; unrelated inactive inlets do not disable it.
+    state->dataAirLoop->AirLoopControlInfo(2).NightVent = true;
+    EXPECT_TRUE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
+        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, zoneEquipConfig, 0, false));
+
+    // An ADU with no connected, night-ventilating loop cannot inherit stale global state.
+    zoneEquipConfig.InletNodeAirLoopNum(1) = 0;
+    zoneEquipConfig.InletNodeAirLoopNum(2) = 0;
+    EXPECT_FALSE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
+        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, zoneEquipConfig, 0, false));
 }
