@@ -13,7 +13,6 @@ set(SHARED_SRC
 #        6par_newton.h
 #        6par_search.h
 #        CMakeLists.txt
-        DB8_vmpp_impp_uint8_bin.h
         lib_battery.cpp
         lib_battery.h
         lib_battery_capacity.cpp
@@ -32,15 +31,11 @@ set(SHARED_SRC
         lib_battery_voltage.h
         lib_irradproc.cpp
         lib_irradproc.h
-        lib_miniz.cpp
-        lib_miniz.h
         lib_ondinv.cpp
         lib_ondinv.h
 #        lib_power_electronics.h
         lib_pv_incidence_modifier.cpp
         lib_pv_incidence_modifier.h
-        lib_pv_shade_loss_mpp.cpp
-        lib_pv_shade_loss_mpp.h
         lib_pvinv.cpp
         lib_pvinv.h
 #        lib_pvmodel.h
