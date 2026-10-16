@@ -701,7 +701,7 @@ SSCEXPORT ssc_var_t ssc_data_get_data_matrix(ssc_data_t p_data, const char *name
     return dat;
 }
 
-// EnergyPlus: json_to_ssc_data / ssc_data_to_json (and their helpers) removed. Not used by E+, they were the only reason jsoncpp was built and linked
+// NOTE: EnergyPlus: json_to_ssc_data / ssc_data_to_json (and their helpers) removed. Not used by E+, they were the only reason jsoncpp was built and linked
 
 
 SSCEXPORT ssc_entry_t ssc_module_entry( int index )

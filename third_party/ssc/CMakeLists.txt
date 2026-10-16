@@ -124,6 +124,5 @@ endfunction()
 #
 #####################################################################################################################
 
-add_subdirectory(splinter)
 add_subdirectory(shared)
 add_subdirectory(ssc)

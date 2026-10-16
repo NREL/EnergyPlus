@@ -130,7 +130,7 @@ public:
 
 	// beam and diffuse loss factors (0: full loss, 1: no loss )
 	bool fbeam(size_t hour_of_year, double minute, double solalt, double solazi);
-	// EnergyPlus: fbeam_shade_db removed. Only used by pvsamv1 (not built), it pulled the 3 MB shading database (lib_pv_shade_loss_mpp) into the link
+	// NOTE: EnergyPlus: fbeam_shade_db removed. Only used by pvsamv1 (not built), it pulled the 3 MB shading database (lib_pv_shade_loss_mpp) into the link
 	double fdiff();
 
 	double beam_shade_factor();

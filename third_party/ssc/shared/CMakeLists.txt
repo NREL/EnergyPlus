@@ -5,7 +5,7 @@
 #####################################################################################################################
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-include_directories(. ../splinter)
+include_directories(.)
 
 set(SHARED_SRC
 #        6par_jacobian.h
@@ -31,8 +31,6 @@ set(SHARED_SRC
         lib_battery_voltage.h
         lib_irradproc.cpp
         lib_irradproc.h
-        lib_ondinv.cpp
-        lib_ondinv.h
 #        lib_power_electronics.h
         lib_pv_incidence_modifier.cpp
         lib_pv_incidence_modifier.h

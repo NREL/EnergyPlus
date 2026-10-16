@@ -274,7 +274,7 @@ SSCEXPORT ssc_var_t ssc_data_get_data_matrix(ssc_data_t p_data, const char *name
 
 /**@}*/
 
-// EnergyPlus: json_to_ssc_data / ssc_data_to_json removed (see sscapi.cpp)
+// NOTE: EnergyPlus: json_to_ssc_data / ssc_data_to_json removed (see sscapi.cpp)
 
 /** The opaque data structure that stores information about a compute module. */
 typedef void* ssc_entry_t;

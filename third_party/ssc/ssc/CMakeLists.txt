@@ -4,7 +4,7 @@
 #
 #####################################################################################################################
 
-include_directories(. ../splinter ../shared ../ssc)
+include_directories(. ../shared ../ssc)
 
 set(SSC_SRC
 		cmod_battery.h
@@ -84,7 +84,6 @@ endif()
 
 set( DEPENDENCIES
 	shared
-	splinter
 	)
 foreach( name ${DEPENDENCIES} )
 	target_link_libraries(ssc PUBLIC ${name})
