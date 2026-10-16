@@ -50,4 +50,4 @@ SSC (https://github.com/NREL/ssc) was brought in as a git subtree, last pulled a
 - `ssc/ssc_equations.h`: equations for compute modules that aren't compiled are commented out (an empty `{}` entry avoids a compiler error if none are left).
 - Plus build fixes for newer compilers (GCC 13/15, Clang 17), the battery state fix (#10543) and the NaN fix for #11244: see `git log -- third_party/ssc`.
 
-Code removals are marked with `// EnergyPlus:` comments. Because of the trimming, `git subtree pull` would now conflict on every upstream file we deleted: to update SSC, re-vendor a release tag and re-apply the above.
+Code removals are marked with `// NOTE: EnergyPlus:` comments. Because of the trimming, `git subtree pull` would now conflict on every upstream file we deleted: to update SSC, re-vendor a release tag and re-apply the above.
