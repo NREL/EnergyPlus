@@ -388,7 +388,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               CASE('BRANCH')
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                   OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                  DO i = 3, CurArgs, 2
+                  DO i = 3, CurArgs, 4
                     IF (OutArgs(i) == 'EvaporativeCooler:Direct:ResearchSpecial') THEN
                       OutArgs(i)='EvaporativeCooler:Direct:UserEffectiveness'
                       nodiff=.false.
