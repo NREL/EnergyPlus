@@ -298,6 +298,8 @@ The ITE total heat generation rate and energy outputs represent the entire therm
 
 The CPU and Fan End-Use Subcategory fields (see Input Description) let the CPU and Fan electricity outputs above roll up separately in the ABUPS End Uses by Subcategory table, so downstream PUE- and ITUE-adjacent analysis can distinguish IT compute load from auxiliary fan load rather than relying on manual post-processing.
 
+Once Coil:Cooling:ITE:ColdPlate is wired up (see Overview and "Zone Heat Gain Registration for Air Spillover"), the ITE Liquid Heat Gain and ITE Air Heat Gain to Zone outputs reported here reflect the coil's achieved split from its *previous* plant-side `simulate()` call, not a value computed in direct response to this timestep's target — the same one-timestep lag already noted for the coil's own zone registration. In other words, the sensible heat actually entering the zone's air heat balance this timestep (via the coil's own `SetupZoneInternalGain` registration) may differ slightly from what `ITE Air Heat Gain to Zone Rate` reports for that same timestep; the two track closely but are not guaranteed to match instantaneously.
+
 ## Engineering Reference ##
 
 N/A

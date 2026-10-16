@@ -10305,12 +10305,13 @@ namespace InternalHeatGains {
         // This subroutine calculates the power consumption, total heat generation, and the split of that
         // heat generation between the liquid cooling loop and the zone air for ElectricEquipment:ITE:LiquidCooled.
         //
-        // Note: The cooling coils referenced by this object (Coil:Cooling:ITE:ColdPlate / Coil:Cooling:ITE:UserDefined)
-        // do not exist yet, so each coil's apportioned share of the target liquid load (per its Load Fraction) is
-        // assumed to be captured in full, with no physical capacity limit imposed by the coil. Once those coil
-        // objects exist, each coil's achieved liquid load should be capped at its own physical maximum (queried
-        // from the coil rather than assumed equal to its target), with any shortfall added to Air Heat Gain to
-        // Zone instead.
+        // Note: This object is not yet wired up to call into Coil:Cooling:ITE:ColdPlate or
+        // Coil:Cooling:ITE:UserDefined, which are being developed in parallel, separate PRs. The total
+        // target liquid load is split across this rack's coil slots by each slot's Load Fraction below,
+        // but until that integration lands, each slot's share is simply assumed to be fully captured,
+        // with no physical capacity limit applied. Once wired up, each coil's achieved liquid load will
+        // instead be queried from the coil itself and capped at its own physical maximum, with any
+        // shortfall added to Air Heat Gain to Zone instead.
 
         using Curve::CurveValue;
 
