@@ -131,7 +131,8 @@ namespace RoomAir {
         DataHeatBalance::IntGainType::SecCoolingDXCoilMultiSpeed,
         DataHeatBalance::IntGainType::SecHeatingDXCoilMultiSpeed,
         DataHeatBalance::IntGainType::ElectricLoadCenterConverter,
-        DataHeatBalance::IntGainType::FanSystemModel};
+        DataHeatBalance::IntGainType::FanSystemModel,
+        DataHeatBalance::IntGainType::FanZoneExhaust};
 
     static constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesMixedSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
                                                                                              DataHeatBalance::IntGainType::Lights};
