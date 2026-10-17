@@ -6054,7 +6054,7 @@ void runZoneFanNightVentTest(EnergyPlus::EnergyPlusData &state)
     auto &zoneEquipList2ForCapture = state.dataZoneEquip->ZoneEquipList(2);
     auto const savedZoneEquipType1 = zoneEquipList1ForCapture.EquipType(1);
     auto const savedZoneEquipType2 = zoneEquipList2ForCapture.EquipType(1);
-    int const equipPtr = 1;
+    constexpr int equipPtr = 1;
     auto *savedComponent1 = zoneEquipList1ForCapture.compPointer[equipPtr];
     auto *savedComponent2 = zoneEquipList2ForCapture.compPointer[equipPtr];
     NightVentFlagCaptureSystem captureSystem;
