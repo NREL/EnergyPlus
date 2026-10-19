@@ -475,21 +475,21 @@ void CoilCoolingITEColdPlateData::checkDesignLoadCapability(EnergyPlusData &stat
     Real64 const resistance = this->getAdjustedThermalResistance(state, maximumFlow / this->nominalFlowRate);
     this->checkThermalResistance(state, resistance, maximumFlow / this->nominalFlowRate);
 
-    Real64 caseTemperature = 0.0; // case temperature needed to transfer the schedule maximum load at the maximum flow [C]
+    Real64 requiredCaseTemperature = 0.0; // case temperature needed to transfer the schedule maximum load at the maximum flow [C]
     if (this->thermalResistanceMethod == ThermalResistanceMethod::LMTD) {
         Real64 const effectiveness = 1.0 - std::exp(-1.0 / (capacityRate * resistance));
-        caseTemperature = inletTemperature + scheduleMaxLoad / (capacityRate * effectiveness);
+        requiredCaseTemperature = inletTemperature + scheduleMaxLoad / (capacityRate * effectiveness);
     } else {
-        caseTemperature = inletTemperature + scheduleMaxLoad * std::max(resistance, 1.0 / capacityRate);
+        requiredCaseTemperature = inletTemperature + scheduleMaxLoad * std::max(resistance, 1.0 / capacityRate);
     }
 
-    if (caseTemperature > this->maximumCaseTemperature) {
+    if (requiredCaseTemperature > this->maximumCaseTemperature) {
         ShowWarningError(state, std::format("{}: {} \"{}\"", routineName, objectType, this->name));
         ShowContinueError(state,
                           std::format("The cold plate cannot transfer the maximum IT Equipment Load Schedule value ({:.2f} W) at its maximum "
                                       "liquid flow rate without the case temperature ({:.2f} C) exceeding the Maximum Case Temperature ({:.2f} C).",
                                       scheduleMaxLoad,
-                                      caseTemperature,
+                                      requiredCaseTemperature,
                                       this->maximumCaseTemperature));
         ShowContinueError(state,
                           std::format("The heat the cold plate transfers at the Maximum Case Temperature is limited to {:.2f} W. The design "
