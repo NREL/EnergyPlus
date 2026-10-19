@@ -247,7 +247,7 @@ namespace EMSManager {
 
     void ManageEMS(EnergyPlusData &state,
                    EMSCallFrom const iCalledFrom,                    // indicates where subroutine was called from, parameters in DataGlobals.
-                   bool &anyProgramRan,                              // true if any Erl programs ran for this call
+                   bool &anyProgramRan,                              // at the HVAC iteration point, true only if an actuator was written
                    ObjexxFCL::Optional_int_const ProgramManagerToRun // specific program manager to run
     )
     {
@@ -271,6 +271,8 @@ namespace EMSManager {
         }
 
         InitEMS(state, iCalledFrom);
+
+        auto const actuatorWritesBefore = state.dataPluginManager->actuatorWriteCount;
 
         // also call plugins and callbacks here for convenience
         if (iCalledFrom != EMSCallFrom::UserDefinedComponentModel) { // don't run user-defined component plugins this way
@@ -371,6 +373,12 @@ namespace EMSManager {
         }
 
         ReportEMS(state);
+
+        // At this calling point, anyProgramRan forces additional air-loop iterations. Read-only callbacks and Erl programs still execute and
+        // report normally, but they must not perturb convergence merely by being registered.
+        if (iCalledFrom == EMSCallFrom::HVACIterationLoop && state.dataPluginManager->actuatorWriteCount == actuatorWritesBefore) {
+            anyProgramRan = false;
+        }
     }
 
     void InitEMS(EnergyPlusData &state, EMSCallFrom const iCalledFrom) // indicates where subroutine was called from, parameters in DataGlobals.
@@ -748,6 +756,7 @@ namespace EMSManager {
                     } else {
                         VariableNum = RuntimeLanguageProcessor::NewEMSVariable(state, cAlphaArgs(1), 0);
                         thisEMSactuator.ErlVariableNum = VariableNum;
+                        state.dataRuntimeLang->ErlVariable(VariableNum).IsActuator = true;
                         // initialize Erl variable for actuator to null
                         state.dataRuntimeLang->ErlVariable(VariableNum).Value = state.dataRuntimeLang->Null;
                         if (ActuatorNum > state.dataRuntimeLang->numActuatorsUsed) {

@@ -398,12 +398,14 @@ namespace DataRuntimeLanguage {
         int StackNum;                // 0 for global Erl variables, index in ErlStack structure if local
         ErlValueType Value;          // values taken by Erl variables
         bool ReadOnly;               // true if Erl variable is read-only
+        bool IsActuator;             // true if this variable controls an EMS actuator
         bool SetByExternalInterface; // set to true if value is set by ExternalInterface
         bool SetByGlobalVariable;
         bool SetByInternalVariable;
 
         // Default Constructor
-        ErlVariableType() : StackNum(0), ReadOnly(false), SetByExternalInterface(false), SetByGlobalVariable(false), SetByInternalVariable(false)
+        ErlVariableType()
+            : StackNum(0), ReadOnly(false), IsActuator(false), SetByExternalInterface(false), SetByGlobalVariable(false), SetByInternalVariable(false)
         {
         }
     };

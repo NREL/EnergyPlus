@@ -127,7 +127,7 @@ void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom co
     if (state.dataGlobal->KickOffSimulation) {
         return;
     }
-    int const actuatorWritesBefore = state.dataPluginManager->actuatorWriteCount;
+    auto const actuatorWritesBefore = state.dataPluginManager->actuatorWriteCount;
     for (auto const &cb : state.dataPluginManager->callbacks[iCalledFrom]) {
         if (iCalledFrom == EMSManager::EMSCallFrom::UserDefinedComponentModel) {
             continue; // these are called -intentionally- using the runSingleUserDefinedCallback method
