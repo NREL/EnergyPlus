@@ -10371,6 +10371,45 @@ namespace InternalHeatGains {
 
     } // End CalcZoneITEqLiquidCooled
 
+    Real64 GetITEColdPlateDesignLoadPerPlate(EnergyPlusData &state, std::string const &coilName)
+    {
+
+        // PURPOSE OF THIS FUNCTION:
+        // Returns the design (nameplate) liquid heat load apportioned to a single Coil:Cooling:ITE:ColdPlate
+        // slot by the ElectricEquipment:ITE:LiquidCooled object that references it, for use by that coil's
+        // own sizing routine. The returned value is per-plate (i.e., NOT multiplied by the ITE object's own
+        // Multiplier field): it represents the design load of a single rack sharing this coil, consistent
+        // with the coil's own capacity and flow rate fields also being specified on a per-plate basis.
+        // Returns 0.0 if no ElectricEquipment:ITE:LiquidCooled object references a coil by this name.
+        //
+        // This is a purely analytical calculation from design/nameplate input values (using the maximum of
+        // any modulating schedule), not a value sampled from the simulation. That keeps it safe to call from
+        // the coil's own sizing routine regardless of when Get Input and Sizing run relative to each other.
+
+        std::string const coilNameUC = Util::makeUPPER(coilName);
+
+        for (int Loop = 1; Loop <= state.dataHeatBal->TotITELiquidCooledEquip; ++Loop) {
+            auto const &thisEquip = state.dataHeatBal->ZoneITELiquidCooled(Loop);
+            for (auto const &coil : thisEquip.CoolingCoils) {
+                if (coil.CoilType != ITECoolingCoilType::ColdPlate || Util::makeUPPER(coil.CoilName) != coilNameUC) {
+                    continue;
+                }
+
+                Real64 liquidHeatCaptureFraction = thisEquip.LiquidHeatCaptureFractionDesign;
+                if (thisEquip.liquidHeatCaptureFracSched != nullptr) {
+                    liquidHeatCaptureFraction *= thisEquip.liquidHeatCaptureFracSched->getMaxVal(state);
+                }
+                liquidHeatCaptureFraction = min(max(liquidHeatCaptureFraction, 0.0), 1.0);
+
+                Real64 const loadFraction = (coil.LoadFractionSched != nullptr) ? coil.LoadFractionSched->getMaxVal(state) : coil.LoadFraction;
+
+                return thisEquip.DesignTotalPower * liquidHeatCaptureFraction * loadFraction;
+            }
+        }
+
+        return 0.0;
+    }
+
     void ReportInternalHeatGains(EnergyPlusData &state)
     {
 
