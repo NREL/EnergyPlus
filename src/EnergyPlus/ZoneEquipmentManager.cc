@@ -3788,8 +3788,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
             // NightVentOn is global, so derive a temporary value from this zone component's controls.
             // Leaving it false when no control is active prevents inheriting stale state from another simulation.
-            bool const zoneNightVentOn =
-                getZoneEquipmentNightVentStatus(state, zoneEquipType, zoneEquipConfig, ZoneCompNum, ValidSAMComp);
+            bool const zoneNightVentOn = getZoneEquipmentNightVentStatus(state, zoneEquipType, zoneEquipConfig, ZoneCompNum, ValidSAMComp);
             bool const savedZoneEquipmentNightVentOn = state.dataHVACGlobal->NightVentOn;
             state.dataHVACGlobal->NightVentOn = zoneNightVentOn;
 
