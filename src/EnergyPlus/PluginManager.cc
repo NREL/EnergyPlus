@@ -108,9 +108,7 @@ void registerUserDefinedCallback(const EnergyPlusData &state, const std::functio
 void onBeginEnvironment(const EnergyPlusData &state)
 {
     // reset vars and trends -- sensors and actuators are reset by EMS
-    for (auto &v : state.dataPluginManager->globalVariableValues) {
-        v = 0;
-    }
+    std::fill(state.dataPluginManager->globalVariableValues.begin(), state.dataPluginManager->globalVariableValues.end(), 0.0);
     // reinitialize trend variables so old data are purged
     for (auto &tr : state.dataPluginManager->trends) {
         tr.reset();
@@ -451,9 +449,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
                 // defaulted to YES
             }
             if (epInDirFlagUC == "YES") {
-                std::string epin_path; // NOLINT(misc-const-correctness)
-                get_environment_variable("epin", epin_path);
-                fs::path const epinPathObject = fs::path(epin_path);
+                fs::path const epinPathObject = fs::path(Util::getEnvVar("epin"));
                 if (epinPathObject.empty()) {
                     ShowWarningMessage(
                         state,
@@ -489,9 +485,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
         EnergyPlus::PythonHelpers::addToPythonPath(state, ".", false);
         EnergyPlus::PythonHelpers::addToPythonPath(state, state.dataStrGlobals->inputDirPath, false);
 
-        std::string epin_path; // NOLINT(misc-const-correctness)
-        get_environment_variable("epin", epin_path);
-        fs::path const epinPathObject = fs::path(epin_path);
+        fs::path const epinPathObject = fs::path(Util::getEnvVar("epin"));
         if (!epinPathObject.empty()) {
             fs::path const epinRootDir = FileSystem::getParentDirectoryPath(fs::path(epinPathObject));
             if (FileSystem::pathExists(epinRootDir)) {
