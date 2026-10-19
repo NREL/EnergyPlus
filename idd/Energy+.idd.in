@@ -63967,13 +63967,42 @@ Coil:Cooling:ITE:ColdPlate,
        \note contributions are summed. When no paired object exists this schedule is the sole load source.
        \type object-list
        \object-list ScheduleNames
-  N7;  \field Sizing Factor
-       \note Multiplies the design load used to autosize the nominal liquid flow rate. Use a value less than 1.0
-       \note when several cold plates share the cooling load, for example 1/X for X identical cold plates.
-       \note Applies to autosizing only.
+  N7,  \field Sizing Factor
+       \note Multiplies the design load used to autosize the nominal liquid flow rate. Applies to autosizing only.
        \type real
        \minimum> 0.0
        \default 1.0
+  A11, \field Nominal Flow Rate Sizing Basis
+       \note Basis of the design load used to autosize the nominal liquid flow rate. The autosized maximum
+       \note liquid flow rate, which equals the nominal flow rate, and the flow rate registered with the plant
+       \note loop follow the same design load.
+       \note ColdPlateCapacity: the heat the cold plate transfers at the Target Case Operating Temperature, the
+       \note Sizing:Plant design loop exit temperature and the nominal thermal resistance.
+       \note MaximumITELoad: the maximum value of the IT Equipment Load Schedule Name, limited to the heat the
+       \note cold plate transfers at the Maximum Case Temperature. Requires the IT Equipment Load Schedule Name.
+       \note Placeholder: until the ElectricEquipment:ITE:LiquidCooled object is available, the design load is taken from
+       \note the IT Equipment Load Schedule Name only. When it is available, the design load of the paired object will also
+       \note be used, and the schedule will no longer be required for a cold plate that has a paired object.
+       \type choice
+       \key ColdPlateCapacity
+       \key MaximumITELoad
+       \default ColdPlateCapacity
+  A12; \field Follow IT Equipment Multipliers
+       \note A cold plate object stands for N identical cold plates. The flow rates, the auxiliary electric power and
+       \note the thermal resistance of this object are for one cold plate. The heat transfer, mass flow rate and
+       \note auxiliary electric outputs are totals for N cold plates.
+       \note ITEMultiplierAndZoneMultiplier: N is the product of the Multiplier of the ElectricEquipment:ITE:LiquidCooled
+       \note object that refers to this cold plate and the zone multipliers (zone multiplier times zone list multiplier)
+       \note of the zone of that object.
+       \note None: N is 1. The object is an aggregate of all the racks and of all the copies of the zone.
+       \note It is an error to use None in a zone with a zone multiplier greater than 1.
+       \note Placeholder: the ElectricEquipment:ITE:LiquidCooled object is not available yet. Until it is, the multiplier of
+       \note that object and the multipliers of its zone are taken as 1, and ITEMultiplierAndZoneMultiplier follows the
+       \note zone multipliers of the zone of this cold plate. This note will be updated when the object is available.
+       \type choice
+       \key ITEMultiplierAndZoneMultiplier
+       \key None
+       \default ITEMultiplierAndZoneMultiplier
 
 \group Evaporative Coolers
 

@@ -73,6 +73,22 @@ namespace LiquidCooledITEPlantComponents {
         Num
     };
 
+    enum class NominalFlowSizingBasis
+    {
+        Invalid = -1,
+        ColdPlateCapacity,
+        MaximumITELoad,
+        Num
+    };
+
+    enum class FollowMultipliers
+    {
+        Invalid = -1,
+        ITEMultiplierAndZoneMultiplier,
+        None,
+        Num
+    };
+
     struct CoilCoolingITEColdPlateData : public EnergyPlus::PlantComponent
     {
         // --- Identity / location ---
@@ -93,27 +109,37 @@ namespace LiquidCooledITEPlantComponents {
         bool maximumFlowRateWasAutoSized = false;    // true if maximum_liquid_flow_rate was input as Autosize
         Real64 auxPower = 0.0;                       // rated auxiliary electric power [W]
         Real64 sizingFactor = 1.0;                   // multiplier on the design load used for autosizing [-]
-        std::string endUseSubcategory = "General";   // ABUPS end-use sub-category label
+        NominalFlowSizingBasis nominalFlowSizingBasis = NominalFlowSizingBasis::ColdPlateCapacity; // basis of the autosizing design load
+        std::string endUseSubcategory = "General";                                                 // ABUPS end-use sub-category label
         int inletNode = 0;
         int outletNode = 0;
         int thermalResistanceModifierCurveIndex = 0;
 
-        Real64 nominalMassFlowRate = 0.0; // nominal coolant mass flow rate [kg/s]
-        Real64 maximumMassFlowRate = 0.0; // maximum coolant mass flow rate [kg/s]
+        // Number of identical cold plates this object represents, N = nIte * nZone. Inputs, sizing results, the case temperature and the
+        // thermal resistance are per plate; the plant-side results (flow request, heat removed by the coolant, auxiliary power) are N times
+        // the per-plate values, and the zone heat gain is per copy of the zone (plateZoneMultiplier).
+        FollowMultipliers followMultipliers = FollowMultipliers::ITEMultiplierAndZoneMultiplier; // multipliers that N follows
+        Real64 nIte = 1.0;  // copies of the paired IT equipment object represented (its Multiplier, or 1)
+        Real64 nZone = 1.0; // copies of the zone represented (zone multiplier times zone list multiplier) of the zone of the paired IT equipment
+                            // object, or of the zone of this object when there is no paired object; 1 for Follow IT Equipment Multipliers = None
+        Real64 plateZoneMultiplier = 1.0; // zone multiplier times zone list multiplier of the Zone Name zone, which receives the zone heat gain
+
+        Real64 nominalMassFlowRate = 0.0; // nominal coolant mass flow rate per plate [kg/s]
+        Real64 maximumMassFlowRate = 0.0; // maximum coolant mass flow rate per plate [kg/s]
 
         bool myPlantScanFlag = true;             // false once ScanPlantLoopsForObject has run
         bool myEnvrnFlag = true;                 // reset to true each BeginEnvrnFlag cycle
         Real64 loadFromITEquipment = 0.0;        // IT load set by the paired ElectricEquipment:ITE:LiquidCooled object [W]
-        Real64 heatRemovedByFluid = 0.0;         // heat actually transferred to the coolant [W]
+        Real64 heatRemovedByFluid = 0.0;         // heat actually transferred to the coolant, all plates [W]
         Real64 heatRemovedByFluidEnergy = 0.0;   // [J]
-        Real64 zoneHeatGainRate = 0.0;           // unmet load returned to zone heat balance [W]
+        Real64 zoneHeatGainRate = 0.0;           // unmet load returned to zone heat balance, per copy of the zone [W]
         Real64 zoneHeatGainEnergy = 0.0;         // [J]
         Real64 caseTemperature = 0.0;            // computed chip case temperature [C]
         Real64 inletTemp = 0.0;                  // coolant inlet temperature [C]
         Real64 outletTemp = 0.0;                 // coolant outlet temperature [C]
-        Real64 massFlowRate = 0.0;               // coolant mass flow rate [kg/s]
-        Real64 effectiveThermalResistance = 0.0; // effective cold-plate thermal resistance at current conditions [K/W]
-        Real64 auxElecPower = 0.0;               // auxiliary electric power (0 when unavailable) [W]
+        Real64 massFlowRate = 0.0;               // coolant mass flow rate, all plates [kg/s]
+        Real64 effectiveThermalResistance = 0.0; // effective cold-plate thermal resistance at current conditions, per plate [K/W]
+        Real64 auxElecPower = 0.0;               // auxiliary electric power, all plates (0 when unavailable) [W]
         Real64 auxElecEnergy = 0.0;              // [J]
 
         virtual ~CoilCoolingITEColdPlateData() = default;
@@ -127,15 +153,22 @@ namespace LiquidCooledITEPlantComponents {
         }
         void oneTimeInit_new(EnergyPlusData &state) override;
         void sizeColdPlate(EnergyPlusData &state);
+        void checkDesignLoadCapability(EnergyPlusData &state, Real64 scheduleMaxLoad, Real64 loadLimit, bool loadWasLimited);
         void setMassFlowRates(EnergyPlusData &state);
         void doPhysics(EnergyPlusData &state);
         void report(EnergyPlusData &state);
         static void processInputForCoilCoolingITEColdPlate(EnergyPlusData &state);
         static PlantComponent *factory(EnergyPlusData &state, const std::string &objectName);
+        Real64 getDesignResistance(EnergyPlusData &state) const;
         Real64 getDesignLoad(EnergyPlusData &state, Real64 inletFluidTemperature, Real64 outletFluidTemperature);
         Real64 getAdjustedThermalResistance(EnergyPlusData &state, Real64 flowRatio) const;
+        void checkThermalResistance(EnergyPlusData &state, Real64 resistance, Real64 flowRatio) const;
         Real64 getReferenceTemperature(EnergyPlusData &state) const;
         void setupOutputVariables(EnergyPlusData &state);
+        Real64 plateCount() const
+        {
+            return this->nIte * this->nZone;
+        }
     };
 
 } // namespace LiquidCooledITEPlantComponents

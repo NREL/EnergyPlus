@@ -9559,7 +9559,7 @@ This numeric field contains the maximum allowed chip case temperature, in $^\cir
 
 \paragraph{Field: Target Case Operating Temperature}\label{field-target-case-operating-temperature-coilcoolingitecoldplate}
 
-This numeric field contains the targeted chip case operating temperature, in $^\circ$C. It is used to size the nominal liquid flow rate when that field is autosized, and in \textbf{VariableFlow} mode the flow rate is adjusted to maintain the case at this temperature. If this field is blank, the \emph{Maximum Case Temperature} is used. The value cannot exceed the \emph{Maximum Case Temperature}.
+This numeric field contains the targeted chip case operating temperature, in $^\circ$C. It is used to size the nominal liquid flow rate when that field is autosized and the \emph{Nominal Flow Rate Sizing Basis} is \textbf{ColdPlateCapacity}, and in \textbf{VariableFlow} mode the flow rate is adjusted to maintain the case at this temperature. If this field is blank, the \emph{Maximum Case Temperature} is used. The value cannot exceed the \emph{Maximum Case Temperature}.
 
 \paragraph{Field: Thermal Resistance Modifier Curve Name}\label{field-thermal-resistance-modifier-curve-name-coilcoolingitecoldplate}
 
@@ -9595,11 +9595,31 @@ This alpha field allows the auxiliary electric energy to be assigned to a user-d
 
 \paragraph{Field: IT Equipment Load Schedule Name}\label{field-it-equipment-load-schedule-name-coilcoolingitecoldplate}
 
-This optional alpha field contains the name of a schedule (ref: Schedules) with the IT equipment heat load, in W. The load is added to any load provided by a paired \textbf{ElectricEquipment:ITE:LiquidCooled} object. When there is no paired object, this schedule is the only source of load. The schedule values must not be negative. If this field is blank, no load is taken from a schedule.
+This optional alpha field contains the name of a schedule (ref: Schedules) with the IT equipment heat load, in W. The load is added to any load provided by a paired \textbf{ElectricEquipment:ITE:LiquidCooled} object. When there is no paired object, this schedule is the only source of load. The schedule is the load of one cold plate: with N cold plates represented by the object (see the field \emph{Follow IT Equipment Multipliers}), the load of the paired object is divided by its multiplier and this schedule is added per cold plate. The schedule values must not be negative. If this field is blank, no load is taken from a schedule.
 
 \paragraph{Field: Sizing Factor}\label{field-sizing-factor-coilcoolingitecoldplate}
 
-This numeric field is a multiplier applied to the design load that is used to autosize the nominal liquid flow rate. It is used when several cold plates share the cooling load of a plant loop. The design load of a cold plate is calculated as if that cold plate alone served the loop, so a value less than 1.0 should be entered for each cold plate, for example 1/X for X identical cold plates. The value must be greater than 0. The default is 1.0. This field affects autosizing only. It does not scale flow rates that are specified by the user, and it does not change the operation of the cold plate.
+This numeric field is a multiplier applied to the design load that is used to autosize the nominal liquid flow rate. The value must be greater than 0. The default is 1.0. This field affects autosizing only. It does not scale flow rates that are specified by the user, and it does not change the operation of the cold plate.
+
+\paragraph{Field: Nominal Flow Rate Sizing Basis}\label{field-nominal-flow-rate-sizing-basis-coilcoolingitecoldplate}
+
+This choice field specifies the design load that is used to autosize the nominal liquid flow rate. The choices are \textbf{ColdPlateCapacity} and \textbf{MaximumITELoad}. The default is \textbf{ColdPlateCapacity}.
+
+With \textbf{ColdPlateCapacity}, the design load is the heat the cold plate transfers when the case is at the \emph{Target Case Operating Temperature}, the coolant enters at the Sizing:Plant design loop exit temperature, and the thermal resistance is the nominal thermal resistance. The load of the IT equipment is not used.
+
+With \textbf{MaximumITELoad}, the design load is the maximum value of the schedule in the field \emph{IT Equipment Load Schedule Name}, multiplied by the \emph{Sizing Factor}, and limited to the heat the cold plate transfers when the case is at the \emph{Maximum Case Temperature}. The \emph{IT Equipment Load Schedule Name} is required for this choice. Placeholder: until the \textbf{ElectricEquipment:ITE:LiquidCooled} object is available, the design load is taken from the schedule only. When it is available, the design load of the paired object will also be used, and the schedule will no longer be required for a cold plate that has a paired object. If the maximum value of the schedule is not greater than 0, an autosized nominal liquid flow rate is permitted; with a nominal flow rate specified by the user, a warning is issued and the design flow rate is not calculated for comparison.
+
+The \emph{Nominal Thermal Resistance} is defined at the nominal liquid flow rate. When the nominal liquid flow rate is autosized from the load, the nominal thermal resistance applies to a flow rate that is not chosen by the user: a smaller load gives a smaller nominal flow rate with the same thermal resistance. The thermal resistance at flow rates different from the nominal flow rate is given by the \emph{Thermal Resistance Modifier Curve Name}.
+
+\paragraph{Field: Follow IT Equipment Multipliers}\label{field-follow-it-equipment-multipliers-coilcoolingitecoldplate}
+
+This choice field dictates how many identical cold plates, N, the object stands for. The choices are \textbf{ITEMultiplierAndZoneMultiplier} and \textbf{None}. The default is \textbf{ITEMultiplierAndZoneMultiplier}.
+
+The flow rates, the auxiliary electric power and the thermal resistance of the cold plate object are for one cold plate. The heat transfer, mass flow rate and auxiliary electric outputs are totals for N cold plates.
+
+With \textbf{ITEMultiplierAndZoneMultiplier}, N is the product of the multiplier of the \textbf{ElectricEquipment:ITE:LiquidCooled} object that refers to the cold plate (identical racks) and the zone multipliers of the zone of that \textbf{ElectricEquipment:ITE:LiquidCooled} object (identical zones: the zone multiplier times the zone list multiplier). With \textbf{None}, N is 1: the object is an aggregate of all of the racks and of all of the copies of the zone. Users cannot use \textbf{None} in a zone with a zone multiplier greater than 1, because the heat of the other copies of the zone would be lost.
+
+Placeholder: the \textbf{ElectricEquipment:ITE:LiquidCooled} object is not available yet. Until it is, the multiplier of that object and the multipliers of its zone are taken as 1, and \textbf{ITEMultiplierAndZoneMultiplier} follows the zone multipliers of the zone named in the field \emph{Zone Name} of the cold plate. This description will be updated when the object is available.
 
 An example of this object in an IDF is shown below.
 
@@ -9621,12 +9641,16 @@ Coil:Cooling:ITE:ColdPlate,
   VariableFlow,                 !- Flow Mode
   ColdPlateAuxiliary,           !- End-Use Subcategory
   ITELoad,                      !- IT Equipment Load Schedule Name
-  1;                            !- Sizing Factor
+  1,                            !- Sizing Factor
+  ColdPlateCapacity,            !- Nominal Flow Rate Sizing Basis
+  ITEMultiplierAndZoneMultiplier; !- Follow IT Equipment Multipliers
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-coilcoolingitecoldplate}
 
 The following output variables are available for each cold plate. All are reported at the system time step.
+
+A cold plate object stands for N identical cold plates, as set by the field \emph{Follow IT Equipment Multipliers}. For example, in a zone that has a zone multiplier or a zone list multiplier the object stands for as many cold plates as there are copies of the zone. The inputs (flow rates, auxiliary electric power and thermal resistance) and the sizing results are for one cold plate. The heat transfer, mass flow rate and auxiliary electric outputs are totals for all of the cold plates that the object represents, so that the loop energy balance and the electric meters are correct. The case temperature, the effective thermal resistance and the coolant temperatures are for one cold plate. The zone heat gain is per copy of the zone, like other internal gains.
 
 \begin{itemize}
 \item
@@ -9663,7 +9687,7 @@ These outputs are the rate and the amount of heat removed from the IT equipment 
 
 \paragraph{Coil Cooling ITE Cold Plate Zone Heat Gain Energy {[}J{]}}\label{coil-cooling-ite-cold-plate-zone-heat-gain-energy-j}
 
-These outputs are the rate and the amount of heat that is not removed by the coolant and is added to the zone as a convective internal gain, in W and J respectively. It is the IT load minus the heat transfer to the coolant. When the cold plate is not available, or there is no flow, all of the IT load is added to the zone.
+These outputs are the rate and the amount of heat that is not removed by the coolant and is added to the zone as a convective internal gain, in W and J respectively. For one cold plate it is the IT load minus the heat transfer to the coolant. When the object stands for N cold plates, it is the total of the heat that is not removed divided by the multiplier of the zone, because an internal gain applies to each copy of the zone. When the cold plate is not available, or there is no flow, all of the IT load is added to the zone.
 
 \paragraph{Coil Cooling ITE Cold Plate Case Temperature {[}C{]}}\label{coil-cooling-ite-cold-plate-case-temperature-c}
 
@@ -9677,13 +9701,13 @@ These outputs are the temperature of the liquid coolant entering and leaving the
 
 \paragraph{Coil Cooling ITE Cold Plate Mass Flow Rate {[}kg/s{]}}\label{coil-cooling-ite-cold-plate-mass-flow-rate-kgs}
 
-This output is the mass flow rate of liquid coolant through the cold plate, in kg/s.
+This output is the mass flow rate of liquid coolant through the cold plate, in kg/s. When the object stands for N cold plates, it is the total flow rate of the N cold plates.
 
 \paragraph{Coil Cooling ITE Cold Plate Auxiliary Electric Power {[}W{]}}\label{coil-cooling-ite-cold-plate-auxiliary-electric-power-w}
 
 \paragraph{Coil Cooling ITE Cold Plate Auxiliary Electric Energy {[}J{]}}\label{coil-cooling-ite-cold-plate-auxiliary-electric-energy-j}
 
-These outputs are the auxiliary electric power and energy consumption of the cold plate, in W and J respectively. They are equal to the \emph{Auxiliary Electric Power} when the cold plate is available, and 0 otherwise. The energy is metered on Cooling:Electricity, Electricity:Plant, and Electricity:Facility, and appears in the End Uses By Subcategory table of the ABUPS report under the subcategory entered in the field \emph{End-Use Subcategory}.
+These outputs are the auxiliary electric power and energy consumption of the cold plate, in W and J respectively. They are equal to N times the \emph{Auxiliary Electric Power} when the cold plate is available, and 0 otherwise. The energy is metered on Cooling:Electricity, Electricity:Plant, and Electricity:Facility, and appears in the End Uses By Subcategory table of the ABUPS report under the subcategory entered in the field \emph{End-Use Subcategory}.
 
 \paragraph{Coil Cooling ITE Cold Plate Effective Thermal Resistance {[}K/W{]}}\label{coil-cooling-ite-cold-plate-effective-thermal-resistance-kw}
 

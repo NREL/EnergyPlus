@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
+#include <cassert>
 #include <format>
 #include <string>
 #include <string_view>
@@ -181,7 +182,7 @@ void CoilCoolingITEColdPlateData::simulate(EnergyPlusData &state,
 {
     if (this->myEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         this->setMassFlowRates(state);
-        PlantUtilities::InitComponentNodes(state, 0.0, this->maximumMassFlowRate, this->inletNode, this->outletNode);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->plateCount() * this->maximumMassFlowRate, this->inletNode, this->outletNode);
         this->heatRemovedByFluid = 0.0;
         this->heatRemovedByFluidEnergy = 0.0;
         this->zoneHeatGainRate = 0.0;
@@ -227,22 +228,42 @@ Real64 CoilCoolingITEColdPlateData::getAdjustedThermalResistance(EnergyPlusData 
     return this->thermalResistance * modifier;
 }
 
+void CoilCoolingITEColdPlateData::checkThermalResistance(EnergyPlusData &state, Real64 const resistance, Real64 const flowRatio) const
+{
+    // The thermal resistance is checked where it is applied, not in getAdjustedThermalResistance, because the curve is also evaluated at flow
+    // ratios where the resistance is not used (no flow). A curve that is positive at a flow ratio of 1.0 can be zero or negative at others.
+    if (resistance <= 0.0) {
+        ShowFatalError(state,
+                       std::format("Thermal resistance for the Coil:Cooling:ITE:ColdPlate \"{}\" is 0 or negative ({:.5f} K/W) for a flow ratio of "
+                                   "{:.3f}. Check the nominal thermal resistance and the thermal resistance modifier curve.",
+                                   this->name,
+                                   resistance,
+                                   flowRatio));
+    }
+}
+
 Real64 CoilCoolingITEColdPlateData::getReferenceTemperature(EnergyPlusData &state) const
 {
     int const plantSizingNum = this->plantLoc.loop->PlantSizNum;
     return (plantSizingNum > 0) ? state.dataSize->PlantSizData(plantSizingNum).ExitTemp : Constant::CWInitConvTemp;
 }
 
-Real64 CoilCoolingITEColdPlateData::getDesignLoad(EnergyPlusData &state, Real64 inletFluidTemperature, Real64 outletFluidTemperature)
+Real64 CoilCoolingITEColdPlateData::getDesignResistance(EnergyPlusData &state) const
 {
-    Real64 adjustedThermalResistance = this->getAdjustedThermalResistance(state, 1.0);
+    Real64 const designResistance = this->getAdjustedThermalResistance(state, 1.0);
 
-    if (adjustedThermalResistance <= 0.0) {
+    if (designResistance <= 0.0) {
         ShowFatalError(state,
                        std::format("Thermal resistance for the Coil:Cooling:ITE:ColdPlate \"{}\" is 0 or negative for a flow ratio of 1.0. "
                                    "Check the nominal thermal resistance and the thermal resistance modifier curve.",
                                    this->name));
     }
+    return designResistance;
+}
+
+Real64 CoilCoolingITEColdPlateData::getDesignLoad(EnergyPlusData &state, Real64 inletFluidTemperature, Real64 outletFluidTemperature)
+{
+    Real64 const adjustedThermalResistance = this->getDesignResistance(state);
 
     if (this->thermalResistanceMethod == ThermalResistanceMethod::Standard) {
         return (this->targetCaseOperatingTemperature - inletFluidTemperature) / adjustedThermalResistance;
@@ -277,13 +298,42 @@ void CoilCoolingITEColdPlateData::sizeColdPlate(EnergyPlusData &state)
     // Nominal flow rate from the plant loop design conditions, also used for hard-sized comparison reporting
     Real64 designFlowRate = 0.0;
     Real64 designLoad = 0.0;
+    bool const loadBased = (this->nominalFlowSizingBasis == NominalFlowSizingBasis::MaximumITELoad);
+    Real64 scheduleMaxLoad = 0.0; // maximum of the IT equipment load schedule [W]
+    Real64 loadLimit = 0.0;       // heat the cold plate transfers at the maximum case temperature [W]
+    bool loadWasLimited = false;  // true if the design load was limited to loadLimit
+    if (loadBased) {
+        scheduleMaxLoad = this->itLoadSchedule->getMaxVal(state);
+        if (scheduleMaxLoad <= 0.0 && this->nominalFlowRateWasAutoSized) {
+            ShowSevereError(state, std::format("{}: Coil:Cooling:ITE:ColdPlate \"{}\"", routineName, this->name));
+            ShowContinueError(state,
+                              std::format("Nominal Flow Rate Sizing Basis = MaximumITELoad requires an IT Equipment Load Schedule with a maximum "
+                                          "value greater than 0 W, but the maximum is {:.2f} W.",
+                                          scheduleMaxLoad));
+            ShowFatalError(state, std::format("{}: Preceding condition causes termination.", routineName));
+        } else if (scheduleMaxLoad <= 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport) {
+            // The nominal flow rate is hard-sized, so the basis is only used for the comparison report, which is skipped
+            ShowWarningError(state, std::format("{}: Coil:Cooling:ITE:ColdPlate \"{}\"", routineName, this->name));
+            ShowContinueError(state,
+                              std::format("Nominal Flow Rate Sizing Basis = MaximumITELoad, but the maximum of the IT Equipment Load Schedule is "
+                                          "{:.2f} W. The design flow rate is not calculated for comparison with the specified nominal flow rate.",
+                                          scheduleMaxLoad));
+        }
+    }
     if (plantSizingNum > 0) {
         auto const &plantSizing = state.dataSize->PlantSizData(plantSizingNum);
         if (plantSizing.DeltaT > 0.0) {
             Real64 const cp = this->plantLoc.loop->glycol->getSpecificHeat(state, plantSizing.ExitTemp, routineName);
             Real64 const rho = this->plantLoc.loop->glycol->getDensity(state, this->getReferenceTemperature(state), routineName);
             // ExitTemp is the loop supply (inlet to cold plate); ExitTemp+DeltaT is the return (outlet from cold plate)
-            designLoad = this->sizingFactor * this->getDesignLoad(state, plantSizing.ExitTemp, plantSizing.ExitTemp + plantSizing.DeltaT);
+            if (loadBased) {
+                // The schedule maximum, limited to the heat one cold plate can transfer at the maximum case temperature
+                loadLimit = (this->maximumCaseTemperature - plantSizing.ExitTemp) / this->getDesignResistance(state);
+                loadWasLimited = (this->sizingFactor * scheduleMaxLoad > loadLimit);
+                designLoad = std::min(this->sizingFactor * scheduleMaxLoad, loadLimit);
+            } else {
+                designLoad = this->sizingFactor * this->getDesignLoad(state, plantSizing.ExitTemp, plantSizing.ExitTemp + plantSizing.DeltaT);
+            }
             if (designLoad > 0.0) {
                 designFlowRate = designLoad / (plantSizing.DeltaT * cp * rho);
             }
@@ -303,14 +353,25 @@ void CoilCoolingITEColdPlateData::sizeColdPlate(EnergyPlusData &state)
                               std::format("Autosizing the nominal liquid flow rate requires a design load greater than 0 W, but the calculated "
                                           "design load is {:.2f} W.",
                                           designLoad));
-            ShowContinueError(state,
-                              std::format("Target Case Operating Temperature = {:.2f} C; plant loop design supply (cold plate inlet) temperature "
-                                          "from Sizing:Plant = {:.2f} C.",
-                                          this->targetCaseOperatingTemperature,
-                                          state.dataSize->PlantSizData(plantSizingNum).ExitTemp));
-            ShowContinueError(state,
-                              "Check that the Target Case Operating Temperature is greater than the Sizing:Plant Design Loop Exit Temperature, "
-                              "and that the cold plate thermal resistance (and thermal resistance modifier curve) is positive.");
+            if (loadBased) {
+                ShowContinueError(state,
+                                  std::format("Maximum Case Temperature = {:.2f} C; plant loop design supply (cold plate inlet) temperature "
+                                              "from Sizing:Plant = {:.2f} C.",
+                                              this->maximumCaseTemperature,
+                                              state.dataSize->PlantSizData(plantSizingNum).ExitTemp));
+                ShowContinueError(state,
+                                  "Check that the Maximum Case Temperature is greater than the Sizing:Plant Design Loop Exit Temperature, "
+                                  "and that the cold plate thermal resistance (and thermal resistance modifier curve) is positive.");
+            } else {
+                ShowContinueError(state,
+                                  std::format("Target Case Operating Temperature = {:.2f} C; plant loop design supply (cold plate inlet) "
+                                              "temperature from Sizing:Plant = {:.2f} C.",
+                                              this->targetCaseOperatingTemperature,
+                                              state.dataSize->PlantSizData(plantSizingNum).ExitTemp));
+                ShowContinueError(state,
+                                  "Check that the Target Case Operating Temperature is greater than the Sizing:Plant Design Loop Exit "
+                                  "Temperature, and that the cold plate thermal resistance (and thermal resistance modifier curve) is positive.");
+            }
             ShowContinueError(state, "Alternatively, enter a hard-sized Nominal Liquid Flow Rate instead of Autosize.");
             ShowFatalError(state, std::format("{}: Preceding condition causes termination.", routineName));
         }
@@ -367,8 +428,76 @@ void CoilCoolingITEColdPlateData::sizeColdPlate(EnergyPlusData &state)
         }
     }
 
-    PlantUtilities::RegisterPlantCompDesignFlow(state, this->inletNode, this->nominalFlowRate);
+    if (designLoad > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport) {
+        BaseSizer::reportSizerOutput(state, objectType, this->name, "Design Size Design Load [W]", designLoad);
+    }
+
+    if (loadBased && scheduleMaxLoad > 0.0 && plantSizingNum > 0 && state.dataPlnt->PlantFinalSizesOkayToReport) {
+        this->checkDesignLoadCapability(state, scheduleMaxLoad, loadLimit, loadWasLimited);
+    }
+
+    PlantUtilities::RegisterPlantCompDesignFlow(state, this->inletNode, this->plateCount() * this->nominalFlowRate);
     this->setMassFlowRates(state);
+}
+
+void CoilCoolingITEColdPlateData::checkDesignLoadCapability(EnergyPlusData &state,
+                                                            Real64 const scheduleMaxLoad,
+                                                            Real64 const loadLimit,
+                                                            bool const loadWasLimited)
+{
+    // Warns if the cold plate cannot carry the maximum schedule load at its maximum flow without exceeding the maximum case temperature
+    static constexpr std::string_view routineName("checkDesignLoadCapability");
+    static constexpr std::string_view objectType("Coil:Cooling:ITE:ColdPlate");
+
+    auto const &plantSizing = state.dataSize->PlantSizData(this->plantLoc.loop->PlantSizNum);
+    if (plantSizing.DeltaT <= 0.0) {
+        return;
+    }
+    Real64 const inletTemperature = plantSizing.ExitTemp;
+
+    if (this->maximumCaseTemperature <= inletTemperature + plantSizing.DeltaT) {
+        ShowWarningError(state, std::format("{}: {} \"{}\"", routineName, objectType, this->name));
+        ShowContinueError(state,
+                          std::format("Maximum Case Temperature ({:.2f} C) is not greater than the Sizing:Plant loop design return temperature "
+                                      "({:.2f} C).",
+                                      this->maximumCaseTemperature,
+                                      inletTemperature + plantSizing.DeltaT));
+        ShowContinueError(state,
+                          "The coolant cannot reach the loop design temperature difference without the case exceeding its maximum temperature.");
+    }
+
+    // The flow rates are greater than 0 here: the inputs have a minimum greater than 0 and an autosized nominal flow rate is checked in sizeColdPlate
+    Real64 const maximumFlow = (this->maximumFlowRate > 0.0) ? this->maximumFlowRate : this->nominalFlowRate;
+    assert(this->nominalFlowRate > 0.0 && maximumFlow > 0.0);
+    Real64 const cp = this->plantLoc.loop->glycol->getSpecificHeat(state, inletTemperature, routineName);
+    Real64 const rho = this->plantLoc.loop->glycol->getDensity(state, this->getReferenceTemperature(state), routineName);
+    Real64 const capacityRate = rho * maximumFlow * cp; // m_dot * cp at the maximum flow [W/K]
+    Real64 const resistance = this->getAdjustedThermalResistance(state, maximumFlow / this->nominalFlowRate);
+    this->checkThermalResistance(state, resistance, maximumFlow / this->nominalFlowRate);
+
+    Real64 caseTemperature = 0.0; // case temperature needed to transfer the schedule maximum load at the maximum flow [C]
+    if (this->thermalResistanceMethod == ThermalResistanceMethod::LMTD) {
+        Real64 const effectiveness = 1.0 - std::exp(-1.0 / (capacityRate * resistance));
+        caseTemperature = inletTemperature + scheduleMaxLoad / (capacityRate * effectiveness);
+    } else {
+        caseTemperature = inletTemperature + scheduleMaxLoad * std::max(resistance, 1.0 / capacityRate);
+    }
+
+    if (caseTemperature > this->maximumCaseTemperature) {
+        ShowWarningError(state, std::format("{}: {} \"{}\"", routineName, objectType, this->name));
+        ShowContinueError(state,
+                          std::format("The cold plate cannot transfer the maximum IT Equipment Load Schedule value ({:.2f} W) at its maximum "
+                                      "liquid flow rate without the case temperature ({:.2f} C) exceeding the Maximum Case Temperature ({:.2f} C).",
+                                      scheduleMaxLoad,
+                                      caseTemperature,
+                                      this->maximumCaseTemperature));
+        ShowContinueError(state,
+                          std::format("The heat the cold plate transfers at the Maximum Case Temperature is limited to {:.2f} W. The design "
+                                      "load used for autosizing {} limited to this value.",
+                                      loadLimit,
+                                      loadWasLimited ? "was" : "was not"));
+        ShowContinueError(state, "During operation the heat that is not removed by the coolant is added to the zone.");
+    }
 }
 
 void CoilCoolingITEColdPlateData::setMassFlowRates(EnergyPlusData &state)
@@ -398,18 +527,23 @@ void CoilCoolingITEColdPlateData::doPhysics(EnergyPlusData &state)
                                    this->name,
                                    this->loadFromITEquipment));
     }
-    Real64 const load = this->loadFromITEquipment + loadFromSchedule;
+    // The load of the paired equipment includes its multiplier, so one plate sees its share of it; the schedule is already per plate.
+    // Everything below is per plate. The plant-side results are N times the per-plate values, and the zone heat gain is the total
+    // shortfall divided by the multiplier of the zone that receives it, because the gain is applied to every copy of the zone.
+    Real64 const plates = this->plateCount();
+    Real64 const load = this->loadFromITEquipment / this->nIte + loadFromSchedule;
+    Real64 const zoneGainPerPlate = plates / this->plateZoneMultiplier; // converts a per-plate shortfall to the zone heat gain per zone copy
 
     // Check if the component is running
     Real64 const running = this->availabilitySchedule->getCurrentVal();
 
     // Auxiliary power runs whenever the cold plate is available, regardless of IT load
-    this->auxElecPower = (running > 0.0) ? this->auxPower : 0.0;
+    this->auxElecPower = (running > 0.0) ? plates * this->auxPower : 0.0;
 
     // No load or not running
     if (load <= 0.0 || running <= 0.0) {
         this->heatRemovedByFluid = 0.0;
-        this->zoneHeatGainRate = load; // unmet load goes to zone when unavailable
+        this->zoneHeatGainRate = zoneGainPerPlate * load; // unmet load goes to zone when unavailable
         this->massFlowRate = 0.0;
         this->effectiveThermalResistance = 0.0;
         // When there is a load but no active cooling, report the maximum case temperature (same as the zero-flow guard below).
@@ -449,6 +583,9 @@ void CoilCoolingITEColdPlateData::doPhysics(EnergyPlusData &state)
         // returns the load achievable at a given mass flow rate and target temperature
         auto loadCalculated = [this, &state, &heatTransferCapacity, nominalFlow](Real64 const massFlow, Real64 const targetTemp) {
             Real64 coldPlateThermalResistance = this->getAdjustedThermalResistance(state, massFlow / nominalFlow);
+            if (massFlow > 0.0) { // the resistance is not used at zero flow
+                this->checkThermalResistance(state, coldPlateThermalResistance, massFlow / nominalFlow);
+            }
             return heatTransferCapacity(massFlow, coldPlateThermalResistance, targetTemp);
         };
 
@@ -470,15 +607,18 @@ void CoilCoolingITEColdPlateData::doPhysics(EnergyPlusData &state)
             coolantFlow = maximumFlow;
         }
     }
-    PlantUtilities::SetComponentFlowRate(state, coolantFlow, this->inletNode, this->outletNode, this->plantLoc);
-    this->massFlowRate = coolantFlow;
+    // The plant is asked for the flow of all plates and can deliver less (a flow-limited loop): the per-plate flow is what was delivered
+    Real64 plantFlow = plates * coolantFlow;
+    PlantUtilities::SetComponentFlowRate(state, plantFlow, this->inletNode, this->outletNode, this->plantLoc);
+    coolantFlow = plantFlow / plates;
+    this->massFlowRate = plantFlow;
 
     // If the flow is zero, all of the load goes to the zone and the maximum case temperature is reported.
     // This is a reporting convention, not a prediction: without cooling a real chip would exceed this limit, and there is no
     // transient chip model (Tc = f(t, load)) to represent the thermal mass or the time taken to heat up.
     if (coolantFlow <= 0.0) {
         this->heatRemovedByFluid = 0.0;
-        this->zoneHeatGainRate = load;
+        this->zoneHeatGainRate = zoneGainPerPlate * load;
         this->effectiveThermalResistance = 0.0;
         this->caseTemperature = this->maximumCaseTemperature;
         this->outletTemp = coolantInletTemp;
@@ -487,24 +627,26 @@ void CoilCoolingITEColdPlateData::doPhysics(EnergyPlusData &state)
 
     // Flow is known check cold plate maximum heat transfer rate
     Real64 coldPlateThermalResistance = this->getAdjustedThermalResistance(state, coolantFlow / nominalFlow);
+    this->checkThermalResistance(state, coldPlateThermalResistance, coolantFlow / nominalFlow);
     this->effectiveThermalResistance = coldPlateThermalResistance;
     Real64 const maxHeatTransferRate = heatTransferCapacity(coolantFlow, coldPlateThermalResistance, this->maximumCaseTemperature);
 
     // Determine how much of the load is met by the fluid and how much spills to the zone
-    this->heatRemovedByFluid = std::min(load, maxHeatTransferRate);
-    this->zoneHeatGainRate = load - this->heatRemovedByFluid;
+    Real64 const heatRemovedPerPlate = std::min(load, maxHeatTransferRate);
+    this->heatRemovedByFluid = plates * heatRemovedPerPlate;
+    this->zoneHeatGainRate = zoneGainPerPlate * (load - heatRemovedPerPlate);
 
     // Chip case temperature
     if (this->thermalResistanceMethod == ThermalResistanceMethod::LMTD && coolantFlow > 0.0) {
         Real64 const effectiveness = 1.0 - std::exp(-1.0 / (coolantFlow * cp * coldPlateThermalResistance));
-        this->caseTemperature = coolantInletTemp + this->heatRemovedByFluid / (coolantFlow * cp * effectiveness);
+        this->caseTemperature = coolantInletTemp + heatRemovedPerPlate / (coolantFlow * cp * effectiveness);
     } else {
         // When limited by the coolant energy balance, the coolant leaves at the case temperature
-        this->caseTemperature = coolantInletTemp + this->heatRemovedByFluid * std::max(coldPlateThermalResistance, 1.0 / (coolantFlow * cp));
+        this->caseTemperature = coolantInletTemp + heatRemovedPerPlate * std::max(coldPlateThermalResistance, 1.0 / (coolantFlow * cp));
     }
 
     // Store outlet temperature — node update happens in report() via SafeCopyPlantNode
-    this->outletTemp = (coolantFlow > 0.0) ? coolantInletTemp + this->heatRemovedByFluid / (coolantFlow * cp) : coolantInletTemp;
+    this->outletTemp = (coolantFlow > 0.0) ? coolantInletTemp + heatRemovedPerPlate / (coolantFlow * cp) : coolantInletTemp;
 }
 
 void CoilCoolingITEColdPlateData::report(EnergyPlusData &state)
@@ -615,6 +757,29 @@ void CoilCoolingITEColdPlateData::processInputForCoilCoolingITEColdPlate(EnergyP
                                                     : ThermalResistanceMethod::Standard;
         thisColdPlate.flowMode = (ip->getAlphaFieldValue(fields, schemaProps, "flow_mode") == "VARIABLEFLOW") ? DataPlant::FlowMode::Variable
                                                                                                               : DataPlant::FlowMode::Constant;
+        thisColdPlate.nominalFlowSizingBasis = (ip->getAlphaFieldValue(fields, schemaProps, "nominal_flow_rate_sizing_basis") == "MAXIMUMITELOAD")
+                                                   ? NominalFlowSizingBasis::MaximumITELoad
+                                                   : NominalFlowSizingBasis::ColdPlateCapacity;
+        thisColdPlate.followMultipliers = (ip->getAlphaFieldValue(fields, schemaProps, "follow_it_equipment_multipliers") == "NONE")
+                                              ? FollowMultipliers::None
+                                              : FollowMultipliers::ITEMultiplierAndZoneMultiplier;
+        if (thisColdPlate.itLoadSchedule != nullptr && thisColdPlate.itLoadSchedule->getMinVal(state) < 0.0) {
+            ShowSevereError(state,
+                            std::format("{}: IT Equipment Load Schedule Name \"{}\" has a negative value for object \"{}\"; the load schedule "
+                                        "must be non-negative.",
+                                        cCurrentModuleObject,
+                                        loadSchedName,
+                                        thisColdPlate.name));
+            errorsFound = true;
+        }
+        if (thisColdPlate.nominalFlowSizingBasis == NominalFlowSizingBasis::MaximumITELoad && loadSchedName.empty()) {
+            ShowSevereError(state,
+                            std::format("{}: Nominal Flow Rate Sizing Basis = MaximumITELoad requires an IT Equipment Load Schedule Name for "
+                                        "object \"{}\".",
+                                        cCurrentModuleObject,
+                                        thisColdPlate.name));
+            errorsFound = true;
+        }
 
         // Get the node names and validate them
         std::string const inletNodeName = ip->getAlphaFieldValue(fields, schemaProps, "inlet_node");
@@ -655,6 +820,35 @@ void CoilCoolingITEColdPlateData::processInputForCoilCoolingITEColdPlate(EnergyP
 
         // Set up zone heat gains
         if (zoneIndex > 0) {
+            // The object stands for every copy of its zone: the heat removed by the coolant is the heat of all copies, and the zone heat
+            // gain is per copy
+            stored.plateZoneMultiplier = state.dataHeatBal->Zone(zoneIndex).Multiplier * state.dataHeatBal->Zone(zoneIndex).ListMultiplier;
+
+            // Number of plates the object represents.
+            // This block is the rule for a cold plate without a paired IT equipment object: nIte = 1 and nZone follows the zone of this
+            // object, and None is an error in a multiplied zone. It stays when the ElectricEquipment:ITE:LiquidCooled object is available.
+            // Until then no cold plate has a paired object. For a paired cold plate, the link made when this object is created overrides
+            // these values with nIte = Multiplier of the paired object and nZone = multipliers of the zone of the paired object, and applies
+            // the None check to that zone.
+            stored.nIte = 1.0;
+            if (stored.followMultipliers == FollowMultipliers::ITEMultiplierAndZoneMultiplier) {
+                stored.nZone = stored.plateZoneMultiplier;
+            } else {
+                // The object stands for one copy of the zone only, so the heat of the other copies of a multiplied zone would be lost
+                stored.nZone = 1.0;
+                if (stored.plateZoneMultiplier > 1.0) {
+                    ShowSevereError(
+                        state,
+                        std::format("{}: Follow IT Equipment Multipliers = None is not allowed for object \"{}\" because zone \"{}\" has a "
+                                    "zone multiplier of {:.0f}.",
+                                    cCurrentModuleObject,
+                                    stored.name,
+                                    zoneName,
+                                    stored.plateZoneMultiplier));
+                    ShowContinueError(state, "Use ITEMultiplierAndZoneMultiplier, or a zone without a zone multiplier.");
+                    errorsFound = true;
+                }
+            }
             SetupZoneInternalGain(state, zoneIndex, stored.name, DataHeatBalance::IntGainType::CoilCoolingITEColdPlate, &stored.zoneHeatGainRate);
         }
     }

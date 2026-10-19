@@ -7762,6 +7762,8 @@ The heat load is the sum of the heat from the paired ElectricEquipment:ITE:Liqui
 \dot{Q}_{load} = \dot{Q}_{ITE} + \dot{Q}_{sched}
 \end{equation}
 
+This is the load of one cold plate when the object stands for one cold plate. When it stands for several, \(\dot{Q}_{ITE}\) is divided by the multiplier of the IT equipment (see the Multipliers section below).
+
 \paragraph{Thermal Resistance}\label{thermal-resistance-coilcoolingitecoldplate}
 
 The heat transfer of a cold plate is characterized by a case-to-fluid thermal resistance, which relates the heat flow to a driving temperature difference. Thermal resistance is the metric most widely used to evaluate and design cold plates (Martinez et al.~2025). The model supports two definitions of the thermal resistance, which are selected with the field Thermal Resistance Method.
@@ -7863,7 +7865,7 @@ With the flow rate known, the heat removed by the coolant is the smaller of the 
 \dot{Q}_{zone} = \dot{Q}_{load} - \dot{Q}_{c}
 \end{equation}
 
-Thus, in every time step the load equals the sum of the heat removed by the coolant and the heat added to the zone. The heat added to the zone is a convective internal gain. The gain is applied to the zone heat balance with a lag of one system time step.
+Thus, in every time step the load of one cold plate equals the sum of the heat removed by the coolant and the heat that is not removed. When the object stands for several cold plates, the heat added to the zone is given in the Multipliers section below. The heat added to the zone is a convective internal gain. The gain is applied to the zone heat balance with a lag of one system time step.
 
 \paragraph{Outlet Temperature and Case Temperature}\label{outlet-temperature-and-case-temperature-coilcoolingitecoldplate}
 
@@ -7905,7 +7907,7 @@ For the LMTD method the design load is:
 \dot{Q}_{d} = \frac{LMTD_{d}}{R_{d}}, \qquad LMTD_{d} = \frac{\PB{T_{target} - T_{out,d}} - \PB{T_{target} - T_{in,d}}}{\ln\PB{\dfrac{T_{target} - T_{out,d}}{T_{target} - T_{in,d}}}}
 \end{equation}
 
-The target case operating temperature must be greater than the design outlet temperature for the LMTD method, and the design load must be greater than zero. The design load is multiplied by the user-specified sizing factor, \(F_{s}\), which allows several cold plates to share the load of a plant loop (for example \(F_{s} = 1/X\) for \(X\) identical cold plates):
+The target case operating temperature must be greater than the design outlet temperature for the LMTD method, and the design load must be greater than zero. The design load is multiplied by the user-specified sizing factor, \(F_{s}\):
 
 \begin{equation}
 \dot{Q}_{d,sized} = F_{s} \, \dot{Q}_{d}
@@ -7919,7 +7921,49 @@ The nominal liquid volume flow rate is the flow rate that carries the design loa
 
 where the density, \(\rho\), and the specific heat are evaluated at the design inlet temperature. When the target case operating temperature is greater than the design outlet temperature, the cold plate removes the design load at this flow rate with the case at the target temperature. When the maximum liquid flow rate is autosized, it is equal to the nominal flow rate. When it is specified by the user, it must be greater than or equal to the nominal flow rate. If the nominal flow rate is specified by the user and a Sizing:Plant object exists, the value above is calculated and reported for comparison.
 
+The design load above is used when the nominal flow rate sizing basis is \textbf{ColdPlateCapacity}. When the basis is \textbf{MaximumITELoad}, the design load is the maximum value of the IT equipment load schedule, \(\dot{Q}_{sched}\), multiplied by the sizing factor and limited to the heat the cold plate transfers when the case is at the maximum case temperature, \(T_{case,max}\):
+
+\begin{equation}
+\dot{Q}_{limit} = \frac{T_{case,max} - T_{in,d}}{R_{d}}, \qquad \dot{Q}_{d,sized} = \min\PB{F_{s} \, \dot{Q}_{sched}, \; \dot{Q}_{limit}}
+\end{equation}
+
+The limit is the heat transferred through the thermal resistance alone, and does not depend on the flow rate that is being sized. For the Standard method, when \(T_{case,max} - T_{in,d} \geq \Delta T_{d}\), a larger flow rate than the one that carries \(\dot{Q}_{limit}\) would not remove more heat. Otherwise, and for the LMTD method, \(\dot{Q}_{limit}\) is an upper bound: a larger flow rate raises the heat removed (for LMTD, through the effectiveness) but only towards \(\dot{Q}_{limit}\), and the warning below is issued if the cold plate cannot transfer the load. The nominal flow rate is then calculated from \(\dot{Q}_{d,sized}\) as above.
+
+The nominal thermal resistance is defined at the nominal flow rate. Since the cold plate is at the nominal flow rate at the design load, the heat it can transfer at the nominal flow rate is set by \(R_{d}\) and not by the flow rate, unless the coolant term, \(\dot{m} c_p\), is the smaller one. When the nominal flow rate is autosized from a load, the nominal thermal resistance applies to a flow rate that is not chosen by the user.
+
+For the \textbf{MaximumITELoad} basis, the case temperature needed to transfer \(\dot{Q}_{sched}\) at the maximum flow rate, \(\dot{V}_{max}\), is calculated with \(R_{max} = R_{nom} \, f\PB{\dot{V}_{max} / \dot{V}_{nom}}\) and \(\dot{m}_{max} = \rho \dot{V}_{max}\). For the Standard method:
+
+\begin{equation}
+T_{case} = T_{in,d} + \dot{Q}_{sched} \, \max\PB{R_{max}, \; \frac{1}{\dot{m}_{max} c_p}}
+\end{equation}
+
+and for the LMTD method:
+
+\begin{equation}
+T_{case} = T_{in,d} + \frac{\dot{Q}_{sched}}{\dot{m}_{max} c_p \, \varepsilon}, \qquad \varepsilon = 1 - \exp\PB{-\frac{1}{\dot{m}_{max} c_p R_{max}}}
+\end{equation}
+
+A warning is issued if \(T_{case}\) is greater than \(T_{case,max}\), and also if \(T_{case,max}\) is not greater than the loop design return temperature \(T_{in,d} + \Delta T_{d}\). The heat that is not removed by the coolant is added to the zone during the simulation.
+
 The nominal and maximum mass flow rates used in the operating calculations are the volume flow rates multiplied by the density. The density is evaluated at the design inlet temperature of the Sizing:Plant object.
+
+\subsubsection{IT Equipment and Zone Multipliers}\label{zone-multipliers-coilcoolingitecoldplate}
+
+A zone with a zone multiplier \(M_{zone}\) (the product of the zone multiplier and the zone list multiplier) is calculated once and stands for \(M_{zone}\) identical zones. The multiplier of the zone of the IT equipment object is noted \(M_{zone,ite}\), and the multiplier of the zone named in the field \emph{Zone Name} of the cold plate, which receives the heat that the coolant does not remove, is noted \(M_{zone,plate}\). Both are usually the same zone. An \textbf{ElectricEquipment:ITE:LiquidCooled} object with a multiplier \(M_{ite}\) stands for \(M_{ite}\) identical racks. A cold plate object therefore stands for \(N\) identical cold plates. When the field \emph{Follow IT Equipment Multipliers} is \textbf{ITEMultiplierAndZoneMultiplier}, \(N = M_{ite} \, M_{zone,ite}\), with the multipliers of the IT equipment object that refers to the cold plate and of its zone. When the field is \textbf{None}, \(N = 1\) and the object is an aggregate of all of the racks and zone copies, which is not allowed in a zone with a zone multiplier greater than 1 because the heat of the other copies would be lost.
+
+The IT equipment load that the cold plate receives includes \(M_{ite}\) and is for one copy of the zone, so one cold plate has a load of \(\dot{Q}_{load} = \dot{Q}_{ITE} / M_{ite} + \dot{Q}_{sched}\), where \(\dot{Q}_{ITE}\) is the load received from the paired object and \(\dot{Q}_{sched}\), the load of the cold plate's own load schedule, is already for one cold plate.
+
+Until the \textbf{ElectricEquipment:ITE:LiquidCooled} object is available, \(M_{ite}\) and the multipliers of its zone are taken as 1, and \(N = M_{zone,plate}\), the zone multiplier of the zone named in the field \emph{Zone Name} of the cold plate. This section will be updated when that object is available.
+
+All of the equations above are for one cold plate, with the load, flow rates, thermal resistance and auxiliary power of one cold plate. The values that the plant loop and the electric meters see are \(N\) times the values of one cold plate: the coolant mass flow rate, the heat removed by the coolant, the auxiliary electric power and the design flow rate registered with the plant loop.
+
+The heat that the coolant does not remove is added to the zone as an internal gain. An internal gain on a zone applies to each copy of the zone, so the gain is the total of the heat not removed by all \(N\) cold plates divided by \(M_{zone,plate}\):
+
+\begin{equation}
+\dot{Q}_{zone} = \frac{N \, \PB{\dot{Q}_{load} - \dot{Q}_{c}}}{M_{zone,plate}}
+\end{equation}
+
+where \(\dot{Q}_{load}\) and \(\dot{Q}_{c}\) are the load and the heat removed by the coolant of one cold plate, and \(M_{zone,plate}\) is the multiplier of the zone that receives the heat. When the two zones have the same multiplier, \(\dot{Q}_{zone} = M_{ite} \PB{\dot{Q}_{load} - \dot{Q}_{c}}\); when they differ, dividing by \(M_{zone,plate}\) keeps the energy balance of the building. If the flow rate that the plant delivers is smaller than the flow rate requested for all \(N\) cold plates, one cold plate receives the delivered flow rate divided by \(N\).
 
 \subsubsection{Assumptions and Limitations}\label{assumptions-and-limitations-coilcoolingitecoldplate}
 
