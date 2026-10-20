@@ -3558,17 +3558,15 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
 
 bool getZoneEquipmentNightVentStatus(EnergyPlusData &state,
                                      DataZoneEquipment::ZoneEquipType const zoneEquipType,
-                                     DataZoneEquipment::EquipConfiguration const &zoneEquipConfig,
                                      int const zoneCompNum,
                                      bool const validSAMComp)
 {
     bool zoneNightVentOn = false;
     if (zoneEquipType == DataZoneEquipment::ZoneEquipType::AirDistributionUnit) {
-        for (int inletNodeNum = 1; inletNodeNum <= zoneEquipConfig.NumInletNodes; ++inletNodeNum) {
-            int const airLoopNum = zoneEquipConfig.InletNodeAirLoopNum(inletNodeNum);
-            if (airLoopNum > 0 && state.dataAirLoop->AirLoopControlInfo(airLoopNum).NightVent) {
-                zoneNightVentOn = true;
-                break;
+        if (zoneCompNum > 0 && zoneCompNum <= state.dataDefineEquipment->AirDistUnit.size()) {
+            int const airLoopNum = state.dataDefineEquipment->AirDistUnit(zoneCompNum).AirLoopNum;
+            if (airLoopNum > 0 && airLoopNum <= state.dataAirLoop->AirLoopControlInfo.size()) {
+                zoneNightVentOn = state.dataAirLoop->AirLoopControlInfo(airLoopNum).NightVent;
             }
         }
     } else if (zoneCompNum > 0 && validSAMComp) {
@@ -3788,7 +3786,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
             // NightVentOn is global, so derive a temporary value from this zone component's controls.
             // Leaving it false when no control is active prevents inheriting stale state from another simulation.
-            bool const zoneNightVentOn = getZoneEquipmentNightVentStatus(state, zoneEquipType, zoneEquipConfig, ZoneCompNum, ValidSAMComp);
+            bool const zoneNightVentOn = getZoneEquipmentNightVentStatus(state, zoneEquipType, ZoneCompNum, ValidSAMComp);
             bool const savedZoneEquipmentNightVentOn = state.dataHVACGlobal->NightVentOn;
             state.dataHVACGlobal->NightVentOn = zoneNightVentOn;
 

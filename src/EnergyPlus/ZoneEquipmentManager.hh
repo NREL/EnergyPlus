@@ -185,7 +185,6 @@ namespace ZoneEquipmentManager {
 
     bool getZoneEquipmentNightVentStatus(EnergyPlusData &state,
                                          DataZoneEquipment::ZoneEquipType zoneEquipType,
-                                         DataZoneEquipment::EquipConfiguration const &zoneEquipConfig,
                                          int zoneCompNum,
                                          bool validSAMComp);
 

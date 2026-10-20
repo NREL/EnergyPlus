@@ -6100,35 +6100,31 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneConstantVolumeFanUsesComponen
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ADUUsesConnectedLoopNightVentilation)
 {
     state->init_state(*state);
+    state->dataDefineEquipment->AirDistUnit.allocate(2);
+    state->dataDefineEquipment->AirDistUnit(1).AirLoopNum = 1;
+    state->dataDefineEquipment->AirDistUnit(1).ZoneNum = 1;
+    state->dataDefineEquipment->AirDistUnit(2).AirLoopNum = 2;
+    state->dataDefineEquipment->AirDistUnit(2).ZoneNum = 1;
     state->dataAirLoop->AirLoopControlInfo.allocate(2);
     state->dataAirLoop->AirLoopControlInfo(1).NightVent = true;
     state->dataAirLoop->AirLoopControlInfo(2).NightVent = false;
 
-    DataZoneEquipment::EquipConfiguration zoneEquipConfig;
-    zoneEquipConfig.NumInletNodes = 2;
-    zoneEquipConfig.InletNodeAirLoopNum.allocate(2);
-    zoneEquipConfig.InletNodeAirLoopNum(1) = 1;
-    zoneEquipConfig.InletNodeAirLoopNum(2) = 2;
-
-    // PIUs are simulated through their ADU; the ADU must inherit night ventilation from its serving loop.
-    state->dataHVACGlobal->NightVentOn = false;
+    // Two ADUs serve the same zone from different loops; each follows only its own loop's night-vent status.
     EXPECT_TRUE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
-        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, zoneEquipConfig, 0, false));
+        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 1, false));
+    EXPECT_FALSE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
+        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 2, false));
 
-    // A stale global flag must not activate a PIU whose connected loop is not night ventilating.
-    state->dataHVACGlobal->NightVentOn = true;
+    // Reversing the loop states must reverse the result for the two ADUs.
     state->dataAirLoop->AirLoopControlInfo(1).NightVent = false;
-    EXPECT_FALSE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
-        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, zoneEquipConfig, 0, false));
-
-    // Any connected loop can activate the ADU; unrelated inactive inlets do not disable it.
     state->dataAirLoop->AirLoopControlInfo(2).NightVent = true;
-    EXPECT_TRUE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
-        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, zoneEquipConfig, 0, false));
-
-    // An ADU with no connected, night-ventilating loop cannot inherit stale global state.
-    zoneEquipConfig.InletNodeAirLoopNum(1) = 0;
-    zoneEquipConfig.InletNodeAirLoopNum(2) = 0;
     EXPECT_FALSE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
-        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, zoneEquipConfig, 0, false));
+        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 1, false));
+    EXPECT_TRUE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
+        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 2, false));
+
+    // A disconnected ADU cannot inherit night mode from either loop.
+    state->dataDefineEquipment->AirDistUnit(1).AirLoopNum = 0;
+    EXPECT_FALSE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
+        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 1, false));
 }
