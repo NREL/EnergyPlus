@@ -5713,6 +5713,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneExhaustFanNightVentUsesServin
     EXPECT_TRUE(state->dataHVACGlobal->NightVentOn);
 }
 
+// This fixture covers fan models embedded in ZoneHVAC:UnitHeater under a component NightVentilation manager.
+// Fan:ZoneExhaust follows separate serving-air-loop coupling behavior and is covered by
+// ZoneEquipmentManager_ZoneExhaustFanNightVentUsesServingAirLoop.
 // Verify each zone fan uses its component's NightVentilation status: the active zone gets night performance with the global flag off,
 // while the inactive zone keeps design flow when a stale global flag is on.
 std::vector<std::string> zoneFanNightVentInputs(std::string_view fanType)
@@ -5852,7 +5855,7 @@ std::vector<std::string> zoneFanNightVentInputs(std::string_view fanType)
         idfObjects.emplace_back("  1.0,                      !- Efficiency");
         idfObjects.emplace_back("  1000,                     !- Nominal Capacity {W}");
         idfObjects.emplace_back("  " + outletNode + ",        !- Air Inlet Node Name");
-        idfObjects.emplace_back("  " + zone + " Coil Outlet;       !- Air Outlet Node Name");
+        idfObjects.emplace_back("  " + zone + " Inlet;             !- Air Outlet Node Name");
 
         idfObjects.emplace_back("AvailabilityManagerAssignmentList,");
         idfObjects.emplace_back("  " + zone + " Availability List, !- Name");
@@ -6022,6 +6025,8 @@ void runZoneFanNightVentTest(EnergyPlus::EnergyPlusData &state)
     ASSERT_GT(fan2Num, 0);
     auto &fan1 = *state.dataFans->fans(fan1Num);
     auto &fan2 = *state.dataFans->fans(fan2Num);
+    auto &zone1InletNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(1).InletNode(1));
+    auto &zone2InletNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(2).InletNode(1));
     Real64 constexpr designMassFlow = 1.0 * 1.2;
     Real64 constexpr nightVentMassFlow = 0.4 * 1.2;
     bool simAir = false;
@@ -6031,12 +6036,16 @@ void runZoneFanNightVentTest(EnergyPlus::EnergyPlusData &state)
     SimZoneEquipment(state, true, simAir);
     EXPECT_NEAR(fan1.outletAirMassFlowRate, nightVentMassFlow, 0.0001);
     EXPECT_NEAR(fan2.outletAirMassFlowRate, designMassFlow, 0.0001);
+    EXPECT_NEAR(zone1InletNode.MassFlowRate, nightVentMassFlow, 0.0001);
+    EXPECT_NEAR(zone2InletNode.MassFlowRate, designMassFlow, 0.0001);
 
     // A stale true global flag must not grant night performance to inactive zone 2.
     state.dataHVACGlobal->NightVentOn = true;
     SimZoneEquipment(state, true, simAir);
     EXPECT_NEAR(fan1.outletAirMassFlowRate, nightVentMassFlow, 0.0001);
     EXPECT_NEAR(fan2.outletAirMassFlowRate, designMassFlow, 0.0001);
+    EXPECT_NEAR(zone1InletNode.MassFlowRate, nightVentMassFlow, 0.0001);
+    EXPECT_NEAR(zone2InletNode.MassFlowRate, designMassFlow, 0.0001);
     EXPECT_TRUE(state.dataHVACGlobal->NightVentOn);
 
     // Remove zone 2's manager; it must still ignore a stale global night-vent flag.
@@ -6048,6 +6057,8 @@ void runZoneFanNightVentTest(EnergyPlus::EnergyPlusData &state)
     SimZoneEquipment(state, true, simAir);
     EXPECT_NEAR(fan1.outletAirMassFlowRate, nightVentMassFlow, 0.0001);
     EXPECT_NEAR(fan2.outletAirMassFlowRate, designMassFlow, 0.0001);
+    EXPECT_NEAR(zone1InletNode.MassFlowRate, nightVentMassFlow, 0.0001);
+    EXPECT_NEAR(zone2InletNode.MassFlowRate, designMassFlow, 0.0001);
     EXPECT_TRUE(state.dataHVACGlobal->NightVentOn);
 
     auto &zoneEquipList1ForCapture = state.dataZoneEquip->ZoneEquipList(1);
