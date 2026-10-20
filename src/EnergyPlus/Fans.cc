@@ -1339,6 +1339,13 @@ void FanComponent::init(EnergyPlusData &state)
         }
     }
 
+    if (state.dataHVACGlobal->NightVentOn && nightVentPerfNum > 0) {
+        Real64 const nightMaxMassFlowRate = state.dataFans->NightVentPerf(nightVentPerfNum).MaxAirMassFlowRate;
+        massFlowRateMaxAvail = min(massFlowRateMaxAvail, nightMaxMassFlowRate);
+        massFlowRateMinAvail = min(massFlowRateMinAvail, massFlowRateMaxAvail);
+        inletAirMassFlowRate = min(inletAirMassFlowRate, massFlowRateMaxAvail);
+    }
+
     // Then set the other conditions
     inletAirTemp = inletNode.Temp;
     inletAirHumRat = inletNode.HumRat;
@@ -1719,7 +1726,7 @@ void FanComponent::simulateConstant(EnergyPlusData &state)
     }
 
     _massFlow = min(_massFlow, _maxAirMassFlowRate);
-    _massFlow = max(_massFlow, minAirMassFlowRate);
+    _massFlow = max(_massFlow, min(minAirMassFlowRate, _maxAirMassFlowRate));
 
     // Determine the Fan Schedule for the Time step
     if ((availSched->getCurrentVal() > 0.0 || state.dataHVACGlobal->TurnFansOn) && !state.dataHVACGlobal->TurnFansOff && _massFlow > 0.0) {
@@ -1992,7 +1999,7 @@ void FanComponent::simulateOnOff(EnergyPlusData &state, ObjexxFCL::Optional<Real
     }
 
     _massFlow = min(_massFlow, _maxAirMassFlowRate);
-    _massFlow = max(_massFlow, minAirMassFlowRate);
+    _massFlow = max(_massFlow, min(minAirMassFlowRate, _maxAirMassFlowRate));
     runtimeFrac = 0.0;
 
     // Determine the Fan Schedule for the Time step
