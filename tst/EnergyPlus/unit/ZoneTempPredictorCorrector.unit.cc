@@ -2147,6 +2147,57 @@ TEST_F(EnergyPlusFixture, GetZoneAirSetPoints_Test)
                                              true));
 }
 
+TEST_F(EnergyPlusFixture, GetZoneAirSetPoints_CutoutDifferentialIgnoredForSingleHeatingOrCooling)
+{
+    std::string const idf_objects = delimited_string({
+        "ScheduleTypeLimits,",
+        "  Control Type,",
+        "  0,",
+        "  4,",
+        "  Discrete;",
+        "",
+        "Schedule:Constant,",
+        "  Zone Control Type Schedule,",
+        "  Control Type,",
+        "  3;",
+        "",
+        "Schedule:Constant,",
+        "  Setpoint Schedule,",
+        "  ,",
+        "  22.0;",
+        "",
+        "ThermostatSetpoint:SingleHeatingOrCooling,",
+        "  Combined Setpoint,",
+        "  Setpoint Schedule;",
+        "",
+        "ZoneControl:Thermostat,",
+        "  Zone Thermostat,",
+        "  Zone,",
+        "  Zone Control Type Schedule,",
+        "  1.0,",
+        "  ThermostatSetpoint:SingleHeatingOrCooling,",
+        "  Combined Setpoint;",
+        "",
+        "Zone,",
+        "  Zone,",
+        "  0, 0, 0, 0,",
+        "  1,",
+        "  1;",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    state->init_state(*state);
+
+    bool errorsFound = false;
+    GetZoneData(*state, errorsFound);
+    ASSERT_FALSE(errorsFound);
+
+    GetZoneAirSetPoints(*state);
+
+    EXPECT_TRUE(compare_err_stream_substring(
+        "Temperature Difference Between Cutout And Setpoint will not be applied to ThermostatSetpoint:SingleHeatingOrCooling.", true));
+}
+
 TEST_F(EnergyPlusFixture, GetZoneAirSetPoints_ITEApproachTempWarning)
 {
     // issue 10594: Zone cooling setpoint is bypassed when an ITE object uses FlowControlWithApproachTemperatures. Verify the user is warned.

@@ -480,14 +480,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     }
                 }
 
-                if (tempZone.DeltaTCutSet > 0.0 && !tempZone.setpts[(int)HVAC::SetptType::SingleHeatCool].Name.empty()) {
-                    ShowWarningError(state,
-                                     std::format("{}=\"{}: The choice of Temperature Difference Between Cutout And Setpoint will not be applied "
-                                                 "to ThermostatSetpoint:SingleHeatingOrCooling.",
-                                                 s_ipsc->cCurrentModuleObject,
-                                                 s_ipsc->cAlphaArgs(1)));
-                }
-
                 if (s_ipsc->lAlphaFieldBlanks(7)) {
                     NumAlphas = 5;
                 } else if (s_ipsc->lAlphaFieldBlanks(9)) {
@@ -517,6 +509,14 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
                     tempZone.setpts[(int)setptType].Name = s_ipsc->cAlphaArgs(2 * iSetpt + 3);
                     tempZone.setpts[(int)setptType].isUsed = true;
+                }
+
+                if (tempZone.DeltaTCutSet > 0.0 && !tempZone.setpts[(int)HVAC::SetptType::SingleHeatCool].Name.empty()) {
+                    ShowWarningError(state,
+                                     std::format("{}=\"{}: The choice of Temperature Difference Between Cutout And Setpoint will not be applied "
+                                                 "to ThermostatSetpoint:SingleHeatingOrCooling.",
+                                                 s_ipsc->cCurrentModuleObject,
+                                                 s_ipsc->cAlphaArgs(1)));
                 }
             }
         } // NumTStatStatements
