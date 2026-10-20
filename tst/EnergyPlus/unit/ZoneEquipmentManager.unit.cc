@@ -6121,21 +6121,16 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ADUUsesConnectedLoopNightVentilat
     state->dataAirLoop->AirLoopControlInfo(2).NightVent = false;
 
     // Two ADUs serve the same zone from different loops; each follows only its own loop's night-vent status.
-    EXPECT_TRUE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
-        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 1, false));
-    EXPECT_FALSE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
-        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 2, false));
+    EXPECT_TRUE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(*state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 1, false));
+    EXPECT_FALSE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(*state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 2, false));
 
     // Reversing the loop states must reverse the result for the two ADUs.
     state->dataAirLoop->AirLoopControlInfo(1).NightVent = false;
     state->dataAirLoop->AirLoopControlInfo(2).NightVent = true;
-    EXPECT_FALSE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
-        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 1, false));
-    EXPECT_TRUE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
-        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 2, false));
+    EXPECT_FALSE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(*state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 1, false));
+    EXPECT_TRUE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(*state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 2, false));
 
     // A disconnected ADU cannot inherit night mode from either loop.
     state->dataDefineEquipment->AirDistUnit(1).AirLoopNum = 0;
-    EXPECT_FALSE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
-        *state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 1, false));
+    EXPECT_FALSE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(*state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 1, false));
 }

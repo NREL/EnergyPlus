@@ -54,8 +54,8 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
