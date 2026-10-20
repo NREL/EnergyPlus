@@ -55,7 +55,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/floops.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -5070,7 +5069,7 @@ namespace PlantPipingSystemsManager {
             int PipeY = segment->PipeCellCoordinates.Y;
 
             //'loop across all z-direction indices
-            int const Zindex_stop(floop_end(StartingZ, EndingZ, Increment));
+            int const Zindex_stop = EndingZ + Increment; // one past the last cell, so EndingZ is included
             for (int Zindex = StartingZ; Zindex != Zindex_stop; Zindex += Increment) {
 
                 //'overall cell segment counter
@@ -5698,7 +5697,7 @@ namespace PlantPipingSystemsManager {
         this->Cur.CurAirTemp = state.dataEnvrn->OutDryBulbTemp;
         this->Cur.CurWindSpeed = state.dataEnvrn->WindSpeed;
         this->Cur.CurRelativeHumidity = state.dataEnvrn->OutRelHum;
-        this->Cur.CurIncidentSolar = state.dataEnvrn->BeamSolarRad * max(state.dataEnvrn->SOLCOS(3), 0.0);
+        this->Cur.CurIncidentSolar = state.dataEnvrn->BeamSolarRad * max(state.dataEnvrn->SOLCOS.z, 0.0);
 
         //'now update cell properties
         auto &cells = this->Cells;
