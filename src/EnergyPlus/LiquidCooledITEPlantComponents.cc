@@ -432,6 +432,11 @@ void CoilCoolingITEColdPlateData::sizeColdPlate(EnergyPlusData &state)
         BaseSizer::reportSizerOutput(state, objectType, this->name, "Design Size Design Load [W]", designLoad);
     }
 
+    // The sizing results are for one cold plate; N tells how many cold plates the object stands for
+    if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+        BaseSizer::reportSizerOutput(state, objectType, this->name, "Number of Cold Plates Represented", this->plateCount());
+    }
+
     if (loadBased && scheduleMaxLoad > 0.0 && plantSizingNum > 0 && state.dataPlnt->PlantFinalSizesOkayToReport) {
         this->checkDesignLoadCapability(state, scheduleMaxLoad, loadLimit, loadWasLimited);
     }

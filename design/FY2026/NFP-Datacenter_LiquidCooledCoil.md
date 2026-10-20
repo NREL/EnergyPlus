@@ -4,7 +4,7 @@ Liquid-Cooled Plant Equipment
 **Jeremy Lerond, Pacific Northwest National Laboratory**
 
  - Original Date: June 2026
- - Revision Date: 10/12/2026
+ - Revision Date: 10/20/2026
 
 ## Justification for New Feature ##
 
@@ -52,7 +52,11 @@ As shown in [[8]][Eaton], cold plate selection is driven by $T_{case,max}$, whic
 
 A target case operating temperature is used to size the nominal liquid coolant flow rate through the cold plate. During operation, the flow rate is then adjusted to maintain this target temperature. If the maximum flow rate is reached, the case temperature may rise up to $T_{case,max}$.
 
-The design load used for autosizing is calculated as if a single cold plate served the plant loop. When several cold plates share a loop, the optional `Sizing Factor` field, similar to the field of the same name on supply-side plant equipment, multiplies the design load (for example 1/X for X identical cold plates) so that the autosized flow rates, and therefore the autosized loop flow rate, are not overstated. It applies to autosizing only.
+The optional `Sizing Factor` field, similar to the field of the same name on supply-side plant equipment, multiplies the design load used to calculate the autosized nominal liquid flow rate. It applies to autosizing only.
+
+By default (`Nominal Flow Rate Sizing Basis` = `ColdPlateCapacity`) the design load is the heat the cold plate transfers at the target case operating temperature, which does not depend on the IT load. With `MaximumITELoad` the design load is the maximum of the `IT Equipment Load Schedule Name`, limited to the heat the cold plate transfers at the maximum case temperature, so the autosized flow rate (and the autosized loop flow rate) follows the load. A warning is issued if the cold plate cannot transfer that maximum load at its maximum flow rate without exceeding the maximum case temperature. The nominal thermal resistance is defined at the nominal flow rate, so with this basis it applies to a flow rate that is derived from the load.
+
+`ElectricEquipment:ITE:LiquidCooled` and the zone that contains it can have multipliers, which stand for identical racks and identical zones. A single cold plate object then stands for N identical cold plates. The optional `Follow IT Equipment Multipliers` field sets N: `ITEMultiplierAndZoneMultiplier` (default) uses the product of the IT equipment multiplier and the zone multipliers, and `None` uses N = 1 for an aggregate object (not allowed in a zone with a zone multiplier greater than 1). The inputs (flow rates, auxiliary electric power and thermal resistance) are for one cold plate. The flow requested from the plant, the heat removed by the coolant and the auxiliary electric power are N times the values of one cold plate, and the heat that is not removed is added to the zone per copy of the zone. Until the IT equipment object is available, the multiplier of that object and the multipliers of its zone are taken as 1, and the zone multipliers of the zone of the cold plate apply.
 
 The proposed object, together with a `HeatExchanger:FluidToFluid` object and a pump (on the supply side of the same `PlantLoop`), will represent a coolant distribution unit (CDU). Users will add it to the demand side of a `PlantLoop`. As requested by [[0]][Issue #11408], this approach allows D2C to "_be connected to existing EnergyPlus PlantLoop architecture_". Additionally, this approach supports the requirement that liquids with other heat transfer properties "_be handled at the loop level with the fluid_type and user_defined_fluid_type fields_". Coolant properties can be specified using the `FluidProperties` family of objects. Note that PG25 (a mixture of 25% propylene glycol and water) is a widely used single-phase coolant (see [[5]][Wang et al.]) natively supported by EnergyPlus when using the `FluidProperties:GlycolConcentration` object. Two-phase heat transfer is not currently handled in EnergyPlus; this NFP therefore focuses on single-phase D2C. Two-phase D2C can be modeled using the `Coil:Cooling:ITE:UserDefined` object being developed concurrently, or addressed in a future NFP.
 
@@ -211,13 +215,42 @@ Coil:Cooling:ITE:ColdPlate,
        \note contributions are summed. When no paired object exists this schedule is the sole load source.
        \type object-list
        \object-list ScheduleNames
-  N7;  \field Sizing Factor
-       \note Multiplies the design load used to autosize the nominal liquid flow rate. Use a value less than 1.0
-       \note when several cold plates share the cooling load, for example 1/X for X identical cold plates.
-       \note Applies to autosizing only.
+  N7,  \field Sizing Factor
+       \note Multiplies the design load used to autosize the nominal liquid flow rate. Applies to autosizing only.
        \type real
        \minimum> 0.0
        \default 1.0
+  A11, \field Nominal Flow Rate Sizing Basis
+       \note Basis of the design load used to autosize the nominal liquid flow rate. The autosized maximum
+       \note liquid flow rate, which equals the nominal flow rate, and the flow rate registered with the plant
+       \note loop follow the same design load.
+       \note ColdPlateCapacity: the heat the cold plate transfers at the Target Case Operating Temperature, the
+       \note Sizing:Plant design loop exit temperature and the nominal thermal resistance.
+       \note MaximumITELoad: the maximum value of the IT Equipment Load Schedule Name, limited to the heat the
+       \note cold plate transfers at the Maximum Case Temperature. Requires the IT Equipment Load Schedule Name.
+       \note Placeholder: until the ElectricEquipment:ITE:LiquidCooled object is available, the design load is taken from
+       \note the IT Equipment Load Schedule Name only. When it is available, the design load of the paired object will also
+       \note be used, and the schedule will no longer be required for a cold plate that has a paired object.
+       \type choice
+       \key ColdPlateCapacity
+       \key MaximumITELoad
+       \default ColdPlateCapacity
+  A12; \field Follow IT Equipment Multipliers
+       \note A cold plate object stands for N identical cold plates. The flow rates, the auxiliary electric power and
+       \note the thermal resistance of this object are for one cold plate. The heat transfer, mass flow rate and
+       \note auxiliary electric outputs are totals for N cold plates.
+       \note ITEMultiplierAndZoneMultiplier: N is the product of the Multiplier of the ElectricEquipment:ITE:LiquidCooled
+       \note object that refers to this cold plate and the zone multipliers (zone multiplier times zone list multiplier)
+       \note of the zone of that object.
+       \note None: N is 1. The object is an aggregate of all the racks and of all the copies of the zone.
+       \note It is incorrect to use None in a zone with a zone multiplier greater than 1.
+       \note Placeholder: the ElectricEquipment:ITE:LiquidCooled object is not available yet. Until it is, the multiplier of
+       \note that object and the multipliers of its zone are taken as 1, and ITEMultiplierAndZoneMultiplier follows the
+       \note zone multipliers of the zone of this cold plate. This note will be updated when the object is available.
+       \type choice
+       \key ITEMultiplierAndZoneMultiplier
+       \key None
+       \default ITEMultiplierAndZoneMultiplier
 ```
 
 ## Outputs Description ##
