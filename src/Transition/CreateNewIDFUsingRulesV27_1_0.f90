@@ -78,7 +78,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER NA
   INTEGER NN
   INTEGER CurArgs
-  INTEGER TmpArgs
   INTEGER DifLfn
   INTEGER xCount
   INTEGER Num
@@ -120,8 +119,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER :: I, CurField, NewField, KAindex=0, SearchNum
   INTEGER :: AlphaNumI
   REAL :: SaveNumber
-
-  CHARACTER(len=10) :: ZoneControlInputField='Thermostat'
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                     I N S E R T    L O C A L    V A R I A B L E S    H E R E                                     !
