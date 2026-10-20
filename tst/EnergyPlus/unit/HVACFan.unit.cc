@@ -305,7 +305,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc3)
 {
     // this unit test checks the power averaging when cycling between a hi and low speed
     // this uses discrete power fractions at the speed levels
-    // this unit test uses the optional two-mode arguments
+    // this unit test uses the optional operating-mode arguments
     std::string const idf_objects = delimited_string({
 
         "  Fan:SystemModel,",
@@ -662,6 +662,23 @@ TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_noPowerFFlowCurve)
     locFanElecPower = fanSystem->totalPower;
     // uses flow weighted power calculation. 0% of time at 0% flow and 85% of time at 100% flow
     locExpectPower = (0.0 * 0.25 + 0.85 * 1.0) * fanSystem->designElecPower; // expect 85% of full power
+    EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
+
+    // Mode 3 defaults to the fan pressure rise independently of mode 1, but accepts its own pressure rise.
+    Real64 massFlow3 = 0.5 * designMassFlowRate;
+    Real64 runTimeFrac3 = 1.0;
+    massFlow1 = 0.0;
+    runTimeFrac1 = 0.0;
+    massFlow2 = 0.0;
+    runTimeFrac2 = 0.0;
+    fanSystem->simulate(*state, false, _, 200.0, _, massFlow1, runTimeFrac1, massFlow2, runTimeFrac2, _, massFlow3, runTimeFrac3);
+    locFanElecPower = fanSystem->totalPower;
+    locExpectPower = 0.5 * fanSystem->designElecPower;
+    EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
+
+    fanSystem->simulate(*state, false, _, 200.0, _, massFlow1, runTimeFrac1, massFlow2, runTimeFrac2, _, massFlow3, runTimeFrac3, 50.0);
+    locFanElecPower = fanSystem->totalPower;
+    locExpectPower = 0.25 * fanSystem->designElecPower;
     EXPECT_NEAR(locFanElecPower, locExpectPower, 0.01);
 }
 
