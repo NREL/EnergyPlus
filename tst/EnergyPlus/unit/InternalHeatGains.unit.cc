@@ -3791,7 +3791,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_GetITEColdPlateDesignLoadPerPlate)
 
         " Schedule:Constant,AlwaysOn,,1.0;",
         " Schedule:Constant,ComputeLoadSched,,0.5;",
-        " Schedule:Constant,LoadFracSched,,0.6;",       // max used for sizing, not the current value
+        " Schedule:Constant,LoadFracSched,,0.6;",        // max used for sizing, not the current value
         " Schedule:Constant,CaptureFracMultSched,,1.5;", // > 1.0, exercises the sizing-side clamp too
 
         " ElectricEquipment:ITE:LiquidCooled,",
