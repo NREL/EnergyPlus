@@ -566,10 +566,6 @@ No new meters are required. Existing fan and heating energy meters will
 reflect the selected operating mode and, during concurrent operation, the
 effective-weighted energy use.
 
-No new meters are required. Existing fan and heating energy meters will
-reflect the selected operating mode and, during concurrent operation, the
-effective-weighted energy use.
-
 ## Engineering Reference ##
 
 The Unitary System section will document DX-only, supplemental-only, concurrent,
