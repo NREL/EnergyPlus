@@ -540,22 +540,27 @@ Existing node flow, fan electricity, coil energy, and outlet-condition outputs
 will reflect the selected operating case and its timestep weighting. The
 following outputs will be added:
 
-- `Unitary System Supplemental Heating Condition Weight` `[]`
-- `Unitary System Supplemental Heating Air Mass Flow Rate` `[kg/s]`
+- `Unitary System Heating DX-Only Weight` `[]`
+- `Unitary System Heating Off-Cycle Weight` `[]`
+- `Unitary System Heating Supplemental Weight` `[]`
 
-The condition-weight output will report the effective supplemental-condition
-weight used by the airflow model:
+These timestep weights correspond to the three airflow conditions used to
+calculate average unit mass flow:
 
-- DX-only or no-heating operation: 0.
-- Concurrent DX and supplemental heating: $PLR_{SuppHeat}$.
-- Supplemental-only operation: 1.
+$$
+\dot m_{avg} = w_{DX}\dot m_{DX} + w_{off}\dot m_{off} +
+w_{supp}\dot m_{supp}
+$$
 
-These values identify the selected airflow condition; they are not physical
-runtime fractions. The supplemental-only value is 1 even if the coil modulates
-below full capacity. Any off/no-load timestep fraction is handled separately.
-The airflow output will report the supplemental-heating airflow contribution
-when that condition is selected, with the timestep averaging defined by the
-operating case.
+During concurrent DX and supplemental heating, the heating-period weight is
+split using supplemental-heater PLR: $w_{DX}=H(1-PLR_{SuppHeat})$ and
+$w_{supp}=H PLR_{SuppHeat}$. The off-cycle weight remains the existing off-period
+weight. During supplemental-only operation, $w_{DX}=0$ and the
+heating-period weight is assigned to $w_{supp}$. When the supplemental airflow
+blend is inactive, the DX-only and off-cycle weights report the existing
+mode-1 and mode-2 weights, respectively, and the supplemental-heating weight
+is zero. These are effective airflow-blend weights, not necessarily physical
+coil runtime fractions.
 
 No new meters are required. Existing fan and heating energy meters will
 reflect the selected operating mode and, during concurrent operation, the
