@@ -116,7 +116,8 @@ namespace Fans {
                               ObjexxFCL::Optional<Real64 const> runTimeFraction2 = _, // Run time fraction in operating mode 2
                               ObjexxFCL::Optional<Real64 const> pressureRise2 = _,    // Pressure difference to use for operating mode 2
                               ObjexxFCL::Optional<Real64 const> massFlowRate3 = _,    // Mass flow rate in operating mode 3 [kg/s]
-                              ObjexxFCL::Optional<Real64 const> runTimeFraction3 = _  // Run time fraction in operating mode 3
+                              ObjexxFCL::Optional<Real64 const> runTimeFraction3 = _,  // Run time fraction in operating mode 3
+                              ObjexxFCL::Optional<Real64 const> pressureRise3 = _     // Pressure difference for operating mode 3
         );
 
         virtual void update(EnergyPlusData &state) = 0;
@@ -419,7 +420,8 @@ namespace Fans {
                             ObjexxFCL::Optional<Real64 const> runTimeFrac2, // Run time fraction in operating mode 2
                             ObjexxFCL::Optional<Real64 const> pressureRise2, // Pressure difference to use for operating mode 2
                             ObjexxFCL::Optional<Real64 const> flowRatio3 = _,   // Flow ratio in operating mode 3
-                            ObjexxFCL::Optional<Real64 const> runTimeFrac3 = _ // Run time fraction in operating mode 3
+                            ObjexxFCL::Optional<Real64 const> runTimeFrac3 = _, // Run time fraction in operating mode 3
+                            ObjexxFCL::Optional<Real64 const> pressureRise3 = _ // Pressure difference for operating mode 3
         );
 
         void update(EnergyPlusData &state) override;

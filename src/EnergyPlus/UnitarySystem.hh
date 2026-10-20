@@ -318,6 +318,9 @@ namespace UnitarySystems {
         int m_HeatingCapMethod = 0;
         Real64 m_MaxNoCoolHeatAirVolFlow = 0.0;
         Real64 m_MaxSuppHeatAirVolFlow = 0.0;
+        Real64 m_DXOnlyWeight = 0.0;
+        Real64 m_OffCycleWeight = 0.0;
+        Real64 m_SuppHeatingWeight = 0.0;
         UseCompFlow m_AirFlowControl = UseCompFlow::Invalid;
         bool m_CoolingCoilUpstream = true;
         Real64 m_MaxOATSuppHeat = 0.0;

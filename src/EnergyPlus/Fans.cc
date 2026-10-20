@@ -113,7 +113,8 @@ void FanBase::simulate(EnergyPlusData &state,
                        ObjexxFCL::Optional<Real64 const> _runTimeFraction2, // Run time fraction in operating mode 2
                        ObjexxFCL::Optional<Real64 const> _pressureRise2,    // Pressure difference for operating mode 2
                        ObjexxFCL::Optional<Real64 const> _massFlowRate3,    // Mass flow rate in operating mode 3 [kg/s]
-                       ObjexxFCL::Optional<Real64 const> _runTimeFraction3  // Run time fraction in operating mode 3
+                       ObjexxFCL::Optional<Real64 const> _runTimeFraction3, // Run time fraction in operating mode 3
+                       ObjexxFCL::Optional<Real64 const> _pressureRise3     // Pressure difference for operating mode 3
 )
 {
     // SUBROUTINE INFORMATION:
@@ -166,37 +167,46 @@ void FanBase::simulate(EnergyPlusData &state,
         auto *_thisFan = dynamic_cast<FanSystem *>(this);
         assert(_thisFan != nullptr);
 
-        if (present(_pressureRise) && present(_massFlowRate1) && present(_runTimeFraction1) && present(_massFlowRate2) &&
-            present(_runTimeFraction2) && present(_pressureRise2)) {
+        if (present(_massFlowRate1) && present(_runTimeFraction1) && present(_massFlowRate2) && present(_runTimeFraction2) &&
+            present(_massFlowRate3) && present(_runTimeFraction3)) {
             Real64 _flowRatio1 = _massFlowRate1 / maxAirMassFlowRate;
             Real64 _flowRatio2 = _massFlowRate2 / maxAirMassFlowRate;
-            if (present(_massFlowRate3) && present(_runTimeFraction3)) {
-                Real64 _flowRatio3 = _massFlowRate3 / maxAirMassFlowRate;
-                _thisFan->calcSimpleSystemFan(
-                    state, _, _pressureRise, _flowRatio1, _runTimeFraction1, _flowRatio2, _runTimeFraction2, _pressureRise2, _flowRatio3, _runTimeFraction3);
-            } else {
-                _thisFan->calcSimpleSystemFan(
-                    state, _, _pressureRise, _flowRatio1, _runTimeFraction1, _flowRatio2, _runTimeFraction2, _pressureRise2);
-            }
-        } else if (!present(_pressureRise) && present(_massFlowRate1) && present(_runTimeFraction1) && present(_massFlowRate2) &&
-                   present(_runTimeFraction2) && !present(_pressureRise2)) {
-            Real64 _flowRatio1 = _massFlowRate1 / maxAirMassFlowRate;
-            Real64 _flowRatio2 = _massFlowRate2 / maxAirMassFlowRate;
-            if (present(_massFlowRate3) && present(_runTimeFraction3)) {
-                Real64 _flowRatio3 = _massFlowRate3 / maxAirMassFlowRate;
+            Real64 _flowRatio3 = _massFlowRate3 / maxAirMassFlowRate;
+            if (present(_pressureRise3)) {
                 _thisFan->calcSimpleSystemFan(state,
                                               _flowFraction,
-                                              _,
+                                              _pressureRise,
                                               _flowRatio1,
                                               _runTimeFraction1,
                                               _flowRatio2,
                                               _runTimeFraction2,
-                                              _,
+                                              _pressureRise2,
+                                              _flowRatio3,
+                                              _runTimeFraction3,
+                                              _pressureRise3);
+            } else {
+                _thisFan->calcSimpleSystemFan(state,
+                                              _flowFraction,
+                                              _pressureRise,
+                                              _flowRatio1,
+                                              _runTimeFraction1,
+                                              _flowRatio2,
+                                              _runTimeFraction2,
+                                              _pressureRise2,
                                               _flowRatio3,
                                               _runTimeFraction3);
-            } else {
-                _thisFan->calcSimpleSystemFan(state, _flowFraction, _, _flowRatio1, _runTimeFraction1, _flowRatio2, _runTimeFraction2, _);
             }
+        } else if (present(_pressureRise) && present(_massFlowRate1) && present(_runTimeFraction1) && present(_massFlowRate2) &&
+            present(_runTimeFraction2) && present(_pressureRise2)) {
+            Real64 _flowRatio1 = _massFlowRate1 / maxAirMassFlowRate;
+            Real64 _flowRatio2 = _massFlowRate2 / maxAirMassFlowRate;
+            _thisFan->calcSimpleSystemFan(
+                state, _, _pressureRise, _flowRatio1, _runTimeFraction1, _flowRatio2, _runTimeFraction2, _pressureRise2);
+        } else if (!present(_pressureRise) && present(_massFlowRate1) && present(_runTimeFraction1) && present(_massFlowRate2) &&
+                   present(_runTimeFraction2) && !present(_pressureRise2)) {
+            Real64 _flowRatio1 = _massFlowRate1 / maxAirMassFlowRate;
+            Real64 _flowRatio2 = _massFlowRate2 / maxAirMassFlowRate;
+            _thisFan->calcSimpleSystemFan(state, _flowFraction, _, _flowRatio1, _runTimeFraction1, _flowRatio2, _runTimeFraction2, _);
         } else if (present(_pressureRise) && present(_flowFraction)) {
             _thisFan->calcSimpleSystemFan(state, _flowFraction, _pressureRise, _, _, _, _, _);
         } else if (present(_pressureRise) && !present(_flowFraction)) {
@@ -2815,7 +2825,8 @@ void FanSystem::calcSimpleSystemFan(
     ObjexxFCL::Optional<Real64 const> _runTimeFrac2, // Run time fraction in operating mode 2
     ObjexxFCL::Optional<Real64 const> _pressureRise2, // Pressure difference to use for operating mode 2
     ObjexxFCL::Optional<Real64 const> _flowRatio3,   // Flow ratio in operating mode 3
-    ObjexxFCL::Optional<Real64 const> _runTimeFrac3 // Run time fraction in operating mode 3
+    ObjexxFCL::Optional<Real64 const> _runTimeFrac3, // Run time fraction in operating mode 3
+    ObjexxFCL::Optional<Real64 const> _pressureRise3 // Pressure difference for operating mode 3
 )
 {
     Real64 _localFlowFrac;
@@ -2843,9 +2854,8 @@ void FanSystem::calcSimpleSystemFan(
 
     } else { // not in night mode
         _localPressureRise[0] = present(_pressureRise) ? _pressureRise() : deltaPress;
-
         _localPressureRise[1] = present(_pressureRise2) ? _pressureRise2() : deltaPress;
-        _localPressureRise[2] = _localPressureRise[0];
+        _localPressureRise[2] = present(_pressureRise3) ? _pressureRise3() : deltaPress;
 
         if (present(_flowFraction)) {
             _localFlowFrac = _flowFraction;

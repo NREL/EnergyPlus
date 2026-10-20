@@ -11777,6 +11777,9 @@ namespace UnitarySystems {
         Real64 offPeriodWeight = 0.0;
         Real64 suppHeatMassFlow = 0.0;
         bool supplementalAirflowBlendActive = false;
+        this->m_DXOnlyWeight = 0.0;
+        this->m_OffCycleWeight = 0.0;
+        this->m_SuppHeatingWeight = 0.0;
 
         HVAC::CompressorOp CoolingCompOn = HVAC::CompressorOp::Off;
         if (CoolPLR > 0) {
@@ -11820,26 +11823,32 @@ namespace UnitarySystems {
         } else {
             this->setAverageAirFlow(state, max(CoolPLR, HeatPLR), OnOffAirFlowRatio);
         }
+        offPeriodWeight = state.dataUnitarySystems->m_runTimeFraction2;
+        this->m_DXOnlyWeight = state.dataUnitarySystems->m_runTimeFraction1;
+        this->m_OffCycleWeight = offPeriodWeight;
 
         // Split the existing heating-period weight using PLR as an effective condition weight, not as physical coil runtime.
         if (this->m_DXHeatingCoil && this->m_SuppHeatPartLoadFrac > 0.0 && state.dataUnitarySystems->HeatingLoad) {
+            supplementalAirflowBlendActive = true;
+
             Real64 const suppHeatConditionWeight = min(1.0, max(0.0, this->m_SuppHeatPartLoadFrac));
             Real64 const heatingPeriodWeight = state.dataUnitarySystems->m_runTimeFraction1;
-            // Keep any off-cycle flow as its own condition; it is not part of the DX/supplemental PLR split.
-            offPeriodWeight = state.dataUnitarySystems->m_runTimeFraction2;
             suppHeatMassFlow = this->m_MaxSuppHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
             suppHeatPeriodWeight = heatingPeriodWeight;
 
+            // Split the heating-period weight by supplemental PLR only while DX heating is active.
             if (HeatingCompOn == HVAC::CompressorOp::On) {
                 dxOnlyPeriodWeight = heatingPeriodWeight * (1.0 - suppHeatConditionWeight);
                 suppHeatPeriodWeight = heatingPeriodWeight * suppHeatConditionWeight;
             }
+            this->m_DXOnlyWeight = dxOnlyPeriodWeight;
+            this->m_SuppHeatingWeight = suppHeatPeriodWeight;
 
             // With DX locked out, dxOnlyPeriodWeight stays zero and the heating share uses supplemental airflow.
             averageUnitMassFlow = (dxOnlyPeriodWeight * state.dataUnitarySystems->CompOnMassFlow) +
                                   (offPeriodWeight * state.dataUnitarySystems->CompOffMassFlow) +
                                   (suppHeatPeriodWeight * suppHeatMassFlow);
-            supplementalAirflowBlendActive = true;
+
             // Set the timestep-average node flow; air-loop controllers own MaxAvail for air-loop equipment.
             auto &unitaryInletNode = state.dataLoopNodes->Node(this->AirInNode);
             unitaryInletNode.MassFlowRate = averageUnitMassFlow;
@@ -11848,10 +11857,11 @@ namespace UnitarySystems {
             }
 
             // DX coils receive the on-cycle/average ratio separately, while their operating flow includes both heating conditions.
-            Real64 const dxOperatingMassFlow = HeatingCompOn == HVAC::CompressorOp::On
-                                                   ? ((1.0 - suppHeatConditionWeight) * state.dataUnitarySystems->CompOnMassFlow) +
-                                                         (suppHeatConditionWeight * suppHeatMassFlow)
-                                                   : 0.0;
+            Real64 dxOperatingMassFlow = 0.0;
+            if (HeatingCompOn == HVAC::CompressorOp::On) {
+                dxOperatingMassFlow = ((1.0 - suppHeatConditionWeight) * state.dataUnitarySystems->CompOnMassFlow) +
+                              (suppHeatConditionWeight * suppHeatMassFlow);
+            }
             if (HeatingCompOn == HVAC::CompressorOp::On && averageUnitMassFlow > 0.0 && this->m_FanOpMode == HVAC::FanOp::Continuous &&
                 this->m_HeatingSpeedNum <= 1) {
                 OnOffAirFlowRatio = dxOperatingMassFlow / averageUnitMassFlow;
@@ -17641,6 +17651,27 @@ namespace UnitarySystems {
                                         "Unitary System Total Heating Rate",
                                         Constant::Units::W,
                                         state.dataUnitarySystems->unitarySys[sysNum].m_TotHeatEnergyRate,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Unitary System Heating DX-Only Weight",
+                                        Constant::Units::None,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_DXOnlyWeight,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Unitary System Heating Off-Cycle Weight",
+                                        Constant::Units::None,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_OffCycleWeight,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Unitary System Heating Supplemental Weight",
+                                        Constant::Units::None,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_SuppHeatingWeight,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
