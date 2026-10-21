@@ -229,6 +229,39 @@ TEST_F(EnergyPlusFixture, CoilCoolingITEColdPlate_StandardMethod)
     EXPECT_NEAR(2000.0 - maxCapacity, coldPlate.zoneHeatGainRate, 1.0e-6);
     EXPECT_NEAR(maxCaseTemp, coldPlate.caseTemperature, 1.0e-6);
 
+    // Case temperature without a load or without cooling: it cannot be calculated, so the last value is held
+    capMaximumFlow(*state, coldPlate, 1.0);
+    coldPlate.flowMode = DataPlant::FlowMode::Variable;
+    coldPlate.loadFromITEquipment = 1000.0;
+    coldPlate.doPhysics(*state);
+    ASSERT_NEAR(targetCaseTemp, coldPlate.caseTemperature, 1.0e-3);
+    // (a) Idle: nothing changes, and 0 is not reported
+    coldPlate.loadFromITEquipment = 0.0;
+    coldPlate.doPhysics(*state);
+    EXPECT_NEAR(targetCaseTemp, coldPlate.caseTemperature, 1.0e-3);
+    EXPECT_NEAR(0.0, coldPlate.massFlowRate, 1.0e-12);
+    // (b) A load but the cold plate is not available: all of the load goes to the zone, the case temperature is held
+    coldPlate.availabilitySchedule = Sched::GetScheduleAlwaysOff(*state);
+    coldPlate.loadFromITEquipment = 1500.0;
+    coldPlate.doPhysics(*state);
+    EXPECT_NEAR(1500.0, coldPlate.zoneHeatGainRate, 1.0e-9);
+    EXPECT_NEAR(targetCaseTemp, coldPlate.caseTemperature, 1.0e-3);
+    coldPlate.availabilitySchedule = Sched::GetScheduleAlwaysOn(*state);
+    // (c) Available again: the case temperature is calculated again, and is then the held value when the load stops
+    coldPlate.flowMode = DataPlant::FlowMode::Constant;
+    coldPlate.doPhysics(*state);
+    EXPECT_NEAR(designInletTemp + 1500.0 * nominalResistance, coldPlate.caseTemperature, 1.0e-6);
+    coldPlate.loadFromITEquipment = 0.0;
+    coldPlate.doPhysics(*state);
+    EXPECT_NEAR(designInletTemp + 1500.0 * nominalResistance, coldPlate.caseTemperature, 1.0e-6);
+    // (d) The start of an environment resets the case temperature to the target case operating temperature
+    state->dataGlobal->BeginEnvrnFlag = true;
+    coldPlate.myEnvrnFlag = true;
+    Real64 curLoad = 0.0;
+    coldPlate.simulate(*state, coldPlate.plantLoc, true, curLoad, true);
+    EXPECT_NEAR(targetCaseTemp, coldPlate.caseTemperature, 1.0e-9);
+    state->dataGlobal->BeginEnvrnFlag = false;
+
     // MaximumITELoad: the design load is the maximum of the load schedule, limited to the heat transferred at the maximum case temperature
     constexpr Real64 loadLimit = (maxCaseTemp - designInletTemp) / nominalResistance; // 2,200 W
     (void)has_err_output(true);
