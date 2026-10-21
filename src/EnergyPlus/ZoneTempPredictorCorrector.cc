@@ -5681,17 +5681,14 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
             }
         }
     }
-    // now calculate air energy storage source term.
-    // capacitance is volume * density * heat capacity
-    Real64 CpAir = Psychrometrics::PsyCpAirFnW(thisHB->airHumRat);
-    Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisHB->MAT, thisHB->airHumRat);
-
+    // Calculate the air energy storage term using the same capacitance and time integration method as the zone air temperature solver.
     switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
     case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-        thisAirRpt.CzdTdt = RhoAir * CpAir * thisZone.Volume * thisZone.ZoneVolCapMultpSens * (thisHB->MAT - thisHB->ZTM[0]) / TimeStepSysSec;
-        // Exact solution
+        thisAirRpt.CzdTdt =
+            thisHB->AirPowerCap * ((11.0 / 6.0) * thisHB->MAT - 3.0 * thisHB->ZTM[0] + (3.0 / 2.0) * thisHB->ZTM[1] - (1.0 / 3.0) * thisHB->ZTM[2]);
     } break;
     case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
+        // Exact solution
         thisAirRpt.CzdTdt = thisHB->TempIndCoef - thisHB->TempDepCoef * thisHB->MAT;
     } break;
     case DataHeatBalance::SolutionAlgo::EulerMethod: {

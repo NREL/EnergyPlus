@@ -1125,6 +1125,26 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_calcZoneOrSpaceSums_SurfCon
     EXPECT_NEAR(7328.768356, thisZoneHB.SumSysMCpT, 0.0001);
 }
 
+TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ThirdOrderComponentLoadStorageTest)
+{
+    state->init_state(*state);
+
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBalFanSys->SumConvHTRadSys.allocate(1);
+    state->dataHeatBalFanSys->SumConvPool.allocate(1);
+
+    ZoneTempPredictorCorrector::ZoneHeatBalanceData zoneHB;
+    zoneHB.AirPowerCap = 100.0;
+    zoneHB.MAT = 23.0;
+    zoneHB.ZTM = {20.0, 19.0, 18.0, 0.0};
+
+    state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::ThirdOrder;
+    DataHeatBalance::AirReportVars airReport;
+    CalcZoneComponentLoadSums(*state, 1, &zoneHB, airReport);
+
+    EXPECT_NEAR(1400.0 / 3.0, airReport.CzdTdt, 1.0e-10);
+}
+
 TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest)
 {
     // AUTHOR: L. Gu, FSEC
