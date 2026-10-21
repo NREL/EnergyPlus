@@ -191,8 +191,8 @@ extension_renaming = {
     "MaterialProperty:VariableThermalConductivity": "values",
     "ComfortViewFactorAngles": "angles",
     "ZoneMRTCalculation": "people_names",
-    "OutputControl:RVI": "keys",
-    "OutputControl:MVI": "keys",
+    "OutputControl:RVI": "output_variables",
+    "OutputControl:MVI": "output_variables",
 }
 remaining_objects = [
     "Site:SpectrumData",
