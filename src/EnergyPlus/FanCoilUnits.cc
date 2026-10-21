@@ -3228,6 +3228,16 @@ namespace FanCoilUnits {
             }
         }
 
+        // Apply the fan's night limit before mixing and caching the flow used for sensible output.
+        if (state.dataHVACGlobal->NightVentOn) {
+            auto const *fan = dynamic_cast<Fans::FanComponent const *>(state.dataFans->fans(fanCoil.FanIndex));
+            if (fan != nullptr && fan->nightVentPerfNum > 0) {
+                auto &inletNode = state.dataLoopNodes->Node(InletNode);
+                inletNode.MassFlowRate = min(inletNode.MassFlowRate,
+                                            state.dataFans->NightVentPerf(fan->nightVentPerfNum).MaxAirMassFlowRate);
+            }
+        }
+
         // use the value of the outside air schedule if present
         OASchedValue = (fanCoil.oaSched != nullptr) ? fanCoil.oaSched->getCurrentVal() : 1.0;
 

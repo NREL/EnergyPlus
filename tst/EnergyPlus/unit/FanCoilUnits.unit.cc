@@ -1142,6 +1142,39 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     // expect inlet and outlet node air mass flow rates are equal
     EXPECT_EQ(state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirInNode).MassFlowRate,
               state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).AirOutNode).MassFlowRate);
+
+    // A night-vent cap must apply before mixing and sensible-output calculations, and release in normal mode.
+    auto &fanCoil = state->dataFanCoilUnits->FanCoil(FanCoilNum);
+    auto *fan = dynamic_cast<Fans::FanComponent *>(state->dataFans->fans(fanCoil.FanIndex));
+    ASSERT_NE(nullptr, fan);
+    fan->nightVentPerfNum = 1;
+    state->dataFans->NumNightVentPerf = 1;
+    state->dataFans->NightVentPerf.allocate(1);
+    auto &nightVentPerf = state->dataFans->NightVentPerf(1);
+    nightVentPerf.FanEff = fan->totalEff;
+    nightVentPerf.DeltaPress = fan->deltaPress;
+    nightVentPerf.MotEff = fan->motorEff;
+    nightVentPerf.MotInAirFrac = fan->motorInAirFrac;
+    auto &inletNode = state->dataLoopNodes->Node(fanCoil.AirInNode);
+    auto &outletNode = state->dataLoopNodes->Node(fanCoil.AirOutNode);
+    Real64 const designAirMassFlow = inletNode.MassFlowRateMax;
+    nightVentPerf.MaxAirMassFlowRate = 0.4 * designAirMassFlow;
+
+    for (bool const nightVentOn : {false, true, false}) {
+        state->dataHVACGlobal->NightVentOn = nightVentOn;
+        inletNode.MassFlowRateMax = designAirMassFlow;
+        inletNode.MassFlowRateMaxAvail = designAirMassFlow;
+        inletNode.MassFlowRateMinAvail = 0.0;
+        Calc4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut);
+        Real64 const expectedMassFlow = nightVentOn ? nightVentPerf.MaxAirMassFlowRate : designAirMassFlow;
+        EXPECT_NEAR(expectedMassFlow, inletNode.MassFlowRate, 1e-9);
+        EXPECT_NEAR(expectedMassFlow, outletNode.MassFlowRate, 1e-9);
+        EXPECT_NEAR(state->dataLoopNodes->Node(fan->inletNodeNum).MassFlowRate,
+                    state->dataLoopNodes->Node(fan->outletNodeNum).MassFlowRate,
+                    1e-9);
+        Real64 const expectedLoad = expectedMassFlow * PsyCpAirFnW(inletNode.HumRat) * (outletNode.Temp - inletNode.Temp);
+        EXPECT_NEAR(expectedLoad, QUnitOut, 0.01);
+    }
 }
 
 TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
