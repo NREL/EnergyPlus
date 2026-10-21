@@ -24727,12 +24727,18 @@ ElectricEquipment:ITE:LiquidCooled,
        \type object-list
        \object-list CoilCoolingITENames
        \note The specific name of the first cooling component handling physical heat transfer.
+       \note A given coil (its object type and name together) may be referenced by only one ElectricEquipment:ITE:LiquidCooled
+       \note object; referencing the same coil from more than one rack is an input error.
   N5 , \field Cooling Coil 1 Load Fraction
        \type real
        \minimum 0.0
        \maximum 1.0
        \note A static fraction (0.0 to 1.0) of the total IT liquid load directed to this coil.
        \note If this field is used, the Schedule Name field below should be left blank.
+       \note If this is the only active Cooling Coil N slot on this object and neither this field nor the
+       \note schedule below is specified, this coil is assumed to receive the entire liquid load (fraction =
+       \note 1.0). If more than one Cooling Coil N slot is active, one of this field or the schedule below
+       \note must be specified for every active slot.
   A9 , \field Cooling Coil 1 Load Fraction Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -24746,10 +24752,14 @@ ElectricEquipment:ITE:LiquidCooled,
   A11, \field Cooling Coil 2 Name
        \type object-list
        \object-list CoilCoolingITENames
+       \note See the note on Cooling Coil 1 Name: a given coil may be referenced by only one
+       \note ElectricEquipment:ITE:LiquidCooled object.
   N6 , \field Cooling Coil 2 Load Fraction
        \type real
        \minimum 0.0
        \maximum 1.0
+       \note See the note on Cooling Coil 1 Load Fraction for the default (sole active coil) and
+       \note required (multiple active coils) behavior of this field.
   A12, \field Cooling Coil 2 Load Fraction Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -24760,10 +24770,14 @@ ElectricEquipment:ITE:LiquidCooled,
   A14, \field Cooling Coil 3 Name
        \type object-list
        \object-list CoilCoolingITENames
+       \note See the note on Cooling Coil 1 Name: a given coil may be referenced by only one
+       \note ElectricEquipment:ITE:LiquidCooled object.
   N7 , \field Cooling Coil 3 Load Fraction
        \type real
        \minimum 0.0
        \maximum 1.0
+       \note See the note on Cooling Coil 1 Load Fraction for the default (sole active coil) and
+       \note required (multiple active coils) behavior of this field.
   A15, \field Cooling Coil 3 Load Fraction Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -24774,10 +24788,14 @@ ElectricEquipment:ITE:LiquidCooled,
   A17, \field Cooling Coil 4 Name
        \type object-list
        \object-list CoilCoolingITENames
+       \note See the note on Cooling Coil 1 Name: a given coil may be referenced by only one
+       \note ElectricEquipment:ITE:LiquidCooled object.
   N8 , \field Cooling Coil 4 Load Fraction
        \type real
        \minimum 0.0
        \maximum 1.0
+       \note See the note on Cooling Coil 1 Load Fraction for the default (sole active coil) and
+       \note required (multiple active coils) behavior of this field.
   A18, \field Cooling Coil 4 Load Fraction Schedule Name
        \type object-list
        \object-list ScheduleNames
