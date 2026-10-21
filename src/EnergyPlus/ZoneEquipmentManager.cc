@@ -3563,9 +3563,9 @@ bool getZoneEquipmentNightVentStatus(EnergyPlusData &state,
 {
     bool zoneNightVentOn = false;
     if (zoneEquipType == DataZoneEquipment::ZoneEquipType::AirDistributionUnit) {
-        if (zoneCompNum > 0 && zoneCompNum <= state.dataDefineEquipment->AirDistUnit.size()) {
+        if (zoneCompNum > 0 && zoneCompNum <= state.dataDefineEquipment->AirDistUnit.isize()) {
             int const airLoopNum = state.dataDefineEquipment->AirDistUnit(zoneCompNum).AirLoopNum;
-            if (airLoopNum > 0 && airLoopNum <= state.dataAirLoop->AirLoopControlInfo.size()) {
+            if (airLoopNum > 0 && airLoopNum <= state.dataAirLoop->AirLoopControlInfo.isize()) {
                 zoneNightVentOn = state.dataAirLoop->AirLoopControlInfo(airLoopNum).NightVent;
             }
         }
