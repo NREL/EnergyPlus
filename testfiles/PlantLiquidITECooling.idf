@@ -8,8 +8,9 @@
 !                          This file is not intended to represent an actual data center. The building, loads, schedules,
 !                          temperatures and equipment are simplified, and are only meant to exercise the cold plate object.
 !
-! Highlights:              The cold plate is on the demand side of a coolant distribution unit (CDU) loop, which
-!                          circulates a 25% propylene glycol mixture (PG25, defined with FluidProperties:GlycolConcentration).
+! Highlights:              Two cold plates are on the demand side of a coolant distribution unit (CDU) loop,
+!                          on parallel branches. They share the same IT equipment load schedule and availability schedule,
+!                          so each cold plate sees the full schedule. The CDU loop circulates a 25% propylene glycol mixture (PG25, defined with FluidProperties:GlycolConcentration).
 !                          The supply side of the CDU loop has a variable speed pump and a HeatExchanger:FluidToFluid,
 !                          which connects the CDU loop to the Main Loop, a chilled water plant loop served by an
 !                          air-cooled constant COP chiller. The chiller operates in ConstantFlow mode, so the Main Loop
@@ -17,13 +18,17 @@
 !                          which is typical of warm water cooling in liquid-cooled data centers.
 !
 !                          The IT equipment load is represented by a schedule (see the field IT Equipment Load Schedule Name),
-!                          so no ElectricEquipment:ITE:LiquidCooled object is used. The cold plate has an availability
-!                          schedule, and is only available between 08:00 and 20:00 on weekdays. Heat that is not removed by the
-!                          coolant, which includes all of the load while the cold plate is unavailable, is added to the zone.
+!                          so no ElectricEquipment:ITE:LiquidCooled object is used. The cold plates have an availability
+!                          schedule, and are only available between 08:00 and 20:00 on weekdays. Heat that is not removed by the
+!                          coolant, which includes all of the load while a cold plate is unavailable, is added to the zone.
 !                          The zone has no HVAC system, so its temperature floats.
 !
-!                          The flow rates of the cold plate are autosized, based on the Sizing:Plant objects, and the cold
-!                          plate flow is variable to maintain the target case operating temperature.
+!                          The flow rates of the cold plates are autosized, based on the Sizing:Plant objects. Both cold plates
+!                          use the Nominal Flow Rate Sizing Basis MaximumITELoad, so the design load is the maximum value of the
+!                          IT equipment load schedule, limited to the heat a cold plate can transfer at its maximum case
+!                          temperature. The design flow rate of the CDU loop is the sum of the two cold plates. The flow of
+!                          ColdPlate is variable to maintain the target case operating temperature, and ColdPlate2 operates
+!                          in ConstantFlow mode: it requests its nominal flow rate whenever it is available and has a load.
 !
 !                          The thermal resistance modifier curve (Curve:Exponent) was obtained by fitting an exponent curve
 !                          through data published in peer-reviewed sources. It is intended to represent a typical modification
@@ -44,8 +49,8 @@
 ! Floor Area:              232.26 m2
 ! Number of Stories:       1
 !
-! Plant:                   CDU loop (PG25): variable speed pump and heat exchanger on the supply side, cold plate on the
-!                          demand side. Main Loop (water): constant flow chiller and pump on the supply side, heat exchanger
+! Plant:                   CDU loop (PG25): variable speed pump and heat exchanger on the supply side, two cold plates in
+!                          parallel on the demand side. Main Loop (water): constant flow chiller and pump on the supply side, heat exchanger
 !                          on the demand side.
 
   Version,
@@ -286,12 +291,14 @@
   Connector:Splitter,
     CDUDemandSplitter,       !- Name
     CDUDemandInletPipeBranch,  !- Inlet Branch Name
-    ColdPlateBranch;         !- Outlet Branch 1 Name
+    ColdPlateBranch,         !- Outlet Branch 1 Name
+    ColdPlate2Branch;        !- Outlet Branch 2 Name
 
   Connector:Mixer,
     CDUDemandMixer,          !- Name
     CDUDemandOutletBranch,   !- Outlet Branch Name
-    ColdPlateBranch;         !- Inlet Branch 1 Name
+    ColdPlateBranch,         !- Inlet Branch 1 Name
+    ColdPlate2Branch;        !- Inlet Branch 2 Name
 
   Branch,
     ColdPlateBranch,         !- Name
@@ -300,6 +307,14 @@
     ColdPlate,               !- Component 1 Name
     Cold Plate Inlet Node,   !- Component 1 Inlet Node Name
     Cold Plate Outlet Node;  !- Component 1 Outlet Node Name
+
+  Branch,
+    ColdPlate2Branch,        !- Name
+    ,                        !- Pressure Drop Curve Name
+    Coil:Cooling:ITE:Coldplate,  !- Component 1 Object Type
+    ColdPlate2,              !- Component 1 Name
+    Cold Plate 2 Inlet Node, !- Component 1 Inlet Node Name
+    Cold Plate 2 Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CDUDemandOutletBranch,   !- Name
@@ -318,7 +333,8 @@
     CDUDemandBranchList,     !- Name
     CDUDemandInletPipeBranch,  !- Branch 1 Name
     ColdPlateBranch,         !- Branch 2 Name
-    CDUDemandOutletBranch;   !- Branch 3 Name
+    ColdPlate2Branch,        !- Branch 3 Name
+    CDUDemandOutletBranch;   !- Branch 4 Name
 
   PlantLoop,
     Main Loop,               !- Name
@@ -592,7 +608,29 @@
     Zone One,                !- Zone Name
     VariableFlow,            !- Flow Mode
     ColdPlateAuxiliary,      !- End-Use Subcategory
-    ITELoad;                 !- IT Equipment Load Schedule Name
+    ITELoad,                 !- IT Equipment Load Schedule Name
+    1,                       !- Sizing Factor
+    MaximumITELoad;          !- Nominal Flow Rate Sizing Basis
+
+  Coil:Cooling:ITE:ColdPlate,
+    ColdPlate2,              !- Name
+    ColdPlateAvailability,   !- Availability Schedule Name
+    Cold Plate 2 Inlet Node, !- Inlet Node
+    Cold Plate 2 Outlet Node,  !- Outlet Node
+    0.025,                   !- Nominal Thermal Resistance {K/W}
+    85,                      !- Maximum Case Temperature {C}
+    80,                      !- Target Case Operating Temperature {C}
+    ColdPlateThermalResistanceModifier,  !- Thermal Resistance Modifier Curve Name
+    Standard,                !- Thermal Resistance Method
+    autosize,                !- Nominal Liquid Flow Rate {m3/s}
+    autosize,                !- Maximum Liquid Flow Rate {m3/s}
+    30,                      !- Auxiliary Electric Power {W}
+    Zone One,                !- Zone Name
+    ConstantFlow,            !- Flow Mode
+    ColdPlateAuxiliary,      !- End-Use Subcategory
+    ITELoad,                 !- IT Equipment Load Schedule Name
+    1,                       !- Sizing Factor
+    MaximumITELoad;          !- Nominal Flow Rate Sizing Basis
 
   Branch,
     DemandOutletBranch,      !- Name
@@ -935,6 +973,16 @@
 
   Output:Variable,
     Cold Plate Inlet Node,   !- Key Value
+    System Node Mass Flow Rate,  !- Variable Name
+    hourly;                  !- Reporting Frequency
+
+  Output:Variable,
+    Cold Plate 2 Inlet Node, !- Key Value
+    System Node Temperature, !- Variable Name
+    hourly;                  !- Reporting Frequency
+
+  Output:Variable,
+    Cold Plate 2 Inlet Node, !- Key Value
     System Node Mass Flow Rate,  !- Variable Name
     hourly;                  !- Reporting Frequency
 
