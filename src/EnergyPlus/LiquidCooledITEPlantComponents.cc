@@ -187,7 +187,7 @@ void CoilCoolingITEColdPlateData::simulate(EnergyPlusData &state,
         this->heatRemovedByFluidEnergy = 0.0;
         this->zoneHeatGainRate = 0.0;
         this->zoneHeatGainEnergy = 0.0;
-        this->caseTemperature = 0.0;
+        this->caseTemperature = this->targetCaseOperatingTemperature; // the chip starts at the target case operating temperature
         this->outletTemp = state.dataLoopNodes->Node(this->inletNode).Temp;
         this->massFlowRate = 0.0;
         this->auxElecPower = 0.0;
@@ -551,10 +551,9 @@ void CoilCoolingITEColdPlateData::doPhysics(EnergyPlusData &state)
         this->zoneHeatGainRate = zoneGainPerPlate * load; // unmet load goes to zone when unavailable
         this->massFlowRate = 0.0;
         this->effectiveThermalResistance = 0.0;
-        // When there is a load but no active cooling, report the maximum case temperature (same as the zero-flow guard below).
-        // This is a reporting convention, not a prediction: without cooling a real chip would exceed this limit, and there is no
-        // transient chip model (Tc = f(t, load)) to represent the thermal mass or the time taken to heat up.
-        this->caseTemperature = (load > 0.0) ? this->maximumCaseTemperature : 0.0;
+        // The case temperature cannot be computed without cooling or without a load, so the last value is held (the target case operating
+        // temperature at the start of each environment). This is a reporting convention, not a prediction: there is no transient chip
+        // model (Tc = f(t, load)), and the chip is assumed to stay at its last temperature while the heat goes to the zone.
         this->inletTemp = state.dataLoopNodes->Node(this->inletNode).Temp;
         this->outletTemp = this->inletTemp;
         PlantUtilities::SetComponentFlowRate(state, coolantFlow, this->inletNode, this->outletNode, this->plantLoc);
@@ -618,14 +617,11 @@ void CoilCoolingITEColdPlateData::doPhysics(EnergyPlusData &state)
     coolantFlow = plantFlow / plates;
     this->massFlowRate = plantFlow;
 
-    // If the flow is zero, all of the load goes to the zone and the maximum case temperature is reported.
-    // This is a reporting convention, not a prediction: without cooling a real chip would exceed this limit, and there is no
-    // transient chip model (Tc = f(t, load)) to represent the thermal mass or the time taken to heat up.
+    // If the flow is zero, all of the load goes to the zone and the last case temperature is held (see above).
     if (coolantFlow <= 0.0) {
         this->heatRemovedByFluid = 0.0;
         this->zoneHeatGainRate = zoneGainPerPlate * load;
         this->effectiveThermalResistance = 0.0;
-        this->caseTemperature = this->maximumCaseTemperature;
         this->outletTemp = coolantInletTemp;
         return;
     }

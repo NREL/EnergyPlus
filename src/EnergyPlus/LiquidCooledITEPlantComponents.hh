@@ -134,7 +134,7 @@ namespace LiquidCooledITEPlantComponents {
         Real64 heatRemovedByFluidEnergy = 0.0;   // [J]
         Real64 zoneHeatGainRate = 0.0;           // unmet load returned to zone heat balance, per copy of the zone [W]
         Real64 zoneHeatGainEnergy = 0.0;         // [J]
-        Real64 caseTemperature = 0.0;            // computed chip case temperature [C]
+        Real64 caseTemperature = 0.0;            // chip case temperature, held when it cannot be computed (no load or no cooling) [C]
         Real64 inletTemp = 0.0;                  // coolant inlet temperature [C]
         Real64 outletTemp = 0.0;                 // coolant outlet temperature [C]
         Real64 massFlowRate = 0.0;               // coolant mass flow rate, all plates [kg/s]

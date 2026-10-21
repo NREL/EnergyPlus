@@ -9691,7 +9691,7 @@ These outputs are the rate and the amount of heat that is not removed by the coo
 
 \paragraph{Coil Cooling ITE Cold Plate Case Temperature {[}C{]}}\label{coil-cooling-ite-cold-plate-case-temperature-c}
 
-This output is the chip case temperature, in $^\circ$C. It is calculated from the coolant inlet temperature, the heat removed by the coolant, the effective thermal resistance, and the coolant flow. When there is an IT load but the cold plate is not available or there is no flow, the \emph{Maximum Case Temperature} is reported, since the model has no transient chip temperature model. When there is no IT load, the reported value is 0.
+This output is the chip case temperature, in $^\circ$C. It is calculated from the coolant inlet temperature, the heat removed by the coolant, the effective thermal resistance, and the coolant flow. When there is no IT load, or when the cold plate is not available or there is no flow, the case temperature cannot be calculated and the last value is reported. This is a convention, not a prediction, because the model has no transient chip temperature model: the chip is assumed to stay at its last temperature while the heat is added to the zone. At the start of each environment the \emph{Target Case Operating Temperature} is reported.
 
 \paragraph{Coil Cooling ITE Cold Plate Inlet Temperature {[}C{]}}\label{coil-cooling-ite-cold-plate-inlet-temperature-c}
 
