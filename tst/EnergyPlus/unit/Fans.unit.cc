@@ -541,63 +541,83 @@ TEST_F(EnergyPlusFixture, Fans_NightVentilationCapsAvailableFlow)
 
 TEST_F(EnergyPlusFixture, Fans_NightVentilationAirLoopFlowContinuity)
 {
-    // A 0.75 kg/s fan cap must make ResolveSysFlow reduce a 1.0 kg/s loop inlet before the fan is resimulated.
-    Fans::FanComponent fan;
-    configureNightVentFan(*state, fan, HVAC::FanType::Constant);
-    fan.sizingFlag = false;
-    fan.envrnFlag = false;
-    fan.minAirMassFlowRate = 1.0;
-    fan.inletNodeNum = 1;
-    fan.outletNodeNum = 2;
+    auto checkFlowContinuity = [&](HVAC::FanType type) {
+        Fans::FanComponent fan;
+        configureNightVentFan(*state, fan, type);
+        fan.sizingFlag = false;
+        fan.envrnFlag = false;
+        fan.minAirMassFlowRate = 1.0;
+        fan.inletNodeNum = 1;
+        fan.outletNodeNum = 2;
 
-    // Model one branch containing the fan, with the air-loop inlet initially requesting 1.0 kg/s.
-    state->dataLoopNodes->Node.allocate(2);
-    auto &inletNode = state->dataLoopNodes->Node(1);
-    inletNode.MassFlowRate = 1.0;
-    inletNode.MassFlowRateMaxAvail = 2.0;
+        // Model one branch containing the fan, with the air-loop inlet initially requesting 1.0 kg/s.
+        state->dataLoopNodes->Node.allocate(2);
+        auto &inletNode = state->dataLoopNodes->Node(1);
+        inletNode.MassFlowRate = 1.0;
+        inletNode.MassFlowRateMaxAvail = 2.0;
 
-    auto &outletNode = state->dataLoopNodes->Node(2);
-    outletNode.MassFlowRateMax = 2.0;
-    outletNode.MassFlowRateMaxAvail = 2.0;
+        auto &outletNode = state->dataLoopNodes->Node(2);
+        outletNode.MassFlowRateMax = 2.0;
+        outletNode.MassFlowRateMaxAvail = 2.0;
 
-    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
-    auto &airLoop = state->dataAirSystemsData->PrimaryAirSystems(1);
-    airLoop.NumBranches = 1;
-    airLoop.NumInletBranches = 1;
-    airLoop.InletBranchNum[0] = 1;
-    airLoop.Branch.allocate(1);
-    auto &branch = airLoop.Branch(1);
-    branch.NodeNumIn = 1;
-    branch.NodeNumOut = 2;
-    branch.TotalNodes = 2;
-    branch.NodeNum.allocate(2);
-    branch.NodeNum(1) = 1;
-    branch.NodeNum(2) = 2;
+        state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+        auto &airLoop = state->dataAirSystemsData->PrimaryAirSystems(1);
+        airLoop.NumBranches = 1;
+        airLoop.NumInletBranches = 1;
+        airLoop.InletBranchNum[0] = 1;
+        airLoop.Branch.allocate(1);
+        auto &branch = airLoop.Branch(1);
+        branch.NodeNumIn = 1;
+        branch.NodeNumOut = 2;
+        branch.TotalNodes = 2;
+        branch.NodeNum.allocate(2);
+        branch.NodeNum(1) = 1;
+        branch.NodeNum(2) = 2;
 
-    state->dataAirLoop->AirLoopControlInfo.allocate(1);
-    state->dataAirLoop->AirLoopFlow.allocate(1);
+        state->dataAirLoop->AirLoopControlInfo.allocate(1);
+        state->dataAirLoop->AirLoopFlow.allocate(1);
 
-    // First pass caps fan outlet flow, leaving the loop inlet temporarily above the cap.
-    fan.init(*state);
-    fan.simulateConstant(*state);
-    fan.update(*state);
-    EXPECT_DOUBLE_EQ(0.75, outletNode.MassFlowRate);
+        auto simulateFan = [&]() {
+            fan.init(*state);
+            switch (type) {
+            case HVAC::FanType::Constant:
+                fan.simulateConstant(*state);
+                break;
+            case HVAC::FanType::OnOff:
+                fan.simulateOnOff(*state);
+                break;
+            case HVAC::FanType::VAV:
+                fan.simulateVAV(*state);
+                break;
+            default:
+                FAIL() << "Unexpected fan type for air-loop flow continuity";
+            }
+            fan.update(*state);
+        };
 
-    // The resolver propagates the branch limit to the inlet and clamps its flow for resimulation.
-    bool systemResimulationNeeded = false;
-    SimAirServingZones::ResolveSysFlow(*state, 1, systemResimulationNeeded);
+        // First pass caps fan outlet flow, leaving the loop inlet temporarily above the cap.
+        simulateFan();
+        EXPECT_DOUBLE_EQ(0.75, outletNode.MassFlowRate);
 
-    ASSERT_TRUE(systemResimulationNeeded);
-    EXPECT_DOUBLE_EQ(0.75, inletNode.MassFlowRate);
-    EXPECT_DOUBLE_EQ(0.75, inletNode.MassFlowRateMaxAvail);
+        // The resolver propagates the branch limit to the inlet and clamps its flow for resimulation.
+        bool systemResimulationNeeded = false;
+        SimAirServingZones::ResolveSysFlow(*state, 1, systemResimulationNeeded);
 
-    // On the next pass, both ends of the fan branch must carry the resolved flow.
-    fan.init(*state);
-    fan.simulateConstant(*state);
-    fan.update(*state);
+        ASSERT_TRUE(systemResimulationNeeded);
+        EXPECT_DOUBLE_EQ(0.75, inletNode.MassFlowRate);
+        EXPECT_DOUBLE_EQ(0.75, inletNode.MassFlowRateMaxAvail);
 
-    EXPECT_DOUBLE_EQ(0.75, inletNode.MassFlowRate);
-    EXPECT_DOUBLE_EQ(0.75, outletNode.MassFlowRate);
+        // On the next pass, both ends of the fan branch must carry the resolved flow.
+        simulateFan();
+
+        EXPECT_DOUBLE_EQ(0.75, inletNode.MassFlowRate);
+        EXPECT_DOUBLE_EQ(0.75, outletNode.MassFlowRate);
+    };
+
+    checkFlowContinuity(HVAC::FanType::Constant);
+    checkFlowContinuity(HVAC::FanType::OnOff);
+    checkFlowContinuity(HVAC::FanType::VAV);
+    // Fan:ZoneExhaust is zone equipment and does not participate in the primary air-loop flow-resolver path tested here.
 }
 
 TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)

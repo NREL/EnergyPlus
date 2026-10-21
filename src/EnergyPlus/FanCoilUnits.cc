@@ -3233,8 +3233,7 @@ namespace FanCoilUnits {
             auto const *fan = dynamic_cast<Fans::FanComponent const *>(state.dataFans->fans(fanCoil.FanIndex));
             if (fan != nullptr && fan->nightVentPerfNum > 0) {
                 auto &inletNode = state.dataLoopNodes->Node(InletNode);
-                inletNode.MassFlowRate = min(inletNode.MassFlowRate,
-                                            state.dataFans->NightVentPerf(fan->nightVentPerfNum).MaxAirMassFlowRate);
+                inletNode.MassFlowRate = min(inletNode.MassFlowRate, state.dataFans->NightVentPerf(fan->nightVentPerfNum).MaxAirMassFlowRate);
             }
         }
 

@@ -1169,9 +1169,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
         Real64 const expectedMassFlow = nightVentOn ? nightVentPerf.MaxAirMassFlowRate : designAirMassFlow;
         EXPECT_NEAR(expectedMassFlow, inletNode.MassFlowRate, 1e-9);
         EXPECT_NEAR(expectedMassFlow, outletNode.MassFlowRate, 1e-9);
-        EXPECT_NEAR(state->dataLoopNodes->Node(fan->inletNodeNum).MassFlowRate,
-                    state->dataLoopNodes->Node(fan->outletNodeNum).MassFlowRate,
-                    1e-9);
+        EXPECT_NEAR(state->dataLoopNodes->Node(fan->inletNodeNum).MassFlowRate, state->dataLoopNodes->Node(fan->outletNodeNum).MassFlowRate, 1e-9);
         Real64 const expectedLoad = expectedMassFlow * PsyCpAirFnW(inletNode.HumRat) * (outletNode.Temp - inletNode.Temp);
         EXPECT_NEAR(expectedLoad, QUnitOut, 0.01);
     }
