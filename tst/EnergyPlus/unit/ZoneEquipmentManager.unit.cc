@@ -6201,4 +6201,3 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ADUUsesConnectedLoopNightVentilat
     state->dataDefineEquipment->AirDistUnit(1).AirLoopNum = 0;
     EXPECT_FALSE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(*state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 1, false));
 }
-
