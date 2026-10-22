@@ -1066,7 +1066,9 @@ namespace ThermalComfort {
             // Beginning of dripping (Sweat not evaporated on skin surface)
             if (s_tc->SkinWetTot >= EvapEff) {
                 s_tc->SkinWetTot = EvapEff;
-                s_tc->SkinWetSweat = EvapEff / 0.94;
+                // Invert SkinWetTot = SkinWetSweat + SkinWetDiff = SkinWetSweat + (1 - SkinWetSweat) * 0.06 = 0.06 + 0.94 * SkinWetSweat, so
+                // that EvapHeatLoss below equals SkinWetTot * EvapHeatLossMax (Gagge et al. 1986: prsw=(eveff-.06)/.94)
+                s_tc->SkinWetSweat = (s_tc->SkinWetTot - 0.06) / 0.94;
                 s_tc->EvapHeatLossRegSweat = s_tc->SkinWetSweat * s_tc->EvapHeatLossMax;
                 s_tc->SkinWetDiff = (1.0 - s_tc->SkinWetSweat) * 0.06;
                 s_tc->EvapHeatLossDiff = s_tc->SkinWetDiff * s_tc->EvapHeatLossMax;
