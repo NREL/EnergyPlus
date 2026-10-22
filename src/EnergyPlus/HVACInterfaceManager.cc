@@ -562,8 +562,7 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
             flow_supply_to_demand_tol[0] = std::abs(supplyOutletMdot - demandInletMdot);
             // relative tolerance so small loops (e.g., DHW) still resimulate the demand side
             Real64 const flowToler = std::min(DataConvergParams::PlantFlowRateToler,
-                                              std::max(DataBranchAirLoopPlant::MassFlowTolerance,
-                                                       DataConvergParams::PlantFlowRateRelToler * std::max(supplyOutletMdot, demandInletMdot)));
+                                              DataConvergParams::PlantFlowRateRelToler * std::max(supplyOutletMdot, demandInletMdot));
             if (flow_supply_to_demand_tol[0] > flowToler) {
                 convergence.PlantMassFlowNotConverged = true;
             }

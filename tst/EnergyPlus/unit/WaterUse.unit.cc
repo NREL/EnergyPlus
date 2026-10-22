@@ -1741,9 +1741,10 @@ TEST_F(EnergyPlusFixture, WaterUse_calcH2ODensity_Test)
     EXPECT_FALSE(state->dataWaterUse->calcRhoH2O);
 }
 
+// Verifies that WaterUse:Connections reports the hot-water flow actually delivered by a locked plant loop,
+// while cold-water makeup preserves the requested total fixture flow.
 TEST_F(EnergyPlusFixture, WaterUse_ConnectionsHotFlowWhenPlantLimitsFlow)
 {
-    // https://github.com/NatLabRockies/OpenStudio-HPXML/issues/2187
     state->init_state(*state);
 
     state->dataLoopNodes->Node.allocate(2);

@@ -195,9 +195,10 @@ TEST_F(EnergyPlusFixture, UpdateHVACInterface_Test)
     EXPECT_TRUE(state->dataConvergeParams->AirLoopConvergence(1).HVACGenContamNotConverged[2]);
 }
 
+// Verifies that supply-demand flow mismatches trigger resimulation for DHW-sized and near-zero flows,
+// while the same 0.0007 kg/s mismatch is accepted on a large loop.
 TEST_F(EnergyPlusFixture, UpdatePlantLoopInterface_SmallLoopFlowChangeResimulatesDemandSide)
 {
-    // https://github.com/NatLabRockies/OpenStudio-HPXML/issues/2187
     state->init_state(*state);
     state->dataHVACGlobal->TimeStepSys = 1;
     state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::rSecsInHour;
@@ -233,6 +234,14 @@ TEST_F(EnergyPlusFixture, UpdatePlantLoopInterface_SmallLoopFlowChangeResimulate
         *state, supplySide, supplyOutletNode, demandInletNode, resimDemandSide, DataPlant::CommonPipeType::No);
     EXPECT_TRUE(resimDemandSide);
     EXPECT_NEAR(state->dataLoopNodes->Node(demandInletNode).MassFlowRate, 0.0025, 1.0e-10);
+
+    // A flow below 1e-7 kg/s still uses the relative tolerance rather than an absolute floor
+    state->dataLoopNodes->Node(supplyOutletNode).MassFlowRate = 1.02e-8;
+    state->dataLoopNodes->Node(demandInletNode).MassFlowRate = 1.0e-8;
+    resimDemandSide = false;
+    HVACInterfaceManager::UpdatePlantLoopInterface(
+        *state, supplySide, supplyOutletNode, demandInletNode, resimDemandSide, DataPlant::CommonPipeType::No);
+    EXPECT_TRUE(resimDemandSide);
 
     // The same absolute difference on a large loop is still considered converged
     state->dataLoopNodes->Node(supplyOutletNode).MassFlowRate = 10.0007;
