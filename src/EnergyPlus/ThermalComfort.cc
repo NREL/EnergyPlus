@@ -1295,14 +1295,39 @@ namespace ThermalComfort {
                    SET;
         };
 
-        Real64 constexpr Acc = 0.01; // Accuracy of the SET match [C]
-        int constexpr MaxIte = 100;
-        Real64 constexpr lowerBound = 0.0;
-        Real64 constexpr upperBound = 50.0;
-        int SolFla = 0;
+        // Bisection on the bracket width: SET is not smooth in x at warm conditions (it jumps by a few tenths of a degree), so
+        // a solver that converges on |f(x)| (e.g. General::SolveRoot) can fail to find a point within tolerance
+        Real64 constexpr Tol = 0.01; // Width of the final bracket [deltaC]
+        int constexpr MaxIte = 200;
+        Real64 lowerBound = 0.0;
+        Real64 upperBound = 50.0;
+        Real64 fLower = ce_root_function(lowerBound);
+        Real64 const fUpper = ce_root_function(upperBound);
+        bool solved = true;
+        if (fLower == 0.0) {
+            upperBound = lowerBound;
+        } else if (fUpper == 0.0) {
+            lowerBound = upperBound;
+        } else if (fLower * fUpper > 0.0) {
+            solved = false;
+        } else {
+            for (int iter = 0; iter < MaxIte && (upperBound - lowerBound) > Tol; ++iter) {
+                Real64 const mid = (lowerBound + upperBound) / 2.0;
+                Real64 const fMid = ce_root_function(mid);
+                if (fMid == 0.0) {
+                    lowerBound = upperBound = mid;
+                } else if ((fMid < 0.0) != (fLower < 0.0)) {
+                    upperBound = mid;
+                } else {
+                    lowerBound = mid;
+                    fLower = fMid;
+                }
+            }
+        }
 
-        General::SolveRoot(state, Acc, MaxIte, SolFla, CoolingEffect, ce_root_function, lowerBound, upperBound);
-        if (SolFla < 0) {
+        if (solved) {
+            CoolingEffect = (lowerBound + upperBound) / 2.0;
+        } else {
             ShowRecurringWarningErrorAtEnd(state,
                                            "The cooling effect could not be solved for People=\"" + people.Name + "\"" +
                                                "As a result, no cooling effect will be applied to adjust the PMV and PPD results.",
