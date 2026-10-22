@@ -1297,13 +1297,13 @@ namespace ThermalComfort {
                    SET;
         };
 
-        Real64 constexpr Acc = 0.01; // Accuracy of the SET match [C]
+        Real64 constexpr tempAccuracy = 0.001; // Accuracy of the SET match [deltaC]
         int constexpr MaxIte = 100;
         Real64 constexpr lowerBound = 0.0;
         Real64 constexpr upperBound = 50.0;
         int SolFla = 0;
 
-        General::SolveRoot(state, Acc, MaxIte, SolFla, CoolingEffect, ce_root_function, lowerBound, upperBound);
+        General::SolveRoot(state, tempAccuracy, MaxIte, SolFla, CoolingEffect, ce_root_function, lowerBound, upperBound);
         if (SolFla < 0) {
             ShowRecurringWarningErrorAtEnd(state,
                                            "The cooling effect could not be solved for People=\"" + people.Name + "\"" +
