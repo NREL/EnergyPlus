@@ -812,9 +812,9 @@ Fan:OnOff,
 
 \subsection{FanPerformance:NightVentilation}\label{fanperformancenightventilation}
 
-This object specifies alternate performance parameters for a fan when night ventilation is active. It can be used with \hyperref[fanconstantvolume]{Fan:ConstantVolume}, \hyperref[fanvariablevolume]{Fan:VariableVolume}, \hyperref[fanzoneexhaust]{Fan:ZoneExhaust}, and \hyperref[fanonoff]{Fan:OnOff} fans, but not with \hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fancomponentmodel]{Fan:ComponentModel} fans. \hyperref[fansystemmodel]{Fan:SystemModel} has its own built-in night-ventilation settings.
+This object specifies alternate performance parameters for a fan when night ventilation is active. It can be used with \hyperref[fanconstantvolume]{Fan:ConstantVolume}, \hyperref[fanvariablevolume]{Fan:VariableVolume}, \hyperref[fanzoneexhaust]{Fan:ZoneExhaust}, and \hyperref[fanonoff]{Fan:OnOff} fans, but not with \hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fancomponentmodel]{Fan:ComponentModel} fans. Fan:SystemModel has separate night-ventilation inputs, but its Night Ventilation Mode Flow Fraction field currently has no effect.
 
-For zone equipment other than air distribution units, night-ventilation mode is determined by that component's own AvailabilityManager:NightVentilation status. An air distribution unit follows the status of its connected air loop. A coupled \hyperref[fanzoneexhaust]{Fan:ZoneExhaust} follows an air loop serving its zone; a decoupled exhaust fan does not enter night-ventilation mode. \hyperref[fansystemmodel]{Fan:SystemModel} uses its built-in night-ventilation settings when the scoped night-ventilation state is active.
+For zone equipment other than air distribution units, night-ventilation mode is determined by that component's own AvailabilityManager:NightVentilation status. An air distribution unit follows the status of its connected air loop. A coupled \hyperref[fanzoneexhaust]{Fan:ZoneExhaust} follows an air loop serving its zone; a decoupled exhaust fan does not enter night-ventilation mode.
 
 For \hyperref[fanzoneexhaust]{Fan:ZoneExhaust}, alternate performance is used only when the fan is coupled to an air loop that is in night-ventilation mode. Decoupled zone exhaust fans do not enter night-ventilation mode.
 
