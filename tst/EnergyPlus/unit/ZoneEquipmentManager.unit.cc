@@ -5571,6 +5571,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_LatentSizingPropagatesOutdoorPeak
     EXPECT_EQ(0.004, designDaySizing.OutHumRatAtHeatPeak);
 }
 
+// Verify an ADU follows only its connected air loop's night state, including reversed and disconnected cases.
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ADUUsesConnectedLoopNightVentilation)
 {
     state->init_state(*state);
@@ -5599,6 +5600,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ADUUsesConnectedLoopNightVentilat
     EXPECT_FALSE(getZoneEquipmentNightVentStatus(*state, DataZoneEquipment::ZoneEquipType::AirDistributionUnit, 1, false));
 }
 
+// Verify coupled ZoneExhaust fans follow their serving loop, decoupled fans ignore it, and global state is restored.
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneExhaustFanNightVentUsesServingAirLoop)
 {
     // Each zone has its own exhaust fan and serving air loop; only zone 1's loop is initially night ventilating.
@@ -6189,6 +6191,7 @@ void runZoneFanNightVentTest(EnergyPlus::EnergyPlusData &state)
     zoneEquipList2ForCapture.compPointer[equipPtr] = savedComponent2;
 }
 
+// Verify a UnitHeater OnOff fan follows its own night manager rather than stale global night mode.
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneOnOffFanUsesComponentNightVentilation)
 {
     ASSERT_TRUE(process_idf(delimited_string(zoneFanNightVentInputs("Fan:OnOff"))));
@@ -6196,6 +6199,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneOnOffFanUsesComponentNightVen
     runZoneFanNightVentTest(*state);
 }
 
+// Verify a UnitHeater VAV fan follows its own night manager rather than stale global night mode.
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneVariableVolumeFanUsesComponentNightVentilation)
 {
     ASSERT_TRUE(process_idf(delimited_string(zoneFanNightVentInputs("Fan:VariableVolume"))));
@@ -6203,6 +6207,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneVariableVolumeFanUsesComponen
     runZoneFanNightVentTest(*state);
 }
 
+// Verify a UnitHeater ConstantVolume fan follows its own night manager rather than stale global night mode.
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneConstantVolumeFanUsesComponentNightVentilation)
 {
     ASSERT_TRUE(process_idf(delimited_string(zoneFanNightVentInputs("Fan:ConstantVolume"))));

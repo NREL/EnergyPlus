@@ -249,6 +249,7 @@ TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
     EXPECT_DOUBLE_EQ(Result2_FanPower, fan1->totalPower); // expects zero
 }
 
+// Verify alternate night performance across ConstantVolume, VAV, OnOff, and ZoneExhaust fan models.
 TEST_F(EnergyPlusFixture, Fans_NightVentilationPerformanceAcrossFanTypes)
 {
     // Alternate night performance changes fan pressure, efficiency, and heat without limiting requested airflow.
@@ -336,6 +337,7 @@ TEST_F(EnergyPlusFixture, Fans_NightVentilationPerformanceAcrossFanTypes)
     EXPECT_DOUBLE_EQ(125.0, exhaustFan->powerLossToAir);
 }
 
+// Verify fouled-filter pressure scaling uses the selected night pressure when night mode is active.
 TEST_F(EnergyPlusFixture, Fans_NightVentilationFouledFilterUsesNightPressure)
 {
     state->init_state(*state);
@@ -401,4 +403,44 @@ TEST_F(EnergyPlusFixture, Fans_NightVentilationFouledFilterUsesNightPressure)
         EXPECT_NEAR(0.9, fan.outletAirMassFlowRate, 0.005);
         EXPECT_NEAR(fan.outletAirMassFlowRate * 550.0 / 0.5, fan.totalPower, 0.01);
     }
+}
+
+// Verify the VAV low-flow heat fallback preserves fixed-speed night power instead of using normal part-load coefficients.
+TEST_F(EnergyPlusFixture, Fans_VAVNightVentilationLowFlowFallbackUsesFixedSpeedPower)
+{
+    state->init_state(*state);
+    state->dataEnvrn->StdRhoAir = 1.0;
+    state->dataHVACGlobal->NightVentOn = true;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataFans->NightVentPerf.allocate(1);
+    auto &nightVentPerf = state->dataFans->NightVentPerf(1);
+    nightVentPerf.DeltaPress = 100.0;
+    nightVentPerf.FanEff = 0.5;
+    nightVentPerf.MotEff = 1.0;
+    nightVentPerf.MotInAirFrac = 1.0;
+
+    Fans::FanComponent fan;
+    fan.Name = "Low Flow Night Vent VAV Fan";
+    fan.type = HVAC::FanType::VAV;
+    fan.availSched = Sched::GetScheduleAlwaysOff(*state);
+    fan.maxAirFlowRate = 1.0;
+    fan.maxAirMassFlowRate = 1.0;
+    fan.minAirFlowRate = 0.0;
+    fan.inletAirMassFlowRate = 0.005;
+    fan.inletAirTemp = 20.0;
+    fan.inletAirHumRat = 0.008;
+    fan.inletAirEnthalpy = 40000.0;
+    fan.rhoAirStdInit = 1.0;
+    fan.deltaPress = 300.0;
+    fan.totalEff = 0.6;
+    fan.motorEff = 1.0;
+    fan.motorInAirFrac = 1.0;
+    fan.nightVentPerfNum = 1;
+    fan.coeffs = {0.25, 0.0, 0.0, 0.0, 0.0};
+
+    fan.simulateVAV(*state);
+
+    EXPECT_DOUBLE_EQ(0.005, fan.outletAirMassFlowRate);
+    EXPECT_NEAR(10.0, fan.totalPower, 0.0001);
 }
