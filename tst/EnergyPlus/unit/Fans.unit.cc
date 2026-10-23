@@ -52,11 +52,14 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataSizing;
@@ -244,4 +247,200 @@ TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
     fan1->simulateVAV(*state);
     Real64 Result2_FanPower = max(0.0, PartLoadFrac * fan1->maxAirMassFlowRate * fan1->EMSPressureValue / (fan1->totalEff * fan1->rhoAirStdInit));
     EXPECT_DOUBLE_EQ(Result2_FanPower, fan1->totalPower); // expects zero
+}
+
+// Verify alternate night performance across ConstantVolume, VAV, OnOff, and ZoneExhaust fan models.
+TEST_F(EnergyPlusFixture, Fans_NightVentilationPerformanceAcrossFanTypes)
+{
+    // Alternate night performance changes fan pressure, efficiency, and heat without limiting requested airflow.
+    state->init_state(*state);
+    state->dataEnvrn->StdRhoAir = 1.0;
+    state->dataHVACGlobal->NightVentOn = true;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
+    state->dataFans->NightVentPerf.allocate(1);
+    auto &nightVentPerf = state->dataFans->NightVentPerf(1);
+    nightVentPerf.DeltaPress = 100.0;
+    nightVentPerf.FanEff = 0.5;
+    nightVentPerf.MotEff = 0.6;
+    nightVentPerf.MotInAirFrac = 0.25;
+
+    auto configureFan = [&](HVAC::FanType type) {
+        auto fan = std::make_unique<Fans::FanComponent>();
+        fan->Name = "Night Vent Fan";
+        fan->type = type;
+        fan->availSched = Sched::GetScheduleAlwaysOff(*state);
+        fan->maxAirFlowRate = 1.0;
+        fan->maxAirMassFlowRate = 1.0;
+        fan->inletAirMassFlowRate = 1.0;
+        fan->rhoAirStdInit = 1.0;
+        fan->deltaPress = 300.0;
+        fan->totalEff = 0.7;
+        fan->motorEff = 0.9;
+        fan->motorInAirFrac = 1.0;
+        fan->nightVentPerfNum = 1;
+        return fan;
+    };
+
+    // Constant-volume flow remains at its 1.0 kg/s request while night power uses the alternate settings.
+    auto constantFan = configureFan(HVAC::FanType::Constant);
+    constantFan->simulateConstant(*state);
+    EXPECT_DOUBLE_EQ(1.0, constantFan->outletAirMassFlowRate);
+    EXPECT_DOUBLE_EQ(200.0, constantFan->totalPower);
+    EXPECT_DOUBLE_EQ(140.0, constantFan->powerLossToAir);
+
+    auto variableFan = configureFan(HVAC::FanType::VAV);
+    variableFan->coeffs = {0.25, 0.0, 0.0, 0.0, 0.0};
+    // Night ventilation assumes fixed speed, so it must bypass the normal VAV part-load power curve.
+    variableFan->simulateVAV(*state);
+    EXPECT_DOUBLE_EQ(1.0, variableFan->outletAirMassFlowRate);
+    EXPECT_DOUBLE_EQ(200.0, variableFan->totalPower);
+    EXPECT_DOUBLE_EQ(140.0, variableFan->powerLossToAir);
+
+    auto onOffFan = configureFan(HVAC::FanType::OnOff);
+    auto *powerRatioCurve = Curve::AddCurve(*state, "Night Vent Power Ratio");
+    powerRatioCurve->curveType = Curve::CurveType::Quadratic;
+    powerRatioCurve->coeff[0] = 0.5;
+    powerRatioCurve->inputLimits[0].min = 0.0;
+    powerRatioCurve->inputLimits[0].max = 1.0;
+    onOffFan->powerRatioAtSpeedRatioCurveNum = powerRatioCurve->Num;
+
+    auto *efficiencyRatioCurve = Curve::AddCurve(*state, "Night Vent Efficiency Ratio");
+    efficiencyRatioCurve->curveType = Curve::CurveType::Quadratic;
+    efficiencyRatioCurve->coeff[0] = 0.8;
+    efficiencyRatioCurve->inputLimits[0].min = 0.0;
+    efficiencyRatioCurve->inputLimits[0].max = 1.0;
+    onOffFan->effRatioCurveNum = efficiencyRatioCurve->Num;
+
+    // Normal operation must continue to apply the parent speed ratio and its curves.
+    state->dataHVACGlobal->NightVentOn = false;
+    onOffFan->simulateOnOff(*state, 0.5);
+    Real64 constexpr normalPowerBeforeCurves = 300.0 / 0.7;
+    EXPECT_DOUBLE_EQ(1.0, onOffFan->outletAirMassFlowRate);
+    EXPECT_NEAR(normalPowerBeforeCurves * 0.5 / 0.8, onOffFan->totalPower, 0.0001);
+    EXPECT_DOUBLE_EQ(onOffFan->totalPower, onOffFan->powerLossToAir);
+
+    // Night ventilation is fixed-speed, so the parent speed ratio and curves must not modify night power.
+    state->dataHVACGlobal->NightVentOn = true;
+    onOffFan->simulateOnOff(*state, 0.5);
+    EXPECT_DOUBLE_EQ(1.0, onOffFan->outletAirMassFlowRate);
+    EXPECT_DOUBLE_EQ(200.0, onOffFan->totalPower);
+    EXPECT_DOUBLE_EQ(140.0, onOffFan->powerLossToAir);
+
+    auto exhaustFan = configureFan(HVAC::FanType::Exhaust);
+    exhaustFan->availManagerMode = Fans::AvailManagerMode::Coupled;
+    exhaustFan->simulateZoneExhaust(*state);
+    // Zone exhaust fan heat uses air power; its night motor efficiency does not alter the heat calculation.
+    EXPECT_DOUBLE_EQ(1.0, exhaustFan->outletAirMassFlowRate);
+    EXPECT_DOUBLE_EQ(200.0, exhaustFan->totalPower);
+    EXPECT_DOUBLE_EQ(125.0, exhaustFan->powerLossToAir);
+}
+
+// Verify fouled-filter pressure scaling uses the selected night pressure when night mode is active.
+TEST_F(EnergyPlusFixture, Fans_NightVentilationFouledFilterUsesNightPressure)
+{
+    state->init_state(*state);
+    state->dataEnvrn->StdRhoAir = 1.0;
+    state->dataHVACGlobal->NightVentOn = true;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataFans->NightVentPerf.allocate(1);
+    auto &nightVentPerf = state->dataFans->NightVentPerf(1);
+    nightVentPerf.DeltaPress = 500.0;
+    nightVentPerf.FanEff = 0.5;
+    nightVentPerf.MotEff = 0.9;
+    nightVentPerf.MotInAirFrac = 1.0;
+
+    auto *fanCurve = Curve::AddCurve(*state, "Night Pressure Fan Curve");
+    fanCurve->curveType = Curve::CurveType::Quadratic;
+    fanCurve->coeff[0] = 1000.0;
+    fanCurve->coeff[1] = -500.0;
+    fanCurve->inputLimits[0].min = 0.0;
+    fanCurve->inputLimits[0].max = 1.0;
+
+    Sched::ScheduleConstant faultAvailableSchedule;
+    faultAvailableSchedule.currentVal = 1.0;
+    Sched::ScheduleConstant pressureFractionSchedule;
+    pressureFractionSchedule.currentVal = 1.1;
+    state->dataFaultsMgr->FaultsFouledAirFilters.allocate(1);
+    auto &fault = state->dataFaultsMgr->FaultsFouledAirFilters(1);
+    fault.availSched = &faultAvailableSchedule;
+    fault.pressFracSched = &pressureFractionSchedule;
+    fault.fanCurveNum = fanCurve->Num;
+
+    for (HVAC::FanType const fanType : {HVAC::FanType::Constant, HVAC::FanType::VAV, HVAC::FanType::OnOff}) {
+        Fans::FanComponent fan;
+        fan.Name = "Night Vent Fan";
+        fan.type = fanType;
+        fan.availSched = Sched::GetScheduleAlwaysOff(*state);
+        fan.maxAirFlowRate = 1.0;
+        fan.maxAirMassFlowRate = 1.0;
+        fan.inletAirMassFlowRate = 1.0;
+        fan.rhoAirStdInit = 1.0;
+        fan.deltaPress = 300.0;
+        fan.totalEff = 0.6;
+        fan.motorEff = 0.9;
+        fan.motorInAirFrac = 1.0;
+        fan.nightVentPerfNum = 1;
+        fan.faultyFilterFlag = true;
+        fan.faultyFilterIndex = 1;
+
+        switch (fanType) {
+        case HVAC::FanType::Constant:
+            fan.simulateConstant(*state);
+            break;
+        case HVAC::FanType::VAV:
+            fan.simulateVAV(*state);
+            break;
+        case HVAC::FanType::OnOff:
+            fan.simulateOnOff(*state);
+            break;
+        default:
+            FAIL() << "Unexpected fan type in night fouled-filter test";
+        }
+
+        EXPECT_NEAR(0.9, fan.outletAirMassFlowRate, 0.005);
+        EXPECT_NEAR(fan.outletAirMassFlowRate * 550.0 / 0.5, fan.totalPower, 0.01);
+    }
+}
+
+// Verify the VAV low-flow heat fallback preserves fixed-speed night power instead of using normal part-load coefficients.
+TEST_F(EnergyPlusFixture, Fans_VAVNightVentilationLowFlowFallbackUsesFixedSpeedPower)
+{
+    state->init_state(*state);
+    state->dataEnvrn->StdRhoAir = 1.0;
+    state->dataHVACGlobal->NightVentOn = true;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataFans->NightVentPerf.allocate(1);
+    auto &nightVentPerf = state->dataFans->NightVentPerf(1);
+    nightVentPerf.DeltaPress = 100.0;
+    nightVentPerf.FanEff = 0.5;
+    nightVentPerf.MotEff = 1.0;
+    nightVentPerf.MotInAirFrac = 1.0;
+
+    Fans::FanComponent fan;
+    fan.Name = "Low Flow Night Vent VAV Fan";
+    fan.type = HVAC::FanType::VAV;
+    fan.availSched = Sched::GetScheduleAlwaysOff(*state);
+    fan.maxAirFlowRate = 1.0;
+    fan.maxAirMassFlowRate = 1.0;
+    fan.minAirFlowRate = 0.0;
+    fan.inletAirMassFlowRate = 0.005;
+    fan.inletAirTemp = 20.0;
+    fan.inletAirHumRat = 0.008;
+    fan.inletAirEnthalpy = 40000.0;
+    fan.rhoAirStdInit = 1.0;
+    fan.deltaPress = 300.0;
+    fan.totalEff = 0.6;
+    fan.motorEff = 1.0;
+    fan.motorInAirFrac = 1.0;
+    fan.nightVentPerfNum = 1;
+    fan.coeffs = {0.25, 0.0, 0.0, 0.0, 0.0};
+
+    fan.simulateVAV(*state);
+
+    EXPECT_DOUBLE_EQ(0.005, fan.outletAirMassFlowRate);
+    EXPECT_NEAR(10.0, fan.totalPower, 0.0001);
 }

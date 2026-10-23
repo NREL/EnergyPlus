@@ -431,6 +431,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with F, insert the rules here
 
+                CASE('FANPERFORMANCE:NIGHTVENTILATION')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4:CurArgs - 1)=InArgs(5:CurArgs)
+                  CurArgs = CurArgs - 1
+                  nodiff=.false.
+
               ! If your original object starts with G, insert the rules here
 
               ! If your original object starts with H, insert the rules here
