@@ -1681,13 +1681,19 @@ void FanComponent::simulateConstant(EnergyPlusData &state)
         auto &fault = state.dataFaultsMgr->FaultsFouledAirFilters(faultyFilterIndex);
         // Check fault availability schedules
         if (fault.availSched->getCurrentVal() > 0.0) {
+            Real64 const _faultBasePressure = _deltaPress;
             // Decrease of the Fan Design Volume Flow Rate [m3/sec]
             Real64 _fanDesignFlowRateDec = CalFaultyFanAirFlowReduction(
-                state, Name, maxAirFlowRate, deltaPress, (fault.pressFracSched->getCurrentVal() - 1) * deltaPress, fault.fanCurveNum);
+                state,
+                Name,
+                maxAirFlowRate,
+                _faultBasePressure,
+                (fault.pressFracSched->getCurrentVal() - 1) * _faultBasePressure,
+                fault.fanCurveNum);
 
             // Update MassFlow & DeltaPress of the fan
             _massFlow = min(_massFlow, maxAirMassFlowRate - _fanDesignFlowRateDec * _rhoAir);
-            _deltaPress = fault.pressFracSched->getCurrentVal() * deltaPress;
+            _deltaPress = fault.pressFracSched->getCurrentVal() * _faultBasePressure;
         }
     }
 
@@ -1798,14 +1804,20 @@ void FanComponent::simulateVAV(EnergyPlusData &state, ObjexxFCL::Optional<Real64
         auto &fault = state.dataFaultsMgr->FaultsFouledAirFilters(faultyFilterIndex);
         // Check fault availability schedules
         if (fault.availSched->getCurrentVal() > 0.0) {
+            Real64 const _faultBasePressure = _deltaPress;
             Real64 _fanDesignFlowRateDec = // Decrease of the Fan Design Volume Flow Rate [m3/sec]
                 CalFaultyFanAirFlowReduction(
-                    state, Name, maxAirFlowRate, deltaPress, (fault.pressFracSched->getCurrentVal() - 1) * deltaPress, fault.fanCurveNum);
+                    state,
+                    Name,
+                    maxAirFlowRate,
+                    _faultBasePressure,
+                    (fault.pressFracSched->getCurrentVal() - 1) * _faultBasePressure,
+                    fault.fanCurveNum);
 
             // Update MassFlow & DeltaPress of the fan
             _maxAirFlowRate = maxAirFlowRate - _fanDesignFlowRateDec;
             _maxAirMassFlowRate = maxAirMassFlowRate - _fanDesignFlowRateDec * _rhoAir;
-            _deltaPress = fault.pressFracSched->getCurrentVal() * deltaPress;
+            _deltaPress = fault.pressFracSched->getCurrentVal() * _faultBasePressure;
         }
     }
 
@@ -1953,13 +1965,19 @@ void FanComponent::simulateOnOff(EnergyPlusData &state, ObjexxFCL::Optional<Real
 
         // Check fault availability schedules
         if (fault.availSched->getCurrentVal() > 0.0) {
+            Real64 const _faultBasePressure = _deltaPress;
             Real64 _fanDesignFlowRateDec = // Decrease of the Fan Design Volume Flow Rate [m3/sec]
                 CalFaultyFanAirFlowReduction(
-                    state, Name, maxAirFlowRate, deltaPress, (fault.pressFracSched->getCurrentVal() - 1) * deltaPress, fault.fanCurveNum);
+                    state,
+                    Name,
+                    maxAirFlowRate,
+                    _faultBasePressure,
+                    (fault.pressFracSched->getCurrentVal() - 1) * _faultBasePressure,
+                    fault.fanCurveNum);
 
             // Update MassFlow & DeltaPress of the fan
             _maxAirMassFlowRate = maxAirMassFlowRate - _fanDesignFlowRateDec * _rhoAir;
-            _deltaPress = fault.pressFracSched->getCurrentVal() * deltaPress;
+            _deltaPress = fault.pressFracSched->getCurrentVal() * _faultBasePressure;
         }
     }
 

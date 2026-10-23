@@ -3583,10 +3583,13 @@ bool getZoneEquipmentNightVentStatus(EnergyPlusData &state,
         }
     } else if (zoneCompNum > 0 && validSAMComp) {
         auto const &componentAvailability = state.dataAvail->ZoneComp((int)zoneEquipType).ZoneCompAvailMgrs(zoneCompNum);
+        if (componentAvailability.availStatus != Avail::Status::CycleOn) {
+            return false;
+        }
         for (int managerNum = 1; managerNum <= componentAvailability.NumAvailManagers; ++managerNum) {
             auto const &manager = componentAvailability.availManagers(managerNum);
             if (manager.type == Avail::ManagerType::NightVent) {
-                if (manager.Num > 0 && state.dataAvail->NightVentData(manager.Num).availStatus == Avail::Status::CycleOn) {
+                if (manager.availStatus == Avail::Status::CycleOn) {
                     zoneNightVentOn = true;
                     break;
                 }
