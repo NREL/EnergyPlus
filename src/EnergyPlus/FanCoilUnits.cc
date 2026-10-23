@@ -1926,9 +1926,9 @@ namespace FanCoilUnits {
                 zoneEqSizing.HeatingAirFlow = true;
                 zoneEqSizing.HeatingAirVolFlow = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
             }
-            // when DesignSizeFromParent is set, sizing will use MaxAirVolFlow in CoolingAirFlowSizing and HeatingAirFlowSizing
+            // when DesignSizeFromParent is set, sizing will use AirVolFlow in CoolingAirFlowSizing and HeatingAirFlowSizing
             // if CoolingAirFlow and HeatingAirFlow are also set (as above), then sizing will use the CoolingAirVolFlow and HeatingAirVolFlow values
-            // instead of MaxAirVolFlow
+            // instead of AirVolFlow
             zoneEqSizing.DesignSizeFromParent = true;
             zoneEqSizing.AirVolFlow = fanCoil.MaxAirVolFlow;
         }
