@@ -1766,6 +1766,7 @@ void FanComponent::simulateVAV(EnergyPlusData &state, ObjexxFCL::Optional<Real64
     Real64 _motorInAirFrac;
     Real64 _motorEff;
     Real64 _partLoadFrac;
+    bool const nightVentMode = state.dataHVACGlobal->NightVentOn && nightVentPerfNum > 0;
 
     // Simple Variable Volume Fan - default values from DOE-2
     // Type of Fan          Coeff1       Coeff2       Coeff3        Coeff4      Coeff5
@@ -1773,7 +1774,7 @@ void FanComponent::simulateVAV(EnergyPlusData &state, ObjexxFCL::Optional<Real64
     // DISCHARGE DAMPERS    0.37073425   0.97250253   -0.34240761   0.000       0.000
     // VARIABLE SPEED MOTOR 0.0015302446 0.0052080574  1.1086242   -0.11635563  0.000
 
-    if (state.dataHVACGlobal->NightVentOn && nightVentPerfNum > 0) {
+    if (nightVentMode) {
         auto const &nightVentPerf = state.dataFans->NightVentPerf(nightVentPerfNum);
         _deltaPress = nightVentPerf.DeltaPress;
         _totalEff = nightVentPerf.FanEff;
@@ -1848,7 +1849,7 @@ void FanComponent::simulateVAV(EnergyPlusData &state, ObjexxFCL::Optional<Real64
         // Calculate the part Load Fraction             (PH 7/13/03)
 
         Real64 _flowFracForPower = max(_minFlowFrac, min(_flowFracActual, 1.0)); // limit flow fraction to allowed range
-        if (state.dataHVACGlobal->NightVentOn && nightVentPerfNum > 0) {
+        if (nightVentMode) {
             _partLoadFrac = 1.0;
         } else {
             _partLoadFrac = coeffs[0] + coeffs[1] * _flowFracForPower + coeffs[2] * pow_2(_flowFracForPower) + coeffs[3] * pow_3(_flowFracForPower) +
@@ -1879,13 +1880,15 @@ void FanComponent::simulateVAV(EnergyPlusData &state, ObjexxFCL::Optional<Real64
             Real64 _partLoadFracatLowMin;
             Real64 _minFlowFracLimitFanHeat = 0.10;
             if (_flowFracForPower < _minFlowFracLimitFanHeat) {
-                _partLoadFracatLowMin = coeffs[0] + coeffs[1] * _minFlowFracLimitFanHeat + coeffs[2] * pow_2(_minFlowFracLimitFanHeat) +
-                                        coeffs[3] * pow_3(_minFlowFracLimitFanHeat) + coeffs[4] * pow_4(_minFlowFracLimitFanHeat);
+                _partLoadFracatLowMin = nightVentMode ? 1.0
+                                                      : coeffs[0] + coeffs[1] * _minFlowFracLimitFanHeat + coeffs[2] * pow_2(_minFlowFracLimitFanHeat) +
+                                                            coeffs[3] * pow_3(_minFlowFracLimitFanHeat) + coeffs[4] * pow_4(_minFlowFracLimitFanHeat);
                 _fanPoweratLowMinimum = _partLoadFracatLowMin * _maxAirMassFlowRate * _deltaPress / (_totalEff * _rhoAir);
                 totalPower = max(0.0, _flowFracForPower * _fanPoweratLowMinimum / _minFlowFracLimitFanHeat);
             } else if (_flowFracActual < _minFlowFracLimitFanHeat) {
-                _partLoadFracatLowMin = coeffs[0] + coeffs[1] * _minFlowFracLimitFanHeat + coeffs[2] * pow_2(_minFlowFracLimitFanHeat) +
-                                        coeffs[3] * pow_3(_minFlowFracLimitFanHeat) + coeffs[4] * pow_4(_minFlowFracLimitFanHeat);
+                _partLoadFracatLowMin = nightVentMode ? 1.0
+                                                      : coeffs[0] + coeffs[1] * _minFlowFracLimitFanHeat + coeffs[2] * pow_2(_minFlowFracLimitFanHeat) +
+                                                            coeffs[3] * pow_3(_minFlowFracLimitFanHeat) + coeffs[4] * pow_4(_minFlowFracLimitFanHeat);
                 _fanPoweratLowMinimum = _partLoadFracatLowMin * _maxAirMassFlowRate * _deltaPress / (_totalEff * _rhoAir);
                 totalPower = max(0.0, _flowFracActual * _fanPoweratLowMinimum / _minFlowFracLimitFanHeat);
             }
