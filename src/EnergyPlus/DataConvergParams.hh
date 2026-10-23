@@ -94,9 +94,6 @@ namespace DataConvergParams {
 
     constexpr Real64 PlantEnergyToler(10.0); // Tolerance for Energy comparisons (in Watts W)
 
-    // Energy Tolerance Calculation, used to scale the answer for a more intuitive answer for comparison
-    constexpr Real64 PlantFlowFlowRateToler(0.01); // Tolerance for mass flow rate convergence (in kg/s)
-
     constexpr int ConvergLogStackDepth(10);
 
     enum class CalledFrom
