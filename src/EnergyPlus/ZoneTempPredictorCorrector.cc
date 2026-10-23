@@ -63,6 +63,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -461,6 +462,24 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     }
                 }
 
+                if (NumNums > 0) {
+                    if (s_ipsc->rNumericArgs(1) >= 0.0) {
+                        tempZone.DeltaTCutSet = s_ipsc->rNumericArgs(1);
+                        if (s_ipsc->rNumericArgs(1) > 0.0) {
+                            s_ztpc->NumOnOffCtrZone++;
+                        }
+                    } else {
+                        ShowSevereError(state,
+                                        std::format("{}=\"{} invalid {}=[{:.0f}].",
+                                                    s_ipsc->cCurrentModuleObject,
+                                                    s_ipsc->cAlphaArgs(1),
+                                                    s_ipsc->cNumericFieldNames(1),
+                                                    s_ipsc->rNumericArgs(1)));
+                        ShowContinueError(state, "..Allowable values must be greater or equal to 0");
+                        ErrorsFound = true;
+                    }
+                }
+
                 if (s_ipsc->lAlphaFieldBlanks(7)) {
                     NumAlphas = 5;
                 } else if (s_ipsc->lAlphaFieldBlanks(9)) {
@@ -490,24 +509,6 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
                     tempZone.setpts[(int)setptType].Name = s_ipsc->cAlphaArgs(2 * iSetpt + 3);
                     tempZone.setpts[(int)setptType].isUsed = true;
-                }
-
-                if (NumNums > 0) {
-                    if (s_ipsc->rNumericArgs(1) >= 0.0) {
-                        tempZone.DeltaTCutSet = s_ipsc->rNumericArgs(1);
-                        if (s_ipsc->rNumericArgs(1) > 0.0) {
-                            s_ztpc->NumOnOffCtrZone++;
-                        }
-                    } else {
-                        ShowSevereError(state,
-                                        std::format("{}=\"{} invalid {}=[{:.0f}].",
-                                                    s_ipsc->cCurrentModuleObject,
-                                                    s_ipsc->cAlphaArgs(1),
-                                                    s_ipsc->cNumericFieldNames(1),
-                                                    s_ipsc->rNumericArgs(1)));
-                        ShowContinueError(state, "..Allowable values must be greater or equal to 0");
-                        ErrorsFound = true;
-                    }
                 }
 
                 if (tempZone.DeltaTCutSet > 0.0 && !tempZone.setpts[(int)HVAC::SetptType::SingleHeatCool].Name.empty()) {
@@ -724,7 +725,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         int SchedMax = tempZone.setptTypeSched->getMaxVal(state);
 
         if (SchedMin == (int)HVAC::SetptType::Uncontrolled && SchedMax == (int)HVAC::SetptType::Uncontrolled) {
-            if (FindNumberInList(tempZone.setptTypeSched->Num, CTSchedMapToControlledZone, state.dataZoneCtrls->NumTempControlledZones) == 0) {
+            if (FindNumberInList(tempZone.setptTypeSched->Num, CTSchedMapToControlledZone) == 0) {
                 ShowSevereError(state, std::format("Control Type Schedule={}", tempZone.setptTypeSched->Name));
                 ShowContinueError(state, "..specifies control type 0 for all entries.");
                 ShowContinueError(state, "All zones using this Control Type Schedule have no heating or cooling available.");
@@ -1372,7 +1373,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         int SchedMax = comfortZone.setptTypeSched->getMaxVal(state);
 
         if (SchedMin == (int)HVAC::SetptType::Uncontrolled && SchedMax == (int)HVAC::SetptType::Uncontrolled) {
-            if (FindNumberInList(comfortZone.setptTypeSched->Num, CCmSchedMapToControlledZone, state.dataZoneCtrls->NumComfortControlledZones) == 0) {
+            if (FindNumberInList(comfortZone.setptTypeSched->Num, CCmSchedMapToControlledZone) == 0) {
                 ShowWarningError(state, std::format("Control Type Schedule={}", comfortZone.setptTypeSched->Name));
                 ShowContinueError(state, "..specifies control type 0 for all entries.");
                 ShowContinueError(state, "All zones using this Control Type Schedule have no thermal comfort control.");
@@ -4947,10 +4948,10 @@ void InverseModelTemperature(EnergyPlusData &state,
 
             Real64 FractionSensible = zone.ZonePeopleSensibleHeatFraction;
             Real64 FractionRadiation = zone.ZonePeopleRadiantHeatFraction;
-            Real64 ActivityLevel = (hmZone.peopleActivityLevelSched != nullptr) ? hmZone.peopleActivityLevelSched->getCurrentVal() : 0.0;
+            Real64 ActivityLevel = zone.ZonePeopleActivityLevel;
 
             if (FractionSensible <= 0.0) {
-                FractionSensible = 0.6;
+                FractionSensible = InternalHeatGains::peopleSensibleFracDefault;
             }
 
             if (FractionRadiation <= 0.0) {
@@ -4960,7 +4961,7 @@ void InverseModelTemperature(EnergyPlusData &state,
             }
 
             if (ActivityLevel <= 0.0) {
-                ActivityLevel = 130.0;
+                ActivityLevel = InternalHeatGains::peopleActivityLevelDefault;
             }
 
             if (hmZone.IncludeSystemSupplyParameters) {
@@ -5133,13 +5134,14 @@ void InverseModelHumidity(EnergyPlusData &state,
             zone.ZonePeopleRadiantHeatFraction = (hmZone.peopleRadiantFracSched != nullptr) ? hmZone.peopleRadiantFracSched->getCurrentVal() : 0.0;
 
             Real64 FractionSensible = zone.ZonePeopleSensibleHeatFraction;
+            ActivityLevel = zone.ZonePeopleActivityLevel;
 
             if (FractionSensible <= 0.0) {
-                FractionSensible = 0.6;
+                FractionSensible = InternalHeatGains::peopleSensibleFracDefault;
             }
 
             if (ActivityLevel <= 0.0) {
-                ActivityLevel = 130.0;
+                ActivityLevel = InternalHeatGains::peopleActivityLevelDefault;
             }
 
             // Conditionally calculate the humidity-dependent and humidity-independent
@@ -5679,17 +5681,14 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
             }
         }
     }
-    // now calculate air energy storage source term.
-    // capacitance is volume * density * heat capacity
-    Real64 CpAir = Psychrometrics::PsyCpAirFnW(thisHB->airHumRat);
-    Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisHB->MAT, thisHB->airHumRat);
-
+    // Calculate the air energy storage term using the same capacitance and time integration method as the zone air temperature solver.
     switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
     case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-        thisAirRpt.CzdTdt = RhoAir * CpAir * thisZone.Volume * thisZone.ZoneVolCapMultpSens * (thisHB->MAT - thisHB->ZTM[0]) / TimeStepSysSec;
-        // Exact solution
+        thisAirRpt.CzdTdt =
+            thisHB->AirPowerCap * ((11.0 / 6.0) * thisHB->MAT - 3.0 * thisHB->ZTM[0] + (3.0 / 2.0) * thisHB->ZTM[1] - (1.0 / 3.0) * thisHB->ZTM[2]);
     } break;
     case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
+        // Exact solution
         thisAirRpt.CzdTdt = thisHB->TempIndCoef - thisHB->TempDepCoef * thisHB->MAT;
     } break;
     case DataHeatBalance::SolutionAlgo::EulerMethod: {
@@ -5710,6 +5709,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
                                            pow_2(thisAirRpt.CzdTdt));
         if ((std::abs(thisAirRpt.imBalance) > Threshold) && (!state.dataGlobal->WarmupFlag) &&
             (!state.dataGlobal->DoingSizing)) { // air balance is out by more than threshold
+            ++state.dataErrTracking->ErrorSummaryCount[static_cast<size_t>(DataErrorTracking::ErrorSummaryType::ZoneAirHeatBalanceWarnings)];
             if (thisZone.AirHBimBalanceErrIndex == 0) {
                 ShowWarningMessage(state, std::format("Zone Air Heat Balance is out of balance for zone named {}", thisZone.Name));
                 ShowContinueError(state, std::format("Zone Air Heat Balance Deviation Rate is more than {:.1f} {{W}}", Threshold));
