@@ -53072,16 +53072,12 @@ FanPerformance:NightVentilation,
        \units Pa
        \ip-units inH2O
        \required-field
-  N3 , \field Maximum Flow Rate
-       \units m3/s
-       \minimum 0.0
-       \autosizable
-  N4 , \field Motor Efficiency
+  N3 , \field Motor Efficiency
        \type real
        \required-field
        \minimum> 0
        \maximum 1.0
-  N5 ; \field Motor in Airstream Fraction
+  N4 ; \field Motor in Airstream Fraction
        \type real
        \default 1.0
        \minimum 0.0
