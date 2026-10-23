@@ -69,6 +69,7 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -863,6 +864,9 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                     // thisErlVar.Value.String = ReturnValue.String;
                     thisErlVar.Value.Error = ReturnValue.Error;
                     thisErlVar.Value.initialized = ReturnValue.initialized;
+                    if (thisErlVar.IsActuator) {
+                        ++state.dataPluginManager->actuatorWriteCount;
+                    }
                 } else if (thisErlVar.Value.TrendVariable) {
                     thisErlVar.Value.Number = ReturnValue.Number;
                     thisErlVar.Value.Error = ReturnValue.Error;
