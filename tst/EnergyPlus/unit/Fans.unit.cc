@@ -57,7 +57,9 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataSizing;
@@ -332,4 +334,71 @@ TEST_F(EnergyPlusFixture, Fans_NightVentilationPerformanceAcrossFanTypes)
     EXPECT_DOUBLE_EQ(1.0, exhaustFan->outletAirMassFlowRate);
     EXPECT_DOUBLE_EQ(200.0, exhaustFan->totalPower);
     EXPECT_DOUBLE_EQ(125.0, exhaustFan->powerLossToAir);
+}
+
+TEST_F(EnergyPlusFixture, Fans_NightVentilationFouledFilterUsesNightPressure)
+{
+    state->init_state(*state);
+    state->dataEnvrn->StdRhoAir = 1.0;
+    state->dataHVACGlobal->NightVentOn = true;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataFans->NightVentPerf.allocate(1);
+    auto &nightVentPerf = state->dataFans->NightVentPerf(1);
+    nightVentPerf.DeltaPress = 500.0;
+    nightVentPerf.FanEff = 0.5;
+    nightVentPerf.MotEff = 0.9;
+    nightVentPerf.MotInAirFrac = 1.0;
+
+    auto *fanCurve = Curve::AddCurve(*state, "Night Pressure Fan Curve");
+    fanCurve->curveType = Curve::CurveType::Quadratic;
+    fanCurve->coeff[0] = 1000.0;
+    fanCurve->coeff[1] = -500.0;
+    fanCurve->inputLimits[0].min = 0.0;
+    fanCurve->inputLimits[0].max = 1.0;
+
+    Sched::ScheduleConstant faultAvailableSchedule;
+    faultAvailableSchedule.currentVal = 1.0;
+    Sched::ScheduleConstant pressureFractionSchedule;
+    pressureFractionSchedule.currentVal = 1.1;
+    state->dataFaultsMgr->FaultsFouledAirFilters.allocate(1);
+    auto &fault = state->dataFaultsMgr->FaultsFouledAirFilters(1);
+    fault.availSched = &faultAvailableSchedule;
+    fault.pressFracSched = &pressureFractionSchedule;
+    fault.fanCurveNum = fanCurve->Num;
+
+    for (HVAC::FanType const fanType : {HVAC::FanType::Constant, HVAC::FanType::VAV, HVAC::FanType::OnOff}) {
+        Fans::FanComponent fan;
+        fan.Name = "Night Vent Fan";
+        fan.type = fanType;
+        fan.availSched = Sched::GetScheduleAlwaysOff(*state);
+        fan.maxAirFlowRate = 1.0;
+        fan.maxAirMassFlowRate = 1.0;
+        fan.inletAirMassFlowRate = 1.0;
+        fan.rhoAirStdInit = 1.0;
+        fan.deltaPress = 300.0;
+        fan.totalEff = 0.6;
+        fan.motorEff = 0.9;
+        fan.motorInAirFrac = 1.0;
+        fan.nightVentPerfNum = 1;
+        fan.faultyFilterFlag = true;
+        fan.faultyFilterIndex = 1;
+
+        switch (fanType) {
+        case HVAC::FanType::Constant:
+            fan.simulateConstant(*state);
+            break;
+        case HVAC::FanType::VAV:
+            fan.simulateVAV(*state);
+            break;
+        case HVAC::FanType::OnOff:
+            fan.simulateOnOff(*state);
+            break;
+        default:
+            FAIL() << "Unexpected fan type in night fouled-filter test";
+        }
+
+        EXPECT_NEAR(0.9, fan.outletAirMassFlowRate, 0.005);
+        EXPECT_NEAR(fan.outletAirMassFlowRate * 550.0 / 0.5, fan.totalPower, 0.01);
+    }
 }

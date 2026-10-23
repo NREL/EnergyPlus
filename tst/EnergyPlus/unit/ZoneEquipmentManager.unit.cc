@@ -6048,7 +6048,7 @@ void runZoneFanNightVentTest(EnergyPlus::EnergyPlusData &state)
     zoneEquipList1.EquipIndex(1) = 1;
     zoneEquipList2.EquipIndex(1) = 2;
 
-    // Bind each component to its zone-specific NightVentilation manager.
+    // Bind both components to the same NightVentilation manager number; their evaluated statuses must remain component-specific.
     auto &unitHeaterAvailability = state.dataAvail->ZoneComp((int)DataZoneEquipment::ZoneEquipType::UnitHeater);
     ASSERT_EQ(unitHeaterAvailability.TotalNumComp, 2);
     for (int zoneNum = 1; zoneNum <= 2; ++zoneNum) {
@@ -6058,9 +6058,10 @@ void runZoneFanNightVentTest(EnergyPlus::EnergyPlusData &state)
         componentAvailability.Input = false;
         componentAvailability.NumAvailManagers = 1;
         componentAvailability.availManagers.allocate(1);
-        componentAvailability.availManagers(1).Name = "Zone " + std::to_string(zoneNum) + " Night Ventilation";
+        componentAvailability.availManagers(1).Name = "Shared Night Ventilation";
         componentAvailability.availManagers(1).type = Avail::ManagerType::NightVent;
-        componentAvailability.availManagers(1).Num = zoneNum;
+        componentAvailability.availManagers(1).Num = 1;
+        componentAvailability.availManagers(1).availStatus = Avail::Status::NoAction;
     }
 
     // Allocate the minimal zone demand and simulation-order state required by SimZoneEquipment.
@@ -6092,8 +6093,18 @@ void runZoneFanNightVentTest(EnergyPlus::EnergyPlusData &state)
         auto &componentAvailability = unitHeaterAvailability.ZoneCompAvailMgrs(zoneNum);
         componentAvailability.availStatus = zoneNum == 1 ? Avail::Status::CycleOn : Avail::Status::NoAction;
         int const managerNum = componentAvailability.availManagers(1).Num;
+        componentAvailability.availManagers(1).availStatus = componentAvailability.availStatus;
         state.dataAvail->NightVentData(managerNum).availStatus = componentAvailability.availStatus;
     }
+    EXPECT_EQ(state.dataAvail->NightVentData(1).availStatus, Avail::Status::NoAction);
+    EXPECT_EQ(unitHeaterAvailability.ZoneCompAvailMgrs(1).availManagers(1).availStatus, Avail::Status::CycleOn);
+    auto &zone2AvailabilityForForceOff = unitHeaterAvailability.ZoneCompAvailMgrs(2);
+    zone2AvailabilityForForceOff.availStatus = Avail::Status::ForceOff;
+    zone2AvailabilityForForceOff.availManagers(1).availStatus = Avail::Status::CycleOn;
+    EXPECT_FALSE(ZoneEquipmentManager::getZoneEquipmentNightVentStatus(
+        state, DataZoneEquipment::ZoneEquipType::UnitHeater, 2, true));
+    zone2AvailabilityForForceOff.availStatus = Avail::Status::NoAction;
+    zone2AvailabilityForForceOff.availManagers(1).availStatus = Avail::Status::NoAction;
 
     int const fan1Num = Fans::GetFanIndex(state, "ZONE 1 FAN");
     int const fan2Num = Fans::GetFanIndex(state, "ZONE 2 FAN");
