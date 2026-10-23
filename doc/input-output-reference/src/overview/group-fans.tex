@@ -833,10 +833,6 @@ This value is the overall efficiency of the fan, i.e., the ratio of the power de
 
 The pressure rise in Pascals at full flow and standard (sea level) conditions (\SI{20}{\celsius} and 101325 Pa). This is a required field with no default.
 
-\paragraph{Field: Maximum Flow Rate}\label{field-maximum-flow-rate-4}
-
-The design volumetric flow rate of the fan (m\(^{3}\)/sec) at standard conditions. This input is not currently used by the night ventilation manager. The flow rate during night ventilation is specified using the \hyperref[availabilitymanagernightventilation]{AvailabilityManager:NightVentilation} ``Night Venting Flow Fraction'' field. This fraction is multiplied by the fan object's design flow rate.
-
 \paragraph{Field: Motor Efficiency}\label{field-motor-efficiency-3}
 
 The shaft power divided by the electrical power consumed. Must be between 0 and 1. This is a required field with no default.
@@ -871,7 +867,6 @@ FanPerformance:NightVentilation,
   Supply Fan 1,               !- Fan Name
   0.7,                        !- Fan Total Efficiency
   67.0,                       !- Pressure Rise {Pa}
-  autosize,                   !- Maximum Flow Rate {m3/s}
   0.9,                        !- Motor Efficiency
   1.0;                        !- Motor in Airstream Fraction
 \end{lstlisting}
