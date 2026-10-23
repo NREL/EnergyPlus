@@ -320,8 +320,6 @@ namespace Fans {
         std::string FanName;             // Name of the fan that will use this data
         Real64 FanEff = 0.0;             // Fan total efficiency; motor and mechanical
         Real64 DeltaPress = 0.0;         // Delta Pressure Across the Fan [N/m2]
-        Real64 MaxAirFlowRate = 0.0;     // Max Specified Volume Flow Rate of Fan [m3/s]
-        Real64 MaxAirMassFlowRate = 0.0; // Max flow rate of fan in kg/sec
         Real64 MotEff = 0.0;             // Fan motor efficiency
         Real64 MotInAirFrac = 0.0;       // Fraction of motor heat entering air stream
     };
